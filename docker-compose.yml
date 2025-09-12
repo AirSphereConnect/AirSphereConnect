@@ -1,0 +1,65 @@
+services:
+  # ==============================
+  # BASE DE DONNÉES MARIADB
+  # ==============================
+  mariadb:
+    image: mariadb:12.0.2
+    container_name: air-sphere-connect_db
+    restart: unless-stopped
+    
+    # Variables d'environnement
+    environment:
+        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+        MYSQL_DATABASE: ${DB_NAME}
+        MYSQL_USER: ${DB_USER}
+        MYSQL_PASSWORD: ${DB_PASSWORD}
+        MYSQL_CHARSET: utf8mb4
+        MYSQL_COLLATION: utf8mb4_unicode_ci
+    
+    ports:
+      - "${DB_PORT:-3306}:3306"
+    
+    volumes:
+      - mariadb_data:/var/lib/mysql
+      # ./config/database/init.sql : structure de la base, /docker-entrypoint-initdb.d/01-init.sql : dossier spécial que MariaDB Docker utilise pour l’initialisation
+      - ./config/database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+
+    networks:
+      - air-sphere-connect-network
+    
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword123}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+    
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 1G
+#          cpus: '0.5'
+#        reservations:
+#          memory: 512M
+#          cpus: '0.25'
+
+
+
+# ==============================
+# VOLUMES NOMMÉS
+# ==============================
+volumes:
+  mariadb_data:
+    name: air-sphere-connect_db_data
+    driver: local
+
+
+# ==============================
+# RÉSEAUX
+# ==============================
+networks:
+  air-sphere-connect-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16

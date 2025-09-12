@@ -1,0 +1,26 @@
+# Environment variables
+.env
+
+# Docker
+*.log
+docker-compose.override.yml
+
+# IDE
+.vscode/
+.idea/
+*.iml
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Dependencies (quand on les ajoutera)
+node_modules/
+target/
+
+# Build outputs (quand on les ajoutera)
+dist/
+build/
+
+air-sphere-connect-back/*
+air-sphere-connect-front/*
