@@ -22,5 +22,3 @@ target/
 dist/
 build/
 
-air-sphere-connect-back/*
-air-sphere-connect-front/*

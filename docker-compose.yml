@@ -3,63 +3,120 @@ services:
   # BASE DE DONNÉES MARIADB
   # ==============================
   mariadb:
-    image: mariadb:12.0.2
-    container_name: air-sphere-connect_db
+    image: mariadb:${MARIADB_VERSION:-11.2}
+    container_name: ${DB_CONTAINER_NAME:-airsphere_db}
     restart: unless-stopped
-    
-    # Variables d'environnement
+
     environment:
-        MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
-        MYSQL_DATABASE: ${DB_NAME}
-        MYSQL_USER: ${DB_USER}
-        MYSQL_PASSWORD: ${DB_PASSWORD}
-        MYSQL_CHARSET: utf8mb4
-        MYSQL_COLLATION: utf8mb4_unicode_ci
-    
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_CHARSET: ${DB_CHARSET:-utf8mb4}
+      MYSQL_COLLATION: ${DB_COLLATION:-utf8mb4_unicode_ci}
+
     ports:
       - "${DB_PORT:-3306}:3306"
-    
+
     volumes:
       - mariadb_data:/var/lib/mysql
-      # ./config/database/init.sql : structure de la base, /docker-entrypoint-initdb.d/01-init.sql : dossier spécial que MariaDB Docker utilise pour l’initialisation
       - ./config/database/init.sql:/docker-entrypoint-initdb.d/01-init.sql
 
     networks:
       - air-sphere-connect-network
-    
+
+    # ✅ Health check corrigé pour MariaDB
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD:-rootpassword123}"]
+      test: [ "CMD", "mariadb", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}", "-e", "SELECT 1" ]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+      start_period: ${HEALTHCHECK_START_PERIOD}
+
+  # ==============================
+  # BACKEND SPRING BOOT
+  # ==============================
+  backend:
+    build:
+      context: ${BACKEND_CONTEXT:-./airsphere-backend}
+      dockerfile: ${BACKEND_DOCKERFILE:-Dockerfile}
+    container_name: ${BACKEND_CONTAINER_NAME:-airsphere_backend}
+    restart: unless-stopped
+
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-docker}
+      DB_HOST: mariadb
+      DB_PORT: 3306
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JPA_DDL_AUTO: ${JPA_DDL_AUTO:-update}
+      JPA_SHOW_SQL: ${JPA_SHOW_SQL:-true}
+      CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:4200}
+
+    ports:
+      - "${BACKEND_PORT:-8080}:8080"
+      - "${DEBUG_PORT:-5005}:5005"
+
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+    networks:
+      - ${NETWORK_NAME:-air-sphere-connect-network}
+
+    # ✅ Health check backend (nécessite curl dans Dockerfile)
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 5
-      start_period: 30s
-    
-#    deploy:
-#      resources:
-#        limits:
-#          memory: 1G
-#          cpus: '0.5'
-#        reservations:
-#          memory: 512M
-#          cpus: '0.25'
+      start_period: 60s
 
+  # ==============================
+  # FRONTEND ANGULAR
+  # ==============================
+  frontend:
+    build:
+      context: ${FRONTEND_CONTEXT:-./airsphere-frontend}
+      dockerfile: ${FRONTEND_DOCKERFILE:-Dockerfile}
+    container_name: ${FRONTEND_CONTAINER_NAME:-airsphere_frontend}
+    restart: unless-stopped
 
+    environment:
+      API_URL: ${API_URL:-http://localhost:8080}
+      # ✅ Pour l'apprentissage, development est plus pratique
+      NODE_ENV: ${NODE_ENV:-development}
+
+    ports:
+      - "${FRONTEND_PORT:-4200}:4200"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      - ${NETWORK_NAME:-air-sphere-connect-network}
+
+    # ✅ Health check avec curl (cohérent avec backend)
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4200 || exit 1"]
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: 3
 
 # ==============================
-# VOLUMES NOMMÉS
+# VOLUMES
 # ==============================
 volumes:
   mariadb_data:
-    name: air-sphere-connect_db_data
+    name: ${DB_VOLUME_NAME:-airsphere_db_data}
     driver: local
 
-
 # ==============================
-# RÉSEAUX
+# NETWORKS
 # ==============================
 networks:
   air-sphere-connect-network:
+    name: ${NETWORK_NAME:-air-sphere-connect-network}
     driver: bridge
-    ipam:
-      config:
-        - subnet: 172.20.0.0/16

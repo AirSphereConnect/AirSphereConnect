@@ -1,0 +1,39 @@
+# Profil Docker
+spring:
+  datasource:
+    url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${DB_NAME:air-sphere-connect}
+    username: ${DB_USER:air-sphere-connect_user}
+    password: ${DB_PASSWORD:userpassword123}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  docker:
+    compose:
+      enabled: false
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO:update}
+    show-sql: ${JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+  # Configuration sécurité pour health check
+  security:
+    web:
+      ignoring:
+        - "/actuator/**"
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always
+
+# CORS
+cors:
+  allowed-origins: ${CORS_ORIGINS:http://localhost:4200}
