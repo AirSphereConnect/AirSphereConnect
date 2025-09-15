@@ -1,34 +1,36 @@
 #!/bin/bash
-echo "Restart Air Sphere Connect!"
 
-# Create .env if not exists
-if [ ! -f .env ]; then
-echo "Creating .env file"
-cp .env.example .env
-fi
+# 🚀 Script de démarrage AirSphere Connect
+# Usage: ./start.sh
 
-# Stop the existing services
-echo "Stopping old services"
+echo "🚀 Démarrage d'AirSphere Connect..."
+
+# Arrêter les services existants (au cas où)
+echo "🛑 Arrêt des services existants..."
 docker-compose down
 
-# Build and start complete
-echo "Build and start services"
-docker-compose up -d --build
+# Démarrer tous les services
+echo "🐳 Démarrage des services Docker..."
+docker-compose up -d
 
-# Wait for everything to be ready
-echo "Waiting for services"
-sleep 90
+# Attendre un peu que tout démarre
+echo "⏳ Attente du démarrage (30 secondes)..."
+sleep 30
 
-# Check status
-echo "🔍 Checking services"
+# Afficher le statut
+echo "📊 Statut des services :"
 docker-compose ps
 
 echo ""
-echo "AirSphere Connect started!"
-echo "Frontend: http://localhost:4200"
-echo "Backend: http://localhost:8080"
-echo "Base: localhost:3306"
+echo "✅ AirSphere Connect démarré !"
 echo ""
-echo "Useful commands:"
-echo "Logs: docker-compose logs -f [service]"
-echo "Stop: ./scripts/stop.sh"
+echo "🔗 URLs disponibles :"
+echo "   📊 Base de données : localhost:3306"
+echo "   🌐 Backend API : http://localhost:8080"
+echo "   🎨 Frontend : http://localhost:4200"
+echo "   🔧 Adminer (DB) : http://localhost:8081"
+echo ""
+echo "💡 Commandes utiles :"
+echo "   Logs : docker-compose logs -f"
+echo "   Arrêt : docker-compose down"
+echo "   Base : docker-compose exec database mysql -u airsphere_user -p"
