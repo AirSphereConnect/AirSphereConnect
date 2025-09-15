@@ -1,4 +1,4 @@
-package com.airsphereconnectback;
+package com.airSphereConnect;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
