@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-thread-list',
+  selector: 'app-thread-detail',
   imports: [],
-  templateUrl: './thread-list.html',
-  styleUrls: ['./thread-list.scss']
+  templateUrl: './thread-detail.html',
+  styleUrls: ['./thread-detail.scss']
 })
 export class ThreadDetail {
 
