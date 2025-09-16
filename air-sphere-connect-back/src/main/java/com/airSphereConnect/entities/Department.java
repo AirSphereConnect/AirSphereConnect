@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import com.airSphereConnect.entities.Region;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Entity
 @Table(name = "departments")
@@ -12,13 +13,17 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name= "name", nullable = false)
     private String name;
+
+    @Column(name= "code", nullable = false)
     private String code;
 
     @ManyToOne
     @JoinColumn(name="region_id", nullable = false)
     private Region region;
 
+    @Column(name= "created_at", nullable = false)
     private LocalDateTime createdAt;
 
     public Department() {}
@@ -68,5 +73,28 @@ public class Department {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        Department that = (Department) o;
+        return Objects.equals(id, that.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "Department{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", code='" + code + '\'' +
+                ", region=" + region +
+                ", createdAt=" + createdAt +
+                '}';
     }
 }
