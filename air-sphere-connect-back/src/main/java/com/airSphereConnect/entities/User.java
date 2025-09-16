@@ -1,10 +1,8 @@
 package com.airSphereConnect.entities;
 
 import com.airSphereConnect.entities.enums.UserRole;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import javax.management.Notification;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -34,43 +32,34 @@ public class User {
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", nullable = false)
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at", nullable = false,  updatable = false)
+    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<Favorite> favorites = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinTable(
             name = "user_notifications",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "notification_id")
     )
-    @JsonIgnore
     private List<Notification> notifications = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<ForumRubric> forumRubrics = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<ForumThread> forumThreads = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<ForumPost> forumPosts = new ArrayList<>();
-
-
-
 
 
     protected User() {}
@@ -82,7 +71,6 @@ public class User {
         this.role = role;
 
     }
-
 
 
     public Long getId() {
@@ -141,6 +129,61 @@ public class User {
         this.updatedAt = updatedAt;
     }
 
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public List<Address> getAddresses() {
+        return addresses;
+    }
+
+    public void setAddresses(List<Address> addresses) {
+        this.addresses = addresses;
+    }
+
+    public List<Favorite> getFavorites() {
+        return favorites;
+    }
+
+    public void setFavorites(List<Favorite> favorites) {
+        this.favorites = favorites;
+    }
+
+    public List<Notification> getNotifications() {
+        return notifications;
+    }
+
+    public void setNotifications(List<Notification> notifications) {
+        this.notifications = notifications;
+    }
+
+    public List<ForumRubric> getForumRubrics() {
+        return forumRubrics;
+    }
+
+    public void setForumRubrics(List<ForumRubric> forumRubrics) {
+        this.forumRubrics = forumRubrics;
+    }
+
+    public List<ForumThread> getForumThreads() {
+        return forumThreads;
+    }
+
+    public void setForumThreads(List<ForumThread> forumThreads) {
+        this.forumThreads = forumThreads;
+    }
+
+    public List<ForumPost> getForumPosts() {
+        return forumPosts;
+    }
+
+    public void setForumPosts(List<ForumPost> forumPosts) {
+        this.forumPosts = forumPosts;
+    }
 
     @Override
     public boolean equals(Object o) {
