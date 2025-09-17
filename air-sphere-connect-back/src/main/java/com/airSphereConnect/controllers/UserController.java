@@ -1,12 +1,11 @@
 package com.airSphereConnect.controllers;
 
 import com.airSphereConnect.entities.User;
-import com.airSphereConnect.services.implementations.UserService;
+import com.airSphereConnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,21 +21,18 @@ public class UserController {
         return userService.getAllUsers();
     }
 
-    @GetMapping("?name={username}")
-    public User getUserByUsername(@PathVariable String username) {
-        return userService.getUserByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+    @GetMapping("/name")
+    public User getUserByUsername(@RequestParam String username) {
+        return userService.getUserByUsername(username);
     }
 
     @PostMapping
-    //Ajouter @Valid losrque spring sécurity est acctivé
     public ResponseEntity<User> createUser(@RequestBody User user) {
         User created = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    //Ajouter @Valid losrque spring sécurity est acctivé
     public User updateUser(@PathVariable Long id, @RequestBody User user) {
         return userService.updateUser(id, user);
     }
@@ -47,4 +43,3 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 }
-
