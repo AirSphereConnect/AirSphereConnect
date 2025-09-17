@@ -1,7 +1,7 @@
 package com.airSphereConnect.services.implementations;
 
 import com.airSphereConnect.entities.User;
-import com.airSphereConnect.exceptions.UserNotFoundException;
+import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,13 +23,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec le username : " + username));
+                .orElseThrow(() -> new GlobalException.UserNotFoundException("Utilisateur non trouvé avec le username : " + username));
     }
 
     @Override
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new UserNotFoundException("Utilisateur non trouvé avec l'id : " + id));
+                .orElseThrow(() -> new GlobalException.UserNotFoundException("Utilisateur non trouvé avec l'id : " + id));
     }
 
     @Override

@@ -69,14 +69,13 @@ public class User {
     private List<PostReaction> postReactions = new ArrayList<>();
 
 
-    protected User() {}
+    public User() {}
 
     public User(String username, String email, String password, UserRole role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
-
     }
 
 
@@ -206,6 +205,10 @@ public class User {
 
     @Override
     public String toString() {
-        return "User{}";
+        return "User{" +
+                "id='" + id + '\'' +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                '}';
     }
 }

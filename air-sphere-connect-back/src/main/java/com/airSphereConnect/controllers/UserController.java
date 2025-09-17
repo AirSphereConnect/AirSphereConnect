@@ -1,6 +1,8 @@
 package com.airSphereConnect.controllers;
 
+import com.airSphereConnect.dtos.request.UserRequestDto;
 import com.airSphereConnect.entities.User;
+import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -10,19 +12,27 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
-    @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public UserController(UserService userService) {
+        this.userService = userService;
     }
 
-    @GetMapping("/name")
+    @GetMapping("/users")
+    public List<UserRequestDto> getAllUsers() {
+        return userService.getAllUsers()
+                .stream()
+                .map(UserMapper::toDto)
+                .toList();
+    }
+
+    @GetMapping("/users/name")
     public User getUserByUsername(@RequestParam String username) {
+
         return userService.getUserByUsername(username);
     }
 
