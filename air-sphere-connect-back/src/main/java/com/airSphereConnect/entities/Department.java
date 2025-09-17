@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import com.airSphereConnect.entities.Region;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -23,8 +24,8 @@ public class Department {
     @JoinColumn(name="region_id", nullable = false)
     private Region region;
 
-    @Column(name= "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "department")
+    private List<City> cities;
 
     public Department() {}
 
@@ -32,7 +33,6 @@ public class Department {
         this.name = name;
         this.code = code;
         this.region = region;
-        this.createdAt = createdAt;
     }
 
     public Long getId() {

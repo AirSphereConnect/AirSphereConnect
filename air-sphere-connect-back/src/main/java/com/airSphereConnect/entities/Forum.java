@@ -1,10 +1,7 @@
 package com.airSphereConnect.entities;
 
-import com.airSphereConnect.entities.enums.UserRole;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -22,9 +19,6 @@ public class Forum {
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private UserRole role = UserRole.USER;
 
     @OneToMany(mappedBy = "forum", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ForumRubric> forumRubrics = new ArrayList<>();
@@ -33,10 +27,9 @@ public class Forum {
     public Forum() {
     }
 
-    public Forum(String title, String description, UserRole role, List<ForumRubric> forumRubrics) {
+    public Forum(String title, String description, List<ForumRubric> forumRubrics) {
         this.title = title;
         this.description = description;
-        this.role = role;
         this.forumRubrics = forumRubrics;
     }
 
@@ -62,14 +55,6 @@ public class Forum {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public UserRole getRole() {
-        return role;
-    }
-
-    public void setRole(UserRole role) {
-        this.role = role;
     }
 
     public List<ForumRubric> getForumRubrics() {
