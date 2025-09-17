@@ -39,6 +39,4 @@ public class DepartmentController {
     public DepartmentRequestDto getDepartmentByCode(@PathVariable String code) {
         return DepartmentMapper.toDto(departmentService.getDepartmentByCode(code));
     }
-
-
 }

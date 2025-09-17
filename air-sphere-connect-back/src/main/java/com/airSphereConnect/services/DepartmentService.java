@@ -12,5 +12,7 @@ public interface DepartmentService {
 
     Department getDepartmentByCode(String code);
 
+    Department getDepartmentById(Long id);
+
     Department getDepartmentByName(String name);
 }
