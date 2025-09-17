@@ -8,8 +8,9 @@ COPY pom.xml .
 COPY .mvn .mvn
 COPY mvnw .
 
-# Rendre le script exécutable
-RUN chmod +x ./mvnw
+
+# Rendre mvnw exécutable et corriger CRLF → LF
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
 
 # Télécharger les dépendances (cache Docker)
 RUN ./mvnw dependency:go-offline -B
@@ -18,7 +19,8 @@ RUN ./mvnw dependency:go-offline -B
 COPY src src
 
 # Build de l'application
-RUN ./mvnw clean package -DskipTests
+RUN ./mvnw clean package -DskipTests -e -X
+
 
 # Production stage
 FROM eclipse-temurin:21-jre-alpine
