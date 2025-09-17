@@ -26,7 +26,7 @@ public class WeatherMeasurement {
     @Column(name = "wind_speed")
     private Double windSpeed;
 
-    @Column(name = "windDirection", length = 50)
+    @Column(name = "wind_direction", length = 50)
     private String windDirection;
 
     @Column(name = "message", length = 50)
@@ -57,7 +57,7 @@ public class WeatherMeasurement {
         this.pressure = pressure;
         this.windSpeed = windSpeed;
         this.windDirection = windDirection;
-        this.message = WeatherMeasurement.this.message;
+        this.message = message;
         this.source = source;
     }
 

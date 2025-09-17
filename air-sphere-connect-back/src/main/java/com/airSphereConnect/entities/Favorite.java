@@ -1,7 +1,6 @@
 package com.airSphereConnect.entities;
 
 import com.airSphereConnect.entities.enums.FavoriteCategory;
-import com.airSphereConnect.entities.enums.NotificationType;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;

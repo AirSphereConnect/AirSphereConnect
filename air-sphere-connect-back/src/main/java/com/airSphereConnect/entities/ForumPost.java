@@ -17,12 +17,6 @@ public class ForumPost {
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
-    @Column(name = "is_liked", nullable = false)
-    private Boolean isLiked = false;
-
-    @Column(name = "is_disliked", nullable = false)
-    private Boolean isDisliked = false;
-
     @Column(name = "likes_count", nullable = false)
     private Integer likesCount = 0;
 
@@ -53,8 +47,6 @@ public class ForumPost {
         this.content = content;
         this.thread = thread;
         this.user = user;
-        this.isLiked = false;
-        this.isDisliked = false;
         this.likesCount = 0;
         this.dislikesCount = 0;
     }
@@ -73,22 +65,6 @@ public class ForumPost {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Boolean getIsLiked() {
-        return isLiked;
-    }
-
-    public void setIsLiked(Boolean isLiked) {
-        this.isLiked = isLiked;
-    }
-
-    public Boolean getIsDisliked() {
-        return isDisliked;
-    }
-
-    public void setIsDisliked(Boolean isDisliked) {
-        this.isDisliked = isDisliked;
     }
 
     public Integer getLikesCount() {
@@ -147,22 +123,6 @@ public class ForumPost {
         this.user = user;
     }
 
-    public Boolean getLiked() {
-        return isLiked;
-    }
-
-    public void setLiked(Boolean liked) {
-        isLiked = liked;
-    }
-
-    public Boolean getDisliked() {
-        return isDisliked;
-    }
-
-    public void setDisliked(Boolean disliked) {
-        isDisliked = disliked;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -179,8 +139,6 @@ public class ForumPost {
     public String toString() {
         return "ForumPost{" +
                 "content='" + content + '\'' +
-                ", isLiked=" + isLiked +
-                ", isDisliked=" + isDisliked +
                 '}';
     }
 }

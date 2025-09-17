@@ -1,9 +1,6 @@
 package com.airSphereConnect.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-
-import java.time.LocalDateTime;
 import java.util.*;
 
 @Entity
@@ -21,7 +18,6 @@ public class Region {
 
 
     @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
     private List<Department> departments = new ArrayList<>();
 
     @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

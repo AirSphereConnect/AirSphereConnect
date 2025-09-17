@@ -23,18 +23,14 @@ public class Notification {
     @Column(name = "notification_type", nullable = false)
     private NotificationType notificationType;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "sent_at", nullable = false) // 🔧 Renommé pour cohérence
+    @Column(name = "sent_at", nullable = false)
     private LocalDateTime sentAt;
 
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
+    @Column(name = "is_checked", nullable = false)
+    private boolean isChecked = false;
 
     @ManyToMany(mappedBy = "notifications")
     private List<User> users = new ArrayList<>();
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id")
@@ -101,28 +97,12 @@ public class Notification {
         this.notificationType = notificationType;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
     public LocalDateTime getSentAt() {
         return sentAt;
     }
 
     public void setSentAt(LocalDateTime sentAt) {
         this.sentAt = sentAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
     }
 
     public List<User> getUsers() {

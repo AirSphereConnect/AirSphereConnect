@@ -13,17 +13,8 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "description", columnDefinition = "TEXT")
-    private String description;
-
     @Column(name = "street", nullable = false, length = 200)
     private String street;
-
-    @Column(name = "postal_code", length = 10)
-    private String postalCode;
-
-    @Column(name = "city_name", nullable = false, length = 100)
-    private String cityName;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -31,8 +22,8 @@ public class Address {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id", nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -43,11 +34,8 @@ public class Address {
     public Address() {
     }
 
-    public Address(String description, String street, String postalCode, String cityName, User user, City city) {
-        this.description = description;
+    public Address(String street, User user, City city) {
         this.street = street;
-        this.postalCode = postalCode;
-        this.cityName = cityName;
         this.user = user;
         this.city = city;
     }
@@ -66,22 +54,6 @@ public class Address {
 
     public void setStreet(String street) {
         this.street = street;
-    }
-
-    public String getPostalCode() {
-        return postalCode;
-    }
-
-    public void setPostalCode(String postalCode) {
-        this.postalCode = postalCode;
-    }
-
-    public String getCityName() {
-        return cityName;
-    }
-
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -105,20 +77,16 @@ public class Address {
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
         Address address = (Address) o;
-        return Objects.equals(street, address.street) && Objects.equals(postalCode, address.postalCode) && Objects.equals(cityName, address.cityName) && Objects.equals(city, address.city);
+        return Objects.equals(id, address.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(street, postalCode, cityName, city);
+        return Objects.hashCode(id);
     }
 
     @Override
     public String toString() {
-        return "Address{" +
-                "street='" + street + '\'' +
-                ", postalCode='" + postalCode + '\'' +
-                ", cityName='" + cityName + '\'' +
-                '}';
+        return "Address{}";
     }
 }

@@ -1,6 +1,5 @@
 package com.airSphereConnect.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
@@ -36,8 +35,7 @@ public class ForumThread {
     @JoinColumn(name = "rubric_id", nullable = false)
     private ForumRubric forumRubric;
 
-    @OneToMany(mappedBy = "forumThread", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    @JsonIgnore
+    @OneToMany(mappedBy = "thread", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ForumPost> forumPosts = new ArrayList<>();
 
     public ForumThread() {
