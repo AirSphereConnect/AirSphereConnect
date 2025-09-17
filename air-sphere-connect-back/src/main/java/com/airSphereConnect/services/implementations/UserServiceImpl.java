@@ -1,10 +1,14 @@
 package com.airSphereConnect.services.implementations;
 
+import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
+import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -33,8 +37,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public UserResponseDto createUser(UserRequestDto userDto) {
+        User user = UserMapper.toEntity(userDto);
+        User created = userRepository.save(user);
+        UserResponseDto dto = UserMapper.toResponseDto(created);
+        return null;
     }
 
     @Override

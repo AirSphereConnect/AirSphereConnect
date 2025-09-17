@@ -1,18 +1,18 @@
 package com.airSphereConnect.controllers;
 
 import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
@@ -22,7 +22,7 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/users")
+    @GetMapping
     public List<UserRequestDto> getAllUsers() {
         return userService.getAllUsers()
                 .stream()
@@ -30,16 +30,15 @@ public class UserController {
                 .toList();
     }
 
-    @GetMapping("/users/name")
-    public User getUserByUsername(@RequestParam String username) {
+    @GetMapping("/name")
+    public UserRequestDto getUserByUsername(@RequestParam String username) {
 
-        return userService.getUserByUsername(username);
+        return UserMapper.toDto(userService.getUserByUsername(username));
     }
 
     @PostMapping
-    public ResponseEntity<User> createUser(@RequestBody User user) {
-        User created = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+    public UserResponseDto createUser(@RequestBody UserRequestDto userDto) {
+        return userService.createUser(userDto);
     }
 
     @PutMapping("/{id}")

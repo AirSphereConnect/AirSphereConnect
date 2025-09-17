@@ -1,5 +1,7 @@
 package com.airSphereConnect.services;
 
+import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 
 import java.util.List;
@@ -11,7 +13,7 @@ public interface UserService {
 
     User getUserById(Long id);
 
-    User createUser(User user);
+    UserResponseDto createUser(UserRequestDto userDto);
 
     User updateUser(Long id, User newUserData);
 
