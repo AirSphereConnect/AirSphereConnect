@@ -23,8 +23,8 @@ public class Department {
     @JoinColumn(name="region_id", nullable = false)
     private Region region;
 
-    @Column(name= "created_at", nullable = false)
-    private LocalDateTime createdAt;
+    @OneToMany(mappedBy = "department")
+    private List<City> cities;
 
     public Department() {}
 
@@ -32,7 +32,6 @@ public class Department {
         this.name = name;
         this.code = code;
         this.region = region;
-        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -67,12 +66,12 @@ public class Department {
         this.region = region;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public List<City> getCities() {
+        return cities;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCities(List<City> cities) {
+        this.cities = cities;
     }
 
     @Override
@@ -94,7 +93,7 @@ public class Department {
                 ", name='" + name + '\'' +
                 ", code='" + code + '\'' +
                 ", region=" + region +
-                ", createdAt=" + createdAt +
+                ", cities=" + cities +
                 '}';
     }
 }

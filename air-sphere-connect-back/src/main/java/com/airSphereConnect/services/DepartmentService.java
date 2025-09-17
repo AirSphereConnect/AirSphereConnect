@@ -9,6 +9,6 @@ import java.util.Optional;
 public interface DepartmentService {
 
     List<Department> getAllDepartments();
-    Department getDepartmentById(Long id);
+    Department getDepartmentByCode(String code);
     Department getDepartmentByName(String name);
 }
