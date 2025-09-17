@@ -1,14 +1,14 @@
-package com.airSphereConnect.dtos;
+package com.airSphereConnect.dtos.request;
 
-public class DepartmentDto {
+public class DepartmentRequestDto {
     // TODO implement ToDto and FromDto methods
     private String name;
     private String code;
 
-    public DepartmentDto() {
+    public DepartmentRequestDto() {
     }
 
-    public DepartmentDto(String name, String code) {
+    public DepartmentRequestDto(String name, String code) {
         this.name = name;
         this.code = code;
     }
