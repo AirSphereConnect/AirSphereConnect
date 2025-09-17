@@ -3,7 +3,7 @@ spring:
   datasource:
     url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${DB_NAME:air-sphere-connect}
     username: ${DB_USER:air-sphere-connect_user}
-    password: ${DB_PASSWORD:userpassword123}
+    password: ${DB_PASSWORD:userpass123}
     driver-class-name: org.mariadb.jdbc.Driver
 
   docker:
