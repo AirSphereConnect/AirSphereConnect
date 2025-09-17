@@ -67,12 +67,12 @@ public class Department {
         this.region = region;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public List<City> getCities() {
+        return cities;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setCities(List<City> cities) {
+        this.cities = cities;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class Department {
                 ", name='" + name + '\'' +
                 ", code='" + code + '\'' +
                 ", region=" + region +
-                ", createdAt=" + createdAt +
+                ", cities=" + cities +
                 '}';
     }
 }
