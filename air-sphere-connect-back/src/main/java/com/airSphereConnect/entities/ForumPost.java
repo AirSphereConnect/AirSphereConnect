@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -16,12 +18,6 @@ public class ForumPost {
 
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
-
-    @Column(name = "likes_count", nullable = false)
-    private Integer likesCount = 0;
-
-    @Column(name = "dislikes_count", nullable = false)
-    private Integer dislikesCount = 0;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -40,6 +36,9 @@ public class ForumPost {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<PostReaction> reactions = new ArrayList<>();
+
     public ForumPost() {
     }
 
@@ -47,8 +46,6 @@ public class ForumPost {
         this.content = content;
         this.thread = thread;
         this.user = user;
-        this.likesCount = 0;
-        this.dislikesCount = 0;
     }
 
     public Long getId() {
@@ -65,22 +62,6 @@ public class ForumPost {
 
     public void setContent(String content) {
         this.content = content;
-    }
-
-    public Integer getLikesCount() {
-        return likesCount;
-    }
-
-    public void setLikesCount(Integer likesCount) {
-        this.likesCount = likesCount;
-    }
-
-    public Integer getDislikesCount() {
-        return dislikesCount;
-    }
-
-    public void setDislikesCount(Integer dislikesCount) {
-        this.dislikesCount = dislikesCount;
     }
 
     public LocalDateTime getCreatedAt() {

@@ -14,8 +14,6 @@ CREATE TABLE regions (
                          id BIGINT AUTO_INCREMENT PRIMARY KEY,
                          name VARCHAR(100) NOT NULL UNIQUE,
                          code VARCHAR(10) NOT NULL UNIQUE,
-                         created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                         updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
 
 -- Table des départements
@@ -24,8 +22,6 @@ CREATE TABLE departments (
                              code VARCHAR(10) NOT NULL UNIQUE,
                              name VARCHAR(100) NOT NULL,
                              region_id BIGINT NOT NULL,
-                             created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                             updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                              FOREIGN KEY (region_id) REFERENCES regions(id) ON DELETE CASCADE,
                              INDEX idx_dept_region (region_id)
 );
@@ -39,8 +35,6 @@ CREATE TABLE cities (
                         latitude DOUBLE NOT NULL,
                         longitude DOUBLE NOT NULL,
                         area_code VARCHAR(10),
-                        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
                         FOREIGN KEY (department_id) REFERENCES departments(id) ON DELETE CASCADE,
                         INDEX idx_city_dept (department_id),
                         INDEX idx_city_coords (latitude, longitude)
@@ -262,6 +256,26 @@ CREATE TABLE notifications (
                                INDEX idx_notif_type (notification_type),
                                INDEX idx_notif_sent_at (sent_at)
 );
+
+-- ===================================
+-- TABLE POST REACTIONS
+-- ===================================
+
+CREATE TABLE post_reactions (
+                                id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                                user_id BIGINT NOT NULL,
+                                post_id BIGINT NOT NULL,
+                                reaction_type ENUM('LIKE','DISLIKE') NOT NULL,
+                                created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                                updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                                deleted_at DATETIME NULL,
+                                FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+                                FOREIGN KEY (post_id) REFERENCES forum_posts(id) ON DELETE CASCADE,
+                                UNIQUE KEY unique_user_post (user_id, post_id),
+                                INDEX idx_reaction_user (user_id),
+                                INDEX idx_reaction_post (post_id)
+);
+
 
 -- ===================================
 -- DONNÉES DE TEST - OCCITANIE
