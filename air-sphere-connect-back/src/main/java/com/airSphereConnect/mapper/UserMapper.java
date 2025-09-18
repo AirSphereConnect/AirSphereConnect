@@ -10,10 +10,10 @@ import com.airSphereConnect.entities.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapper {
+public interface UserMapper {
 
     // Frontend -> Backend
-    public User toEntity(UserRequestDto request) {
+    public static User toEntity(UserRequestDto request) {
         if (request == null) {
             return null;
         }
@@ -29,12 +29,11 @@ public class UserMapper {
             user.setAddress(address);
 
         }
-
         return user;
     }
 
     // Backend -> Frontend
-    public UserResponseDto toResponseDto(User user) {
+    static UserResponseDto toResponseDto(User user) {
         if (user == null) {
             return null;
         }
@@ -51,7 +50,6 @@ public class UserMapper {
             AddressResponseDto addressDto = new AddressResponseDto();
             response.setAddress(addressDto);
         }
-
         return response;
     }
 

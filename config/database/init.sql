@@ -54,7 +54,7 @@ CREATE TABLE users
     login_count INTEGER                       DEFAULT 0,
     created_at  DATETIME                      DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME                      DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at  DATETIME     NULL,
+    deleted_at  DATETIME                      DEFAULT NULL,
     INDEX idx_user_email (email),
     INDEX idx_user_role (role)
 );
@@ -163,7 +163,7 @@ CREATE TABLE favorites
     favorite_category ENUM ('POPULATION','AIR_QUALITY','WEATHER','ALL') NOT NULL,
     created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at        DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at        DATETIME                                          NULL,
+    deleted_at        DATETIME DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (city_id) REFERENCES cities (id),
     UNIQUE KEY unique_user_city_category (user_id, city_id, favorite_category),
@@ -181,7 +181,7 @@ CREATE TABLE forum
     description TEXT,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at  DATETIME     NULL
+    deleted_at  DATETIME DEFAULT NULL
 );
 
 CREATE TABLE forum_rubrics
@@ -193,7 +193,7 @@ CREATE TABLE forum_rubrics
     description TEXT,
     created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at  DATETIME     NULL,
+    deleted_at  DATETIME DEFAULT NULL,
     FOREIGN KEY (forum_id) REFERENCES forum (id),
     FOREIGN KEY (user_id) REFERENCES users (id),
     INDEX idx_rubric_forum (forum_id),
@@ -208,7 +208,7 @@ CREATE TABLE forum_threads
     title      VARCHAR(255) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at DATETIME     NULL,
+    deleted_at DATETIME DEFAULT NULL,
     FOREIGN KEY (rubric_id) REFERENCES forum_rubrics (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id),
     INDEX idx_thread_rubric (rubric_id),
@@ -225,7 +225,7 @@ CREATE TABLE forum_posts
     dislikes_count INTEGER  DEFAULT 0,
     created_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at     DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at     DATETIME NULL,
+    deleted_at     DATETIME DEFAULT NULL,
     FOREIGN KEY (thread_id) REFERENCES forum_threads (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id),
     INDEX idx_post_thread (thread_id),
@@ -269,7 +269,7 @@ CREATE TABLE post_reactions
     reaction_type ENUM ('LIKE','DISLIKE') NOT NULL,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at    DATETIME                NULL,
+    deleted_at    DATETIME DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES forum_posts (id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_post (user_id, post_id),

@@ -1,51 +1,61 @@
 package com.airSphereConnect.controllers;
 
+import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
-import com.airSphereConnect.services.implementations.UserService;
-import jakarta.validation.Valid;
+import com.airSphereConnect.mapper.UserMapper;
+import com.airSphereConnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/api/users")
 public class UserController {
 
     @Autowired
     private UserService userService;
 
+    // Tous les utilisateurs
     @GetMapping
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+    public List<UserResponseDto> getAllUsers() {
+        return userService.getAllUsers()
+                .stream()
+                .map(UserMapper::toResponseDto)
+                .toList();
     }
 
-    @GetMapping("?name={username}")
-    public User getUserByUsername(@PathVariable String username) {
-        return userService.getUserByUsername(username)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Utilisateur non trouvé"));
+    // Par nom d'utilisateur
+    @GetMapping("/name")
+    public UserResponseDto getUserByUsername(@RequestParam String username) {
+        return UserMapper.toResponseDto(userService.getUserByUsername(username));
     }
 
+    // Création d'un utilisateur
     @PostMapping
-    //Ajouter @Valid lorsque spring sécurity est activé
-    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto reqDto) {
+        User user = UserMapper.toEntity(reqDto);
         User created = userService.createUser(user);
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        UserResponseDto respDto = UserMapper.toResponseDto(created);
+        return ResponseEntity.status(201).body(respDto);
     }
 
+    // Mettre à jour un utilisateur
     @PutMapping("/{id}")
-    //Ajouter @Valid lorsque spring sécurity est activé
-    public User updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
-        return userService.updateUser(id, user);
+    public UserResponseDto updateUser(@PathVariable Long id, @RequestBody UserRequestDto reqDto) {
+        User user = UserMapper.toEntity(reqDto);
+        User updated = userService.updateUser(id, user);
+        return UserMapper.toResponseDto(updated);
     }
 
+    // Supprimer un utilisateur
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<UserResponseDto> deleteUser(@PathVariable Long id) {
+        User deletedUser = userService.deleteUser(id);
+        UserResponseDto respDto = UserMapper.toResponseDto(deletedUser);
+        return ResponseEntity.ok(respDto);
     }
-}
 
+}
