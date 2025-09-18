@@ -10,30 +10,14 @@ import com.airSphereConnect.entities.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapper {
+public interface UserMapper {
 
     // Frontend -> Backend
-    public User toEntity(UserRequestDto request) {
+    public static User toEntity(UserRequestDto request) {
         if (request == null) {
             return null;
         }
-public interface UserMapper {
-    // Entity -> ResponseDto
-    public static UserResponseDto toResponseDto(User user) {
-        if (user == null) return null;
-        System.out.printf("UserMapper.toResponseDto(): user=%s\n", user);
-        return new UserResponseDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail()
-                // pas de mot de passe ici !
-        );
-    }
 
-    // RequestDto -> Entity
-    public static User toEntity(UserRequestDto userDto) {
-        if (userDto == null) return null;
-        System.out.printf("UserMapper.toEntity: userDto=%s\n", userDto);
         User user = new User();
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
@@ -45,15 +29,11 @@ public interface UserMapper {
             user.setAddress(address);
 
         }
-
-        user.setUsername(userDto.getUsername());
-        user.setEmail(userDto.getEmail());
-        user.setPassword(userDto.getPassword()); // le service doit encoder le mot de passe après !
         return user;
     }
 
     // Backend -> Frontend
-    public UserResponseDto toResponseDto(User user) {
+    static UserResponseDto toResponseDto(User user) {
         if (user == null) {
             return null;
         }
@@ -70,7 +50,7 @@ public interface UserMapper {
             AddressResponseDto addressDto = new AddressResponseDto();
             response.setAddress(addressDto);
         }
-}
-
         return response;
     }
+
+}
