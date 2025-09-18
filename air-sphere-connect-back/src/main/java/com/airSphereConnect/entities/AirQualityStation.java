@@ -17,10 +17,10 @@ public class AirQualityStation {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name="code",  unique = true, nullable = false, length = 10)
+    @Column(name="code",  unique = true, nullable = false, length = 20)
     private String code;
 
-    @Column(name="source",  unique = true, nullable = false, length = 10)
+    @Column(name="source",  unique = true, nullable = false, length = 50)
     private String source;
 
     @Column(name = "latitude", nullable = false)

@@ -104,6 +104,14 @@ public class ForumPost {
         this.user = user;
     }
 
+    public List<PostReaction> getReactions() {
+        return reactions;
+    }
+
+    public void setReactions(List<PostReaction> reactions) {
+        this.reactions = reactions;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
