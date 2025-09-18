@@ -13,4 +13,12 @@ public class GlobalControllerAdvice {
     public ResponseEntity<String> handleUserNotFound(GlobalException.UserNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
     }
+    @ExceptionHandler(GlobalException.CityNotFoundException.class)
+    public ResponseEntity<String> handleCityNotFound(GlobalException.CityNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
+    @ExceptionHandler(GlobalException.FavoriteNotFoundException.class)
+    public ResponseEntity<String> handleCityNotFound(GlobalException.FavoriteNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    }
 }

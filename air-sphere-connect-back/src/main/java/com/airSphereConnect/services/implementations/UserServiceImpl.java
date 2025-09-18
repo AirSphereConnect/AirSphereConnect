@@ -1,14 +1,11 @@
 package com.airSphereConnect.services.implementations;
 
-import com.airSphereConnect.dtos.request.UserRequestDto;
-import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
-import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -19,6 +16,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
+
+    private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
     @Override
     public List<User> getAllUsers() {
@@ -42,6 +41,7 @@ public class UserServiceImpl implements UserService {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());
         }
+        user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
 
@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
         User user = getUserById(id);
         user.setUsername(newUserData.getUsername());
         user.setEmail(newUserData.getEmail());
+        user.setPassword(encoder.encode(newUserData.getPassword()));
         return userRepository.save(user);
     }
 

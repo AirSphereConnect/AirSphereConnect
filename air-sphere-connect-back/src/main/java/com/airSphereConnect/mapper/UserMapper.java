@@ -1,7 +1,5 @@
 package com.airSphereConnect.mapper;
 
-
-import com.airSphereConnect.dtos.request.AddressRequestDto;
 import com.airSphereConnect.dtos.request.UserRequestDto;
 import com.airSphereConnect.dtos.response.AddressResponseDto;
 import com.airSphereConnect.dtos.response.UserResponseDto;
@@ -10,13 +8,11 @@ import com.airSphereConnect.entities.User;
 import org.springframework.stereotype.Component;
 
 @Component
-public class UserMapper {
+public interface UserMapper {
 
     // Frontend -> Backend
-    public static User toEntity(UserRequestDto request) {
-        if (request == null) {
-            return null;
-        }
+    static User toEntity(UserRequestDto request) {
+        if (request == null) return null;
 
         User user = new User();
         user.setUsername(request.getUsername());
@@ -33,10 +29,8 @@ public class UserMapper {
     }
 
     // Backend -> Frontend
-    public static UserResponseDto toResponseDto(User user) {
-        if (user == null) {
-            return null;
-        }
+    static UserResponseDto toResponseDto(User user) {
+        if (user == null) return null;
 
         UserResponseDto response = new UserResponseDto();
         response.setId(user.getId());
@@ -52,5 +46,4 @@ public class UserMapper {
         }
         return response;
     }
-
 }

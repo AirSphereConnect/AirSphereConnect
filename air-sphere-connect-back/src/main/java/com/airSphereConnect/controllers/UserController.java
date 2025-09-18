@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-
+//TODO Il faut ajouter l'adresse aux différentes méthodes
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -57,5 +57,4 @@ public class UserController {
         UserResponseDto respDto = UserMapper.toResponseDto(deletedUser);
         return ResponseEntity.ok(respDto);
     }
-
 }
