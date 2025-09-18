@@ -1,43 +1,31 @@
 package com.airSphereConnect.mapper;
 
-import com.airSphereConnect.dtos.request.DepartmentRequestDto;
 import com.airSphereConnect.dtos.request.UserRequestDto;
 import com.airSphereConnect.dtos.response.UserResponseDto;
-import com.airSphereConnect.entities.Department;
 import com.airSphereConnect.entities.User;
 
-public class UserMapper {
-    // RequestDto -> Entity
-    public static UserRequestDto toDto(User user) {
+public interface UserMapper {
+    // Entity -> ResponseDto
+    public static UserResponseDto toResponseDto(User user) {
         if (user == null) return null;
-
-        return new UserRequestDto(
+        System.out.printf("UserMapper.toResponseDto(): user=%s\n", user);
+        return new UserResponseDto(
+                user.getId(),
                 user.getUsername(),
                 user.getEmail()
-                // à voir pour le password
+                // pas de mot de passe ici !
         );
     }
 
-    // Entity -> ResponseDto
+    // RequestDto -> Entity
     public static User toEntity(UserRequestDto userDto) {
         if (userDto == null) return null;
-
+        System.out.printf("UserMapper.toEntity: userDto=%s\n", userDto);
         User user = new User();
         user.setUsername(userDto.getUsername());
         user.setEmail(userDto.getEmail());
-        // à voir pour le password
+        user.setPassword(userDto.getPassword()); // le service doit encoder le mot de passe après !
         return user;
     }
-
-    // Post UserResponseDto -> User
-    public static UserResponseDto toResponseDto(User user) {
-        if (user == null) return null;
-        return new UserResponseDto(
-                user.getId().toString(),
-                user.getUsername(),
-                user.getEmail(),
-                null // Ne pas exposer password
-        );
-    }
-
 }
+

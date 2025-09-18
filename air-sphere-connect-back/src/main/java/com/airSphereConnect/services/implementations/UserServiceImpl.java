@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -37,11 +38,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto createUser(UserRequestDto userDto) {
-        User user = UserMapper.toEntity(userDto);
-        User created = userRepository.save(user);
-        UserResponseDto dto = UserMapper.toResponseDto(created);
-        return null;
+    public User createUser(User user) {
+        if (user.getCreatedAt() == null) {
+            user.setCreatedAt(LocalDateTime.now());
+        }
+        return userRepository.save(user);
     }
 
     @Override
@@ -53,8 +54,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void deleteUser(Long id) {
-        User user = getUserById(id);
-        userRepository.delete(user);
+    public User deleteUser(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new GlobalException.UserNotFoundException("Utilisateur non trouvé avec l'id : " + id));
+        user.setDeletedAt(LocalDateTime.now());
+        userRepository.save(user);
+        return user;
     }
 }

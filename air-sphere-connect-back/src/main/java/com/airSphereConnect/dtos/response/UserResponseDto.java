@@ -3,25 +3,23 @@ package com.airSphereConnect.dtos.response;
 import java.util.Objects;
 
 public class UserResponseDto {
-    private String id;
+    private Long id;
     private String username;
     private String email;
-    private String password;
 
     public UserResponseDto() {
     }
 
-    public UserResponseDto(String id, String username, String email, String password) {
+    public UserResponseDto(Long id, String username, String email) {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.password = password;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -39,12 +37,6 @@ public class UserResponseDto {
         this.email = email;
     }
 
-    public String getPassword() {
-        return password;
-    }
-    public void setPassword(String password) {
-        this.password = password;
-    }
 
     @Override
     public boolean equals(Object o) {

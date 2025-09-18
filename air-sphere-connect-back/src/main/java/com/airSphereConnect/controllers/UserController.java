@@ -18,37 +18,44 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
-
+    // Tous les utilisateurs
     @GetMapping
-    public List<UserRequestDto> getAllUsers() {
+    public List<UserResponseDto> getAllUsers() {
         return userService.getAllUsers()
                 .stream()
-                .map(UserMapper::toDto)
+                .map(UserMapper::toResponseDto)
                 .toList();
     }
 
+    // Par nom d'utilisateur
     @GetMapping("/name")
-    public UserRequestDto getUserByUsername(@RequestParam String username) {
-
-        return UserMapper.toDto(userService.getUserByUsername(username));
+    public UserResponseDto getUserByUsername(@RequestParam String username) {
+        return UserMapper.toResponseDto(userService.getUserByUsername(username));
     }
 
+    // Création d'un utilisateur
     @PostMapping
-    public UserResponseDto createUser(@RequestBody UserRequestDto userDto) {
-        return userService.createUser(userDto);
+    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto reqDto) {
+        User user = UserMapper.toEntity(reqDto);
+        User created = userService.createUser(user);
+        UserResponseDto respDto = UserMapper.toResponseDto(created);
+        return ResponseEntity.status(201).body(respDto);
     }
 
+    // Mettre à jour un utilisateur
     @PutMapping("/{id}")
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
-        return userService.updateUser(id, user);
+    public UserResponseDto updateUser(@PathVariable Long id, @RequestBody UserRequestDto reqDto) {
+        User user = UserMapper.toEntity(reqDto);
+        User updated = userService.updateUser(id, user);
+        return UserMapper.toResponseDto(updated);
     }
 
+    // Supprimer un utilisateur
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
-        userService.deleteUser(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<UserResponseDto> deleteUser(@PathVariable Long id) {
+        User deletedUser = userService.deleteUser(id);
+        UserResponseDto respDto = UserMapper.toResponseDto(deletedUser);
+        return ResponseEntity.ok(respDto);
     }
+
 }
