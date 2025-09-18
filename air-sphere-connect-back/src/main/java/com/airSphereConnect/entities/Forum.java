@@ -27,6 +27,11 @@ public class Forum {
     public Forum() {
     }
 
+    public Forum(String title, String description) {
+        this.title = title;
+        this.description = description;
+    }
+
     public Forum(String title, String description, List<ForumRubric> forumRubrics) {
         this.title = title;
         this.description = description;
