@@ -2,6 +2,9 @@ package com.airSphereConnect.entities;
 
 import com.airSphereConnect.entities.enums.UserRole;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -16,18 +19,30 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{user.username.notBlank}")
+    @Size(min = 2, max = 50, message = "{user.username.size}")
     @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
 
+    @NotBlank(message = "{user.email.notBlank}")
+    @Email(message = "{user.email.invalid}")
     @Column(name = "email", unique = true, nullable = false, length = 150)
     private String email;
 
+    @NotBlank(message = "{user.password.notBlank}")
+    @Size(min = 8, message = "{user.password.min}")
     @Column(name = "password", nullable = false)
     private String password;
+
+
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, columnDefinition = "ENUM('USER','ADMIN','GUEST')")
     private UserRole role = UserRole.USER;
+
+
+
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -69,16 +84,25 @@ public class User {
     private List<PostReaction> postReactions = new ArrayList<>();
 
 
-    protected User() {}
+    public User() {}
 
     public User(String username, String email, String password, UserRole role) {
         this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
-
     }
 
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 
     public Long getId() {
         return id;
@@ -190,6 +214,14 @@ public class User {
 
     public void setForumPosts(List<ForumPost> forumPosts) {
         this.forumPosts = forumPosts;
+    }
+
+    public List<PostReaction> getPostReactions() {
+        return postReactions;
+    }
+
+    public void setPostReactions(List<PostReaction> postReactions) {
+        this.postReactions = postReactions;
     }
 
     @Override

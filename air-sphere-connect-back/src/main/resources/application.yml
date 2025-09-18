@@ -9,6 +9,11 @@ spring:
     compose:
       file: ../docker-compose.yml
 
+  messages:
+    basename: ValidationMessages
+    encoding: UTF-8
+
+
 # Configuration commune
 server:
   port: 8080

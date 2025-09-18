@@ -1,6 +1,9 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -13,7 +16,13 @@ public class Address {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "street", nullable = false, length = 200)
+    @NotBlank(message = "{address.street.required}")
+    @Size(min = 1, max = 50, message = "{address.street.size}")
+    @Pattern(
+            regexp = "^[0-9]{0,5}\\s?[A-Za-zÀ-ÖØ-öø-ÿ0-9'’\\-.,/() ]+$",
+            message = "{address.street.pattern}"
+    )
+    @Column(name = "street", nullable = false, length = 100)
     private String street;
 
     @Column(name = "created_at", nullable = false, updatable = false)
@@ -34,10 +43,24 @@ public class Address {
     public Address() {
     }
 
-    public Address(String street, User user, City city) {
+    public Address(String street) {
+        this.street = street;
+    }
+
+    public Address(String street, User user) {
         this.street = street;
         this.user = user;
-        this.city = city;
+    }
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = createdAt;
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     public Long getId() {
@@ -72,6 +95,21 @@ public class Address {
         this.updatedAt = updatedAt;
     }
 
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -10,6 +10,10 @@ spring:
     compose:
       enabled: false
 
+  messages:
+    basename: ValidationMessages
+    encoding: UTF-8
+
   security:
     user:
       name: admin

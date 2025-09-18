@@ -2,6 +2,7 @@ package com.airSphereConnect.controllers;
 
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.services.implementations.UserService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -29,15 +30,15 @@ public class UserController {
     }
 
     @PostMapping
-    //Ajouter @Valid losrque spring sécurity est acctivé
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    //Ajouter @Valid lorsque spring sécurity est activé
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         User created = userService.createUser(user);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
     @PutMapping("/{id}")
-    //Ajouter @Valid losrque spring sécurity est acctivé
-    public User updateUser(@PathVariable Long id, @RequestBody User user) {
+    //Ajouter @Valid lorsque spring sécurity est activé
+    public User updateUser(@PathVariable Long id, @Valid @RequestBody User user) {
         return userService.updateUser(id, user);
     }
 
