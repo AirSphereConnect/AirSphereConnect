@@ -4,6 +4,7 @@ import ch.qos.logback.core.joran.conditional.IfAction;
 import com.airSphereConnect.dtos.FavoriteDto;
 import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.Favorite;
+import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.FavoriteMapper;
 import com.airSphereConnect.repositories.CityRepository;
@@ -53,21 +54,28 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public FavoriteDto createFavorite(Long userId, FavoriteDto favoriteDto) {
-        if (userRepository.findById(userId).isEmpty()) {
-            userRepository.findById(userId).orElseThrow(() ->
-                    new GlobalException.RessourceNotFoundException("Utilisateur non trouvé avec l'id : " + userId));
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Utilisateur non trouvé avec l'id : " + userId));
+
+        City city = null;
+        if (favoriteDto.getCityId() != null) {
+            city = cityRepository.findById(favoriteDto.getCityId())
+                    .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Ville non trouvée avec l'id : " + favoriteDto.getCityId()));
         }
 
-        favoriteDto.setUserId(userId);
         Favorite favorite = favoriteMapper.toEntity(favoriteDto);
+        favorite.setUser(user);
+        favorite.setCity(city);
         favorite.setCreatedAt(LocalDateTime.now());
+
         Favorite saved = favoriteRepository.save(favorite);
         return favoriteMapper.toDto(saved);
     }
 
+
     @Override
     public FavoriteDto updateFavorite(Long id, FavoriteDto favoriteDto) {
-
+        //Voir s'il faut contrôler si current user est autorisé à modifier son favori
         Favorite existing = favoriteRepository.findById(id)
                 .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Favori non trouvé avec l'id : " + id));
 

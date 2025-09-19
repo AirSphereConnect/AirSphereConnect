@@ -2,20 +2,22 @@ package com.airSphereConnect.services.implementations;
 
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
+import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 
     private final UserRepository userRepository;
+
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -25,7 +27,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUsers() {
-        return userRepository.findAll();
+        return userRepository.findByDeletedAtIsNull();
     }
 
     @Override
@@ -54,6 +56,9 @@ public class UserServiceImpl implements UserService {
         if (user.getCreatedAt() == null) {
             user.setCreatedAt(LocalDateTime.now());
         }
+        if (user.getAddress() != null) {
+            user.getAddress().setUser(user);
+        }
         user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
@@ -75,6 +80,9 @@ public class UserServiceImpl implements UserService {
         user.setUsername(newUserData.getUsername());
         user.setEmail(newUserData.getEmail());
         user.setPassword(encoder.encode(newUserData.getPassword()));
+        if (user.getAddress() != null) {
+            user.getAddress().setUser(user);
+        }
         return userRepository.save(user);
     }
 
