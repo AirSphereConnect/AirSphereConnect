@@ -1,17 +1,21 @@
 package com.airSphereConnect.services;
 
 import com.airSphereConnect.entities.City;
-import com.airSphereConnect.entities.Department;
-import com.airSphereConnect.entities.Region;
+
+import java.util.List;
 
 public interface CityService {
+
+    List<City> getAllCities();
 
     City getCityByName(String name);
 
     City getCityByPostalCode(String code);
 
-    City getCityByRegion(Region region);
+    List<City> getCitiesByRegionName(String region);
 
-    City getCityByDepartment(Department department);
+    List<City> getCitiesByDepartmentName(String departmentName);
+
+    List<City> getCitiesByDepartmentCode(String departmentCode);
 
 }

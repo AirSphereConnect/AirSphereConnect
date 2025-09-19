@@ -17,7 +17,7 @@ public class City {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "postal_code", length = 10)
+    @Column(name = "postal_code", length = 10, nullable = false)
     private String postalCode;
 
     @Column(name = "latitude", nullable = false)

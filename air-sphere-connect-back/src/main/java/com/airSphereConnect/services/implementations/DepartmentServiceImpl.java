@@ -16,7 +16,6 @@ public class DepartmentServiceImpl implements DepartmentService {
     public DepartmentServiceImpl(DepartmentRepository departmentRepository) {
         this.departmentRepository = departmentRepository;
     }
-
     @Override
     public List<Department> getAllDepartments() {
         return departmentRepository.findAll();
@@ -24,18 +23,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Department getDepartmentByCode(String code) {
-        return null;
-    }
-
-    @Override
-    public Department getDepartmentById(Long id) {
-        return departmentRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException("Department not " +
-                "found with id: " + id));
+        return departmentRepository.getDepartmentByCodeIgnoreCase(code).orElseThrow(() -> new ResourceNotFoundException(
+                "Department with code " + code + " not found"));
     }
 
     @Override
     public Department getDepartmentByName(String name) {
-        return departmentRepository.getDepartmentByName(name).orElseThrow(() -> new ResourceNotFoundException(
+        return departmentRepository.getDepartmentByNameIgnoreCase(name).orElseThrow(() -> new ResourceNotFoundException(
                 "Department not found with name : " + name));
     }
 }

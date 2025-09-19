@@ -39,25 +39,4 @@ public class DepartmentResponseDto {
     public void setCode(String code) {
         this.code = code;
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        DepartmentResponseDto that = (DepartmentResponseDto) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "DepartmentResponseDto{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", code='" + code + '\'' +
-                '}';
-    }
 }

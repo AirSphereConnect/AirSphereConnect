@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface DepartmentRepository extends JpaRepository<Department, Long> {
 
-    Optional<Department> getDepartmentByName(String name);
-    Optional<Department> getDepartmentByCode(String code);
+    Optional<Department> getDepartmentByNameIgnoreCase(String name);
+    Optional<Department> getDepartmentByCodeIgnoreCase(String code);
 }

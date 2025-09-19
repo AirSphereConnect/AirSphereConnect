@@ -1,0 +1,21 @@
+package com.airSphereConnect.mapper;
+
+import com.airSphereConnect.dtos.response.CityResponseDto;
+import com.airSphereConnect.entities.City;
+
+public class CityMapper {
+
+    public static CityResponseDto toDto(City city) {
+        if (city == null) return null;
+
+        return new CityResponseDto(
+                city.getId(),
+                city.getName(),
+                city.getPostalCode(),
+                city.getLatitude(),
+                city.getLongitude(),
+                city.getAreaCode(),
+                city.getDepartment() != null ? city.getDepartment().getName() : null
+        );
+    }
+}

@@ -8,7 +8,6 @@ import java.util.Objects;
 @Table(name = "populations")
 public class Population {
 
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

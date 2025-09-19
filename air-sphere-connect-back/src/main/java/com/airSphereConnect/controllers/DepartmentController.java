@@ -1,7 +1,7 @@
 package com.airSphereConnect.controllers;
 
 
-import com.airSphereConnect.dtos.request.DepartmentRequestDto;
+import com.airSphereConnect.dtos.response.DepartmentResponseDto;
 import com.airSphereConnect.mapper.DepartmentMapper;
 import com.airSphereConnect.services.DepartmentService;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/departments")
 public class DepartmentController {
 
     private final DepartmentService departmentService;
@@ -22,21 +22,21 @@ public class DepartmentController {
         this.departmentService = departmentService;
     }
 
-    @GetMapping("/departments")
-    public List<DepartmentRequestDto> getAllDepartments() {
+    @GetMapping()
+    public List<DepartmentResponseDto> getAllDepartments() {
         return departmentService.getAllDepartments()
                 .stream()
                 .map(DepartmentMapper::toDto)
                 .toList();
     }
 
-    @GetMapping("/departments/{name}")
-    public DepartmentRequestDto getDepartmentByName(@PathVariable String name) {
+    @GetMapping("/departmentName/{name}")
+    public DepartmentResponseDto getDepartmentByName(@PathVariable String name) {
         return DepartmentMapper.toDto(departmentService.getDepartmentByName(name));
     }
 
-    @GetMapping("/departments/{code}")
-    public DepartmentRequestDto getDepartmentByCode(@PathVariable String code) {
+    @GetMapping("/departmentCode/{code}")
+    public DepartmentResponseDto getDepartmentByCode(@PathVariable String code) {
         return DepartmentMapper.toDto(departmentService.getDepartmentByCode(code));
     }
 }
