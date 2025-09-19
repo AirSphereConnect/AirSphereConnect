@@ -7,17 +7,19 @@ import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FavoriteMapper {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private CityRepository cityRepository;
+    private final CityRepository cityRepository;
+
+    public FavoriteMapper(UserRepository userRepository, CityRepository cityRepository) {
+        this.userRepository = userRepository;
+        this.cityRepository = cityRepository;
+    }
 
     public FavoriteDto toDto(Favorite favorite) {
         return new FavoriteDto(
@@ -39,13 +41,13 @@ public class FavoriteMapper {
 
         if (dto.getUserId() != null) {
             User user = userRepository.findById(dto.getUserId())
-                    .orElseThrow(() -> new GlobalException.UserNotFoundException("Utilisateur non trouvé"));
+                    .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Utilisateur non trouvé"));
             favorite.setUser(user);
         }
 
         if (dto.getCityId() != null) {
             City city = cityRepository.findById(dto.getCityId())
-                    .orElseThrow(() -> new GlobalException.CityNotFoundException("Ville non trouvée"));
+                    .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Ville non trouvée"));
             favorite.setCity(city);
         }
         return favorite;
