@@ -15,8 +15,12 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     // Tous les utilisateurs
     @GetMapping
@@ -35,11 +39,10 @@ public class UserController {
 
     // Création d'un utilisateur
     @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto reqDto) {
+    public UserResponseDto createUser(@RequestBody UserRequestDto reqDto) {
         User user = UserMapper.toEntity(reqDto);
         User created = userService.createUser(user);
-        UserResponseDto respDto = UserMapper.toResponseDto(created);
-        return ResponseEntity.status(201).body(respDto);
+        return UserMapper.toResponseDto(created);
     }
 
     // Mettre à jour un utilisateur
@@ -52,9 +55,8 @@ public class UserController {
 
     // Supprimer un utilisateur
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserResponseDto> deleteUser(@PathVariable Long id) {
+    public UserResponseDto deleteUser(@PathVariable Long id) {
         User deletedUser = userService.deleteUser(id);
-        UserResponseDto respDto = UserMapper.toResponseDto(deletedUser);
-        return ResponseEntity.ok(respDto);
+        return UserMapper.toResponseDto(deletedUser);
     }
 }
