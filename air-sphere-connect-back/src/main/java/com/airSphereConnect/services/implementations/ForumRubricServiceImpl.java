@@ -11,6 +11,7 @@ import com.airSphereConnect.repositories.ForumRepository;
 import com.airSphereConnect.repositories.ForumRubricRepository;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.ForumRubricService;
+import org.springframework.data.rest.webmvc.ResourceNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,9 +46,9 @@ public class ForumRubricServiceImpl implements ForumRubricService {
     }
 
 
-    private ForumRubric findForumRubricByIdOrThrow(Long rubricId) {
-       return forumRubricRepository.findByIdAndDeletedAtIsNull(rubricId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Rubrique introuvable : " + rubricId));
+    private ForumRubric findForumRubricByIdOrThrow(Long id) {
+       return forumRubricRepository.findByIdAndDeletedAtIsNull(id)
+                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Rubrique introuvable : " + id));
     }
 
     private Forum findForumByIdOrThrow(Long forumId) {
@@ -89,16 +90,17 @@ public class ForumRubricServiceImpl implements ForumRubricService {
     @Transactional(readOnly = true)
     public List<ForumRubricResponseDto> getRubricsByCurrentUser(Long userId) {
         User user = findUserByIdOrThrow(userId);
-        List<ForumRubric> rubrics = forumRubricRepository.findByUserIdAndDeletedAtIsNull(userId);
+        List<ForumRubric> rubrics = forumRubricRepository.findByUserIdAndDeletedAtIsNull(user.getId());
         return rubrics.stream()
                 .map(forumRubricMapper::toResponseDto)
                 .toList();
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ForumRubricResponseDto> getRubricsByForumId(Long forumId) {
         Forum forum = findForumByIdOrThrow(forumId);
-        List<ForumRubric> rubrics = forumRubricRepository.findByForumIdAndDeletedAtIsNull(forumId);
+        List<ForumRubric> rubrics = forumRubricRepository.findByForumIdAndDeletedAtIsNull(forum.getId());
         return rubrics.stream()
                 .map(forumRubricMapper::toResponseDto)
                 .toList();
@@ -109,9 +111,7 @@ public class ForumRubricServiceImpl implements ForumRubricService {
         User user = findUserByIdOrThrow(userId);
         Forum forum = findForumByIdOrThrow(request.getForumId());
 
-
         validateRubricCreation(request, user, forum);
-
 
         ForumRubric rubric = forumRubricMapper.toEntity(request, user, forum);
         ForumRubric savedRubric = forumRubricRepository.save(rubric);
@@ -146,15 +146,24 @@ public class ForumRubricServiceImpl implements ForumRubricService {
 
         existingRubric.softDelete();
         forumRubricRepository.save(existingRubric);
-
     }
-
 
     @Override
+    @Transactional(readOnly = true)
     public ForumRubricResponseDto getRubricWithAllDetails(Long id, Long userId) {
-        ForumRubric rubric = findForumRubricByIdOrThrow(id);
-        return forumRubricMapper.toResponseDto(rubric);
+        User user = findUserByIdOrThrow(userId);
+
+        ForumRubric rubric = forumRubricRepository.findByIdWithRelations(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Rubrique introuvable: " + id));
+
+        ForumRubricResponseDto response = forumRubricMapper.toResponseDto(rubric);
+
+        countRubricsByUser(user.getId());
+        countRubricsByForum(rubric.getForum().getId());
+
+        return response;
     }
+
 
     @Override
     public int countRubricsByUser(Long userId) {
