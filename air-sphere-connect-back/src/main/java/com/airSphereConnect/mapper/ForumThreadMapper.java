@@ -5,7 +5,9 @@ import com.airSphereConnect.dtos.response.ForumThreadResponseDto;
 import com.airSphereConnect.entities.ForumRubric;
 import com.airSphereConnect.entities.ForumThread;
 import com.airSphereConnect.entities.User;
+import org.springframework.stereotype.Component;
 
+@Component
 public class ForumThreadMapper {
 
     public ForumThread toEntity(ForumThreadRequestDto request, User user, ForumRubric rubric) {
@@ -33,8 +35,6 @@ public class ForumThreadMapper {
         response.setUsername(thread.getUser().getUsername());
         response.setRubricId(thread.getForumRubric().getId());
         response.setRubricTitle(thread.getForumRubric().getTitle());
-        response.setCreatedAt(thread.getCreatedAt());
-        response.setUpdatedAt(thread.getUpdatedAt());
 
         return response;
     }

@@ -10,16 +10,18 @@ public class ForumThreadRequestDto {
     @NotBlank(message = "{thread.title.required}")
     @Size(min = 2, max = 255, message = "{thread.title.size}")
     private String title;
-    private Long user_id;
-    private Long rubric_id;
+    private Long userId;
+    private Long rubricId;
 
     public ForumThreadRequestDto() {
+
     }
 
-    public ForumThreadRequestDto(String title, Long user_id, Long rubric_id) {
+    public ForumThreadRequestDto(String title, Long userId, Long rubricId) {
         this.title = title;
-        this.user_id = user_id;
-        this.rubric_id = rubric_id;
+
+        this.userId = userId;
+        this.rubricId = rubricId;
     }
 
     public String getTitle() {
@@ -30,19 +32,20 @@ public class ForumThreadRequestDto {
         this.title = title;
     }
 
-    public Long getUser_id() {
-        return user_id;
+
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public Long getRubric_id() {
-        return rubric_id;
+    public Long getRubricId() {
+        return rubricId;
     }
 
-    public void setRubric_id(Long rubric_id) {
-        this.rubric_id = rubric_id;
+    public void setRubricId(Long rubricId) {
+        this.rubricId = rubricId;
     }
 }

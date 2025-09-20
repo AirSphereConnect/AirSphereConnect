@@ -10,21 +10,17 @@ public class ForumThreadResponseDto {
     private String username;
     private Long rubricId;
     private String rubricTitle;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deleteAt;
 
     public ForumThreadResponseDto() {
     }
 
-    public ForumThreadResponseDto(Long id, String title, Long userId, String username, Long rubricId, String rubricTitle, LocalDateTime createdAt) {
+    public ForumThreadResponseDto(Long id, String title, Long userId, String username, Long rubricId, String rubricTitle) {
         this.id = id;
         this.title = title;
         this.userId = userId;
         this.username = username;
         this.rubricId = rubricId;
         this.rubricTitle = rubricTitle;
-        this.createdAt = createdAt;
     }
 
     public Long getId() {
@@ -75,27 +71,4 @@ public class ForumThreadResponseDto {
         this.rubricTitle = rubricTitle;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getDeleteAt() {
-        return deleteAt;
-    }
-
-    public void setDeleteAt(LocalDateTime deleteAt) {
-        this.deleteAt = deleteAt;
-    }
 }
