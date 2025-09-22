@@ -2,6 +2,8 @@ package com.airSphereConnect.repositories;
 
 import com.airSphereConnect.entities.ForumRubric;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -37,4 +39,10 @@ public interface ForumRubricRepository extends JpaRepository<ForumRubric, Long> 
 
 
     List<ForumRubric> findByForumIdAndDeletedAtIsNull(Long forumId);
+
+    @Query("SELECT r FROM ForumRubric r " +
+            "LEFT JOIN FETCH r.forum " +
+            "LEFT JOIN FETCH r.user " +
+            "WHERE r.id = :id AND r.deletedAt IS NULL")
+    Optional<ForumRubric> findByIdWithRelations(@Param("id") Long id);
 }

@@ -31,6 +31,12 @@ public class ForumRubricController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ForumRubricResponseDto>> getRubricsByUser(@PathVariable Long userId) {
+        List<ForumRubricResponseDto> responses = forumRubricService.getRubricsByCurrentUser(userId);
+        return ResponseEntity.ok(responses);
+    }
+
     @PostMapping("/new/{userId}")
     public ResponseEntity<ForumRubricResponseDto> createRubric(
             @Valid @RequestBody ForumRubricRequestDto request,
@@ -38,12 +44,6 @@ public class ForumRubricController {
 
         ForumRubricResponseDto response = forumRubricService.createRubric(request, userId);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<List<ForumRubricResponseDto>> getRubricsByUser(@PathVariable Long userId) {
-        List<ForumRubricResponseDto> responses = forumRubricService.getRubricsByCurrentUser(userId);
-        return ResponseEntity.ok(responses);
     }
 
     @PutMapping("/{id}")

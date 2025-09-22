@@ -41,6 +41,7 @@ public class ForumServiceImpl implements ForumService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ForumRubricResponseDto> getRubricsByForumId(Long forumId) {
         List<ForumRubric> rubrics = forumRubricRepository.findByForumIdAndDeletedAtIsNull(forumId);
         return rubrics.stream()

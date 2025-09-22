@@ -7,18 +7,14 @@ public class ForumPostRequestDto {
 
     @Size(min = 2, max = 255, message = "{post.content.size}")
     private String content;
-    private String user_id;
-    private String thread_id;
+    private Long userId;
+    private Long threadId;
 
 
-    public ForumPostRequestDto() {
-    }
-
-    public ForumPostRequestDto(String content, String user_id, String thread_id) {
+    public ForumPostRequestDto(String content, Long userId, Long threadId) {
         this.content = content;
-        this.user_id = user_id;
-        this.thread_id = thread_id;
-
+        this.userId = userId;
+        this.threadId = threadId;
     }
 
     public String getContent() {
@@ -29,20 +25,19 @@ public class ForumPostRequestDto {
         this.content = content;
     }
 
-    public String getUser_id() {
-        return user_id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser_id(String user_id) {
-        this.user_id = user_id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public String getThread_id() {
-        return thread_id;
+    public Long getThreadId() {
+        return threadId;
     }
 
-    public void setThread_id(String thread_id) {
-        this.thread_id = thread_id;
+    public void setThreadId(Long threadId) {
+        this.threadId = threadId;
     }
-
 }

@@ -9,16 +9,16 @@ import java.util.List;
 public interface ForumRubricService {
 
     ForumRubricResponseDto createRubric(ForumRubricRequestDto request, Long userId);
-    ForumRubricResponseDto getRubricById(Long rubricId);
+    ForumRubricResponseDto getRubricById(Long id);
     List<ForumRubricResponseDto> getAllActiveRubrics();
     List<ForumRubricResponseDto> getRubricsByCurrentUser(Long userId);
-    List<ForumRubricResponseDto> getRubricsByForumId(Long id);
+    List<ForumRubricResponseDto> getRubricsByForumId(Long forumId);
 
     ForumRubricResponseDto updateRubric(Long id, ForumRubricRequestDto request, Long userId);
-    void deleteRubric(Long rubricId, Long userId);
+    void deleteRubric(Long id, Long userId);
 
 
-    ForumRubricResponseDto getRubricWithAllDetails(Long rubricId, Long userId);
+    ForumRubricResponseDto getRubricWithAllDetails(Long id, Long userId);
     int countRubricsByUser(Long userId);
     int countRubricsByForum(Long forumId);
 

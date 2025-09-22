@@ -9,7 +9,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "forum_threads")
-public class ForumThread {
+public class ForumThread extends Timestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,15 +17,6 @@ public class ForumThread {
 
     @Column(name = "title", nullable = false, length = 255)
     private String title;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private  LocalDateTime updatedAt;
-
-    @Column(name = "delete_at")
-    private LocalDateTime deleteAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -63,29 +54,6 @@ public class ForumThread {
         this.title = title;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getDeleteAt() {
-        return deleteAt;
-    }
-
-    public void setDeleteAt(LocalDateTime deleteAt) {
-        this.deleteAt = deleteAt;
-    }
 
     public User getUser() {
         return user;
