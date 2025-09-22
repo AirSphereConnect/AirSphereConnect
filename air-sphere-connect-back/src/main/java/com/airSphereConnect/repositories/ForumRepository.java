@@ -11,8 +11,6 @@ import java.util.Optional;
 public interface ForumRepository extends JpaRepository<Forum, Long> {
     Optional<Forum> findById(Long id);
 
-    Optional<Forum> findByTitle(String title);
-
     @Query("SELECT f FROM Forum f LEFT JOIN FETCH f.forumRubrics WHERE f.id = :id")
     Optional<Forum> findByIdWithRubrics(Long id);
 }

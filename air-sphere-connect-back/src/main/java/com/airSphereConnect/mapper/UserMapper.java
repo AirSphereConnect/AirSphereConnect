@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component;
 public class UserMapper {
 
     // Frontend -> Backend
-    static User toEntity(UserRequestDto request) {
+    public static User toEntity(UserRequestDto request) {
         if (request == null) return null;
 
         User user = new User();
@@ -32,7 +32,7 @@ public class UserMapper {
     }
 
     // Backend -> Frontend
-    static UserResponseDto toDto(User user) {
+    public static UserResponseDto toDto(User user) {
         if (user == null) return null;
 
         UserResponseDto response = new UserResponseDto();

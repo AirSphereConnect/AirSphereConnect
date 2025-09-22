@@ -34,7 +34,7 @@ public class ForumServiceImpl implements ForumService {
     @Override
     @Transactional(readOnly = true)
     public ForumResponseDto getForumById(Long id) {
-        Forum forum = forumRepository.findById(id)
+        Forum forum = forumRepository.findByIdWithRubrics(id)
                 .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Forum non trouvé"));
 
         return forumMapper.toResponseDto(forum);
@@ -42,8 +42,8 @@ public class ForumServiceImpl implements ForumService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ForumRubricResponseDto> getRubricsByForumId(Long forumId) {
-        List<ForumRubric> rubrics = forumRubricRepository.findByForumIdAndDeletedAtIsNull(forumId);
+    public List<ForumRubricResponseDto> getRubricsByForumId(Long id) {
+        List<ForumRubric> rubrics = forumRubricRepository.findByForumIdAndDeletedAtIsNull(id);
         return rubrics.stream()
                 .map(forumRubricMapper::toResponseDto)
                 .toList();
