@@ -21,10 +21,10 @@ public class Region {
     private List<Department> departments = new ArrayList<>();
 
     @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Notification> notifications = new ArrayList<>();
+    private List<Alerts> alerts = new ArrayList<>();
 
 
-    public  Region() {}
+    public Region() {}
 
     public Region(String name, String code) {
        this.name = name;
@@ -78,15 +78,13 @@ public class Region {
         this.departments = departments;
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
+    public List<Alerts> getNotifications() {
+        return alerts;
     }
 
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
+    public void setNotifications(List<Alerts> alerts) {
+        this.alerts = alerts;
     }
-
-
 
     @Override
     public boolean equals(Object obj) {
