@@ -1,7 +1,6 @@
 package com.airSphereConnect.repositories;
 
 import com.airSphereConnect.entities.ForumPost;
-import com.airSphereConnect.entities.ForumThread;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

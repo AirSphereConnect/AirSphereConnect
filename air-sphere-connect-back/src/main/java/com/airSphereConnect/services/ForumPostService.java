@@ -2,7 +2,6 @@ package com.airSphereConnect.services;
 
 import com.airSphereConnect.dtos.request.ForumPostRequestDto;
 import com.airSphereConnect.dtos.response.ForumPostResponseDto;
-import com.airSphereConnect.entities.enums.ReactionType;
 
 import java.util.List;
 

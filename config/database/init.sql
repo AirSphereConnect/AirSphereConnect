@@ -286,7 +286,6 @@ CREATE TABLE post_reactions
     deleted_at    DATETIME DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (post_id) REFERENCES forum_posts (id) ON DELETE CASCADE,
-    UNIQUE KEY unique_user_post (user_id, post_id),
     INDEX idx_reaction_user (user_id),
     INDEX idx_reaction_post (post_id)
 );
