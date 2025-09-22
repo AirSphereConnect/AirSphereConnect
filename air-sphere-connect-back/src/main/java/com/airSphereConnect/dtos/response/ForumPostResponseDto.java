@@ -7,22 +7,30 @@ import java.time.LocalDateTime;
 public class ForumPostResponseDto {
     private Long id;
     private String content;
-    private Long user_id;
-    private Long thread_id;
-    private ReactionType reaction;
+    private Long userId;
+    private  String username;
+    private Long threadId;
+    private String threadTitle;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    private long likeCount;
+    private long dislikeCount;
+    private ReactionType currentUserReaction;
 
     public ForumPostResponseDto() {
     }
 
-    public ForumPostResponseDto(Long id, String content, Long user_id, Long thread_id, ReactionType reaction, LocalDateTime createdAt) {
+    public ForumPostResponseDto(Long id, String content, Long userId, String username, Long threadId, String threadTitle, LocalDateTime createdAt, long likeCount, long dislikeCount, ReactionType currentUserReaction) {
         this.id = id;
         this.content = content;
-        this.user_id = user_id;
-        this.thread_id = thread_id;
-        this.reaction = reaction;
+        this.userId = userId;
+        this.username = username;
+        this.threadId = threadId;
+        this.threadTitle = threadTitle;
         this.createdAt = createdAt;
+        this.likeCount = likeCount;
+        this.dislikeCount = dislikeCount;
+        this.currentUserReaction = currentUserReaction;
     }
 
     public Long getId() {
@@ -41,28 +49,44 @@ public class ForumPostResponseDto {
         this.content = content;
     }
 
-    public Long getUser_id() {
-        return user_id;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser_id(Long user_id) {
-        this.user_id = user_id;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public Long getThread_id() {
-        return thread_id;
+    public Long getThreadId() {
+        return threadId;
     }
 
-    public void setThread_id(Long thread_id) {
-        this.thread_id = thread_id;
+    public void setThreadId(Long threadId) {
+        this.threadId = threadId;
     }
 
-    public ReactionType getReaction() {
-        return reaction;
+    public long getLikeCount() {
+        return likeCount;
     }
 
-    public void setReaction(ReactionType reaction) {
-        this.reaction = reaction;
+    public void setLikeCount(long likeCount) {
+        this.likeCount = likeCount;
+    }
+
+    public long getDislikeCount() {
+        return dislikeCount;
+    }
+
+    public void setDislikeCount(long dislikeCount) {
+        this.dislikeCount = dislikeCount;
+    }
+
+    public ReactionType getCurrentUserReaction() {
+        return currentUserReaction;
+    }
+
+    public void setCurrentUserReaction(ReactionType currentUserReaction) {
+        this.currentUserReaction = currentUserReaction;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -79,5 +103,21 @@ public class ForumPostResponseDto {
 
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public String getThreadTitle() {
+        return threadTitle;
+    }
+
+    public void setThreadTitle(String threadTitle) {
+        this.threadTitle = threadTitle;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 }

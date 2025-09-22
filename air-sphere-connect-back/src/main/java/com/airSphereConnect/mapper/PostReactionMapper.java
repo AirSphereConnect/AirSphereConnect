@@ -5,7 +5,9 @@ import com.airSphereConnect.dtos.response.PostReactionResponseDto;
 import com.airSphereConnect.entities.ForumPost;
 import com.airSphereConnect.entities.PostReaction;
 import com.airSphereConnect.entities.User;
+import org.springframework.stereotype.Component;
 
+@Component
 public class PostReactionMapper {
 
     public PostReaction toEntity(PostReactionRequestDto request, User user, ForumPost post) {
