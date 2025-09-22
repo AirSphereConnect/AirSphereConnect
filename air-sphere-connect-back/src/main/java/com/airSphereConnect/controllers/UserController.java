@@ -5,8 +5,6 @@ import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,31 +13,39 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     // Tous les utilisateurs
     @GetMapping
     public List<UserResponseDto> getAllUsers() {
         return userService.getAllUsers()
                 .stream()
-                .map(UserMapper::toResponseDto)
+                .map(UserMapper::toDto)
                 .toList();
     }
 
     // Par nom d'utilisateur
     @GetMapping("/name")
     public UserResponseDto getUserByUsername(@RequestParam String username) {
-        return UserMapper.toResponseDto(userService.getUserByUsername(username));
+        return UserMapper.toDto(userService.getUserByUsername(username));
+    }
+    // Par Id utilisateur
+    @GetMapping("/id")
+    public UserResponseDto getUserById(@RequestParam Long id) {
+        return UserMapper.toDto(userService.getUserById(id));
     }
 
     // Création d'un utilisateur
-    @PostMapping
-    public ResponseEntity<UserResponseDto> createUser(@RequestBody UserRequestDto reqDto) {
+    @PostMapping("/new")
+    public UserResponseDto createUser(@RequestBody UserRequestDto reqDto) {
         User user = UserMapper.toEntity(reqDto);
         User created = userService.createUser(user);
-        UserResponseDto respDto = UserMapper.toResponseDto(created);
-        return ResponseEntity.status(201).body(respDto);
+        return UserMapper.toDto(created);
     }
 
     // Mettre à jour un utilisateur
@@ -47,14 +53,13 @@ public class UserController {
     public UserResponseDto updateUser(@PathVariable Long id, @RequestBody UserRequestDto reqDto) {
         User user = UserMapper.toEntity(reqDto);
         User updated = userService.updateUser(id, user);
-        return UserMapper.toResponseDto(updated);
+        return UserMapper.toDto(updated);
     }
 
     // Supprimer un utilisateur
     @DeleteMapping("/{id}")
-    public ResponseEntity<UserResponseDto> deleteUser(@PathVariable Long id) {
+    public UserResponseDto deleteUser(@PathVariable Long id) {
         User deletedUser = userService.deleteUser(id);
-        UserResponseDto respDto = UserMapper.toResponseDto(deletedUser);
-        return ResponseEntity.ok(respDto);
+        return UserMapper.toDto(deletedUser);
     }
 }

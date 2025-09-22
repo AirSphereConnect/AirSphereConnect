@@ -7,9 +7,7 @@ public class ForumPostRequestDto {
 
     @Size(min = 2, max = 255, message = "{post.content.size}")
     private String content;
-    @NotNull(message = "{post.userId.required}")
     private String user_id;
-    @NotNull(message = "{post.threadId.required}")
     private String thread_id;
 
 

@@ -27,20 +27,4 @@ public class GlobalException {
         }
     }
 
-    public static class UserNotFoundException extends RuntimeException {
-        public UserNotFoundException(String message) {
-            super(message);
-        }
-    }
-
-    public static class CityNotFoundException extends RuntimeException {
-        public CityNotFoundException(String message) {
-            super(message);
-        }
-    }
-    public static class FavoriteNotFoundException extends RuntimeException {
-        public FavoriteNotFoundException(String message) {
-            super(message);
-        }
-    }
 }

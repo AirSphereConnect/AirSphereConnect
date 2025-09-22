@@ -1,5 +1,6 @@
 package com.airSphereConnect.dtos.request;
 
+import com.airSphereConnect.entities.City;
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -15,11 +16,14 @@ public class AddressRequestDto {
     @Column(name = "street", nullable = false, length = 100)
     private String street;
 
+    private City city;
+
     public AddressRequestDto() {
     }
 
-    public AddressRequestDto(String street) {
+    public AddressRequestDto(String street,  City city) {
         this.street = street;
+        this.city = city;
     }
 
     public String getStreet() {
@@ -28,6 +32,13 @@ public class AddressRequestDto {
 
     public void setStreet(String street) {
         this.street = street;
+    }
+
+    public City getCity() {
+       return city;
+    }
+    public void setCity(City city) {
+        this.city = city;
     }
 }
 

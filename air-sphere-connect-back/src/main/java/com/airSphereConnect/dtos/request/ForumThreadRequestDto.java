@@ -10,9 +10,7 @@ public class ForumThreadRequestDto {
     @NotBlank(message = "{thread.title.required}")
     @Size(min = 2, max = 255, message = "{thread.title.size}")
     private String title;
-    @NotNull(message = "{thread.userId.required}")
     private Long user_id;
-    @NotNull(message = "{thread.rubricId.required}")
     private Long rubric_id;
 
     public ForumThreadRequestDto() {

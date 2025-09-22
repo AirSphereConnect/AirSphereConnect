@@ -5,9 +5,7 @@ import jakarta.validation.constraints.NotNull;
 
 public class PostReactionRequestDto {
 
-    @NotNull(message = "{reaction.userId.required}")
     private Long user_id;
-    @NotNull(message = "{reaction.postId.required}")
     private Long post_id;
     private ReactionType reaction;
 

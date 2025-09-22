@@ -10,13 +10,17 @@ public class ForumRubricRequestDto {
     @NotBlank(message = "{rubric.description.required}")
     @Size(min = 2, max = 255, message = "{rubric.description.size}")
     private String description;
+    private Long userId;
+    private Long forumId;
 
     public ForumRubricRequestDto() {
     }
 
-    public ForumRubricRequestDto(String title, String description) {
+    public ForumRubricRequestDto(String title, String description, Long userId, Long forumId) {
         this.title = title;
         this.description = description;
+        this.userId = userId;
+        this.forumId = forumId;
     }
 
     public String getTitle() {
@@ -33,5 +37,21 @@ public class ForumRubricRequestDto {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public Long getForumId() {
+        return forumId;
+    }
+
+    public void setForumId(Long forumId) {
+        this.forumId = forumId;
     }
 }

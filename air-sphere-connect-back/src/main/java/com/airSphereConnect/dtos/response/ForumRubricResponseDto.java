@@ -7,18 +7,22 @@ public class ForumRubricResponseDto {
     private Long id;
     private String title;
     private String description;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private LocalDateTime deletedAt;
+    private Long userId;
+    private String username;
+    private Long forumId;
+    private String forumTitle;
 
     public ForumRubricResponseDto() {
     }
 
-    public ForumRubricResponseDto(Long id, String title, String description, LocalDateTime createdAt) {
+    public ForumRubricResponseDto(Long id, String title, String description, Long userId, String username, Long forumId, String forumTitle) {
         this.id = id;
         this.title = title;
         this.description = description;
-        this.createdAt = createdAt;
+        this.userId = userId;
+        this.username = username;
+        this.forumId = forumId;
+        this.forumTitle = forumTitle;
     }
 
     public Long getId() {
@@ -45,19 +49,35 @@ public class ForumRubricResponseDto {
         this.description = description;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
+    public String getUsername() {
+        return username;
     }
 
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public Long getForumId() {
+        return forumId;
+    }
+
+    public void setForumId(Long forumId) {
+        this.forumId = forumId;
+    }
+
+    public String getForumTitle() {
+        return forumTitle;
+    }
+
+    public void setForumTitle(String forumTitle) {
+        this.forumTitle = forumTitle;
     }
 }

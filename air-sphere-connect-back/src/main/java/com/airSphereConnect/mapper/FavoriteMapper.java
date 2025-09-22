@@ -1,24 +1,12 @@
 package com.airSphereConnect.mapper;
 
 import com.airSphereConnect.dtos.FavoriteDto;
-import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.Favorite;
-import com.airSphereConnect.entities.User;
-import com.airSphereConnect.exceptions.GlobalException;
-import com.airSphereConnect.repositories.CityRepository;
-import com.airSphereConnect.repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class FavoriteMapper {
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private CityRepository cityRepository;
-
+    // Backend -> Frontend
     public FavoriteDto toDto(Favorite favorite) {
         return new FavoriteDto(
                 favorite.getId(),
@@ -29,7 +17,7 @@ public class FavoriteMapper {
                 favorite.getCity() != null ? favorite.getCity().getId() : null
         );
     }
-
+    // Frontend -> Backend
     public Favorite toEntity(FavoriteDto dto) {
         Favorite favorite = new Favorite();
         favorite.setId(dto.getId());
@@ -37,17 +25,7 @@ public class FavoriteMapper {
         favorite.setCreatedAt(dto.getCreatedAt());
         favorite.setUpdatedAt(dto.getUpdatedAt());
 
-        if (dto.getUserId() != null) {
-            User user = userRepository.findById(dto.getUserId())
-                    .orElseThrow(() -> new GlobalException.UserNotFoundException("Utilisateur non trouvé"));
-            favorite.setUser(user);
-        }
-
-        if (dto.getCityId() != null) {
-            City city = cityRepository.findById(dto.getCityId())
-                    .orElseThrow(() -> new GlobalException.CityNotFoundException("Ville non trouvée"));
-            favorite.setCity(city);
-        }
         return favorite;
     }
 }
+
