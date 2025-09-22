@@ -1,12 +1,12 @@
 package com.airSphereConnect.entities.enums;
 
-public enum NotificationType {
+public enum AlertType {
     WEATHER("Météo"),
     AIR_QUALITY("Qualité de l'air");
 
     private final String displayName;
 
-    NotificationType(String displayName) {
+    AlertType(String displayName) {
         this.displayName = displayName;
     }
 

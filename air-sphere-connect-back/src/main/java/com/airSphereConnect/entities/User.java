@@ -5,15 +5,20 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
 @Entity
 @Table(name= "users")
-public class User {
+public class User implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,9 +43,6 @@ public class User {
     @Column(name = "role", nullable = false, columnDefinition = "ENUM('USER','ADMIN','GUEST')")
     private UserRole role = UserRole.USER;
 
-
-
-
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -56,17 +58,12 @@ public class User {
     @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Favorite> favorites = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = {
-            CascadeType.PERSIST,
-            CascadeType.MERGE,
-            CascadeType.REFRESH,
-            CascadeType.DETACH
-    })    @JoinTable(
-            name = "user_notifications",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "notification_id")
-    )
-    private List<Notification> notifications = new ArrayList<>();
+    @OneToMany(mappedBy = "user",  cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FavoritesAlerts> favoritesAlerts = new ArrayList<>();
+
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Alerts> alerts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ForumRubric> forumRubrics = new ArrayList<>();
@@ -181,12 +178,12 @@ public class User {
         this.favorites = favorites;
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
+    public List<Alerts> getNotifications() {
+        return alerts;
     }
 
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
+    public void setNotifications(List<Alerts> alerts) {
+        this.alerts = alerts;
     }
 
     public List<ForumRubric> getForumRubrics() {
@@ -228,6 +225,22 @@ public class User {
         return Objects.equals(id, user.id);
     }
 
+    public List<FavoritesAlerts> getFavoritesAlerts() {
+        return favoritesAlerts;
+    }
+
+    public void setFavoritesAlerts(List<FavoritesAlerts> favoritesAlerts) {
+        this.favoritesAlerts = favoritesAlerts;
+    }
+
+    public List<Alerts> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alerts> alerts) {
+        this.alerts = alerts;
+    }
+
     @Override
     public int hashCode() {
         return Objects.hashCode(id);
@@ -241,4 +254,10 @@ public class User {
                 ", email='" + email + '\'' +
                 '}';
     }
+    //Besoin pour la gestion des rôles dans spring sécurity
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+    }
+
 }

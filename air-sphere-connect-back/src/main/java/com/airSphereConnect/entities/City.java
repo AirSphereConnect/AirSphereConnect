@@ -49,7 +49,7 @@ public class City {
     private List<Address> addresses = new ArrayList<>();
 
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Notification> notifications = new ArrayList<>();
+    private List<Alerts> alerts = new ArrayList<>();
 
 
     public City() {}
@@ -159,12 +159,12 @@ public class City {
         this.addresses = addresses;
     }
 
-    public List<Notification> getNotifications() {
-        return notifications;
+    public List<Alerts> getAlerts() {
+        return alerts;
     }
 
-    public void setNotifications(List<Notification> notifications) {
-        this.notifications = notifications;
+    public void setAlerts(List<Alerts> alerts) {
+        this.alerts = alerts;
     }
 
     @Override
