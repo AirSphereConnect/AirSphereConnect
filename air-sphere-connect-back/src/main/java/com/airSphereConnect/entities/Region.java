@@ -24,7 +24,7 @@ public class Region {
     private List<Notification> notifications = new ArrayList<>();
 
 
-    protected  Region() {}
+    public  Region() {}
 
     public Region(String name, String code) {
        this.name = name;

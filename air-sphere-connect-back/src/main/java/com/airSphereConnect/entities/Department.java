@@ -20,7 +20,7 @@ public class Department {
     @Column(name= "code", nullable = false)
     private String code;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name="region_id", nullable = false)
     private Region region;
 
@@ -29,7 +29,7 @@ public class Department {
 
     public Department() {}
 
-    public Department(String name, String code, Region region, LocalDateTime createdAt) {
+    public Department(String name, String code, Region region) {
         this.name = name;
         this.code = code;
         this.region = region;
@@ -93,8 +93,7 @@ public class Department {
                 "id=" + id +
                 ", name='" + name + '\'' +
                 ", code='" + code + '\'' +
-                ", region=" + region +
-                ", cities=" + cities +
+                ", regionId=" + (region != null ? region.getId() : null) +
                 '}';
     }
 }

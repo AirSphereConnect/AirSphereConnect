@@ -1,7 +1,9 @@
 package com.airSphereConnect.mapper;
 
+import com.airSphereConnect.dtos.response.ApiCityResponseDto;
 import com.airSphereConnect.dtos.response.CityResponseDto;
 import com.airSphereConnect.entities.City;
+import com.airSphereConnect.entities.Department;
 
 public class CityMapper {
 

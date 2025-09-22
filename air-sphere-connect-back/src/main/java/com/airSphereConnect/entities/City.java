@@ -17,13 +17,13 @@ public class City {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name = "postal_code", length = 10, nullable = false)
+    @Column(name = "postal_code", length = 10, nullable = true)
     private String postalCode;
 
-    @Column(name = "latitude", nullable = false)
+    @Column(name = "latitude")
     private Double latitude;
 
-    @Column(name = "longitude", nullable = false)
+    @Column(name = "longitude")
     private Double longitude;
 
     @Column(name = "area_code", length = 10)
