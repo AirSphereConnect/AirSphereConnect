@@ -230,7 +230,7 @@ CREATE TABLE favorites_alerts
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id       BIGINT NOT NULL,
-    city_id       INT    NOT NULL,
+    city_id       BIGINT    NOT NULL,
     department_id BIGINT,
     region_id     BIGINT,
     is_enabled    BOOLEAN  DEFAULT TRUE,
@@ -253,7 +253,7 @@ CREATE TABLE alerts
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id       BIGINT                          NOT NULL,
-    city_id       INT                             NOT NULL,
+    city_id       BIGINT                             NOT NULL,
     department_id BIGINT,
     region_id     BIGINT,
     alert_type    ENUM ('AIR_QUALITY', 'WEATHER') NOT NULL,
