@@ -17,4 +17,6 @@ public interface ForumThreadService {
 
     ForumThreadResponseDto getThreadWithAllDetails(Long id, Long userId);
 
+    int countThreadsByUser(Long userId);
+    int countThreadsByRubric(Long rubricId);
 }

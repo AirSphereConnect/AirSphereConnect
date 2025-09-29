@@ -57,7 +57,7 @@ public class ForumThreadServiceImpl implements ForumThreadService {
                 .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Rubrique non trouvée avec l'ID: " + forumRubricId));
     }
 
-    private void validateThreadCreation(ForumThreadRequestDto request, User user, Forum forum) {
+    private void validateThreadCreation(ForumThreadRequestDto request, User user, ForumRubric forumRubric) {
         int activeUserThreads = forumThreadRepository.countByUserIdAndDeletedAtIsNull(user.getId());
         if (activeUserThreads >= MAX_ACTIVE_THREADS_PER_USER) {
             throw new GlobalException.BadRequestException(
@@ -108,7 +108,7 @@ public class ForumThreadServiceImpl implements ForumThreadService {
     public ForumThreadResponseDto createThread(ForumThreadRequestDto request, Long userId) {
         User user = findUserByIdOrThrow(userId);
         ForumRubric forumRubric = findForumRubricByIdOrThrow(request.getRubricId());
-        validateThreadCreation(request, user, forumRubric.getForum());
+        validateThreadCreation(request, user, forumRubric);
 
         ForumThread thread = forumThreadMapper.toEntity(request, user, forumRubric);
         ForumThread savedThread = forumThreadRepository.save(thread);
@@ -128,6 +128,7 @@ public class ForumThreadServiceImpl implements ForumThreadService {
 
         ForumThread updatedThread = forumThreadRepository.save(existingThread);
         return forumThreadMapper.toResponseDto(updatedThread);
+
     }
 
     @Override
@@ -151,7 +152,22 @@ public class ForumThreadServiceImpl implements ForumThreadService {
         ForumThread thread = forumThreadRepository.findByIdAndDeletedAtIsNull(id)
                 .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Fil de discussion introuvable : " + id));
 
-        return forumThreadMapper.toResponseDto(thread);
+        ForumThreadResponseDto response = forumThreadMapper.toResponseDto(thread);
+
+        countThreadsByUser(user.getId());
+        countThreadsByRubric(thread.getForumRubric().getId());
+        return response;
+    }
+
+
+    public int countThreadsByRubric(Long rubricId) {
+        ForumRubric forumRubric = findForumRubricByIdOrThrow(rubricId);
+        return forumThreadRepository.countByForumRubricIdAndDeletedAtIsNull(forumRubric.getId());
+    }
+
+    public int countThreadsByUser(Long userId) {
+        User user = findUserByIdOrThrow(userId);
+        return forumThreadRepository.countByUserIdAndDeletedAtIsNull(user.getId());
     }
 
 }

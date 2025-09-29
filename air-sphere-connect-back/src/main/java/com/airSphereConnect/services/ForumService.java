@@ -7,6 +7,7 @@ import java.util.List;
 
 public interface ForumService {
     ForumResponseDto getForumById(Long id);
-    List<ForumRubricResponseDto> getRubricsByForumId(Long forumId);
+
+    List<ForumRubricResponseDto> getRubricsByForumId(Long id);
 
 }
