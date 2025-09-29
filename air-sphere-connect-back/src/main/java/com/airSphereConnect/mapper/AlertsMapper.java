@@ -2,73 +2,46 @@ package com.airSphereConnect.mapper;
 
 import com.airSphereConnect.dtos.AlertsDto;
 import com.airSphereConnect.entities.*;
+import org.springframework.stereotype.Component;
 
+@Component
 public class AlertsMapper {
 
-    public static Alerts toEntity(AlertsDto dto) {
-        if (dto == null) return null;
-
-        Alerts entity = new Alerts();
-        entity.setId(dto.getId());
-
-        if (dto.getUserId() != null) {
-            User user = new User();
-            user.setId(dto.getUserId());
-            entity.setUser(user);
+        public static AlertsDto toDto(Alerts alerts) {
+            if (alerts == null) return null;
+            AlertsDto dto = new AlertsDto();
+            copyAlertsToDto(alerts, dto);
+            return dto;
         }
 
-        if (dto.getCityId() != null) {
-            City city = new City();
-            city.setId(dto.getCityId());
-            entity.setCity(city);
+        public static Alerts toEntity(AlertsDto dto) {
+            if (dto == null) return null;
+            Alerts alerts = new Alerts();
+            copyDtoToAlerts(dto, alerts);
+            return alerts;
         }
 
-        if (dto.getDepartmentId() != null) {
-            Department department = new Department();
-            department.setId(dto.getDepartmentId());
-            entity.setDepartment(department);
+        private static void copyAlertsToDto(Alerts alerts, AlertsDto dto) {
+            dto.setId(alerts.getId());
+            dto.setAlertType(alerts.getAlertType());
+            dto.setMessage(alerts.getMessage());
+            dto.setSentAt(alerts.getSentAt());
+            dto.setCity(alerts.getCity());
+            dto.setRegion(alerts.getRegion());
+            dto.setDepartmentId(alerts.getDepartment());
+            if (alerts.getUser() != null) {
+                dto.setUserId(alerts.getUser().getId());
+            }
         }
 
-        if (dto.getRegionId() != null) {
-            Region region = new Region();
-            region.setId(dto.getRegionId());
-            entity.setRegion(region);
+        private static void copyDtoToAlerts(AlertsDto dto, Alerts alerts) {
+            alerts.setId(dto.getId());
+            alerts.setAlertType(dto.getAlertType());
+            alerts.setMessage(dto.getMessage());
+            alerts.setSentAt(dto.getSentAt());
+            alerts.setCity(dto.getCity());
+            alerts.setRegion(dto.getRegion());
+            alerts.setDepartment(dto.getDepartment());
+            // author à set dans service
         }
-
-        entity.setAlertType(dto.getAlertType());
-        entity.setMessage(dto.getMessage());
-        entity.setSentAt(dto.getSentAt());
-
-        return entity;
     }
-
-    public static AlertsDto toDto(Alerts entity) {
-        if (entity == null) return null;
-
-        AlertsDto dto = new AlertsDto();
-        dto.setId(entity.getId());
-
-        if (entity.getUser() != null) {
-            dto.setUserId(entity.getUser().getId());
-        }
-
-        if (entity.getCity() != null) {
-            dto.setCityId(entity.getCity().getId());
-        }
-
-        if (entity.getDepartment() != null) {
-            dto.setDepartmentId(entity.getDepartment().getId());
-        }
-
-        if (entity.getRegion() != null) {
-            dto.setRegionId(entity.getRegion().getId());
-        }
-
-        dto.setAlertType(entity.getAlertType());
-        dto.setMessage(entity.getMessage());
-        dto.setSentAt(entity.getSentAt());
-
-        return dto;
-    }
-
-}

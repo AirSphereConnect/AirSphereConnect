@@ -1,5 +1,6 @@
 package com.airSphereConnect.dtos;
 
+import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.Department;
 import com.airSphereConnect.entities.Region;
 import com.airSphereConnect.entities.enums.AlertType;
@@ -9,21 +10,21 @@ import java.time.LocalDateTime;
 public class AlertsDto {
     private Long id;
     private Long userId;
-    private Long cityId;
+    private City city;
 
-    private Long departmentId;
-    private Long regionId;
+    private Department department;
+    private Region region;
     private String message;
     private AlertType alertType;
     private LocalDateTime sentAt;
 
     public AlertsDto() {}
 
-    public AlertsDto(Long userId, Long cityId, AlertType alertType, String message, LocalDateTime sentAt, Long regionId, Long departmentId) {
+    public AlertsDto(Long userId, City city, AlertType alertType, String message, LocalDateTime sentAt, Region region, Department department) {
         this.userId = userId;
-        this.cityId = cityId;
-        this.regionId = regionId;
-        this.departmentId = departmentId;
+        this.city = city;
+        this.region = region;
+        this.department = department;
         this.alertType = alertType;
         this.message = message;
         this.sentAt = sentAt;
@@ -45,12 +46,12 @@ public class AlertsDto {
         this.userId = userId;
     }
 
-    public Long getCityId() {
-        return cityId;
+    public City getCity() {
+        return city;
     }
 
-    public void setCityId(Long cityId) {
-        this.cityId = cityId;
+    public void setCity(City city) {
+        this.city = city;
     }
 
     public AlertType getAlertType() {
@@ -77,19 +78,19 @@ public class AlertsDto {
         this.sentAt = sentAt;
     }
 
-    public Long getRegionId() {
-        return regionId;
+    public Region getRegion() {
+        return region;
     }
 
-    public void setRegionId(Long regionId) {
-        this.regionId = regionId;
+    public void setRegion(Region region) {
+        this.region = region;
     }
 
-    public Long getDepartmentId() {
-        return departmentId;
+    public Department getDepartment() {
+        return department;
     }
 
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
+    public void setDepartmentId(Department department) {
+        this.department = department;
     }
 }
