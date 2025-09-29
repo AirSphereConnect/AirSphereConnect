@@ -31,7 +31,8 @@ public class FavoritesAlerts {
     private Region region;
 
     @Column(name = "is_enabled", nullable = false)
-    private boolean isEnabled = true;
+    private boolean isEnabled;
+
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -96,4 +97,13 @@ public class FavoritesAlerts {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public boolean getIsEnabled() {
+        return isEnabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.isEnabled = enabled;
+    }
+
 }

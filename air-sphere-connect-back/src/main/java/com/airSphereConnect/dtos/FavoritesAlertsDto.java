@@ -62,12 +62,12 @@ public class FavoritesAlertsDto {
         this.regionId = regionId;
     }
 
-    public boolean isEnabled() {
+    public boolean getIsEnabled() {
         return isEnabled;
     }
 
     public void setEnabled(boolean enabled) {
-        isEnabled = enabled;
+        this.isEnabled = enabled;
     }
 
     public LocalDateTime getCreatedAt() {

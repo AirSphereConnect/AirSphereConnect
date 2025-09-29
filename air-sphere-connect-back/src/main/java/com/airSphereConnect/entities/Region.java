@@ -23,6 +23,9 @@ public class Region {
     @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Alerts> alerts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FavoritesAlerts> favoritesAlerts = new ArrayList<>();
+
 
     public Region() {}
 
@@ -84,6 +87,22 @@ public class Region {
 
     public void setNotifications(List<Alerts> alerts) {
         this.alerts = alerts;
+    }
+
+    public List<Alerts> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alerts> alerts) {
+        this.alerts = alerts;
+    }
+
+    public List<FavoritesAlerts> getFavoritesAlerts() {
+        return favoritesAlerts;
+    }
+
+    public void setFavoritesAlerts(List<FavoritesAlerts> favoritesAlerts) {
+        this.favoritesAlerts = favoritesAlerts;
     }
 
     @Override

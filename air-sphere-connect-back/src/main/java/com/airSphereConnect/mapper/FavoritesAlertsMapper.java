@@ -4,44 +4,19 @@ import com.airSphereConnect.dtos.FavoritesAlertsDto;
 import com.airSphereConnect.entities.*;
 
 public class FavoritesAlertsMapper {
-
+    // Frontend -> Backend
     public static FavoritesAlerts toEntity(FavoritesAlertsDto dto) {
         if (dto == null) return null;
 
         FavoritesAlerts entity = new FavoritesAlerts();
-
         entity.setId(dto.getId());
-
-        if (dto.getUserId() != null) {
-            User user = new User();
-            user.setId(dto.getUserId());
-            entity.setUser(user);
-        }
-
-        if (dto.getCityId() != null) {
-            City city = new City();
-            city.setId(dto.getCityId());
-            entity.setCity(city);
-        }
-
-        if (dto.getDepartmentId() != null) {
-            Department department = new Department();
-            department.setId(dto.getDepartmentId());
-            entity.setDepartment(department);
-        }
-
-        if (dto.getRegionId() != null) {
-            Region region = new Region();
-            region.setId(dto.getRegionId());
-            entity.setRegion(region);
-        }
-
+        entity.setEnabled(dto.getIsEnabled());
         entity.setCreatedAt(dto.getCreatedAt());
         entity.setUpdatedAt(dto.getUpdatedAt());
 
         return entity;
     }
-
+    // Backend -> Frontend
     public static FavoritesAlertsDto toDto(FavoritesAlerts entity) {
         if (entity == null) return null;
 
@@ -63,7 +38,7 @@ public class FavoritesAlertsMapper {
         if (entity.getRegion() != null) {
             dto.setRegionId(entity.getRegion().getId());
         }
-
+        dto.setEnabled(entity.getIsEnabled());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
 

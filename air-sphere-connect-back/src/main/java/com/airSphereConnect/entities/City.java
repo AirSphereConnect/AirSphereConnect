@@ -51,6 +51,9 @@ public class City {
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Alerts> alerts = new ArrayList<>();
 
+    @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FavoritesAlerts> favoritesAlerts = new ArrayList<>();
+
 
     public City() {}
 
@@ -165,6 +168,14 @@ public class City {
 
     public void setAlerts(List<Alerts> alerts) {
         this.alerts = alerts;
+    }
+
+    public List<FavoritesAlerts> getFavoritesAlerts() {
+        return favoritesAlerts;
+    }
+
+    public void setFavoritesAlerts(List<FavoritesAlerts> favoritesAlerts) {
+        this.favoritesAlerts = favoritesAlerts;
     }
 
     @Override

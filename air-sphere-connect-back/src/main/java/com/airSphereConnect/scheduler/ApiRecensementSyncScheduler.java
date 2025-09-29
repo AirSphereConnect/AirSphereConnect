@@ -22,9 +22,9 @@ public class ApiRecensementSyncScheduler {
 
     @PostConstruct
     public void init() {
-        regionSyncService.importRegions();
-        departmentSyncService.importDepartments();
-        citySyncService.importCitiesOccitanie();
+//        regionSyncService.importRegions();
+//        departmentSyncService.importDepartments();
+//        citySyncService.importCitiesOccitanie();
     }
 
     @Scheduled(cron = "0 0 2 27 12 *")

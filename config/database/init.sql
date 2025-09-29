@@ -230,18 +230,16 @@ CREATE TABLE favorites_alerts
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id       BIGINT NOT NULL,
-    city_id       INT    NOT NULL,
-    department_id BIGINT,
-    region_id     BIGINT,
+    city_id       BIGINT NOT NULL,
+    department_id BIGINT NOT NULL,
+    region_id     BIGINT NOT NULL,
     is_enabled    BOOLEAN  DEFAULT TRUE,
     created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (city_id) REFERENCES cities (id),
     FOREIGN KEY (department_id) REFERENCES departments (id),
     FOREIGN KEY (region_id) REFERENCES regions (id),
-
     INDEX idx_alert_user_enabled (user_id, is_enabled),
     INDEX idx_alert_city (city_id)
 );
@@ -253,18 +251,16 @@ CREATE TABLE alerts
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     user_id       BIGINT                          NOT NULL,
-    city_id       INT                             NOT NULL,
-    department_id BIGINT,
-    region_id     BIGINT,
+    city_id       BIGINT                          NOT NULL,
+    department_id BIGINT                          NOT NULL,
+    region_id     BIGINT                          NOT NULL,
     alert_type    ENUM ('AIR_QUALITY', 'WEATHER') NOT NULL,
     message       TEXT                            NOT NULL,
     sent_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
-
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (city_id) REFERENCES cities (id),
     FOREIGN KEY (department_id) REFERENCES departments (id),
     FOREIGN KEY (region_id) REFERENCES regions (id),
-
     INDEX idx_sent_date (sent_at),
     INDEX idx_city_type (city_id, alert_type),
     INDEX idx_user (user_id)

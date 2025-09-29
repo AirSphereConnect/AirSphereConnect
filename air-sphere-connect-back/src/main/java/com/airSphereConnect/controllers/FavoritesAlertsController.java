@@ -2,12 +2,13 @@ package com.airSphereConnect.controllers;
 
 import com.airSphereConnect.dtos.FavoritesAlertsDto;
 import com.airSphereConnect.services.FavoritesAlertsService;
+import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/alert_configurations")
+@RequestMapping("/api/alert/configurations")
 public class FavoritesAlertsController {
 
     private final FavoritesAlertsService favoritesAlertsService;
@@ -16,9 +17,16 @@ public class FavoritesAlertsController {
         this.favoritesAlertsService = favoritesAlertsService;
     }
 
+
     @PostMapping
     public FavoritesAlertsDto create(@RequestBody FavoritesAlertsDto dto) {
         return favoritesAlertsService.createAlertConfig(dto);
+    }
+
+    @GetMapping
+//    @PostAuthorize("hasRole('ADMIN')")
+    public List<FavoritesAlertsDto> getAllFavoritesAlerts() {
+        return favoritesAlertsService.getAllFavoritesAlerts();
     }
 
     @GetMapping("/user/{userId}")
@@ -27,8 +35,8 @@ public class FavoritesAlertsController {
     }
 
     @PutMapping
-    public FavoritesAlertsDto update(@RequestBody FavoritesAlertsDto dto) {
-        return favoritesAlertsService.updateAlertConfig(dto);
+    public FavoritesAlertsDto update(@RequestBody FavoritesAlertsDto dto, @RequestParam Long userId) {
+        return favoritesAlertsService.updateAlertConfig(dto, userId);
     }
 
     @PatchMapping("/{id}/enabled")

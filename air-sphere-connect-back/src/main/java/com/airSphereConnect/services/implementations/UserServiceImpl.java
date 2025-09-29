@@ -2,7 +2,6 @@ package com.airSphereConnect.services.implementations;
 
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
-import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.UserService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -59,6 +57,7 @@ public class UserServiceImpl implements UserService {
         if (user.getAddress() != null) {
             user.getAddress().setUser(user);
         }
+        // TODO Une fois spring sécurity en place il faut revoir ce encoder
         user.setPassword(encoder.encode(user.getPassword()));
         return userRepository.save(user);
     }
