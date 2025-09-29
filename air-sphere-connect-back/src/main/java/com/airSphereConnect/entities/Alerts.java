@@ -15,20 +15,21 @@ public class Alerts {
     private Long id;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne(optional = false)
-    @JoinColumn(name = "city_id")
+    @JoinColumn(name = "city_id", nullable = false)
     private City city;
 
-    @ManyToOne
-    @JoinColumn(name = "department_id")
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "department_id", nullable = true)
     private Department department;
 
-    @ManyToOne
-    @JoinColumn(name = "region_id")
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "region_id", nullable = true)
     private Region region;
+
 
     @Enumerated(EnumType.STRING)
     @Column(name = "alert_type", nullable = false)
@@ -104,6 +105,6 @@ public class Alerts {
     public void setSentAt(LocalDateTime sentAt) {
         this.sentAt = sentAt;
     }
-// getters and setters
+
 }
 

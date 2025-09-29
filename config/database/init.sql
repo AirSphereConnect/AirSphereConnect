@@ -30,8 +30,9 @@ CREATE TABLE cities
 (
     id            BIGINT AUTO_INCREMENT PRIMARY KEY,
     name          VARCHAR(100) NOT NULL,
-    postal_code   VARCHAR(10),
+    postal_code   VARCHAR(10)  NOT NULL,
     department_id BIGINT       NOT NULL,
+    population    INTEGER       NOT NULL,
     latitude      DOUBLE       NOT NULL,
     longitude     DOUBLE       NOT NULL,
     area_code     VARCHAR(10),
@@ -61,17 +62,12 @@ CREATE TABLE users
 
 CREATE TABLE addresses
 (
-    id          BIGINT AUTO_INCREMENT PRIMARY KEY,
-    user_id     BIGINT       NOT NULL,
-    city_id     BIGINT       NOT NULL,
-    type        ENUM ('HOME','WORK','OTHER') DEFAULT 'HOME',
-    description VARCHAR(255),
-    street      VARCHAR(255) NOT NULL,
-    postal_code VARCHAR(10)  NOT NULL,
-    city_name   VARCHAR(150) NOT NULL,
-    country     VARCHAR(100) NOT NULL        DEFAULT 'France',
-    created_at  DATETIME                     DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME                     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id    BIGINT       NOT NULL,
+    city_id    BIGINT       NOT NULL,
+    street     VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (city_id) REFERENCES cities (id),
     INDEX idx_address_user (user_id)
@@ -85,9 +81,8 @@ CREATE TABLE populations
 (
     id         BIGINT AUTO_INCREMENT PRIMARY KEY,
     city_id    BIGINT       NOT NULL,
-    population INTEGER      NOT NULL,
+    population INTEGER       NOT NULL,
     year       INTEGER      NOT NULL,
-    density    DOUBLE,
     source     VARCHAR(100) NOT NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -116,18 +111,16 @@ CREATE TABLE air_quality_measurements
 (
     id          BIGINT AUTO_INCREMENT PRIMARY KEY,
     station_id  BIGINT   NOT NULL,
-    datetime    DATETIME NOT NULL,
     pm10        DOUBLE,
     pm25        DOUBLE,
     no2         DOUBLE,
     o3          DOUBLE,
     so2         DOUBLE,
     atmo        INTEGER,
+    area_code   VARCHAR(10),
     message     VARCHAR(50),
     source      VARCHAR(100),
     measured_at DATETIME NOT NULL,
-    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at  DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (station_id) REFERENCES air_quality_stations (id) ON DELETE CASCADE,
     INDEX idx_measurement_station_date (station_id, measured_at),
     INDEX idx_measurement_date (measured_at)
@@ -217,45 +210,62 @@ CREATE TABLE forum_threads
 
 CREATE TABLE forum_posts
 (
-    id             BIGINT AUTO_INCREMENT PRIMARY KEY,
-    thread_id      BIGINT   NOT NULL,
-    user_id        BIGINT   NOT NULL,
-    content        TEXT     NOT NULL,
-    likes_count    INTEGER  DEFAULT 0,
-    dislikes_count INTEGER  DEFAULT 0,
-    created_at     DATETIME DEFAULT CURRENT_TIMESTAMP,
-    updated_at     DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    deleted_at     DATETIME DEFAULT NULL,
+    id         BIGINT AUTO_INCREMENT PRIMARY KEY,
+    thread_id  BIGINT NOT NULL,
+    user_id    BIGINT NOT NULL,
+    content    TEXT   NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME DEFAULT NULL,
     FOREIGN KEY (thread_id) REFERENCES forum_threads (id) ON DELETE CASCADE,
     FOREIGN KEY (user_id) REFERENCES users (id),
     INDEX idx_post_thread (thread_id),
     INDEX idx_post_user (user_id)
 );
 
--- ===================================
--- TABLE NOTIFICATIONS
--- ===================================
-
-CREATE TABLE notifications
+-- ==============================
+-- TABLE FAVORITE_ALERTS (Paramètres d'alertes par utilisateur)
+-- ==============================
+CREATE TABLE favorites_alerts
 (
-    id                BIGINT AUTO_INCREMENT PRIMARY KEY,
-    message           TEXT                                                         NOT NULL,
-    notification_type ENUM ('WEATHER','AIR_QUALITY','POPULATION','FORUM','SYSTEM') NOT NULL,
-    sent_at           DATETIME                                                     NOT NULL,
-    is_checked        BOOLEAN  DEFAULT FALSE,
-    user_id           BIGINT,
-    city_id           BIGINT,
-    department_id     BIGINT,
-    region_id         BIGINT,
-    created_at        DATETIME DEFAULT CURRENT_TIMESTAMP,
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id       BIGINT NOT NULL,
+    city_id       BIGINT NOT NULL,
+    department_id BIGINT NOT NULL,
+    region_id     BIGINT NOT NULL,
+    is_enabled    BOOLEAN  DEFAULT TRUE,
+    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at    DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (city_id) REFERENCES cities (id),
     FOREIGN KEY (department_id) REFERENCES departments (id),
     FOREIGN KEY (region_id) REFERENCES regions (id),
-    INDEX idx_notif_user (user_id),
-    INDEX idx_notif_type (notification_type),
-    INDEX idx_notif_sent_at (sent_at)
+    INDEX idx_alert_user_enabled (user_id, is_enabled),
+    INDEX idx_alert_city (city_id)
 );
+
+-- ==============================
+-- TABLE ALERTE (Historique des notifications envoyées)
+-- ==============================
+CREATE TABLE alerts
+(
+    id            BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id       BIGINT                          NOT NULL,
+    city_id       BIGINT                          NOT NULL,
+    department_id BIGINT                          NOT NULL,
+    region_id     BIGINT                          NOT NULL,
+    alert_type    ENUM ('AIR_QUALITY', 'WEATHER') NOT NULL,
+    message       TEXT                            NOT NULL,
+    sent_at       DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
+    FOREIGN KEY (city_id) REFERENCES cities (id),
+    FOREIGN KEY (department_id) REFERENCES departments (id),
+    FOREIGN KEY (region_id) REFERENCES regions (id),
+    INDEX idx_sent_date (sent_at),
+    INDEX idx_city_type (city_id, alert_type),
+    INDEX idx_user (user_id)
+);
+
 
 -- ===================================
 -- TABLE POST REACTIONS
@@ -358,21 +368,21 @@ FROM departments
 WHERE code = '82';
 
 -- 3️⃣ Villes principales avec coordonnées GPS
-INSERT INTO cities (name, postal_code, department_id, latitude, longitude, area_code)
-VALUES ('Toulouse', '31000', @dep_haute_garonne, 43.604652, 1.444209, '31555'),
-       ('Colomiers', '31770', @dep_haute_garonne, 43.611546, 1.332524, '31149'),
-       ('Tournefeuille', '31170', @dep_haute_garonne, 43.586111, 1.343611, '31557'),
-       ('Montpellier', '34000', @dep_herault, 43.610769, 3.876716, '34172'),
-       ('Béziers', '34500', @dep_herault, 43.344097, 3.215795, '34032'),
-       ('Sète', '34200', @dep_herault, 43.403889, 3.696944, '34301'),
-       ('Carcassonne', '11000', @dep_aude, 43.212161, 2.353663, '11069'),
-       ('Narbonne', '11100', @dep_aude, 43.183946, 3.004230, '11262'),
-       ('Perpignan', '66000', @dep_pyr_or, 42.698611, 2.895556, '66136'),
-       ('Canet-en-Roussillon', '66140', @dep_pyr_or, 42.693989, 3.038056, '66037'),
-       ('Nîmes', '30000', @dep_gard, 43.836699, 4.360054, '30189'),
-       ('Alès', '30100', @dep_gard, 44.125102, 4.081061, '30007'),
-       ('Albi', '81000', @dep_tarn, 43.929063, 2.147899, '81004'),
-       ('Castres', '81100', @dep_tarn, 43.605473, 2.240647, '81065');
+INSERT INTO cities (name, postal_code, department_id, population, latitude, longitude, area_code)
+VALUES ('Toulouse', '31000', @dep_haute_garonne, 493000, 43.604652, 1.444209, '31555'),
+       ('Colomiers', '31770', @dep_haute_garonne, 39000, 43.611546, 1.332524, '31149'),
+       ('Tournefeuille', '31170', @dep_haute_garonne, 26000, 43.586111, 1.343611, '31557'),
+       ('Montpellier', '34000', @dep_herault, 290000, 43.610769, 3.876716, '34172'),
+       ('Béziers', '34500', @dep_herault, 77000, 43.344097, 3.215795, '34032'),
+       ('Sète', '34200', @dep_herault, 43000, 43.403889, 3.696944, '34301'),
+       ('Carcassonne', '11000', @dep_aude, 47000, 43.212161, 2.353663, '11069'),
+       ('Narbonne', '11100', @dep_aude, 54000, 43.183946, 3.004230, '11262'),
+       ('Perpignan', '66000', @dep_pyr_or, 122000, 42.698611, 2.895556, '66136'),
+       ('Canet-en-Roussillon', '66140', @dep_pyr_or, 14000, 42.693989, 3.038056, '66037'),
+       ('Nîmes', '30000', @dep_gard, 150000, 43.836699, 4.360054, '30189'),
+       ('Alès', '30100', @dep_gard, 40000, 44.125102, 4.081061, '30007'),
+       ('Albi', '81000', @dep_tarn, 50000, 43.929063, 2.147899, '81004'),
+       ('Castres', '81100', @dep_tarn, 42000, 43.605473, 2.240647, '81065');
 
 -- Récupérer les IDs des villes
 SELECT id
@@ -463,11 +473,10 @@ FROM users
 WHERE username = 'testuser';
 
 -- 5️⃣ Adresses de test
-INSERT INTO addresses (user_id, city_id, type, description, street, postal_code, city_name, country)
-VALUES (@user_sandrine, @city_toulouse, 'HOME', 'Domicile principal', '123 Rue de la Paix', '31000', 'Toulouse',
-        'France'),
-       (@user_cyril, @city_montpellier, 'HOME', 'Appartement centre-ville', '45 Avenue de la République', '34000',
-        'Montpellier', 'France');
+INSERT INTO addresses (user_id, city_id, street)
+VALUES (@user_sandrine, @city_toulouse, '123 Rue de la Paix'),
+       (@user_cyril, @city_montpellier, '45 Avenue de la République');
+
 -- Stations qualité de l'air de test
 INSERT INTO air_quality_stations (name, code, source, latitude, longitude, city_id)
 VALUES ('Toulouse - Chapitre', 'TLS-CHAP-001', 'ATMO Occitanie', 43.612, 1.445, 1),
@@ -476,11 +485,11 @@ VALUES ('Toulouse - Chapitre', 'TLS-CHAP-001', 'ATMO Occitanie', 43.612, 1.445, 
        ('Perpignan - République', 'PER-REP-001', 'ATMO Occitanie', 42.700, 2.896, 9);
 
 -- Mesures qualité de l'air de test (données récentes)
-INSERT INTO air_quality_measurements (station_id, datetime, pm10, pm25, no2, o3, so2, atmo, source, measured_at)
-VALUES (1, NOW(), 25.5, 15.2, 38.7, 85.3, 5.1, 3, 'ATMO Occitanie', NOW()),
-       (2, NOW(), 22.1, 12.8, 42.1, 92.5, 3.2, 2, 'ATMO Occitanie', NOW()),
-       (3, NOW(), 28.9, 18.4, 35.6, 78.9, 7.8, 4, 'ATMO Occitanie', NOW()),
-       (4, NOW(), 24.7, 14.1, 40.3, 88.2, 4.5, 3, 'ATMO Occitanie', NOW());
+INSERT INTO air_quality_measurements (station_id, pm10, pm25, no2, o3, so2, atmo, source, measured_at)
+VALUES (1, 25.5, 15.2, 38.7, 85.3, 5.1, 3, 'ATMO Occitanie', NOW()),
+       (2, 22.1, 12.8, 42.1, 92.5, 3.2, 2, 'ATMO Occitanie', NOW()),
+       (3, 28.9, 18.4, 35.6, 78.9, 7.8, 4, 'ATMO Occitanie', NOW()),
+       (4, 24.7, 14.1, 40.3, 88.2, 4.5, 3, 'ATMO Occitanie', NOW());
 
 -- Mesures météo de test
 INSERT INTO weather_measurements (city_id, temperature, humidity, pressure, wind_speed, wind_direction, source,
@@ -507,11 +516,15 @@ VALUES (1, 2, 'Pic de pollution à Toulouse - que faire ?'),
        (3, 4, 'Jardins partagés à Montpellier');
 
 -- Posts forum de test
-INSERT INTO forum_posts (thread_id, user_id, content, likes_count)
-VALUES (1, 2, 'J\'ai remarqué une forte pollution aujourd\'hui. Quelles sont les mesures à prendre ?', 3),
-       (1, 3, 'Il faut éviter les activités extérieures et fermer les fenêtres.', 5),
-       (2, 4, 'Utiliser les transports en commun est un bon début !', 2),
-       (3, 2, 'Super initiative ! Y a-t-il des places disponibles ?', 1);
+INSERT INTO forum_posts (thread_id, user_id, content)
+VALUES (1, 2, 'J\'ai remarqué une forte pollution aujourd\'hui. Quelles sont les mesures à prendre ?'),
+       (1, 3, 'Il faut éviter les activités extérieures et fermer les fenêtres.'),
+       (2, 4, 'Utiliser les transports en commun est un bon début !'),
+       (3, 2, 'Super initiative ! Y a-t-il des places disponibles ?');
+
+INSERT INTO post_reactions (user_id, post_id, reaction_type)
+VALUES (@user_cyril, 1, 'LIKE'),
+       (@user_sandrine, 2, 'LIKE');
 
 -- Favoris de test
 INSERT INTO favorites (user_id, city_id, favorite_category)
@@ -521,11 +534,15 @@ VALUES (2, 1, 'AIR_QUALITY'), -- Sandrine suit la qualité de l'air à Toulouse
        (4, 9, 'POPULATION');
 -- Nuno suit la démographie à Perpignan
 
--- Notifications de test
-INSERT INTO notifications (message, notification_type, sent_at, user_id, city_id, is_checked)
-VALUES ('Alerte pollution : indice ATMO élevé à Toulouse', 'AIR_QUALITY', NOW(), 2, 1, FALSE),
-       ('Forte chaleur prévue demain à Montpellier', 'WEATHER', NOW(), 3, 4, FALSE),
-       ('Nouveau message dans le forum', 'FORUM', NOW(), 4, NULL, TRUE);
+-- Alertes favorites
+INSERT INTO favorites_alerts (user_id, city_id, is_enabled) VALUES
+                                                                (1, 1, TRUE),
+                                                                (2, 2, TRUE);
+
+-- Historique des alertes
+INSERT INTO alerts (user_id, city_id, alert_type, message) VALUES
+                                                               (1, 1, 'AIR_QUALITY', 'PM10 élevé aujourd’hui'),
+                                                               (2, 2, 'WEATHER', 'Vent fort prévu');
 -- ===================================
 -- VÉRIFICATIONS ET INFORMATIONS
 -- ===================================
@@ -567,3 +584,30 @@ SELECT 'Forum'                                                       AS section,
        (SELECT COUNT(*) FROM forum_rubrics WHERE deleted_at IS NULL) AS rubriques,
        (SELECT COUNT(*) FROM forum_threads WHERE deleted_at IS NULL) AS threads,
        (SELECT COUNT(*) FROM forum_posts WHERE deleted_at IS NULL)   AS posts;
+
+-- Liste des utilisateurs et leurs adresses
+SELECT u.username, u.email, a.street, c.name AS city, d.name AS department, r.name AS region
+FROM users u
+         JOIN addresses a ON a.user_id = u.id
+         JOIN cities c ON c.id = a.city_id
+         JOIN departments d ON d.id = c.department_id
+         JOIN regions r ON r.id = d.region_id;
+
+-- Mesures qualité de l’air récentes
+SELECT s.name AS station, c.name AS city, m.pm10, m.pm25, m.no2, m.o3, m.so2, m.atmo, m.measured_at
+FROM air_quality_measurements m
+         JOIN air_quality_stations s ON s.id = m.station_id
+         JOIN cities c ON c.id = s.city_id
+ORDER BY m.measured_at DESC;
+
+-- Posts et réactions
+SELECT p.content, u.username, r.reaction_type
+FROM forum_posts p
+         LEFT JOIN post_reactions r ON r.post_id = p.id
+         LEFT JOIN users u ON u.id = r.user_id;
+
+-- Favoris par utilisateur
+SELECT u.username, c.name AS city, f.favorite_category
+FROM favorites f
+         JOIN users u ON u.id = f.user_id
+         JOIN cities c ON c.id = f.city_id;

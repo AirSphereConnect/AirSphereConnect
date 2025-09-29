@@ -27,6 +27,12 @@ public class Department {
     @OneToMany(mappedBy = "department")
     private List<City> cities;
 
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<Alerts> alerts;
+
+    @OneToMany(mappedBy = "department", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<FavoritesAlerts> favoritesAlerts;
+
     public Department() {}
 
     public Department(String name, String code, Region region, LocalDateTime createdAt) {
@@ -73,6 +79,22 @@ public class Department {
 
     public void setCities(List<City> cities) {
         this.cities = cities;
+    }
+
+    public List<Alerts> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<Alerts> alerts) {
+        this.alerts = alerts;
+    }
+
+    public List<FavoritesAlerts> getFavoritesAlerts() {
+        return favoritesAlerts;
+    }
+
+    public void setFavoritesAlerts(List<FavoritesAlerts> favoritesAlerts) {
+        this.favoritesAlerts = favoritesAlerts;
     }
 
     @Override
