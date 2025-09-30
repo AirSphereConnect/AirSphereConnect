@@ -46,16 +46,17 @@ public class PostReactionServiceImpl implements PostReactionService {
         User user = findUserByIdOrThrow(userId);
 
         Optional<PostReaction> existingReactionOpt = postReactionRepository
-                .findByPostIdAndUserIdAndDeletedAtIsNull(postId, userId);
+                .findByPostIdAndUserId(postId, userId);
 
         if (existingReactionOpt.isPresent()) {
             PostReaction existingReaction = existingReactionOpt.get();
 
-            if (existingReaction.getReactionType() == newReaction) {
-                // Delete
+            if (existingReaction.getDeletedAt() != null) {
+                existingReaction.setDeletedAt(null);
+                existingReaction.setReactionType(newReaction);
+            } else if (existingReaction.getReactionType() == newReaction) {
                 existingReaction.softDelete();
             } else {
-                // Update
                 existingReaction.setReactionType(newReaction);
             }
             postReactionRepository.save(existingReaction);

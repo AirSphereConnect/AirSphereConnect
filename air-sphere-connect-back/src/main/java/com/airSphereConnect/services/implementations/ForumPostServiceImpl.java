@@ -5,12 +5,10 @@ import com.airSphereConnect.dtos.response.ForumPostResponseDto;
 import com.airSphereConnect.entities.ForumPost;
 import com.airSphereConnect.entities.ForumThread;
 import com.airSphereConnect.entities.User;
-import com.airSphereConnect.entities.enums.ReactionType;
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.ForumPostMapper;
 import com.airSphereConnect.repositories.ForumPostRepository;
 import com.airSphereConnect.repositories.ForumThreadRepository;
-import com.airSphereConnect.repositories.PostReactionRepository;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.ForumPostService;
 import org.springframework.stereotype.Service;
@@ -24,14 +22,12 @@ public class ForumPostServiceImpl implements ForumPostService {
 
     private final ForumPostRepository forumPostRepository;
     private final ForumThreadRepository forumThreadRepository;
-    private final PostReactionRepository postReactionRepository;
     private final UserRepository userRepository;
     private final ForumPostMapper forumPostMapper;
 
-    public ForumPostServiceImpl(ForumPostRepository forumPostRepository, ForumThreadRepository forumThreadRepository, PostReactionRepository postReactionRepository, UserRepository userRepository, ForumPostMapper forumPostMapper) {
+    public ForumPostServiceImpl(ForumPostRepository forumPostRepository, ForumThreadRepository forumThreadRepository, UserRepository userRepository, ForumPostMapper forumPostMapper) {
         this.forumPostRepository = forumPostRepository;
         this.forumThreadRepository = forumThreadRepository;
-        this.postReactionRepository = postReactionRepository;
         this.userRepository = userRepository;
         this.forumPostMapper = forumPostMapper;
     }

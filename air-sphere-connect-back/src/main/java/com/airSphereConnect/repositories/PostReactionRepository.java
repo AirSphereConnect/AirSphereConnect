@@ -3,7 +3,6 @@ package com.airSphereConnect.repositories;
 import com.airSphereConnect.entities.PostReaction;
 import com.airSphereConnect.entities.enums.ReactionType;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -17,9 +16,6 @@ public interface PostReactionRepository extends JpaRepository<PostReaction, Long
     @Query("SELECT pr.reactionType FROM PostReaction pr WHERE pr.post.id = :postId AND pr.user.id = :userId AND pr.deletedAt IS NULL")
     ReactionType findUserReaction(@Param("postId") Long postId, @Param("userId") Long currentUserId);
 
-    @Query("SELECT pr FROM PostReaction pr WHERE pr.post.id = :postId AND pr.user.id = :userId AND pr.deletedAt IS NULL")
-    Optional<PostReaction> findByPostIdAndUserIdAndDeletedAtIsNull(
-            @Param("postId") Long postId,
-            @Param("userId") Long userId
-    );
+    @Query("SELECT pr FROM PostReaction pr WHERE pr.post.id = :postId AND pr.user.id = :userId")
+    Optional<PostReaction> findByPostIdAndUserId(@Param("postId") Long postId, @Param("userId") Long userId);
 }

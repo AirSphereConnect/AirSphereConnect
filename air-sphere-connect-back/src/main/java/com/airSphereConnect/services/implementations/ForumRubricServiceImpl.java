@@ -154,7 +154,7 @@ public class ForumRubricServiceImpl implements ForumRubricService {
         User user = findUserByIdOrThrow(userId);
 
         ForumRubric rubric = forumRubricRepository.findByIdWithRelations(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Rubrique introuvable: " + id));
+                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Rubrique introuvable: " + id));
 
         ForumRubricResponseDto response = forumRubricMapper.toResponseDto(rubric);
 
