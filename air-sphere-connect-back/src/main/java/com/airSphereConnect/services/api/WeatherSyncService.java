@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 import static com.airSphereConnect.configuration.WebClientConfig.WEATHER_API_BASEURL;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -64,30 +65,30 @@ public class WeatherSyncService {
                 WeatherMeasurement weather = new WeatherMeasurement();
                 weather.setCity(city);
 
-                if (response.getMain() != null) {
-                    weather.setTemperature(response.getMain().getTemp());
-                    weather.setPressure(response.getMain().getPressure());
-                    weather.setHumidity(response.getMain().getHumidity());
+                if (response.weatherMainDto() != null) {
+                    weather.setTemperature(response.weatherMainDto().temp());
+                    weather.setPressure(response.weatherMainDto().pressure());
+                    weather.setHumidity(response.weatherMainDto().humidity());
                 }
 
-                if (response.getWind() != null) {
-                    weather.setWindDirection(response.getWind().getDeg());
-                    weather.setWindSpeed(response.getWind().getSpeed());
+                if (response.weatherWindDto() != null) {
+                    weather.setWindDirection(response.weatherWindDto().deg());
+                    weather.setWindSpeed(response.weatherWindDto().speed());
                 }
 
-                if (response.getWeather() != null && response.getWeather().length > 0) {
-                    ApiWeatherResponseDto.Weather firstWeather = response.getWeather()[0];
-                    String jsonMessage = objectMapper.writeValueAsString(firstWeather);
+                if (response.weatherDescriptionDto() != null && response.weatherDescriptionDto().length > 0) {
+
+                    String jsonMessage = objectMapper.writeValueAsString(response.weatherDescriptionDto());
                     weather.setMessage(jsonMessage);
 //                    logger.debug("Message JSON stocké : {}", jsonMessage);
                 }
                 weather.setSource(WEATHER_API_BASEURL);
 
-                boolean hasAlert = response.getAlerts() != null && response.getAlerts().length > 0;
+                boolean hasAlert = response.weatherAlertDto() != null && response.weatherAlertDto().length > 0;
                 weather.setAlert(hasAlert);
 
                 if (hasAlert) {
-                    String alertJson = objectMapper.writeValueAsString(response.getAlerts());
+                    String alertJson = objectMapper.writeValueAsString(Arrays.toString(response.weatherAlertDto()));
                     weather.setAlertMessage(alertJson);
                 } else {
                     weather.setAlertMessage(null);
