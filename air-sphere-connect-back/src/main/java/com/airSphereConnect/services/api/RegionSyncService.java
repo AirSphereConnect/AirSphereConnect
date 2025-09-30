@@ -17,8 +17,8 @@ public class RegionSyncService {
     private final WebClient webClient;
     private final RegionRepository regionRepository;
 
-    public RegionSyncService(WebClient webClient, RegionRepository regionRepository) {
-        this.webClient = webClient;
+    public RegionSyncService(WebClient populationApiWebClient, RegionRepository regionRepository) {
+        this.webClient = populationApiWebClient;
         this.regionRepository = regionRepository;
     }
 
