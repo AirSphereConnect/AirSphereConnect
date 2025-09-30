@@ -27,9 +27,9 @@ public class WeatherMeasurement {
     private Double windSpeed;
 
     @Column(name = "wind_direction", length = 50)
-    private String windDirection;
+    private Double windDirection;
 
-    @Column(name = "message", length = 50)
+    @Column(name = "message", columnDefinition = "TEXT")
     private String message;
 
     @Column(name = "source", length = 100)
@@ -37,6 +37,12 @@ public class WeatherMeasurement {
 
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
+
+    @Column(name = "alert", nullable = false)
+    private Boolean alert;
+
+    @Column(columnDefinition = "TEXT")
+    private String alertMessage;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
@@ -51,7 +57,8 @@ public class WeatherMeasurement {
         this.source = source;
     }
 
-    public WeatherMeasurement(Double temperature, Double humidity, Double pressure, Double windSpeed, String windDirection, String message, String source) {
+    public WeatherMeasurement(City city, Double temperature, Double humidity, Double pressure, Double windSpeed, Double windDirection, String message, String source, Boolean alert, String alertMessage, LocalDateTime measuredAt) {
+        this.city = city;
         this.temperature = temperature;
         this.humidity = humidity;
         this.pressure = pressure;
@@ -59,6 +66,8 @@ public class WeatherMeasurement {
         this.windDirection = windDirection;
         this.message = message;
         this.source = source;
+        this.alertMessage = alertMessage;
+        this.alert = alert;
     }
 
     public Long getId() {
@@ -101,11 +110,11 @@ public class WeatherMeasurement {
         this.windSpeed = windSpeed;
     }
 
-    public String getWindDirection() {
+    public Double getWindDirection() {
         return windDirection;
     }
 
-    public void setWindDirection(String windDirection) {
+    public void setWindDirection(Double windDirection) {
         this.windDirection = windDirection;
     }
 
@@ -139,6 +148,22 @@ public class WeatherMeasurement {
 
     public void setCity(City city) {
         this.city = city;
+    }
+
+    public Boolean getAlert() {
+        return alert;
+    }
+
+    public void setAlert(Boolean alert) {
+        this.alert = alert;
+    }
+
+    public String getAlertMessage() {
+        return alertMessage;
+    }
+
+    public void setAlertMessage(String alertMessage) {
+        this.alertMessage = alertMessage;
     }
 
     @Override

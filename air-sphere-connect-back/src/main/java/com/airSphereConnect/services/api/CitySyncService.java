@@ -7,6 +7,7 @@ import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.ApiCityMapper;
 import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.DepartmentRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -20,8 +21,8 @@ public class CitySyncService {
     private final CityRepository cityRepository;
     private final DepartmentRepository departmentRepository;
 
-    public CitySyncService(WebClient webClient, CityRepository cityRepository, DepartmentRepository departmentRepository) {
-        this.webClient = webClient;
+    public CitySyncService(WebClient populationApiWebClient, CityRepository cityRepository, DepartmentRepository departmentRepository) {
+        this.webClient = populationApiWebClient;
         this.departmentRepository = departmentRepository;
         this.cityRepository = cityRepository;
     }
