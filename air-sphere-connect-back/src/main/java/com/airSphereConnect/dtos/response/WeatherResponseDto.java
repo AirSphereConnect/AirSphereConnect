@@ -1,37 +1,30 @@
 package com.airSphereConnect.dtos.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+
+import java.time.LocalDateTime;
+
 public class WeatherResponseDto {
-    public Long getCityId() {
-        return cityId;
-    }
-
-    public void setCityId(Long cityId) {
-        this.cityId = cityId;
-    }
-
-    public Double getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(Double temperature) {
-        this.temperature = temperature;
-    }
 
     private Long cityId;
     private String cityName;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    private LocalDateTime measuredAt;
+
     private Double temperature;
     private Double humidity;
     private Double windSpeed;
     private Double windDirection;
     private Double pressure;
-    private String message;
+    private WeatherDescriptionDto[] message;
     private Boolean alert;
-    private String alertMessage;
+    private WeatherAlertDto[] alertMessage;
 
 
-    public WeatherResponseDto(Long cityId, String cityName, Double temperature, Double humidity, Double pressure, Double windSpeed, Double windDirection, String message, Boolean alert, String alertMessage) {
+    public WeatherResponseDto(Long cityId, String cityName, LocalDateTime measuredAt, Double temperature, Double humidity, Double pressure, Double windSpeed, Double windDirection, WeatherDescriptionDto[] message, Boolean alert, WeatherAlertDto[] alertMessage) {
         this.cityId = cityId;
         this.cityName = cityName;
+        this.measuredAt = measuredAt;
         this.temperature = temperature;
         this.humidity = humidity;
         this.windSpeed = windSpeed;
@@ -50,12 +43,27 @@ public class WeatherResponseDto {
     public void setCityName(String cityName) {
         this.cityName = cityName;
     }
+    public Long getCityId() {
+        return cityId;
+    }
 
-    public Double getTemp() {
+    public void setCityId(Long cityId) {
+        this.cityId = cityId;
+    }
+
+    public LocalDateTime getMeasuredAt() {
+        return measuredAt;
+    }
+
+    public void setMeasuredAt(LocalDateTime measuredAt) {
+        this.measuredAt = measuredAt;
+    }
+
+    public Double getTemperature() {
         return temperature;
     }
 
-    public void setTemp(Double temperature) {
+    public void setTemperature(Double temperature) {
         this.temperature = temperature;
     }
 
@@ -91,11 +99,11 @@ public class WeatherResponseDto {
         this.pressure = pressure;
     }
 
-    public String getMessage() {
+    public WeatherDescriptionDto[] getMessage() {
         return message;
     }
 
-    public void setMessage(String message) {
+    public void setMessage(WeatherDescriptionDto[] message) {
         this.message = message;
     }
 
@@ -107,11 +115,11 @@ public class WeatherResponseDto {
         this.alert = alert;
     }
 
-    public String getAlertMessage() {
+    public WeatherAlertDto[] getAlertMessage() {
         return alertMessage;
     }
 
-    public void setAlertMessage(String alertMessage) {
+    public void setAlertMessage(WeatherAlertDto[] alertMessage) {
         this.alertMessage = alertMessage;
     }
 

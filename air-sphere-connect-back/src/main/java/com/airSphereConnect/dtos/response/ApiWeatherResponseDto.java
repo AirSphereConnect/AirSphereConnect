@@ -8,8 +8,7 @@ public record ApiWeatherResponseDto(
     @JsonProperty("main") WeatherMainDto weatherMainDto,
     @JsonProperty("wind") WeatherWindDto weatherWindDto,
     @JsonProperty("weather") WeatherDescriptionDto[] weatherDescriptionDto,
-    @JsonProperty("alert") WeatherAlertDto[] weatherAlertDto
-
+    @JsonProperty("alerts") WeatherAlertDto[] weatherAlertDto
 ) {
 
 }

@@ -13,6 +13,13 @@ spring:
     basename: ValidationMessages
     encoding: UTF-8
 
+  jackson:
+    serialization:
+          WRITE_DATES_AS_TIMESTAMPS: false
+
+
+
+
 
 # Configuration commune
 server:
@@ -35,3 +42,4 @@ logging:
     com.air-sphere-connect: DEBUG
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
+

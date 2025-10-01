@@ -13,6 +13,7 @@ public class AlertsController {
     private final AlertsService alertsService;
 
     public AlertsController(AlertsService alertsService) {
+
         this.alertsService = alertsService;
     }
 

@@ -5,7 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record WeatherAlertDto(
-        @JsonProperty("event") Boolean event,
+        @JsonProperty("sender_name") String senderName,
+        @JsonProperty("event") String event,
         @JsonProperty("description") String description
 ) {
 }
