@@ -7,8 +7,6 @@ public class ExternalAlertDto {
 
 
     private Long cityId;
-    private Long departmentId;
-    private Long regionId;
 
     @NotNull(message = "type est obligatoire")
     @Size(min = 1, message = "type ne peut être vide")
@@ -20,10 +18,8 @@ public class ExternalAlertDto {
 
     public ExternalAlertDto() {}
 
-    public ExternalAlertDto(Long cityId, String type, String message, Long departmentId, Long regionId) {
+    public ExternalAlertDto(Long cityId, String type, String message) {
         this.cityId = cityId;
-        this.departmentId = departmentId;
-        this.regionId = regionId;
         this.type = type;
         this.message = message;
     }
@@ -50,21 +46,5 @@ public class ExternalAlertDto {
 
     public void setMessage(String message) {
         this.message = message;
-    }
-
-    public Long getDepartmentId() {
-        return departmentId;
-    }
-
-    public void setDepartmentId(Long departmentId) {
-        this.departmentId = departmentId;
-    }
-
-    public Long getRegionId() {
-        return regionId;
-    }
-
-    public void setRegionId(Long regionId) {
-        this.regionId = regionId;
     }
 }

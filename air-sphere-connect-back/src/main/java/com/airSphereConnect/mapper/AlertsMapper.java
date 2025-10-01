@@ -7,21 +7,21 @@ import org.springframework.stereotype.Component;
 @Component
 public class AlertsMapper {
 
-        public static AlertsDto toDto(Alerts alerts) {
+        public AlertsDto toDto(Alerts alerts) {
             if (alerts == null) return null;
             AlertsDto dto = new AlertsDto();
             copyAlertsToDto(alerts, dto);
             return dto;
         }
 
-        public static Alerts toEntity(AlertsDto dto) {
+        public Alerts toEntity(AlertsDto dto) {
             if (dto == null) return null;
             Alerts alerts = new Alerts();
             copyDtoToAlerts(dto, alerts);
             return alerts;
         }
 
-        private static void copyAlertsToDto(Alerts alerts, AlertsDto dto) {
+        private void copyAlertsToDto(Alerts alerts, AlertsDto dto) {
             dto.setId(alerts.getId());
             dto.setAlertType(alerts.getAlertType());
             dto.setMessage(alerts.getMessage());
@@ -34,7 +34,7 @@ public class AlertsMapper {
             }
         }
 
-        private static void copyDtoToAlerts(AlertsDto dto, Alerts alerts) {
+        private void copyDtoToAlerts(AlertsDto dto, Alerts alerts) {
             alerts.setId(dto.getId());
             alerts.setAlertType(dto.getAlertType());
             alerts.setMessage(dto.getMessage());

@@ -1,9 +1,11 @@
 package com.airSphereConnect.dtos;
 
+import com.airSphereConnect.dtos.response.WeatherAlertDto;
 import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.Department;
 import com.airSphereConnect.entities.Region;
 import com.airSphereConnect.entities.enums.AlertType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
@@ -92,5 +94,15 @@ public class AlertsDto {
 
     public void setDepartmentId(Department department) {
         this.department = department;
+    }
+
+    public WeatherAlertDto getParsedMessage() {
+        try {
+            ObjectMapper mapper = new ObjectMapper();
+            return mapper.readValue(this.message, WeatherAlertDto.class);
+        } catch (Exception e) {
+            //TODO Ajout logger
+            return null;
+        }
     }
 }

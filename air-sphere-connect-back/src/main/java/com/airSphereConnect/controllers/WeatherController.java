@@ -11,6 +11,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/weather")
@@ -42,6 +44,16 @@ public class WeatherController {
 
         return weatherMapper.toDto(weather);
     }
+
+    @GetMapping("/city/history/{id}")
+    public List<WeatherResponseDto> getWeatherHistoryByCityId(@PathVariable Long id) {
+        List<WeatherMeasurement> measurements = weatherService.getWeatherHistoryByCityId(id);
+        return measurements.stream()
+                .map(weatherMapper::toDto)
+                .collect(Collectors.toList());
+    }
+
+
 }
 
 

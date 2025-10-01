@@ -5,7 +5,6 @@ import com.airSphereConnect.entities.Alerts;
 import com.airSphereConnect.mapper.AlertsMapper;
 import com.airSphereConnect.repositories.AlertsRepository;
 import com.airSphereConnect.repositories.UserRepository;
-import com.airSphereConnect.services.AlertsEmailSender;
 import com.airSphereConnect.services.AlertsService;
 import org.springframework.stereotype.Service;
 import org.slf4j.Logger;
@@ -16,14 +15,17 @@ import java.util.stream.Collectors;
 
 @Service
 public class AlertsServiceImpl implements AlertsService {
-    private static final Logger logger = (Logger) LoggerFactory.getLogger(AlertsServiceImpl.class);
+    private static final Logger logger = LoggerFactory.getLogger(AlertsServiceImpl.class);
+
+    //MailtrapSdkEmailSender
+    //EmailHogSenderImpl
 
     private final AlertsRepository alertsRepository;
     private final AlertsMapper alertsMapper;
-    private final AlertsEmailSender emailSender;
+    private final EmailHogSenderImpl emailSender;
     private final UserRepository userRepository;
 
-    public AlertsServiceImpl(AlertsRepository alertsRepository, AlertsMapper alertsMapper, AlertsEmailSender emailSender, UserRepository userRepository) {
+    public AlertsServiceImpl(AlertsRepository alertsRepository, AlertsMapper alertsMapper, EmailHogSenderImpl emailSender, UserRepository userRepository) {
         this.alertsRepository = alertsRepository;
         this.alertsMapper = alertsMapper;
         this.emailSender = emailSender;
@@ -33,7 +35,7 @@ public class AlertsServiceImpl implements AlertsService {
     @Override
     public void sendAlerts(AlertsDto dto) {
         logger.debug("Envoi alerte pour userId={}, type={}, message={}", dto.getUserId(), dto.getAlertType(), dto.getMessage());
-        Alerts entity = AlertsMapper.toEntity(dto);
+        Alerts entity = alertsMapper.toEntity(dto);
 
         entity.setUser(userRepository.findById(dto.getUserId()).orElseThrow());
         entity.setCity(dto.getCity());
@@ -45,19 +47,17 @@ public class AlertsServiceImpl implements AlertsService {
 
         userRepository.findById(dto.getUserId()).ifPresent(user -> {
             logger.debug("Envoi mail à {}", user.getEmail());
-            emailSender.sendEmail(
-                    user.getEmail(),
-                    "Nouvelle alerte : " + dto.getAlertType(),
-                    dto.getMessage()
-            );
+            String to = user.getEmail();
+            String username = user.getUsername();
+            String subject = "Nouvelle alerte : " + dto.getAlertType();
+            emailSender.sendEmail(to, username, subject, dto);
         });
     }
 
     @Override
     public List<AlertsDto> getUserAlerts(Long userId) {
         return alertsRepository.findByUserId(userId).stream()
-                .map(AlertsMapper::toDto)
+                .map(alertsMapper::toDto)
                 .collect(Collectors.toList());
     }
 }
-
