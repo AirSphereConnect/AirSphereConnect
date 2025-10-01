@@ -42,18 +42,18 @@ public class ForumRubricServiceImpl implements ForumRubricService {
 
     private User findUserByIdOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
     }
 
 
     private ForumRubric findForumRubricByIdOrThrow(Long id) {
        return forumRubricRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Rubrique introuvable : " + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Rubrique introuvable : " + id));
     }
 
     private Forum findForumByIdOrThrow(Long forumId) {
         return forumRepository.findById(forumId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Forum non trouvé avec l'ID: " + forumId));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Forum non trouvé avec l'ID: " + forumId));
     }
 
     private void validateRubricCreation(ForumRubricRequestDto request, User user, Forum forum) {
@@ -154,7 +154,7 @@ public class ForumRubricServiceImpl implements ForumRubricService {
         User user = findUserByIdOrThrow(userId);
 
         ForumRubric rubric = forumRubricRepository.findByIdWithRelations(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Rubrique introuvable: " + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Rubrique introuvable: " + id));
 
         ForumRubricResponseDto response = forumRubricMapper.toResponseDto(rubric);
 
