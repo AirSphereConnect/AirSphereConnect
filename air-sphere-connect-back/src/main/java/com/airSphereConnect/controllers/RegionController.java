@@ -19,27 +19,29 @@ import java.util.List;
 public class RegionController {
 
     private final RegionService regionService;
+    private final RegionMapper regionMapper;
 
 
-    public RegionController(RegionService regionService) {
+    public RegionController(RegionService regionService, RegionMapper regionMapper) {
         this.regionService = regionService;
+        this.regionMapper = regionMapper;
     }
 
     @GetMapping()
     public List<RegionResponseDto> getAllDepartments() {
         return regionService.getAllRegions()
                 .stream()
-                .map(RegionMapper::toDto)
+                .map(regionMapper::toDto)
                 .toList();
     }
 
     @GetMapping("/regionName/{name}")
     public RegionResponseDto getDepartmentByName(@PathVariable String name) {
-        return RegionMapper.toDto(regionService.getRegionByName(name));
+        return regionMapper.toDto(regionService.getRegionByName(name));
     }
 
     @GetMapping("/regionCode/{code}")
     public RegionResponseDto getDepartmentByCode(@PathVariable String code) {
-        return RegionMapper.toDto(regionService.getRegionByCode(code));
+        return regionMapper.toDto(regionService.getRegionByCode(code));
     }
 }

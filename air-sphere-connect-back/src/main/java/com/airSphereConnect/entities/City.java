@@ -14,6 +14,9 @@ public class City {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name= "insee_code", unique = true, nullable = false, length = 10)
+    private String inseeCode;
+
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
@@ -28,6 +31,9 @@ public class City {
 
     @Column(name = "area_code", length = 10)
     private String areaCode;
+
+    @Column(name= "population")
+    private Integer population;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
@@ -57,13 +63,16 @@ public class City {
 
     public City() {}
 
-    public City(String name, String postalCode, Double latitude, Double longitude, String areaCode, Department department) {
+    public City(String name, String inseeCode, String postalCode, Double latitude, Double longitude, String areaCode,
+                Department department, Integer population) {
+        this.inseeCode = inseeCode;
         this.name = name;
         this.postalCode = postalCode;
         this.latitude = latitude;
         this.longitude = longitude;
         this.areaCode = areaCode;
         this.department = department;
+        this.population = population;
     }
 
     public Long getId() {
@@ -72,6 +81,13 @@ public class City {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getInseeCode() {
+        return inseeCode;
+    }
+    public void setInseeCode(String inseeCode) {
+        this.inseeCode = inseeCode;
     }
 
     public String getName() {
@@ -120,6 +136,14 @@ public class City {
 
     public void setDepartment(Department department) {
         this.department = department;
+    }
+
+    public Integer getPopulation() {
+        return population;
+    }
+
+    public void setPopulation(Integer population) {
+        this.population = population;
     }
 
     public List<Population> getPopulations() {
@@ -193,8 +217,12 @@ public class City {
     @Override
     public String toString() {
         return "City{" +
+                "inseeCode='" + inseeCode + '\'' +
                 "name='" + name + '\'' +
                 ", postalCode='" + postalCode + '\'' +
+                ", latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", areaCode='" + areaCode + '\'' +
                 '}';
     }
 }

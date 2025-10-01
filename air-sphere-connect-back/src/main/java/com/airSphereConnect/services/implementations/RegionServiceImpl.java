@@ -24,13 +24,13 @@ public class RegionServiceImpl implements RegionService {
 
     @Override
     public Region getRegionByName(String name) {
-        return regionRepository.getRegionByNameIgnoreCase(name).orElseThrow(() ->
-                new GlobalException.RessourceNotFoundException("Region with name " + name + " not found"));
+        return regionRepository.findByNameIgnoreCase(name).orElseThrow(() ->
+                new GlobalException.ResourceNotFoundException("Region with name " + name + " not found"));
     }
 
     @Override
     public Region getRegionByCode(String code) {
-        return regionRepository.getRegionByCode(code).orElseThrow(() ->
-                new GlobalException.RessourceNotFoundException("Region with name " + code + " not found"));
+        return regionRepository.findByCode(code).orElseThrow(() ->
+                new GlobalException.ResourceNotFoundException("Region with name " + code + " not found"));
     }
 }

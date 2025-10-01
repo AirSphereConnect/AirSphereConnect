@@ -15,11 +15,8 @@ public class Population {
     @Column(name = "population", nullable = false)
     private Integer population;
 
-    @Column(name = "year", nullable = false)
+    @Column(name = "`year`", nullable = false)
     private Integer year;
-
-    @Column(name = "density", nullable = false)
-    private Double density;
 
     @Column(name = "source", nullable = false, length = 100)
     private String source;
@@ -32,10 +29,9 @@ public class Population {
     public Population() {
     }
 
-    public Population(Integer population, Integer year, Double density, String source, City city) {
+    public Population(Integer population, Integer year, String source, City city) {
         this.population = population;
         this.year = year;
-        this.density = density;
         this.source = source;
         this.city = city;
     }
@@ -62,14 +58,6 @@ public class Population {
 
     public void setYear(Integer year) {
         this.year = year;
-    }
-
-    public Double getDensity() {
-        return density;
-    }
-
-    public void setDensity(Double density) {
-        this.density = density;
     }
 
     public String getSource() {
@@ -105,7 +93,6 @@ public class Population {
         return "Population{" +
                 "population=" + population +
                 ", year=" + year +
-                ", density=" + density +
                 ", source='" + source + '\'' +
                 '}';
     }

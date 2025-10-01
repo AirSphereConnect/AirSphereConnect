@@ -3,8 +3,8 @@ package com.airSphereConnect.exceptions;
 public class GlobalException {
 
 
-    public static class RessourceNotFoundException extends RuntimeException {
-        public RessourceNotFoundException(String message) {
+    public static class ResourceNotFoundException extends RuntimeException {
+        public ResourceNotFoundException(String message) {
             super(message);
         }
     }

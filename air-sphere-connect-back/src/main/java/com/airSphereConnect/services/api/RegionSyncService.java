@@ -4,12 +4,14 @@ import com.airSphereConnect.dtos.response.ApiRegionResponseDto;
 import com.airSphereConnect.entities.Region;
 import com.airSphereConnect.mapper.ApiRegionMapper;
 import com.airSphereConnect.repositories.RegionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class RegionSyncService {
 
     private final WebClient webClient;
@@ -19,7 +21,6 @@ public class RegionSyncService {
         this.webClient = webClient;
         this.regionRepository = regionRepository;
     }
-
 
     public void importRegions() {
         List<ApiRegionResponseDto> regions = webClient.get()

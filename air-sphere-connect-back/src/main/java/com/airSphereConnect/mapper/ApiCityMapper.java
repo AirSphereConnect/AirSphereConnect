@@ -9,13 +9,14 @@ public class ApiCityMapper {
         if (dto == null) return null;
 
         City city = new City();
+        city.setInseeCode(dto.inseeCode());
         city.setName(dto.name());
         city.setPostalCode(dto.postalCodes() != null && !dto.postalCodes().isEmpty() ? dto.postalCodes().getFirst() : null);
         if (dto.centre() != null) {
             city.setLatitude(dto.centre().latitude());
             city.setLongitude(dto.centre().longitude());
         }
-        city.setAreaCode(dto.codeZone());
+        city.setAreaCode(dto.zoneCode());
         city.setDepartment(department);
         return city;
     }
