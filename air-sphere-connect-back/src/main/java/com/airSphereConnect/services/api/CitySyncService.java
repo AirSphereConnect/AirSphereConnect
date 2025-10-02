@@ -37,9 +37,23 @@ public class CitySyncService {
 
         if (cities == null || cities.isEmpty()) return;
 
+<<<<<<< Updated upstream
         Map<String, Department> departmentMap = departmentRepository.findAll()
                 .stream()
                 .collect(Collectors.toMap(Department::getCode, d -> d));
+=======
+        // Mapping departments by their code for quick access
+        Map<String, Department> departmentMap = departmentRepository.findAll().stream()
+                .collect(Collectors.toMap(
+                        Department::getCode,
+                        d -> d,
+                        (existing, replacement) -> existing  // garde la première occurrence
+                ));
+
+//        Map<String, Department> departmentMap = departmentRepository.findAll()
+//                .stream()
+//                .collect(Collectors.toMap(Department::getCode, d -> d));
+>>>>>>> Stashed changes
 
         List<City> cityEntities = cities.stream()
                 .filter(dto -> departmentMap.containsKey(dto.departmentCode()))

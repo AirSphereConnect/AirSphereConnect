@@ -8,11 +8,12 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class WebClientConfig {
 
     public static final String WEATHER_API_BASEURL = "openweathermap.org";
+    public static final String POP_BASE_URL = "geo.api.gouv.fr";
 
     @Bean
     public WebClient populationApiWebClient() {
         return WebClient.builder()
-                .baseUrl("https://geo.api.gouv.fr")
+                .baseUrl("https://" + POP_BASE_URL)
                 .build();
     }
 
