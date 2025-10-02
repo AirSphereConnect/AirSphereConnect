@@ -28,9 +28,21 @@ public class RegionServiceImpl implements RegionService {
                 new GlobalException.ResourceNotFoundException("Region with name " + name + " not found"));
     }
 
+//    @Override
+//    public Region getRegionByCode(String code) {
+//        return regionRepository.getRegionByCode(code).orElseThrow(() ->
+//                new GlobalException.ResourceNotFoundException("Region with name " + code + " not found"));
+//    }
+
     @Override
     public Region getRegionByCode(String code) {
-        return regionRepository.getRegionByCode(code).orElseThrow(() ->
-                new GlobalException.ResourceNotFoundException("Region with name " + code + " not found"));
+        List<Region> regions = regionRepository.findByCode(code);
+        if (regions.isEmpty()) {
+            throw new GlobalException.ResourceNotFoundException("Region with code " + code + " not found");
+        } else if (regions.size() > 1) {
+            // Gestion spéciale : logger, exception ou renvoyer le premier
+        }
+        return regions.get(0);
     }
+
 }

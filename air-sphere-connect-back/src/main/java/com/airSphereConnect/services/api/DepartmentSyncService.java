@@ -39,16 +39,15 @@ public class DepartmentSyncService {
             List<Department> departmentsEntities = departments.stream()
                     .map(dto -> {
 
-                        Region region = regionRepository.getRegionByCode(dto.regionCode()).orElseThrow( () -> new GlobalException.ResourceNotFoundException("Region with code " + dto.regionCode() + " not found."));
-
+                        Region region;
                         List<Region> regions = regionRepository.findByCode(dto.regionCode());
                         if (regions.isEmpty()) {
                             throw new GlobalException.ResourceNotFoundException("Region with code " + dto.regionCode() + " not found.");
                         } else if (regions.size() > 1) {
-                            // Ici, on choisit la première région, mais à adapter selon la logique métier
-                            // On peut aussi loguer un warning ou gérer autrement
+                            // choix ou gestion spéciale
                         }
                         region = regions.get(0);
+
 
                         return ApiDepartmentMapper.toEntity(dto, region);
                     })
