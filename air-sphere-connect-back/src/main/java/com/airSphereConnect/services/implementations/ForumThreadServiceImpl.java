@@ -43,18 +43,18 @@ public class ForumThreadServiceImpl implements ForumThreadService {
 
     private User findUserByIdOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
     }
 
 
     private ForumThread findForumThreadByIdOrThrow(Long id) {
         return forumThreadRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Fil de discussion introuvable : " + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Fil de discussion introuvable : " + id));
     }
 
     private ForumRubric findForumRubricByIdOrThrow(Long forumRubricId) {
         return forumRubricRepository.findById(forumRubricId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Rubrique non trouvée avec l'ID: " + forumRubricId));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Rubrique non trouvée avec l'ID: " + forumRubricId));
     }
 
     private void validateThreadCreation(ForumThreadRequestDto request, User user, ForumRubric forumRubric) {
@@ -150,7 +150,7 @@ public class ForumThreadServiceImpl implements ForumThreadService {
         User user = findUserByIdOrThrow(userId);
 
         ForumThread thread = forumThreadRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Fil de discussion introuvable : " + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Fil de discussion introuvable : " + id));
 
         ForumThreadResponseDto response = forumThreadMapper.toResponseDto(thread);
 

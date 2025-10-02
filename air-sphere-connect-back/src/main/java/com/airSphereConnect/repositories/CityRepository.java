@@ -2,21 +2,37 @@ package com.airSphereConnect.repositories;
 
 import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.Department;
-import com.airSphereConnect.entities.Region;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface CityRepository extends JpaRepository<City, Long>  {
+public interface CityRepository extends JpaRepository<City, Long> {
 
-    Optional<City> getCityByNameIgnoreCase(String name);
-    Optional<City> getCityByPostalCode(String code);
-    List<City> getCitiesByDepartmentRegionNameIgnoreCase(String regionName);
-    List<City> getCitiesByDepartmentNameIgnoreCase(String department);
-    List<City> getCitiesByDepartmentCode(String department);
+    List<City> findByNameIgnoreCaseIn(Collection<String> name);
+
+    Optional<City> findByInseeCode(String inseeCode);
+
+    Optional<City> findByNameIgnoreCase(String name);
+
+    Optional<City> findByPostalCode(String postalCode);
+
+    Optional<City> findByNameIgnoreCaseAndDepartment(String name, Department department);
+
+    List<City> findByDepartmentRegionNameIgnoreCase(String regionName);
+
+    List<City> findByDepartmentNameIgnoreCase(String department);
+
+    List<City> findByDepartmentCode(String department);
+
+    List<City> findDistinctByPopulations_PopulationGreaterThanEqual(Integer population);
+
+    List<City> findDistinctByPopulations_PopulationLessThanEqual(Integer population);
+
+    List<City> findDistinctByPopulations_PopulationBetween(Integer populationMin, Integer populationMax);
 
 }
 

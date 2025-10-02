@@ -30,13 +30,13 @@ public class PostReactionServiceImpl implements PostReactionService {
 
     private User findUserByIdOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
     }
 
 
     private ForumPost findForumPostByIdOrThrow(Long id) {
         return forumPostRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Post introuvable : " + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Post introuvable : " + id));
     }
 
 

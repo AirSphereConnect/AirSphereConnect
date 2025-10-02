@@ -35,7 +35,7 @@ public class ForumServiceImpl implements ForumService {
     @Transactional(readOnly = true)
     public ForumResponseDto getForumById(Long id) {
         Forum forum = forumRepository.findByIdWithRubrics(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Forum non trouvé"));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Forum non trouvé"));
 
         return forumMapper.toResponseDto(forum);
     }

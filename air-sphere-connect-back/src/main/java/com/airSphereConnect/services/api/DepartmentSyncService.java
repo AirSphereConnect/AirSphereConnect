@@ -7,12 +7,14 @@ import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.ApiDepartmentMapper;
 import com.airSphereConnect.repositories.DepartmentRepository;
 import com.airSphereConnect.repositories.RegionRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.util.List;
 
 @Service
+@Transactional
 public class DepartmentSyncService {
 
     private final WebClient webClient;
@@ -36,9 +38,9 @@ public class DepartmentSyncService {
         if (departments != null && !departments.isEmpty()) {
             List<Department> departmentsEntities = departments.stream()
                     .map(dto -> {
-<<<<<<< Updated upstream
-                        Region region = regionRepository.getRegionByCode(dto.regionCode()).orElseThrow( () -> new GlobalException.RessourceNotFoundException("Region with code " + dto.regionCode() + " not found."));
-=======
+
+                        Region region = regionRepository.getRegionByCode(dto.regionCode()).orElseThrow( () -> new GlobalException.ResourceNotFoundException("Region with code " + dto.regionCode() + " not found."));
+
                         List<Region> regions = regionRepository.findByCode(dto.regionCode());
                         if (regions.isEmpty()) {
                             throw new GlobalException.ResourceNotFoundException("Region with code " + dto.regionCode() + " not found.");
@@ -46,8 +48,8 @@ public class DepartmentSyncService {
                             // Ici, on choisit la première région, mais à adapter selon la logique métier
                             // On peut aussi loguer un warning ou gérer autrement
                         }
-                        Region region = regions.get(0);
->>>>>>> Stashed changes
+                        region = regions.get(0);
+
                         return ApiDepartmentMapper.toEntity(dto, region);
                     })
                     .toList();

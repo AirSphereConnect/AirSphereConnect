@@ -34,17 +34,17 @@ public class ForumPostServiceImpl implements ForumPostService {
 
     private User findUserByIdOrThrow(Long userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
     }
 
     private ForumThread findForumThreadByIdOrThrow(Long threadId) {
         return forumThreadRepository.findByIdAndDeletedAtIsNull(threadId)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Fil de discussion introuvable : " + threadId));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Fil de discussion introuvable : " + threadId));
     }
 
     private ForumPost findForumPostByIdOrThrow(Long id) {
         return forumPostRepository.findByIdAndDeletedAtIsNull(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Post introuvable : " + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Post introuvable : " + id));
     }
 
     private void validatePostAuthor(ForumPost post, Long userId) {
@@ -58,7 +58,7 @@ public class ForumPostServiceImpl implements ForumPostService {
     @Transactional(readOnly = true)
     public ForumPostResponseDto getPostById(Long id) {
         ForumPost post = forumPostRepository.findByIdWithRelations(id)
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("Post introuvable : " + id));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Post introuvable : " + id));
         return forumPostMapper.toResponseDto(post);
     }
 

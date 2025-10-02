@@ -34,7 +34,7 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService(UserRepository userRepository) {
         return username -> userRepository.findByUsername(username)
                 .map(user -> new User()) // ou adapter User implements UserDetails
-                .orElseThrow(() -> new GlobalException.RessourceNotFoundException("User not found"));
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("User not found"));
     }
 
     @Bean

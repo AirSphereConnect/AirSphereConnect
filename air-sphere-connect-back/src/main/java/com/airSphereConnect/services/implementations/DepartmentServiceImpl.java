@@ -23,13 +23,13 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public Department getDepartmentByCode(String code) {
-        return departmentRepository.getDepartmentByCodeIgnoreCase(code).orElseThrow(() -> new ResourceNotFoundException(
+        return departmentRepository.findByCodeIgnoreCase(code).orElseThrow(() -> new ResourceNotFoundException(
                 "Department with code " + code + " not found"));
     }
 
     @Override
     public Department getDepartmentByName(String name) {
-        return departmentRepository.getDepartmentByNameIgnoreCase(name).orElseThrow(() -> new ResourceNotFoundException(
+        return departmentRepository.findByNameIgnoreCase(name).orElseThrow(() -> new ResourceNotFoundException(
                 "Department not found with name : " + name));
     }
 }

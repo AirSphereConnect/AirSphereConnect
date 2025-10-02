@@ -10,12 +10,20 @@ public interface CityService {
 
     City getCityByName(String name);
 
-    City getCityByPostalCode(String code);
+    City getCityByInseeCode(String inseeCode);
+
+    City getCitiesByPostalCode(String code);
 
     List<City> getCitiesByRegionName(String region);
 
     List<City> getCitiesByDepartmentName(String departmentName);
 
     List<City> getCitiesByDepartmentCode(String departmentCode);
+
+    List<City> getCitiesByPopulationGreaterThanEqual(Integer population);
+
+    List<City> getCitiesByPopulationLessThanEqual(Integer population);
+
+    List<City> getCitiesByPopulationBetweenThan(Integer populationMin, Integer populationMax);
 
 }

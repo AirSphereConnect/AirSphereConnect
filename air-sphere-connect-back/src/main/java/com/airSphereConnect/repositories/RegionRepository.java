@@ -8,11 +8,10 @@ import java.util.Optional;
 
 public interface RegionRepository extends JpaRepository<Region, Long> {
 
-<<<<<<< Updated upstream
+
     Optional<Region> getRegionByCode(String code);
-=======
+
     List<Region> findByCode(String code);
->>>>>>> Stashed changes
 
     Optional<Region> getRegionByNameIgnoreCase(String name);
 }
