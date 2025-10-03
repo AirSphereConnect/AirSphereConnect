@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static com.airSphereConnect.configuration.WebClientConfig.POP_BASE_URL;
+import static com.airSphereConnect.configuration.WebClientConfig.POP_API_BASEURL;
 
 @Service
 @Transactional
@@ -25,9 +25,9 @@ public class PopulationSyncService {
     private final CityRepository cityRepository;
     private final PopulationRepository populationRepository;
 
-    public PopulationSyncService(WebClient populationApiWebClientwebClient, CityRepository cityRepository,
+    public PopulationSyncService(WebClient populationApiWebClient, CityRepository cityRepository,
                                  PopulationRepository populationRepository) {
-        this.populationApiWebClient = populationApiWebClientwebClient;
+        this.populationApiWebClient = populationApiWebClient;
         this.cityRepository = cityRepository;
         this.populationRepository = populationRepository;
     }
@@ -88,7 +88,7 @@ public class PopulationSyncService {
 
                     // Update population details
                     population.setPopulation(dto.population());
-                    population.setSource(POP_BASE_URL);
+                    population.setSource(POP_API_BASEURL);
 
                     // Also update city's current population
                     city.setPopulation(dto.population());

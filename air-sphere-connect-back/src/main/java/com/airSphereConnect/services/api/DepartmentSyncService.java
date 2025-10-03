@@ -23,8 +23,8 @@ public class DepartmentSyncService {
     private final DepartmentRepository departmentRepository;
     private final RegionRepository regionRepository;
 
-    public DepartmentSyncService(WebClient populationApiWebClient, WebClient populationApiWebClient1, DepartmentRepository departmentRepository, RegionRepository regionRepository) {
-        this.populationApiWebClient = populationApiWebClient1;
+    public DepartmentSyncService(WebClient populationApiWebClient, DepartmentRepository departmentRepository, RegionRepository regionRepository) {
+        this.populationApiWebClient = populationApiWebClient;
         this.departmentRepository = departmentRepository;
         this.regionRepository = regionRepository;
     }

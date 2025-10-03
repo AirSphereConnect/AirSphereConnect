@@ -28,8 +28,8 @@ public class CitySyncService {
     private final CityRepository cityRepository;
     private final DepartmentRepository departmentRepository;
 
-    public CitySyncService(WebClient populationApiWebClient, WebClient populationApiWebClient1, CityRepository cityRepository, DepartmentRepository departmentRepository) {
-        this.populationApiWebClient = populationApiWebClient1;
+    public CitySyncService(WebClient populationApiWebClient, CityRepository cityRepository, DepartmentRepository departmentRepository) {
+        this.populationApiWebClient = populationApiWebClient;
         this.departmentRepository = departmentRepository;
         this.cityRepository = cityRepository;
     }
