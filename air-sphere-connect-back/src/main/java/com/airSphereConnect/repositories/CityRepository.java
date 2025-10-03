@@ -28,6 +28,8 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     List<City> findByDepartmentCode(String department);
 
+    List<City> findByDepartmentIn(List<Department> departments);
+
     List<City> findDistinctByPopulations_PopulationGreaterThanEqual(Integer population);
 
     List<City> findDistinctByPopulations_PopulationLessThanEqual(Integer population);

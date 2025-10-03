@@ -21,12 +21,13 @@ import static com.airSphereConnect.configuration.WebClientConfig.POP_BASE_URL;
 @Transactional
 public class PopulationSyncService {
 
-    private final WebClient webClient;
+    private final WebClient populationApiWebClient;
     private final CityRepository cityRepository;
     private final PopulationRepository populationRepository;
 
-    public PopulationSyncService(WebClient populationApiWebClient, CityRepository cityRepository, PopulationRepository populationRepository) {
-        this.webClient = populationApiWebClient;
+    public PopulationSyncService(WebClient populationApiWebClientwebClient, CityRepository cityRepository,
+                                 PopulationRepository populationRepository) {
+        this.populationApiWebClient = populationApiWebClientwebClient;
         this.cityRepository = cityRepository;
         this.populationRepository = populationRepository;
     }
@@ -45,8 +46,8 @@ public class PopulationSyncService {
 
 
         // Fetch population data from the API
-        List<ApiPopulationResponseDto> apiPopulationResponseDtos = webClient.get()
-                .uri(POP_BASE_URL)
+        List<ApiPopulationResponseDto> apiPopulationResponseDtos = populationApiWebClient.get()
+                .uri("/communes?fields=nom,code,population")
                 .retrieve()
                 .bodyToFlux(ApiPopulationResponseDto.class)
                 .collectList()
@@ -58,17 +59,19 @@ public class PopulationSyncService {
         // Fetch existing cities to minimize database calls
         Map<String, City> cityMap = cityRepository.findByNameIgnoreCaseIn(
                         apiPopulationResponseDtos.stream()
-                                .map(dto -> dto.name().toLowerCase())
+                                .map(ApiPopulationResponseDto::name)
                                 .toList())
                 .stream()
-                .collect(Collectors.toMap(city -> city.getName().toLowerCase() + "-" + city.getInseeCode(),
+                .collect(Collectors.toMap(city -> city.getName() + city.getInseeCode(),
                         city -> city));
 
         // Prepare list to hold populations to be saved
         List<Population> populations = apiPopulationResponseDtos.stream()
                 .map(dto -> {
-                    String key = dto.name().toLowerCase() + "-" + dto.code();
+                    String key = dto.name() + dto.code();
                     City city = cityMap.get(key);
+
+
                     if (city == null) return null;
 
 

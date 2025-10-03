@@ -21,9 +21,4 @@ public class PopulationServiceImpl implements PopulationService {
         return populationRepository.findByCityNameIgnoreCaseOrderByYearAsc(cityName);
     }
 
-    @Override
-    public Population getLatestPopulationByCityName(String cityName) {
-        List<Population> populations = populationRepository.findByCityNameIgnoreCaseOrderByYearAsc(cityName);
-        return populations.isEmpty() ? null : populations.getLast();
-    }
 }

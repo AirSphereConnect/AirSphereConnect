@@ -204,14 +204,15 @@ public class City {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+      if(this==o) return true;
+        if(o==null || getClass()!=o.getClass()) return false;
         City city = (City) o;
-        return Objects.equals(name, city.name) && Objects.equals(postalCode, city.postalCode);
+        return Objects.equals(inseeCode, city.inseeCode);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, postalCode);
+        return Objects.hash(inseeCode);
     }
 
     @Override

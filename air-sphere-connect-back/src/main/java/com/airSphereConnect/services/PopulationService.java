@@ -6,8 +6,6 @@ import java.util.List;
 
 public interface PopulationService {
 
-    List<Population> getHistoryByCityName(String cityName);
-
-    Population getLatestPopulationByCityName(String cityName);
+   List<Population> getHistoryByCityName(String cityName);
 
 }
