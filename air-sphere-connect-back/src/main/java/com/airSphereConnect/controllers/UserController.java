@@ -5,11 +5,14 @@ import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.UserService;
+import org.springframework.security.access.prepost.PostAuthorize;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 //TODO Il faut ajouter l'adresse aux différentes méthodes
 @RestController
+@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -21,6 +24,7 @@ public class UserController {
     }
 
     // Tous les utilisateurs
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public List<UserResponseDto> getAllUsers() {
         return userService.getAllUsers()
@@ -30,11 +34,13 @@ public class UserController {
     }
 
     // Par nom d'utilisateur
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/name")
     public UserResponseDto getUserByUsername(@RequestParam String username) {
         return UserMapper.toDto(userService.getUserByUsername(username));
     }
     // Par Id utilisateur
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id")
     public UserResponseDto getUserById(@RequestParam Long id) {
         return UserMapper.toDto(userService.getUserById(id));
@@ -49,6 +55,7 @@ public class UserController {
     }
 
     // Mettre à jour un utilisateur
+    @PreAuthorize("hasRole('USER')")
     @PutMapping("/{id}")
     public UserResponseDto updateUser(@PathVariable Long id, @RequestBody UserRequestDto reqDto) {
         User user = UserMapper.toEntity(reqDto);
@@ -57,6 +64,7 @@ public class UserController {
     }
 
     // Supprimer un utilisateur
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/{id}")
     public UserResponseDto deleteUser(@PathVariable Long id) {
         User deletedUser = userService.deleteUser(id);

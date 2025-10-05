@@ -80,14 +80,6 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
     }
 
     @Override
-    public void setAlertEnabled(Long alertConfigId, boolean enabled) {
-        FavoritesAlerts entity = favoritesAlertsRepository.findById(alertConfigId)
-                .orElseThrow(() -> new IllegalArgumentException("Alert config not found"));
-        entity.setEnabled(enabled);
-        favoritesAlertsRepository.save(entity);
-    }
-
-    @Override
     public void deleteAlertConfig(Long alertConfigId) {
         favoritesAlertsRepository.deleteById(alertConfigId);
     }

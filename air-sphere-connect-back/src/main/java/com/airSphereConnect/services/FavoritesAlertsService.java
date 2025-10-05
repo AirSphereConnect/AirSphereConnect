@@ -9,6 +9,5 @@ public interface FavoritesAlertsService {
     FavoritesAlertsDto createAlertConfig(FavoritesAlertsDto dto);
     List<FavoritesAlertsDto> getUserAlerts(Long userId);
     FavoritesAlertsDto updateAlertConfig(FavoritesAlertsDto dto, Long userId);
-    void setAlertEnabled(Long alertConfigId, boolean enabled);
     void deleteAlertConfig(Long alertConfigId);
 }

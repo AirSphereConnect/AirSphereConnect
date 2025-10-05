@@ -17,6 +17,12 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
+        jdbc.batch_size: 100
+        order_inserts: true
+        order_updates: true
+      jdbc:
+        batch_versioned_data: true
+
 
   # Configuration sécurité pour health check
   security:

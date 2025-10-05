@@ -254,6 +254,7 @@ public class User implements UserDetails {
                 ", email='" + email + '\'' +
                 '}';
     }
+
     //Besoin pour la gestion des rôles dans spring sécurity
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

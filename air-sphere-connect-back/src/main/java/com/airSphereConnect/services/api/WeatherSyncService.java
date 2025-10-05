@@ -114,6 +114,62 @@ public class WeatherSyncService implements DataSyncService {
                                 .build())
                         .retrieve()
                         .bodyToMono(ApiWeatherResponseDto.class)
+                        .map(response -> {
+                            if (response == null) {
+                                logger.warn("Réponse météo nulle pour la ville {}", city.getName());
+                                return null;
+                            }
+                            WeatherMeasurement weather = new WeatherMeasurement();
+                            weather.setCity(city);
+                            if (response.weatherMainDto() != null) {
+                                weather.setTemperature(response.weatherMainDto().temp());
+                                weather.setPressure(response.weatherMainDto().pressure());
+                                weather.setHumidity(response.weatherMainDto().humidity());
+                            }
+                            if (response.weatherWindDto() != null) {
+                                weather.setWindDirection(response.weatherWindDto().deg());
+                                weather.setWindSpeed(response.weatherWindDto().speed());
+                            }
+                            if (response.weatherDescriptionDto() != null && response.weatherDescriptionDto().length > 0) {
+                                try {
+                                    String jsonMessage = objectMapper.writeValueAsString(response.weatherDescriptionDto());
+                                    weather.setMessage(jsonMessage);
+                                } catch (JsonProcessingException e) {
+                                    logger.error("Erreur sérialisation message météo: {}", e.getMessage());
+                                    weather.setMessage(null);
+                                }
+                            }
+                            weather.setSource(WEATHER_API_BASEURL);
+                            boolean hasAlert = response.weatherAlertDto() != null && response.weatherAlertDto().length > 0;
+                            weather.setAlert(hasAlert);
+                            if (hasAlert) {
+                                try {
+                                    String alertJson = objectMapper.writeValueAsString(response.weatherAlertDto());
+                                    weather.setAlertMessage(alertJson);
+                                } catch (JsonProcessingException e) {
+                                    logger.error("Erreur sérialisation alert message météo: {}", e.getMessage());
+                                    weather.setAlertMessage(null);
+                                }
+                            } else {
+                                weather.setAlertMessage(null);
+                            }
+                            weather.setMeasuredAt(LocalDateTime.now());
+                            return weather;
+                        })
+                        .onErrorResume(e -> {
+                            logger.error("Erreur météo pour {} : {}", city.getName(), e.getMessage());
+                            return Mono.empty();
+                        })
+                )
+                .filter(weather -> weather != null)
+                .collectList()
+                .block();
+
+        if (weatherList != null && !weatherList.isEmpty()) {
+            weatherRepository.saveAll(weatherList);
+            logger.info("Synchronisation météo : {} mesures insérées.", weatherList.size());
+        } else {
+            logger.warn("Aucune mesure météo à insérer.");
                         .mapNotNull(response -> {
                             if (response == null) {
                                 logger.warn("Réponse météo nulle pour la ville {}", city.getName());
