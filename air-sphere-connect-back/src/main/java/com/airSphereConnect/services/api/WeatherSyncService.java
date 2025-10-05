@@ -7,7 +7,6 @@ import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.WeatherRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -116,22 +115,25 @@ public class WeatherSyncService implements DataSyncService {
                                 .build())
                         .retrieve()
                         .bodyToMono(ApiWeatherResponseDto.class)
-                        .map(response -> {
+                        .mapNotNull(response -> {
                             if (response == null) {
                                 logger.warn("Réponse météo nulle pour la ville {}", city.getName());
                                 return null;
                             }
                             WeatherMeasurement weather = new WeatherMeasurement();
                             weather.setCity(city);
+
                             if (response.weatherMainDto() != null) {
                                 weather.setTemperature(response.weatherMainDto().temp());
                                 weather.setPressure(response.weatherMainDto().pressure());
                                 weather.setHumidity(response.weatherMainDto().humidity());
                             }
+
                             if (response.weatherWindDto() != null) {
                                 weather.setWindDirection(response.weatherWindDto().deg());
                                 weather.setWindSpeed(response.weatherWindDto().speed());
                             }
+
                             if (response.weatherDescriptionDto() != null && response.weatherDescriptionDto().length > 0) {
                                 try {
                                     String jsonMessage = objectMapper.writeValueAsString(response.weatherDescriptionDto());
@@ -141,9 +143,12 @@ public class WeatherSyncService implements DataSyncService {
                                     weather.setMessage(null);
                                 }
                             }
+
                             weather.setSource(WEATHER_API_BASEURL);
+
                             boolean hasAlert = response.weatherAlertDto() != null && response.weatherAlertDto().length > 0;
                             weather.setAlert(hasAlert);
+
                             if (hasAlert) {
                                 try {
                                     String alertJson = objectMapper.writeValueAsString(response.weatherAlertDto());
@@ -155,7 +160,9 @@ public class WeatherSyncService implements DataSyncService {
                             } else {
                                 weather.setAlertMessage(null);
                             }
+
                             weather.setMeasuredAt(LocalDateTime.now());
+
                             return weather;
                         })
                         .onErrorResume(e -> {
@@ -163,12 +170,13 @@ public class WeatherSyncService implements DataSyncService {
                             return Mono.empty();
                         })
                 )
-                .filter(weather -> weather != null)
+                .filter(Objects::nonNull)
                 .collectList()
                 .block();
 
         if (weatherList != null && !weatherList.isEmpty()) {
             weatherRepository.saveAll(weatherList);
+
             logger.info("Synchronisation météo : {} mesures insérées.", weatherList.size());
         } else {
             logger.warn("Aucune mesure météo à insérer.");
@@ -240,3 +248,4 @@ public class WeatherSyncService implements DataSyncService {
         }
     }
 }
+
