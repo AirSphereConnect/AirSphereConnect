@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "air_quality_measurements")
-public class AirQualityMeasurement {
+public class AirQualityMeasurement extends Timestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,14 +29,8 @@ public class AirQualityMeasurement {
     @Column(name = "so2")
     private Double so2;
 
-    @Column(name = "atmo")
-    private Integer atmo;
-
-    @Column(name = "message", length = 50)
-    private String message;
-
-    @Column(name = "source", length = 100)
-    private String source;
+    @Column(name = "unit", length = 10)
+    private String unit;
 
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
@@ -48,21 +42,15 @@ public class AirQualityMeasurement {
     public AirQualityMeasurement() {
     }
 
-    public AirQualityMeasurement(AirQualityStation station, LocalDateTime measuredAt, String source) {
-        this.station = station;
-        this.measuredAt = measuredAt;
-        this.source = source;
-    }
-
-    public AirQualityMeasurement(Double pm10, Double pm25, Double no2, Double o3, Double so2, Integer atmo, String message, String source) {
+    public AirQualityMeasurement(Double pm10, Double pm25, Double no2, Double o3, Double so2, String unit, LocalDateTime measuredAt, AirQualityStation station) {
         this.pm10 = pm10;
         this.pm25 = pm25;
         this.no2 = no2;
         this.o3 = o3;
         this.so2 = so2;
-        this.atmo = atmo;
-        this.message = message;
-        this.source = source;
+        this.unit = unit;
+        this.measuredAt = measuredAt;
+        this.station = station;
     }
 
     public Long getId() {
@@ -113,28 +101,12 @@ public class AirQualityMeasurement {
         this.so2 = so2;
     }
 
-    public Integer getAtmo() {
-        return atmo;
+    public String getUnit() {
+        return unit;
     }
 
-    public void setAtmo(Integer atmo) {
-        this.atmo = atmo;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
+    public void setUnit(String unit) {
+        this.unit = unit;
     }
 
     public LocalDateTime getMeasuredAt() {
@@ -151,33 +123,6 @@ public class AirQualityMeasurement {
 
     public void setStation(AirQualityStation station) {
         this.station = station;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        AirQualityMeasurement that = (AirQualityMeasurement) o;
-        return Objects.equals(id, that.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(id);
-    }
-
-    @Override
-    public String toString() {
-        return "AirQualityMeasurement{" +
-                "id=" + id +
-                ", pm10=" + pm10 +
-                ", pm25=" + pm25 +
-                ", no2=" + no2 +
-                ", o3=" + o3 +
-                ", so2=" + so2 +
-                ", atmo=" + atmo +
-                ", message='" + message + '\'' +
-                ", source='" + source + '\'' +
-                '}';
     }
 }
 

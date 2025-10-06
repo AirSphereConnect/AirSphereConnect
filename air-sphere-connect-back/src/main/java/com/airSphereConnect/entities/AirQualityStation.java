@@ -8,7 +8,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "air_quality_stations")
-public class AirQualityStation {
+public class AirQualityStation extends Timestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -20,17 +20,11 @@ public class AirQualityStation {
     @Column(name="code",  unique = true, nullable = false, length = 20)
     private String code;
 
-    @Column(name="source",  unique = true, nullable = false, length = 50)
-    private String source;
-
-    @Column(name = "latitude", nullable = false)
-    private Double latitude;
-
-    @Column(name = "longitude", nullable = false)
-    private Double longitude;
+    @Column(name = "area_code", length = 10)
+    private String areaCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "city_id", nullable = false)
+    @JoinColumn(name = "city_insee_code", nullable = false, referencedColumnName = "insee_code")
     private City city;
 
     @OneToMany(mappedBy = "station", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -39,12 +33,10 @@ public class AirQualityStation {
     // Constructeurs
     public AirQualityStation() {}
 
-    public AirQualityStation(String name, String code, String source, Double latitude, Double longitude, City city) {
+    public AirQualityStation(String name, String code, String areaCode, City city) {
         this.name = name;
         this.code = code;
-        this.source = source;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.areaCode = areaCode;
         this.city = city;
     }
 
@@ -72,28 +64,12 @@ public class AirQualityStation {
         this.code = code;
     }
 
-    public Double getLatitude() {
-        return latitude;
+    public String getAreaCode() {
+        return areaCode;
     }
 
-    public void setLatitude(Double latitude) {
-        this.latitude = latitude;
-    }
-
-    public Double getLongitude() {
-        return longitude;
-    }
-
-    public void setLongitude(Double longitude) {
-        this.longitude = longitude;
-    }
-
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
+    public void setAreaCode(String areaCode) {
+        this.areaCode = areaCode;
     }
 
     public City getCity() {
@@ -129,8 +105,6 @@ public class AirQualityStation {
         return "AirQualityStation{" +
                 "name='" + name + '\'' +
                 ", code='" + code + '\'' +
-                ", latitude=" + latitude +
-                ", longitude=" + longitude +
                 '}';
     }
 }
