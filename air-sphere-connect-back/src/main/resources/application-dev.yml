@@ -28,11 +28,6 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
-        jdbc.batch_size: 100
-        order_inserts: true
-        order_updates: true
-      jdbc:
-        batch_versioned_data: true
 
   mail:
     host: localhost

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 //TODO Il faut ajouter l'adresse aux différentes méthodes
 @RestController
-@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
 @RequestMapping("/api/users")
 public class UserController {
 

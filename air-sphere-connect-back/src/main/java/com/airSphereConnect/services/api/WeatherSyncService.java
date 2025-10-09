@@ -7,6 +7,7 @@ import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.WeatherRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -21,6 +22,7 @@ import java.time.Duration;
 import java.util.List;
 
 @Service
+@Transactional
 public class WeatherSyncService implements DataSyncService {
 
     private static final Logger logger = LoggerFactory.getLogger(WeatherSyncService.class);

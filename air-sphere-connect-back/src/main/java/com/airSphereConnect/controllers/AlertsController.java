@@ -9,7 +9,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/api/alerts")
+@RequestMapping("/api/admin/alerts")
 public class AlertsController {
 
     private final AlertsService alertsService;

@@ -56,13 +56,25 @@ public class PopulationSyncService {
 
 
         // Fetch existing cities to minimize database calls
+//        Map<String, City> cityMap = cityRepository.findByNameIgnoreCaseIn(
+//                        apiPopulationResponseDtos.stream()
+//                                .map(dto -> dto.name().toLowerCase())
+//                                .toList())
+//                .stream()
+//                .collect(Collectors.toMap(city -> city.getName().toLowerCase() + "-" + city.getInseeCode(),
+//                        city -> city));
         Map<String, City> cityMap = cityRepository.findByNameIgnoreCaseIn(
                         apiPopulationResponseDtos.stream()
                                 .map(dto -> dto.name().toLowerCase())
-                                .toList())
+                                .toList()
+                )
                 .stream()
-                .collect(Collectors.toMap(city -> city.getName().toLowerCase() + "-" + city.getInseeCode(),
-                        city -> city));
+                .collect(Collectors.toMap(
+                        city -> city.getName().toLowerCase() + "-" + city.getInseeCode(),
+                        city -> city,
+                        (city1, city2) -> city1 // ou city2 pour garder le dernier
+                ));
+
 
         // Prepare list to hold populations to be saved
         List<Population> populations = apiPopulationResponseDtos.stream()
