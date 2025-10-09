@@ -4,18 +4,19 @@ import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.UserService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UserServiceImpl implements UserService {
 
 
     private final UserRepository userRepository;
-
 
     private final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 
@@ -92,5 +93,10 @@ public class UserServiceImpl implements UserService {
         user.setDeletedAt(LocalDateTime.now());
         userRepository.save(user);
         return user;
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) throws UsernameNotFoundException {
+        return Optional.empty();
     }
 }

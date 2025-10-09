@@ -18,6 +18,8 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MariaDBDialect
 
+
+
   # Configuration sécurité pour health check
   security:
     web:
