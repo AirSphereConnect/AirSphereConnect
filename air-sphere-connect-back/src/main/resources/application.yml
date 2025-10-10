@@ -18,9 +18,6 @@ spring:
           WRITE_DATES_AS_TIMESTAMPS: false
 
 
-
-
-
 # Configuration commune
 server:
   port: 8080
