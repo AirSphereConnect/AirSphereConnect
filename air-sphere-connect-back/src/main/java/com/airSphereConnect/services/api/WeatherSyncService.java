@@ -7,19 +7,22 @@ import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.WeatherRepository;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.transaction.Transactional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import static com.airSphereConnect.configuration.WebClientConfig.WEATHER_API_BASEURL;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDateTime;
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
+@Transactional
 public class WeatherSyncService implements DataSyncService {
 
     private static final Logger logger = LoggerFactory.getLogger(WeatherSyncService.class);
@@ -94,9 +97,8 @@ public class WeatherSyncService implements DataSyncService {
 
         List<City> cities = cityRepository.findAll();
 
-        for (City city : cities) {
-            try {
-                ApiWeatherResponseDto response = webClient.get()
+        List<WeatherMeasurement> weatherList = Flux.fromIterable(cities)
+                .flatMap(city -> webClient.get()
                         .uri(uriBuilder -> uriBuilder
                                 .queryParam("lat", city.getLatitude())
                                 .queryParam("lon", city.getLongitude())
@@ -105,64 +107,62 @@ public class WeatherSyncService implements DataSyncService {
                                 .build())
                         .retrieve()
                         .bodyToMono(ApiWeatherResponseDto.class)
-                        .block();
+                        .map(response -> {
+                            if (response == null) {
+                                logger.warn("Réponse météo nulle pour la ville {}", city.getName());
+                                return null;
+                            }
+                            WeatherMeasurement weather = new WeatherMeasurement();
+                            weather.setCity(city);
+                            if (response.weatherMainDto() != null) {
+                                weather.setTemperature(response.weatherMainDto().temp());
+                                weather.setPressure(response.weatherMainDto().pressure());
+                                weather.setHumidity(response.weatherMainDto().humidity());
+                            }
+                            if (response.weatherWindDto() != null) {
+                                weather.setWindDirection(response.weatherWindDto().deg());
+                                weather.setWindSpeed(response.weatherWindDto().speed());
+                            }
+                            if (response.weatherDescriptionDto() != null && response.weatherDescriptionDto().length > 0) {
+                                try {
+                                    String jsonMessage = objectMapper.writeValueAsString(response.weatherDescriptionDto());
+                                    weather.setMessage(jsonMessage);
+                                } catch (JsonProcessingException e) {
+                                    logger.error("Erreur sérialisation message météo: {}", e.getMessage());
+                                    weather.setMessage(null);
+                                }
+                            }
+                            weather.setSource(WEATHER_API_BASEURL);
+                            boolean hasAlert = response.weatherAlertDto() != null && response.weatherAlertDto().length > 0;
+                            weather.setAlert(hasAlert);
+                            if (hasAlert) {
+                                try {
+                                    String alertJson = objectMapper.writeValueAsString(response.weatherAlertDto());
+                                    weather.setAlertMessage(alertJson);
+                                } catch (JsonProcessingException e) {
+                                    logger.error("Erreur sérialisation alert message météo: {}", e.getMessage());
+                                    weather.setAlertMessage(null);
+                                }
+                            } else {
+                                weather.setAlertMessage(null);
+                            }
+                            weather.setMeasuredAt(LocalDateTime.now());
+                            return weather;
+                        })
+                        .onErrorResume(e -> {
+                            logger.error("Erreur météo pour {} : {}", city.getName(), e.getMessage());
+                            return Mono.empty();
+                        })
+                )
+                .filter(weather -> weather != null)
+                .collectList()
+                .block();
 
-                if (response == null) {
-                    logger.warn("Réponse météo nulle pour la ville {}", city.getName());
-                    continue;
-                }
-
-                WeatherMeasurement weather = new WeatherMeasurement();
-                weather.setCity(city);
-
-                if (response.weatherMainDto() != null) {
-                    weather.setTemperature(response.weatherMainDto().temp());
-                    weather.setPressure(response.weatherMainDto().pressure());
-                    weather.setHumidity(response.weatherMainDto().humidity());
-                }
-
-                if (response.weatherWindDto() != null) {
-                    weather.setWindDirection(response.weatherWindDto().deg());
-                    weather.setWindSpeed(response.weatherWindDto().speed());
-                }
-
-                if (response.weatherDescriptionDto() != null && response.weatherDescriptionDto().length > 0) {
-                    try {
-                        String jsonMessage = objectMapper.writeValueAsString(response.weatherDescriptionDto());
-                        weather.setMessage(jsonMessage);
-                    } catch (JsonProcessingException e) {
-                        logger.error("Erreur sérialisation message météo: {}", e.getMessage());
-                        weather.setMessage(null);
-                    }
-                }
-
-
-                weather.setSource(WEATHER_API_BASEURL);
-
-                boolean hasAlert = response.weatherAlertDto() != null && response.weatherAlertDto().length > 0;
-                weather.setAlert(hasAlert);
-
-                if (hasAlert) {
-                    try {
-                        String alertJson = objectMapper.writeValueAsString(response.weatherAlertDto());
-                        weather.setAlertMessage(alertJson);
-                    } catch (JsonProcessingException e) {
-                        logger.error("Erreur sérialisation alert message météo: {}", e.getMessage());
-                        weather.setAlertMessage(null);
-                    }
-                } else {
-                    weather.setAlertMessage(null);
-                }
-
-
-                weather.setMeasuredAt(LocalDateTime.now());
-
-                weatherRepository.save(weather);
-
-            } catch (Exception e) {
-                logger.error("Erreur météo pour {} : {}", city.getName(), e.getMessage());
-            }
+        if (weatherList != null && !weatherList.isEmpty()) {
+            weatherRepository.saveAll(weatherList);
+            logger.info("Synchronisation météo : {} mesures insérées.", weatherList.size());
+        } else {
+            logger.warn("Aucune mesure météo à insérer.");
         }
     }
 }
-
