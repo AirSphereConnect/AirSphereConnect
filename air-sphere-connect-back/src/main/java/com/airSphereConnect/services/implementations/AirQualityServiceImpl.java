@@ -130,7 +130,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         return indices.stream()
                 .map(index -> {
-                    String alertMessage = determineAlertMessage(index.getQualityIndex());
+                    String alertMessage = AirQualityAlertUtils.determineAlertMessage(index.getQualityIndex());
                     return mapper.toDto(index, alertMessage);
                 })
                 .toList();
@@ -158,7 +158,7 @@ public class AirQualityServiceImpl implements AirQualityService {
                             dto.setQualityLabel(index.getQualityLabel());
                             dto.setQualityColor(index.getQualityColor());
                             dto.setIndexMeasuredAt(index.getMeasuredAt());
-                            dto.setAlertMessage(determineAlertMessage(index.getQualityIndex()));
+                            dto.setAlertMessage(AirQualityAlertUtils.determineAlertMessage(index.getQualityIndex()));
                         });
             } catch (NumberFormatException e) {
                 log.error("Code EPCI invalide pour la ville : ", city.getName());
@@ -223,17 +223,5 @@ public class AirQualityServiceImpl implements AirQualityService {
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
-    }
-
-    private String determineAlertMessage(Integer atmoIndex) {
-        if (atmoIndex == null) return null;
-
-        return switch (atmoIndex) {
-            case 1, 2 -> null;
-            case 3, 4 -> "Qualité de l'air moyenne - Personnes sensibles : limitez les activités intenses";
-            case 5 -> "⚠️ Qualité de l'air dégradée - Évitez les efforts prolongés";
-            case 6 -> "🚨 Qualité de l'air très mauvaise - Limitez toute activité physique";
-            default -> null;
-        };
     }
 }
