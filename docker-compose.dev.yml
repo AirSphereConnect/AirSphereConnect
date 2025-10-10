@@ -67,7 +67,9 @@ services:
     env_file:
       - .env
 
-
+    volumes:
+      - ./air-sphere-connect-back:/app/air-sphere-connect-back
+      - maven_cache:/root/.m2
 
     ports:
       - "${BACKEND_PORT}:8080"
@@ -103,10 +105,13 @@ services:
       API_URL: ${API_URL}
       NODE_ENV: ${NODE_ENV:-development}
 
-
-
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+
+    volumes:
+      - ./air-sphere-connect-front:/app/air-sphere-connect-front
+      - ./docker-compose.dev.yml:/app/docker-compose.dev.yml
+
 
     depends_on:
       backend:
@@ -128,6 +133,8 @@ services:
 volumes:
   air-sphere-connect_db_data:
     name: ${DB_VOLUME_NAME}
+    driver: local
+  maven_cache:
     driver: local
 
 # ==============================

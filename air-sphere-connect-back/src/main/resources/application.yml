@@ -7,7 +7,7 @@ spring:
   # Docker Compose pour développement local uniquement
   docker:
     compose:
-      file: ../docker-compose.yml
+      file: /app/docker-compose.dev.yml
 
   messages:
     basename: ValidationMessages
