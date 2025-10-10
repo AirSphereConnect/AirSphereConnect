@@ -6,7 +6,6 @@ services:
     image: mariadb:${MARIADB_VERSION}
     container_name: ${DB_CONTAINER_NAME}
     restart: unless-stopped
-
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
       MYSQL_DATABASE: ${DB_NAME}
@@ -14,19 +13,16 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_CHARSET: ${DB_CHARSET}
       MYSQL_COLLATION: ${DB_COLLATION}
-
+      SPRING_SCHEDULING_ENABLED: "false"
     ports:
       - "${DB_PORT}:3306"
-
     volumes:
       - ${DB_VOLUME_NAME}:/var/lib/mysql
-
+      - ./config/database:/docker-entrypoint-initdb.d:ro
     networks:
       - ${NETWORK_NAME}
-
-    # ✅ Health check corrigé pour MariaDB
     healthcheck:
-      test: [ "CMD", "mariadb", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}", "-e", "SELECT 1" ]
+      test: CMD-SHELL mysqladmin ping -h localhost -u$DB_USER -p$DB_PASSWORD || exit 1
       interval: ${HEALTHCHECK_INTERVAL}
       timeout: ${HEALTHCHECK_TIMEOUT}
       retries: ${HEALTHCHECK_RETRIES}
@@ -61,30 +57,23 @@ services:
     build:
       context: ${BACKEND_CONTEXT}
       dockerfile: ${BACKEND_DOCKERFILE}
-
     container_name: ${BACKEND_CONTAINER_NAME}
     restart: unless-stopped
     env_file:
       - .env
-
     volumes:
       - ./air-sphere-connect-back:/app/air-sphere-connect-back
       - maven_cache:/root/.m2
-
     ports:
       - "${BACKEND_PORT}:8080"
-      - "${DEBUG_PORT}:5005"
-
+#      - "${DEBUG_PORT}:5005"
     depends_on:
       mariadb:
         condition: service_healthy
-
     networks:
       - ${NETWORK_NAME}
-
-    # ✅ Health check backend (nécessite curl dans Dockerfile)
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
       interval: ${HEALTHCHECK_INTERVAL}
       timeout: ${HEALTHCHECK_TIMEOUT}
       retries: ${HEALTHCHECK_RETRIES}
@@ -97,32 +86,22 @@ services:
     build:
       context: ${FRONTEND_CONTEXT}
       dockerfile: ${FRONTEND_DOCKERFILE}
-
     container_name: ${FRONTEND_CONTAINER_NAME}
     restart: unless-stopped
-
     environment:
       API_URL: ${API_URL}
       NODE_ENV: ${NODE_ENV:-development}
-
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
-
     volumes:
       - ./air-sphere-connect-front:/app/air-sphere-connect-front
-      - ./docker-compose.dev.yml:/app/docker-compose.dev.yml
-
-
     depends_on:
       backend:
         condition: service_healthy
-
     networks:
-      - ${NETWORK_NAME:-air-sphere-connect-network}
-
-    # ✅ Health check avec curl (cohérent avec backend)
+      - ${NETWORK_NAME}
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:4200 || exit 1"]
+      test: [ "CMD-SHELL", "curl -f http://localhost:4200 || exit 1" ]
       interval: ${HEALTHCHECK_INTERVAL:-30s}
       timeout: ${HEALTHCHECK_TIMEOUT:-10s}
       retries: 3

@@ -35,7 +35,7 @@ COPY --from=builder /app/target/*.jar app.jar
 
 # Exposer les ports
 EXPOSE 8080
-EXPOSE 5005
+#EXPOSE 5005
 
 # Lancer l'application
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
