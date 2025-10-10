@@ -142,6 +142,11 @@ public class ApiAirQualityService implements DataSyncService {
 
         AirQualityDailyMeasureResponseDto dailyDto = stationMeasures.get(0);
         AirQualityStation station = getOrCreateStation(dailyDto);
+        if (station == null) {
+            log.warn("⚠️ [ATMO] Mesures ignorées pour station {} : station introuvable",
+                    dailyDto.codeStation());
+            return 0;
+        }
 
         AirQualityMeasurement measurement = new AirQualityMeasurement();
         measurement.setStation(station);
@@ -149,7 +154,6 @@ public class ApiAirQualityService implements DataSyncService {
         measurement.setUnit(dailyDto.polluantUnit() != null ? dailyDto.polluantUnit() : "µg/m³");
 
 
-        // Remplit tous les polluants de cette station
         for (AirQualityDailyMeasureResponseDto dto : stationMeasures) {
             fillPollutant(measurement, dto.polluantName(), dto.polluantValue());
         }
@@ -188,6 +192,7 @@ public class ApiAirQualityService implements DataSyncService {
                 if (alertMessage != null) {
                     index.setAlertMessage(alertMessage);
                     alertCount++;
+                    index.setAlert(true);
                     log.warn("⚠️ [ATMO] Alerte qualité air : {}", alertMessage);
                 }
 
@@ -257,15 +262,27 @@ public class ApiAirQualityService implements DataSyncService {
         log.debug("🆕 [ATMO] Création station {}", dto.codeStation());
         AirQualityStation newStation = mapper.toEntity(dto);
 
+        // ✅ CORRECTION : Chercher la ville AVANT de sauvegarder
         if (dto.inseeCode() != null) {
             String inseeCode = String.valueOf(dto.inseeCode());
             cityRepository.findByInseeCode(inseeCode)
-                    .ifPresent(city -> {
-                        newStation.setCity(city);
-                        newStation.setAreaCode(city.getAreaCode());
-                        log.debug("🔗 [ATMO] Station {} liée à la ville {}",
-                                dto.codeStation(), city.getName());
-                    });
+                    .ifPresentOrElse(
+                            city -> {
+                                newStation.setCity(city);
+                                newStation.setAreaCode(city.getAreaCode());
+                                log.debug("🔗 [ATMO] Station {} liée à {}", dto.codeStation(), city.getName());
+                            },
+                            () -> {
+                                log.warn("⚠️ [ATMO] Ville introuvable pour INSEE {}, station {} ignorée",
+                                        inseeCode, dto.codeStation());
+                            }
+                    );
+        }
+
+        // ❌ Si pas de ville trouvée, on ne sauvegarde PAS
+        if (newStation.getCity() == null) {
+            log.warn("⚠️ [ATMO] Station {} ignorée : pas de ville associée", dto.codeStation());
+            return null;
         }
 
         return stationRepository.save(newStation);
