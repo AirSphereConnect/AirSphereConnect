@@ -24,7 +24,7 @@ public class AirQualityStation extends Timestamp {
     private String areaCode;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "city_insee_code", nullable = false, referencedColumnName = "insee_code")
+    @JoinColumn(name = "insee_code", referencedColumnName = "insee_code", nullable = false)
     private City city;
 
     @OneToMany(mappedBy = "station", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

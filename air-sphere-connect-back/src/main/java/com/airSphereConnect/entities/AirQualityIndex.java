@@ -29,11 +29,14 @@ public class AirQualityIndex extends Timestamp {
     @Column(name = "area_code")
     private Integer areaCode;
 
-    @Column(name = "area_name", length = 50)
+    @Column(name = "area_name", length = 150)
     private String areaName;
 
     @Column(name = "alert_message", columnDefinition = "TEXT")
     private String alertMessage;
+
+    @Column(name = "alert")
+    private boolean alert = false;
 
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
@@ -42,7 +45,7 @@ public class AirQualityIndex extends Timestamp {
 
     }
 
-    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, Integer areaCode, String areaName, String alertMessage, LocalDateTime measuredAt) {
+    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, Integer areaCode, String areaName, String alertMessage, boolean alert, LocalDateTime measuredAt) {
         this.qualityIndex = qualityIndex;
         this.qualityLabel = qualityLabel;
         this.qualityColor = qualityColor;
@@ -50,6 +53,7 @@ public class AirQualityIndex extends Timestamp {
         this.areaCode = areaCode;
         this.areaName = areaName;
         this.alertMessage = alertMessage;
+        this.alert = alert;
         this.measuredAt = measuredAt;
     }
 
@@ -122,6 +126,14 @@ public class AirQualityIndex extends Timestamp {
 
     public void setAlertMessage(String alertMessage) {
         this.alertMessage = alertMessage;
+    }
+
+    public boolean getAlert() {
+        return alert;
+    }
+
+    public void setAlert(boolean alert) {
+        this.alert = alert;
     }
 
     @Override

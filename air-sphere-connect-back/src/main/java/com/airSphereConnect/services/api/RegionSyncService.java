@@ -53,5 +53,7 @@ public class RegionSyncService {
                     }
                 })
                 .toList();
+
+        regionRepository.saveAll(regionList);
     }
 }
