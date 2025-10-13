@@ -22,8 +22,7 @@ public class FavoriteMapper {
         Favorite favorite = new Favorite();
         favorite.setId(dto.getId());
         favorite.setFavoriteCategory(dto.getFavoriteCategory());
-        favorite.setCreatedAt(dto.getCreatedAt());
-        favorite.setUpdatedAt(dto.getUpdatedAt());
+
 
         return favorite;
     }

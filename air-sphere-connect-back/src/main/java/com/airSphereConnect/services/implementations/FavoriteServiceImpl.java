@@ -36,7 +36,7 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public List<FavoriteDto> getAllFavorites() {
-        return favoriteRepository.findByDeleteAtIsNull()
+        return favoriteRepository.findByDeletedAtIsNull()
                 .stream()
                 .map(favoriteMapper::toDto)
                 .collect(Collectors.toList());
@@ -64,7 +64,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         Favorite favorite = favoriteMapper.toEntity(favoriteDto);
         favorite.setUser(user);
         favorite.setCity(city);
-        favorite.setCreatedAt(LocalDateTime.now());
+//        favorite.setCreatedAt(LocalDateTime.now());
 
         Favorite saved = favoriteRepository.save(favorite);
         return favoriteMapper.toDto(saved);
@@ -84,7 +84,6 @@ public class FavoriteServiceImpl implements FavoriteService {
         }
 
         existing.setFavoriteCategory(favoriteDto.getFavoriteCategory());
-        existing.setUpdatedAt(LocalDateTime.now());
 
         Favorite updated = favoriteRepository.save(existing);
         return favoriteMapper.toDto(updated);
@@ -95,7 +94,7 @@ public class FavoriteServiceImpl implements FavoriteService {
         Favorite favorite = favoriteRepository.findById(id)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Favori non trouvé avec l'id : " + id));
 
-        favorite.setDeleteAt(LocalDateTime.now());
+        favorite.softDelete();
         Favorite saved = favoriteRepository.save(favorite);
         return favoriteMapper.toDto(saved);
     }
