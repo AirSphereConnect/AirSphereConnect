@@ -15,6 +15,8 @@ spring:
       name: ${SPRING_SECURITY_USER_NAME:-admin}
       password: ${SPRING_SECURITY_USER_PASSWORD:-admin123}
       roles: ADMIN
+    filter:
+      dispatcher-types: REQUEST,ERROR
 
   jpa:
     hibernate:
@@ -55,3 +57,11 @@ docker:
   compose:
     enabled: false
     file: ../docker-compose.dev.yml
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always

@@ -13,7 +13,6 @@ services:
       MYSQL_PASSWORD: ${DB_PASSWORD}
       MYSQL_CHARSET: ${DB_CHARSET}
       MYSQL_COLLATION: ${DB_COLLATION}
-      SPRING_SCHEDULING_ENABLED: "false"
     ports:
       - "${DB_PORT}:3306"
     volumes:
@@ -21,12 +20,13 @@ services:
       - ./config/database:/docker-entrypoint-initdb.d:ro
     networks:
       - ${NETWORK_NAME}
+    # ✅ Health check corrigé pour MariaDB
     healthcheck:
-      test: CMD-SHELL mysqladmin ping -h localhost -u$DB_USER -p$DB_PASSWORD || exit 1
-      interval: ${HEALTHCHECK_INTERVAL}
-      timeout: ${HEALTHCHECK_TIMEOUT}
-      retries: ${HEALTHCHECK_RETRIES}
-      start_period: ${HEALTHCHECK_START_PERIOD}
+      test: [ "CMD", "mariadb", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}", "-e", "SELECT 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
 
   # ==============================
   # MAILHOG
@@ -61,8 +61,17 @@ services:
     restart: unless-stopped
     env_file:
       - .env
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_SCHEDULING_ENABLED: "false"
     volumes:
-      - ./air-sphere-connect-back:/app/air-sphere-connect-back
+      # ✅ Code source Java
+      - ./air-sphere-connect-back/src:/app/src:ro
+
+      # ✅ Configuration Maven
+      - ./air-sphere-connect-back/pom.xml:/app/pom.xml:ro
+
+      # ✅ Cache Maven
       - maven_cache:/root/.m2
     ports:
       - "${BACKEND_PORT}:8080"
@@ -73,7 +82,7 @@ services:
     networks:
       - ${NETWORK_NAME}
     healthcheck:
-      test: [ "CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1" ]
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/actuator/health || exit 1"]
       interval: ${HEALTHCHECK_INTERVAL}
       timeout: ${HEALTHCHECK_TIMEOUT}
       retries: ${HEALTHCHECK_RETRIES}
@@ -94,7 +103,11 @@ services:
     ports:
       - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     volumes:
-      - ./air-sphere-connect-front:/app/air-sphere-connect-front
+      # ✅ Angular : uniquement src/ et config
+      - ./air-sphere-connect-front/src:/app/src:ro
+      - ./air-sphere-connect-front/angular.json:/app/angular.json:ro
+      - ./air-sphere-connect-front/package.json:/app/package.json:ro
+#      - node_modules:/app/node_modules
     depends_on:
       backend:
         condition: service_healthy
@@ -105,6 +118,8 @@ services:
       interval: ${HEALTHCHECK_INTERVAL:-30s}
       timeout: ${HEALTHCHECK_TIMEOUT:-10s}
       retries: 3
+      start_period: 45s
+
 
 # ==============================
 # VOLUMES

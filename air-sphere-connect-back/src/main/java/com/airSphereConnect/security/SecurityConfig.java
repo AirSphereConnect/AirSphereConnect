@@ -34,9 +34,10 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info").permitAll()
+                        .requestMatchers("/api/**").permitAll()
                         .requestMatchers("/api/admin").hasRole("ADMIN")
-                        .requestMatchers("/api/**").hasAnyRole("USER", "ADMIN", "GUEST")
+                        .requestMatchers("/api/weather").hasAnyRole("USER", "ADMIN", "GUEST")
                         .anyRequest().authenticated()
                 )
                 .httpBasic(withDefaults());
