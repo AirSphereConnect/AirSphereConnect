@@ -52,9 +52,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(user.getEmail()).isPresent()) {
             throw new GlobalException.BadRequestException("L'email existe déjà.");
         }
-        if (user.getCreatedAt() == null) {
-            user.setCreatedAt(LocalDateTime.now());
-        }
+
         if (user.getAddress() != null) {
             user.getAddress().setUser(user);
         }
@@ -76,6 +74,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.findByEmail(newUserData.getEmail()).isPresent()) {
             throw new GlobalException.BadRequestException("L'email existe déjà.");
         }
+
         User user = getUserById(id);
         user.setUsername(newUserData.getUsername());
         user.setEmail(newUserData.getEmail());
@@ -90,7 +89,7 @@ public class UserServiceImpl implements UserService {
     public User deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + id));
-        user.setDeletedAt(LocalDateTime.now());
+        user.softDelete();
         userRepository.save(user);
         return user;
     }
