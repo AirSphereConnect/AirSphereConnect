@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/air-quality")
 public class AirQualityController {
 
@@ -26,7 +27,6 @@ public class AirQualityController {
     /**
      * 📍 Récupérer toutes les stations pour la carte Leaflet
      */
-    @PreAuthorize("hasRole('GUEST')")
     @GetMapping("/stations")
     public ResponseEntity<List<AirQualityStationResponseDto>> getAllStations() {
         List<AirQualityStationResponseDto> stations = airQualityService.getAllStations();

@@ -52,9 +52,19 @@ public class SecurityConfig {
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info", "/api/users/login", "/api/users/refresh-token","/api/guest-token").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info", "/api/refresh-token","/api/guest-token").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
-                        .requestMatchers("/api/weather/**", "/api/air-quality/**").hasAnyRole("USER", "ADMIN", "GUEST") // pareil ici
+                        .requestMatchers("/api/home",
+                                "api/login",
+                                "/api/weather/**",
+                                "/api/air-quality/**",
+                                "/api/forums/**", "/forum-posts/**", "/forum-rubrics/**", "/forum-threads/**",
+                                "/api/cities/**",
+                                "/api/history/**",
+                                "/api/regions/**",
+                                "/api/favorites/**",
+                                "/api/alert/configurations/**")
+                        .hasAnyRole("USER", "ADMIN", "GUEST")
                         .anyRequest().authenticated()
                 );
 
