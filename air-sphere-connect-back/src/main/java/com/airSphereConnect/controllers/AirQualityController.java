@@ -7,6 +7,7 @@ import com.airSphereConnect.dtos.response.AirQualityDataResponseDto;
 import com.airSphereConnect.services.implementations.AirQualityServiceImpl;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -25,9 +26,11 @@ public class AirQualityController {
     /**
      * 📍 Récupérer toutes les stations pour la carte Leaflet
      */
+    @PreAuthorize("hasRole('GUEST')")
     @GetMapping("/stations")
     public ResponseEntity<List<AirQualityStationResponseDto>> getAllStations() {
         List<AirQualityStationResponseDto> stations = airQualityService.getAllStations();
+
         return ResponseEntity.ok(stations);
     }
 
