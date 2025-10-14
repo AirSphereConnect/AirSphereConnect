@@ -215,7 +215,7 @@ public class User extends Timestamp implements UserDetails {
     //Besoin pour la gestion des rôles dans spring sécurity
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
 }
