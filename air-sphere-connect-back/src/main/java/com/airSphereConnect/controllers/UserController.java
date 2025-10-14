@@ -5,11 +5,24 @@ import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.UserService;
-import org.springframework.security.access.prepost.PostAuthorize;
+import com.airSphereConnect.services.security.ActiveTokenService;
+import com.airSphereConnect.services.security.implementations.JwtServiceImpl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+
 //TODO Il faut ajouter l'adresse aux différentes méthodes
 @RestController
 @RequestMapping("/api/users")
@@ -17,9 +30,15 @@ public class UserController {
 
 
     private final UserService userService;
+    private final AuthenticationManager authenticationManager;
+    private final JwtServiceImpl jwtServiceImpl;
+    private final ActiveTokenService activeTokenService;
 
-    public UserController(UserService userService) {
+    public UserController(UserService userService, AuthenticationManager authenticationManager, JwtServiceImpl jwtServiceImpl, ActiveTokenService activeTokenService) {
         this.userService = userService;
+        this.authenticationManager = authenticationManager;
+        this.jwtServiceImpl = jwtServiceImpl;
+        this.activeTokenService = activeTokenService;
     }
 
     // Tous les utilisateurs
@@ -38,6 +57,76 @@ public class UserController {
     public UserResponseDto getUserByUsername(@RequestParam String username) {
         return UserMapper.toDto(userService.getUserByUsername(username));
     }
+
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody UserRequestDto loginDto, HttpServletResponse response) {
+        Authentication auth = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+        UserDetails userDetails = (UserDetails) auth.getPrincipal();
+
+        String accessToken = jwtServiceImpl.generateAccessToken(userDetails);
+        String refreshToken = jwtServiceImpl.generateRefreshToken(userDetails);
+
+        activeTokenService.saveRefreshToken(userDetails.getUsername(), refreshToken);
+
+        Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken);
+        accessCookie.setHttpOnly(true);
+        accessCookie.setSecure(true);
+        accessCookie.setPath("/");
+        accessCookie.setMaxAge(jwtServiceImpl.getAccessTokenExpirySeconds());
+        response.addCookie(accessCookie);
+
+        Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true);
+        refreshCookie.setPath("/api/users/refresh-token");
+        refreshCookie.setMaxAge(jwtServiceImpl.getRefreshTokenExpirySeconds());
+        response.addCookie(refreshCookie);
+
+        return ResponseEntity.ok(Map.of("message", "Connexion réussie"));
+    }
+
+    @PostMapping("/refresh-token")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        String refreshToken = Arrays.stream(request.getCookies() != null ? request.getCookies() : new Cookie[0])
+                .filter(cookie -> "REFRESH_TOKEN".equals(cookie.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElse(null);
+
+        if (refreshToken == null) {
+            return ResponseEntity.status(401).body("Refresh token manquant");
+        }
+
+        UserDetails userDetails;
+        try {
+            userDetails = jwtServiceImpl.extractUserDetails(refreshToken);
+        } catch (Exception e) {
+            return ResponseEntity.status(403).body("Refresh token invalide");
+        }
+
+        if (!activeTokenService.isTokenActive(userDetails.getUsername(), refreshToken)) {
+            return ResponseEntity.status(403).body("Refresh token non associé");
+        }
+
+        if (!jwtServiceImpl.validateToken(refreshToken, userDetails)) {
+            return ResponseEntity.status(403).body("Refresh token expiré");
+        }
+
+        String newAccessToken = jwtServiceImpl.generateAccessToken(userDetails);
+
+        Cookie accessTokenCookie = new Cookie("ACCESS_TOKEN", newAccessToken);
+        accessTokenCookie.setHttpOnly(true);
+        accessTokenCookie.setSecure(true);
+        accessTokenCookie.setPath("/");
+        accessTokenCookie.setMaxAge(jwtServiceImpl.getAccessTokenExpirySeconds());
+        response.addCookie(accessTokenCookie);
+
+        return ResponseEntity.ok(Map.of("message", "Token renouvelé"));
+    }
+
+
     // Par Id utilisateur
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id")
