@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @PreAuthorize("hasRole('ADMIN')")
-@RequestMapping("/api/external-alerts")
+@RequestMapping("/api/admin/external-alerts")
 public class ExternalAlertController {
     private static final Logger logger = (Logger) LoggerFactory.getLogger(ExternalAlertController.class);
     private final ExternalAlertProcessingService processingService;

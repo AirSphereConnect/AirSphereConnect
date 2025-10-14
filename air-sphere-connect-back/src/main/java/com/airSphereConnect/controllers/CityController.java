@@ -4,11 +4,13 @@ import com.airSphereConnect.dtos.response.CityResponseDto;
 import com.airSphereConnect.entities.City;
 import com.airSphereConnect.mapper.CityMapper;
 import com.airSphereConnect.services.CityService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/cities")
 public class CityController {
 
