@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -58,6 +60,9 @@ public class AirQualityIndex {
     @NotNull(message = "{airquality.measuredAt.required}")
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
+
+    @OneToMany(mappedBy = "area_code", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<City> cities = new ArrayList<>();
 
     public AirQualityIndex() {
 
@@ -131,13 +136,6 @@ public class AirQualityIndex {
         this.areaName = areaName;
     }
 
-    public LocalDateTime getMeasuredAt() {
-        return measuredAt;
-    }
-
-    public void setMeasuredAt(LocalDateTime measuredAt) {
-        this.measuredAt = measuredAt;
-    }
     public String getAlertMessage() {
         return alertMessage;
     }
@@ -153,6 +151,15 @@ public class AirQualityIndex {
     public void setAlert(boolean alert) {
         this.alert = alert;
     }
+
+    public LocalDateTime getMeasuredAt() {
+        return measuredAt;
+    }
+
+    public void setMeasuredAt(LocalDateTime measuredAt) {
+        this.measuredAt = measuredAt;
+    }
+
 
     @Override
     public boolean equals(Object o) {

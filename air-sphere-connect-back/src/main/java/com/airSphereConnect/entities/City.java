@@ -56,6 +56,11 @@ public class City {
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AirQualityStation> airQualityStations = new ArrayList<>();
 
+    @NotNull(message = "{city.airQualityIndex.required}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "air_quality_index_area_code", referencedColumnName = "area_code", nullable = false)
+    private AirQualityIndex airQualityIndex;
+
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<WeatherMeasurement> weatherMeasurements = new ArrayList<>();
 
@@ -76,7 +81,7 @@ public class City {
     public City() {}
 
     public City(String name, String inseeCode, String postalCode, Double latitude, Double longitude, String areaCode,
-                Department department, Integer population) {
+                Department department, Integer population, AirQualityIndex airQualityIndex) {
         this.inseeCode = inseeCode;
         this.name = name;
         this.postalCode = postalCode;
@@ -85,6 +90,7 @@ public class City {
         this.areaCode = areaCode;
         this.department = department;
         this.population = population;
+        this.airQualityIndex = airQualityIndex;
     }
 
     public Long getId() {
@@ -174,6 +180,14 @@ public class City {
         this.airQualityStations = airQualityStations;
     }
 
+    public AirQualityIndex getAirQualityIndex() {
+        return airQualityIndex;
+    }
+
+    public void setAirQualityIndex(AirQualityIndex airQualityIndex) {
+        this.airQualityIndex = airQualityIndex;
+    }
+
     public List<WeatherMeasurement> getWeatherMeasurements() {
         return weatherMeasurements;
     }
@@ -238,4 +252,6 @@ public class City {
                 ", areaCode='" + areaCode + '\'' +
                 '}';
     }
+
+
 }
