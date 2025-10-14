@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 
@@ -59,16 +61,14 @@ public class AirQualityIndex {
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
 
-    @NotNull(message = "{airquality.city.required}")
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_code", referencedColumnName = "area_code", nullable = false)
-    private City city;
+    @OneToMany(mappedBy = "area_code", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    private List<City> cities = new ArrayList<>();
 
     public AirQualityIndex() {
 
     }
 
-    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, Integer areaCode, String areaName, String alertMessage, boolean alert, LocalDateTime measuredAt, City city) {
+    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, Integer areaCode, String areaName, String alertMessage, boolean alert, LocalDateTime measuredAt) {
         this.qualityIndex = qualityIndex;
         this.qualityLabel = qualityLabel;
         this.qualityColor = qualityColor;
@@ -78,7 +78,6 @@ public class AirQualityIndex {
         this.alertMessage = alertMessage;
         this.alert = alert;
         this.measuredAt = measuredAt;
-        this.city = city;
     }
 
     public Long getId() {
@@ -137,13 +136,6 @@ public class AirQualityIndex {
         this.areaName = areaName;
     }
 
-    public LocalDateTime getMeasuredAt() {
-        return measuredAt;
-    }
-
-    public void setMeasuredAt(LocalDateTime measuredAt) {
-        this.measuredAt = measuredAt;
-    }
     public String getAlertMessage() {
         return alertMessage;
     }
@@ -160,6 +152,15 @@ public class AirQualityIndex {
         this.alert = alert;
     }
 
+    public LocalDateTime getMeasuredAt() {
+        return measuredAt;
+    }
+
+    public void setMeasuredAt(LocalDateTime measuredAt) {
+        this.measuredAt = measuredAt;
+    }
+
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -172,11 +173,4 @@ public class AirQualityIndex {
         return Objects.hashCode(id);
     }
 
-    public City getCity() {
-        return city;
-    }
-
-    public void setCity(City city) {
-        this.city = city;
-    }
 }
