@@ -69,8 +69,8 @@ services:
 
 
     ports:
-      - "${BACKEND_PORT}:8080"
-      - "${DEBUG_PORT}:5005"
+      - "8081:8080"
+      - "5005:5005"
 
     depends_on:
       mariadb:
@@ -78,6 +78,9 @@ services:
 
     networks:
       - ${NETWORK_NAME}
+
+    labels:
+      org.springframework.boot.readiness-check.tcp.disable: "true"
 
     # ✅ Health check backend (nécessite curl dans Dockerfile)
     healthcheck:
