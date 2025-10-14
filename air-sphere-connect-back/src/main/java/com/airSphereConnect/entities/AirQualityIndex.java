@@ -59,11 +59,16 @@ public class AirQualityIndex {
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
 
+    @NotNull(message = "{airquality.city.required}")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_code", referencedColumnName = "area_code", nullable = false)
+    private City city;
+
     public AirQualityIndex() {
 
     }
 
-    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, Integer areaCode, String areaName, String alertMessage, boolean alert, LocalDateTime measuredAt) {
+    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, Integer areaCode, String areaName, String alertMessage, boolean alert, LocalDateTime measuredAt, City city) {
         this.qualityIndex = qualityIndex;
         this.qualityLabel = qualityLabel;
         this.qualityColor = qualityColor;
@@ -73,6 +78,7 @@ public class AirQualityIndex {
         this.alertMessage = alertMessage;
         this.alert = alert;
         this.measuredAt = measuredAt;
+        this.city = city;
     }
 
     public Long getId() {
@@ -166,4 +172,11 @@ public class AirQualityIndex {
         return Objects.hashCode(id);
     }
 
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
 }
