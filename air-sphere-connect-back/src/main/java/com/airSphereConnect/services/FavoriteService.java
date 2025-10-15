@@ -13,4 +13,6 @@ public interface FavoriteService {
     FavoriteDto updateFavorite(Long id, FavoriteDto favoriteDto);
 
     FavoriteDto deleteFavorite(Long id);
+
+
 }
