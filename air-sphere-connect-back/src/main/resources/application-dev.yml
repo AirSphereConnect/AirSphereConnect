@@ -44,12 +44,12 @@ cors:
 
 weather:
   api:
-    key: ${WEATHER_API_KEY}
+    key: e935d0947600dd8f7247eefe1819751a
 
 mailjet:
   api:
-    key: ${MAILJET_API_KEY}
-    secret: ${MAILJET_API_SECRET}
+    key: 13f60c773c9d6b968a6415fa88e6affc
+    secret: 361d897cbe85bd88f3ddfea48599a081
 
 docker:
   compose:
