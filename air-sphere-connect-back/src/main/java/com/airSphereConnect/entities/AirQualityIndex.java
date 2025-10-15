@@ -42,8 +42,8 @@ public class AirQualityIndex {
     private String source;
 
     @NotNull(message = "{airquality.areaCode.required}")
-    @Column(name = "area_code")
-    private Integer areaCode;
+    @Column(name = "area_code", unique = true)
+    private String areaCode;
 
     @NotBlank(message = "{airquality.areaName.required}")
     @Size(max = 150, message = "{airquality.areaName.size}")
@@ -61,14 +61,14 @@ public class AirQualityIndex {
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
 
-    @OneToMany(mappedBy = "area_code", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "airQualityIndex")
     private List<City> cities = new ArrayList<>();
 
     public AirQualityIndex() {
 
     }
 
-    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, Integer areaCode, String areaName, String alertMessage, boolean alert, LocalDateTime measuredAt) {
+    public AirQualityIndex(Integer qualityIndex, String qualityLabel, String qualityColor, String source, String areaCode, String areaName, String alertMessage, boolean alert, LocalDateTime measuredAt) {
         this.qualityIndex = qualityIndex;
         this.qualityLabel = qualityLabel;
         this.qualityColor = qualityColor;
@@ -120,11 +120,11 @@ public class AirQualityIndex {
         this.source = source;
     }
 
-    public Integer getAreaCode() {
+    public String getAreaCode() {
         return areaCode;
     }
 
-    public void setAreaCode(Integer areaCode) {
+    public void setAreaCode(String areaCode) {
         this.areaCode = areaCode;
     }
 
@@ -136,6 +136,13 @@ public class AirQualityIndex {
         this.areaName = areaName;
     }
 
+    public LocalDateTime getMeasuredAt() {
+        return measuredAt;
+    }
+
+    public void setMeasuredAt(LocalDateTime measuredAt) {
+        this.measuredAt = measuredAt;
+    }
     public String getAlertMessage() {
         return alertMessage;
     }
@@ -151,15 +158,6 @@ public class AirQualityIndex {
     public void setAlert(boolean alert) {
         this.alert = alert;
     }
-
-    public LocalDateTime getMeasuredAt() {
-        return measuredAt;
-    }
-
-    public void setMeasuredAt(LocalDateTime measuredAt) {
-        this.measuredAt = measuredAt;
-    }
-
 
     @Override
     public boolean equals(Object o) {

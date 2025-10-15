@@ -14,7 +14,7 @@ import java.util.Optional;
 @Repository
 public interface AirQualityIndexRepository extends JpaRepository<AirQualityIndex, Long> {
 
-    Optional<AirQualityIndex> findFirstByAreaCodeOrderByMeasuredAtDesc(Integer areaCode);
+    Optional<AirQualityIndex> findFirstByAreaCodeOrderByMeasuredAtDesc(String areaCode);
 
     @Query("SELECT i FROM AirQualityIndex i " +
             "WHERE i.areaCode = :areaCode " +
