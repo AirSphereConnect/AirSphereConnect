@@ -8,9 +8,9 @@ public record AirQualityIndexResponseDto(
         String qualityLabel,
         String qualityColor,
         LocalDateTime measuredAt,
+        Integer source,
         String areaCode,
         String areaName,
-        String source,
         String alertMessage
 ) {
 

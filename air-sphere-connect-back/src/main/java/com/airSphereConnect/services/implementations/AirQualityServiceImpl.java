@@ -84,7 +84,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         AirQualityIndex index = indexRepository
                 .findFirstByAreaCodeOrderByMeasuredAtDesc(
-                        city.getAreaCode())
+                        Integer.parseInt(city.getAreaCode()))
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException(
                         "Aucun indice ATMO trouvé pour: " + cityName));
 
@@ -152,7 +152,7 @@ public class AirQualityServiceImpl implements AirQualityService {
             try {
                 indexRepository
                         .findFirstByAreaCodeOrderByMeasuredAtDesc(
-                                city.getAreaCode())
+                                Integer.parseInt(city.getAreaCode()))
                         .ifPresent(index -> {
                             dto.setQualityIndex(index.getQualityIndex());
                             dto.setQualityLabel(index.getQualityLabel());

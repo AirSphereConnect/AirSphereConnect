@@ -51,7 +51,7 @@ public class ApiAirQualityMapper {
         index.setQualityLabel(indexDto.qualityLabel());
         index.setQualityColor(indexDto.qualityColor());
         index.setSource(indexDto.source());
-        index.setAreaCode(indexDto.areaCode());
+        index.setAreaCode(Integer.valueOf(indexDto.areaCode()));
         index.setAreaName(indexDto.areaName());
         index.setMeasuredAt(LocalDateTime.now());
 

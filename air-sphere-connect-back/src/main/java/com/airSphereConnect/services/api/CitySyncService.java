@@ -21,7 +21,6 @@ import java.util.stream.Collectors;
 @Transactional
 public class CitySyncService {
 
-    // codeepci = areaCode
     private static final String SOURCE_URL = "/communes?codeRegion=76&fields=code,nom,codesPostaux,codeEpci," +
             "codeDepartement,centre,population";
 
