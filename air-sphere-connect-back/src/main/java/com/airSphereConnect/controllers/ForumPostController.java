@@ -8,12 +8,14 @@ import com.airSphereConnect.services.PostReactionService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/forum-posts")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
+@RequestMapping("/forum-posts")
 public class ForumPostController {
 
     private final ForumPostService forumPostService;
@@ -60,7 +62,7 @@ public class ForumPostController {
             post.setCurrentUserReaction(userReaction);
         }
     }
-
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ForumPostResponseDto>> getPostsByUser(@PathVariable Long userId) {
         List<ForumPostResponseDto> responses = forumPostService.getPostsByUserId(userId);
@@ -68,6 +70,7 @@ public class ForumPostController {
     }
 
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/new/{userId}")
     public ResponseEntity<ForumPostResponseDto> createPost(
             @Valid @RequestBody ForumPostRequestDto request,
@@ -78,6 +81,7 @@ public class ForumPostController {
 
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/{postId}/reaction")
     public ResponseEntity<ForumPostResponseDto> toggleReaction(
             @PathVariable Long postId,
@@ -88,6 +92,7 @@ public class ForumPostController {
         return getPostWithReactions(postId, userId);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PutMapping("/{id}")
     public ResponseEntity<ForumPostResponseDto> updatePost(
             @PathVariable Long id,
@@ -98,6 +103,7 @@ public class ForumPostController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long id,
