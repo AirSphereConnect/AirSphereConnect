@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+//@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/cities")
 public class CityController {
 

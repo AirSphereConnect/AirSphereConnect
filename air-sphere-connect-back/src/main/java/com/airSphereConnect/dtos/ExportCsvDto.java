@@ -5,16 +5,18 @@ import java.time.LocalDateTime;
 
 public class ExportCsvDto {
 
-    private String nomVille;
-    private String codeZone;
-    private String nomZone;
     private LocalDate dateMesureMeteo;
+    private String nomVille;
+    private Double latitude;
+    private Double longitude;
+    private Integer population;
     private Double temperature;
     private Double humidite;
     private Double pression;
     private Double vitesseVent;
     private Double directionVent;
     private String message;
+    private Long stationId;
     private Double pm25;
     private Double pm10;
     private Double no2;
@@ -23,20 +25,19 @@ public class ExportCsvDto {
     private Integer qualiteIndex;
     private String qualiteLabel;
 
-    public ExportCsvDto(String nomVille, String codeZone, String nomZone, LocalDate dateMesureMeteo, Double temperature,
-                        Double humidite, Double pression, Double vitesseVent, Double directionVent, String message,
-                        Double pm25, Double pm10, Double no2, Double o3, String unite,Integer qualiteIndex, String qualiteLabel) {
-
-        this.nomVille = nomVille;
-        this.codeZone = codeZone;
-        this.nomZone = nomZone;
+    public ExportCsvDto(LocalDate dateMesureMeteo, String nomVille, Double latitude, Double longitude, Integer population, Double temperature, Double humidite, Double pression, Double vitesseVent, Double directionVent, String message, Long stationId, Double pm25, Double pm10, Double no2, Double o3, String unite, Integer qualiteIndex, String qualiteLabel) {
         this.dateMesureMeteo = dateMesureMeteo;
+        this.nomVille = nomVille;
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.population = population;
         this.temperature = temperature;
         this.humidite = humidite;
         this.pression = pression;
         this.vitesseVent = vitesseVent;
         this.directionVent = directionVent;
         this.message = message;
+        this.stationId = stationId;
         this.pm25 = pm25;
         this.pm10 = pm10;
         this.no2 = no2;
@@ -46,23 +47,24 @@ public class ExportCsvDto {
         this.qualiteLabel = qualiteLabel;
     }
 
-    public ExportCsvDto() {
+    public LocalDate getDateMesureMeteo() {
+        return dateMesureMeteo;
     }
 
     public String getNomVille() {
         return nomVille;
     }
 
-    public String getCodeZone() {
-        return codeZone;
+    public Double getLatitude() {
+        return latitude;
     }
 
-    public String getNomZone() {
-        return nomZone;
+    public Double getLongitude() {
+        return longitude;
     }
 
-    public LocalDate getDateMesureMeteo() {
-        return dateMesureMeteo;
+    public Integer getPopulation() {
+        return population;
     }
 
     public Double getTemperature() {
@@ -87,6 +89,10 @@ public class ExportCsvDto {
 
     public String getMessage() {
         return message;
+    }
+
+    public Long getStationId() {
+        return stationId;
     }
 
     public Double getPm25() {

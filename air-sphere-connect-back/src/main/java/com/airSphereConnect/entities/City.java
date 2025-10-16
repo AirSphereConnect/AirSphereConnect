@@ -216,6 +216,10 @@ public class City {
         this.favoritesAlerts = favoritesAlerts;
     }
 
+    public AirQualityIndex getAirQualityIndex() {
+        return airQualityIndex;
+    }
+
     @Override
     public boolean equals(Object o) {
         if(this==o) return true;

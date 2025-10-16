@@ -1,5 +1,8 @@
 package com.airSphereConnect.repositories;
 
+import com.airSphereConnect.dtos.ExportCsvDto;
+import com.airSphereConnect.dtos.response.AirQualityDataResponseDto;
+import com.airSphereConnect.dtos.response.AirQualityStationResponseDto;
 import com.airSphereConnect.entities.AirQualityStation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -16,4 +19,22 @@ public interface AirQualityStationRepository extends JpaRepository<AirQualitySta
 
     @Query("SELECT s FROM AirQualityStation s WHERE s.city.areaCode = :areaCode")
     List<AirQualityStation> findByAreaCode(@Param("areaCode") String areaCode);
+
+
+    @Query("""
+        select
+        aqs.name,
+        aqm.pm10,
+        aqm.pm25,
+        aqm.no2,
+        aqm.o3,
+        aqi.qualityIndex,
+        aqi.qualityLabel
+        from AirQualityStation aqs
+        join aqs.measurements aqm
+        join aqs.city c
+        join c.airQualityIndex aqi
+        where aqs.id = :stationId
+""")
+    List<ExportCsvDto> findByStationId(@Param("stationId") Long stationId);
 }

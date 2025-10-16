@@ -1,51 +1,57 @@
 package com.airSphereConnect.utils;
 
 import com.airSphereConnect.dtos.ExportCsvDto;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVPrinter;
 import org.springframework.stereotype.Component;
 
+import java.io.ByteArrayOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.nio.charset.StandardCharsets;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
 
 @Component
 public class CsvExporter {
 
-    public byte[] exportToCsv(List<ExportCsvDto> data) {
-        StringBuilder builder = new StringBuilder();
+    public byte[] exportToCsv(List<ExportCsvDto> data, List<String> headers) throws Exception {
 
-        // group by cityName
-        Map<String, List<ExportCsvDto>> groupedData = data.stream()
-                .collect(Collectors.groupingBy(ExportCsvDto::getNomVille));
+        CSVFormat format = CSVFormat.Builder.create()
+                .setDelimiter(';')
+                .setHeader(headers.toArray(new String[0]))
+                .setRecordSeparator(System.lineSeparator())
+                .build();
 
-        // Add CSV header
-        builder.append("CodeZone;NomZone;DateMesure;Temperature;Humidite;Pression;VitesseVent;DirectionVent;Message;" +
-                "PM25;PM10;NO2;O3;Unite;QualiteAirIndex;QualiteAirLabel\n");
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+             Writer writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8);
+             CSVPrinter csvPrinter = new CSVPrinter(writer, format)) {
 
-        // Add CSV rows
-        for (ExportCsvDto dto : data) {
-            builder.append(String.format("%s;%s;%s;%.2f;%.2f;%.2f;%.2f;%.2f;%s;%.2f;%.2f;%.2f;%.2f;%s;%d;%s\n",
-                    dto.getCodeZone(),
-                    dto.getNomZone(),
-                    dto.getDateMesureMeteo(),
-                    dto.getTemperature(),
-                    dto.getHumidite(),
-                    dto.getPression(),
-                    dto.getVitesseVent(),
-                    dto.getDirectionVent(),
-                    dto.getMessage(),
-                    dto.getPm25(),
-                    dto.getPm10(),
-                    dto.getNo2(),
-                    dto.getO3(),
-                    dto.getUnite(),
-                    dto.getQualiteIndex(),
-                    dto.getQualiteLabel()
-
-            ));
+            for (ExportCsvDto row : data) {
+                csvPrinter.printRecord(
+                        row.getDateMesureMeteo(),
+                        row.getNomVille(),
+                        row.getLatitude(),
+                        row.getLongitude(),
+                        row.getPopulation(),
+                        row.getTemperature(),
+                        row.getHumidite(),
+                        row.getPression(),
+                        row.getVitesseVent(),
+                        row.getDirectionVent(),
+                        row.getMessage(),
+                        row.getStationId(),
+                        row.getPm25(),
+                        row.getPm10(),
+                        row.getNo2(),
+                        row.getO3(),
+                        row.getUnite(),
+                        row.getQualiteIndex(),
+                        row.getQualiteLabel()
+                );
+            }
+            csvPrinter.flush();
+            return outputStream.toByteArray();
         }
-
-        return builder.toString().getBytes(StandardCharsets.UTF_8);
     }
+
 }
