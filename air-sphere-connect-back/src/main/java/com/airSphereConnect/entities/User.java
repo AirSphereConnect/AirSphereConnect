@@ -18,7 +18,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name= "users")
-public class User implements UserDetails {
+public class User extends Timestamp implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,15 +42,6 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, columnDefinition = "ENUM('USER','ADMIN','GUEST')")
     private UserRole role = UserRole.USER;
-
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     private Address address;
@@ -87,16 +78,6 @@ public class User implements UserDetails {
         this.role = role;
     }
 
-    @PrePersist
-    protected void onCreate() {
-        createdAt = LocalDateTime.now();
-        updatedAt = createdAt;
-    }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
 
     public Long getId() {
         return id;
@@ -136,30 +117,6 @@ public class User implements UserDetails {
 
     public void setRole(UserRole role) {
         this.role = role;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getDeletedAt() {
-        return deletedAt;
-    }
-
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.deletedAt = deletedAt;
     }
 
     public Address getAddress() {
@@ -258,7 +215,7 @@ public class User implements UserDetails {
     //Besoin pour la gestion des rôles dans spring sécurity
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority(role.name()));
     }
 
 }

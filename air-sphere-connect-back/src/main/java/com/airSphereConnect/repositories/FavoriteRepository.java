@@ -8,6 +8,6 @@ import java.util.List;
 
 @Repository
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
-    List<Favorite> findByDeleteAtIsNull();
+    List<Favorite> findByDeletedAtIsNull();
 
 }

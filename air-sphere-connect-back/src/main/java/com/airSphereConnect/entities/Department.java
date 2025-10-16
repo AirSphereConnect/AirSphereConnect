@@ -2,6 +2,9 @@ package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
 import com.airSphereConnect.entities.Region;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -14,12 +17,17 @@ public class Department {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{department.name.required}")
+    @Size(max = 100, message = "{department.name.size}")
     @Column(name= "name", nullable = false)
     private String name;
 
+    @NotBlank(message = "{department.code.required}")
+    @Size(max = 20, message = "{department.code.size}")
     @Column(name= "code", nullable = false, unique = true)
     private String code;
 
+    @NotNull(message = "{department.region.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name="region_id", nullable = false)
     private Region region;

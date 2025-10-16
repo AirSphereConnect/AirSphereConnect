@@ -1,0 +1,140 @@
+services:
+  # ==============================
+  # BASE DE DONNÉES MARIADB
+  # ==============================
+  mariadb:
+    image: mariadb:${MARIADB_VERSION}
+    container_name: ${DB_CONTAINER_NAME}
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_CHARSET: ${DB_CHARSET}
+      MYSQL_COLLATION: ${DB_COLLATION}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - ${DB_VOLUME_NAME}:/var/lib/mysql
+      - ./config/database:/docker-entrypoint-initdb.d:ro
+    networks:
+      - ${NETWORK_NAME}
+    # ✅ Health check corrigé pour MariaDB
+    healthcheck:
+      test: [ "CMD", "mariadb", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}", "-e", "SELECT 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  # ==============================
+  # MAILHOG
+  # ==============================
+
+  mailhog:
+    image: mailhog/mailhog:latest
+    container_name: mailhog
+    restart: unless-stopped
+
+    ports:
+      - "1025:1025"  # SMTP
+      - "8025:8025"  # Web UI
+
+    networks:
+      - ${NETWORK_NAME}
+
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8025" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  # ==============================
+  # BACKEND SPRING BOOT
+  # ==============================
+  backend:
+    build:
+      context: ${BACKEND_CONTEXT}
+      dockerfile: ${BACKEND_DOCKERFILE}
+    container_name: ${BACKEND_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_SCHEDULING_ENABLED: "false"
+    volumes:
+      # ✅ Code source Java
+      - ./air-sphere-connect-back/src:/app/src:ro
+
+      # ✅ Configuration Maven
+      - ./air-sphere-connect-back/pom.xml:/app/pom.xml:ro
+
+      # ✅ Cache Maven
+      - maven_cache:/root/.m2
+    ports:
+      - "${BACKEND_PORT}:8080"
+#      - "${DEBUG_PORT}:5005"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: [ "CMD-SHELL", "wget --spider -q http://localhost:8080/actuator/health || exit 1" ]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  # ==============================
+  # FRONTEND ANGULAR
+  # ==============================
+  frontend:
+    build:
+      context: ${FRONTEND_CONTEXT}
+      dockerfile: ${FRONTEND_DOCKERFILE}
+    container_name: ${FRONTEND_CONTAINER_NAME}
+    restart: unless-stopped
+    environment:
+      API_URL: ${API_URL}
+      NODE_ENV: ${NODE_ENV:-development}
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    volumes:
+      # ✅ Angular : uniquement src/ et config
+      - ./air-sphere-connect-front/src:/app/src:ro
+      - ./air-sphere-connect-front/angular.json:/app/angular.json:ro
+      - ./air-sphere-connect-front/package.json:/app/package.json:ro
+#      - node_modules:/app/node_modules
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: [ "CMD-SHELL", "curl -f http://localhost:4200 || exit 1" ]
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: 3
+      start_period: 45s
+
+
+# ==============================
+# VOLUMES
+# ==============================
+volumes:
+  air-sphere-connect_db_data:
+    name: ${DB_VOLUME_NAME}
+    driver: local
+  maven_cache:
+    driver: local
+
+# ==============================
+# NETWORKS
+# ==============================
+networks:
+  air-sphere-connect-network:
+    name: ${NETWORK_NAME}
+    driver: bridge

@@ -1,6 +1,9 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -8,21 +11,27 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "air_quality_stations")
-public class AirQualityStation extends Timestamp {
+public class AirQualityStation {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{station.name.required}")
+    @Size(max = 100, message = "{station.name.size}")
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @Column(name="code",  unique = true, nullable = false, length = 20)
+    @NotBlank(message = "{station.code.required}")
+    @Size(max = 20, message = "{station.code.size}")
+    @Column(name = "code", unique = true, nullable = false, length = 20)
     private String code;
 
+    @Size(max = 10, message = "{station.areaCode.size}")
     @Column(name = "area_code", length = 10)
     private String areaCode;
 
+    @NotNull(message = "{station.city.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "insee_code", referencedColumnName = "insee_code", nullable = false)
     private City city;
@@ -30,7 +39,6 @@ public class AirQualityStation extends Timestamp {
     @OneToMany(mappedBy = "station", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<AirQualityMeasurement> measurements = new ArrayList<>();
 
-    // Constructeurs
     public AirQualityStation() {}
 
     public AirQualityStation(String name, String code, String areaCode, City city) {

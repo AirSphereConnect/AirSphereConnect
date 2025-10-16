@@ -1,6 +1,9 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
@@ -16,13 +19,17 @@ public class ForumPost extends Timestamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{post.content.required}")
+    @Size(max = 5000, message = "{post.content.size}") // limite arbitraire pour le texte
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @NotNull(message = "{post.thread.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "thread_id", nullable = false)
     private ForumThread thread;
 
+    @NotNull(message = "{post.user.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;

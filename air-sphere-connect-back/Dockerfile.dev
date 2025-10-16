@@ -1,0 +1,34 @@
+# Build stage
+FROM eclipse-temurin:21-jdk-alpine
+
+WORKDIR /app
+
+# ✅ Installer curl pour health check
+RUN apk add --no-cache curl
+
+# Copier les fichiers Maven
+COPY pom.xml .
+COPY .mvn .mvn
+COPY mvnw .
+
+# Rendre mvnw exécutable et corriger CRLF → LF
+RUN sed -i 's/\r$//' mvnw && chmod +x mvnw
+
+# Télécharger les dépendances (cache Docker)
+RUN ./mvnw dependency:go-offline -B
+
+# Copier le code source
+COPY src ./src
+
+
+# Exposer les ports
+EXPOSE 8080
+EXPOSE 5005
+
+
+
+# Lancer l'application en mode dev
+ENTRYPOINT ["./mvnw", "spring-boot:run", "-Dspring-boot.run.profiles=dev"]
+
+
+

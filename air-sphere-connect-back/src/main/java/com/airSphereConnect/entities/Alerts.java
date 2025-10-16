@@ -2,6 +2,8 @@ package com.airSphereConnect.entities;
 
 import com.airSphereConnect.entities.enums.AlertType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
@@ -14,10 +16,12 @@ public class Alerts {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "{alert.user.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @NotNull(message = "{alert.city.required}")
     @ManyToOne(optional = false)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
@@ -30,17 +34,19 @@ public class Alerts {
     @JoinColumn(name = "region_id", nullable = true)
     private Region region;
 
-
+    @NotNull(message = "{alert.type.required}")
     @Enumerated(EnumType.STRING)
     @Column(name = "alert_type", nullable = false)
     private AlertType alertType;
 
+    @NotBlank(message = "{alert.message.required}")
     @Column(nullable = false, columnDefinition = "TEXT")
     private String message;
 
     @CreationTimestamp
     @Column(name = "sent_at", updatable = false)
     private LocalDateTime sentAt;
+
 
     public Long getId() {
         return id;

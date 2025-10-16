@@ -6,12 +6,14 @@ import com.airSphereConnect.services.ForumRubricService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/forum-rubrics")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
+@RequestMapping("/forum-rubrics")
 public class ForumRubricController {
     private final ForumRubricService forumRubricService;
 
@@ -31,12 +33,14 @@ public class ForumRubricController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ForumRubricResponseDto>> getRubricsByUser(@PathVariable Long userId) {
         List<ForumRubricResponseDto> responses = forumRubricService.getRubricsByCurrentUser(userId);
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/new/{userId}")
     public ResponseEntity<ForumRubricResponseDto> createRubric(
             @Valid @RequestBody ForumRubricRequestDto request,
@@ -46,6 +50,7 @@ public class ForumRubricController {
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PutMapping("/{id}")
     public ResponseEntity<ForumRubricResponseDto> updateRubric(
             @PathVariable Long id,
@@ -56,6 +61,7 @@ public class ForumRubricController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteRubric(
             @PathVariable Long id,
@@ -64,9 +70,4 @@ public class ForumRubricController {
         forumRubricService.deleteRubric(id, userId);
         return ResponseEntity.noContent().build();
     }
-
-
-
-
-
 }

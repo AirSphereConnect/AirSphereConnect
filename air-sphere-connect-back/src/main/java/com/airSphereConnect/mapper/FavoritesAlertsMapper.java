@@ -11,8 +11,6 @@ public class FavoritesAlertsMapper {
         FavoritesAlerts entity = new FavoritesAlerts();
         entity.setId(dto.getId());
         entity.setEnabled(dto.getIsEnabled());
-        entity.setCreatedAt(dto.getCreatedAt());
-        entity.setUpdatedAt(dto.getUpdatedAt());
 
         return entity;
     }

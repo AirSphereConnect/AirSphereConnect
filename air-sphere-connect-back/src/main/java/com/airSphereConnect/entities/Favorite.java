@@ -2,35 +2,30 @@ package com.airSphereConnect.entities;
 
 import com.airSphereConnect.entities.enums.FavoriteCategory;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Table(name = "favorites")
-public class Favorite {
+public class Favorite extends Timestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "{favorite.category.required}")
     @Enumerated(EnumType.STRING)
     @Column(name = "favorite_category", nullable = false)
     private FavoriteCategory favoriteCategory;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    private  LocalDateTime updatedAt;
-
-    @Column(name = "delete_at")
-    private LocalDateTime deleteAt;
-
+    @NotNull(message = "{favorite.user.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @NotNull(message = "{favorite.city.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
@@ -57,30 +52,6 @@ public class Favorite {
 
     public void setFavoriteCategory(FavoriteCategory favoriteCategory) {
         this.favoriteCategory = favoriteCategory;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getDeleteAt() {
-        return deleteAt;
-    }
-
-    public void setDeleteAt(LocalDateTime deleteAt) {
-        this.deleteAt = deleteAt;
     }
 
     public User getUser() {

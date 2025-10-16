@@ -1,6 +1,9 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,12 +17,18 @@ public class City {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{city.inseeCode.required}")
+    @Size(max = 10, message = "{city.inseeCode.size}")
     @Column(name= "insee_code", unique = true, nullable = false, length = 10)
     private String inseeCode;
 
+    @NotBlank(message = "{city.name.required}")
+    @Size(max = 100, message = "{city.name.size}")
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
+    @NotBlank(message = "{city.postalCode.required}")
+    @Size(max = 10, message = "{city.postalCode.size}")
     @Column(name = "postal_code", length = 10, nullable = true)
     private String postalCode;
 
@@ -29,12 +38,14 @@ public class City {
     @Column(name = "longitude")
     private Double longitude;
 
+    @Size(max = 10, message = "{city.areaCode.size}")
     @Column(name = "area_code", length = 10)
     private String areaCode;
 
     @Column(name= "population")
     private Integer population;
 
+    @NotNull(message = "{city.department.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
@@ -59,6 +70,7 @@ public class City {
 
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FavoritesAlerts> favoritesAlerts = new ArrayList<>();
+
 
 
     public City() {}

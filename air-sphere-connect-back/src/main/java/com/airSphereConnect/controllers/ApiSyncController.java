@@ -3,6 +3,7 @@ package com.airSphereConnect.controllers;
 import com.airSphereConnect.scheduler.ApiDataSyncScheduler;
 import com.airSphereConnect.scheduler.SyncMetrics;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -13,6 +14,7 @@ import java.util.Map;
  * Permet de forcer les synchronisations et de consulter les métriques
  */
 @RestController
+@PreAuthorize("hasRole('ADMIN')")
 @RequestMapping("/api/admin/sync")
 public class ApiSyncController {
 

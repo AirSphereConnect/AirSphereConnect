@@ -1,6 +1,9 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -15,13 +18,17 @@ public class ForumThread extends Timestamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{forumThread.title.required}")
+    @Size(max = 255, message = "{forumThread.title.size}")
     @Column(name = "title", nullable = false, length = 255)
     private String title;
 
+    @NotNull(message = "{forumThread.user.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @NotNull(message = "{forumThread.forumRubric.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "rubric_id", nullable = false)
     private ForumRubric forumRubric;

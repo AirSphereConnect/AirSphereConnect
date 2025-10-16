@@ -2,13 +2,16 @@ package com.airSphereConnect.entities;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
 @Table(name = "air_quality_measurements")
-public class AirQualityMeasurement extends Timestamp {
+public class AirQualityMeasurement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,12 +32,16 @@ public class AirQualityMeasurement extends Timestamp {
     @Column(name = "so2")
     private Double so2;
 
+    @NotBlank(message = "{measurement.unit.required}")
+    @Size(max = 10, message = "{measurement.unit.size}")
     @Column(name = "unit", length = 10)
     private String unit;
 
+    @NotNull(message = "{measurement.measuredAt.required}")
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
 
+    @NotNull(message = "{measurement.station.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "station_id", nullable = false)
     private AirQualityStation station;

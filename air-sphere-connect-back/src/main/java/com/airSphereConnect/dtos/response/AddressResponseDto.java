@@ -1,7 +1,5 @@
 package com.airSphereConnect.dtos.response;
 
-import com.airSphereConnect.entities.City;
-
 import java.time.LocalDateTime;
 
 public class AddressResponseDto {
@@ -9,12 +7,12 @@ public class AddressResponseDto {
     private String street;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
-    private City city;
+    private CityIdResponseDto city;
 
     public AddressResponseDto() {
     }
 
-    public AddressResponseDto(Long id, String street, LocalDateTime createdAt, City city) {
+    public AddressResponseDto(Long id, String street, LocalDateTime createdAt, CityIdResponseDto city) {
         this.id = id;
         this.street = street;
         this.createdAt = createdAt;
@@ -53,10 +51,11 @@ public class AddressResponseDto {
         this.updatedAt = updatedAt;
     }
 
-    public City getCity() {
+    public CityIdResponseDto getCity() {
         return city;
     }
-    public void setCity(City city) {
+
+    public void setCity(CityIdResponseDto city) {
         this.city = city;
     }
 }

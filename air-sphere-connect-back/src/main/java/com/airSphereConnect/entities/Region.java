@@ -1,6 +1,9 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
 import java.util.*;
 
 @Entity
@@ -10,12 +13,15 @@ public class Region {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name",  unique = true, nullable = false, length = 50)
+    @NotBlank(message = "{region.name.required}")
+    @Size(max = 50, message = "{region.name.size}")
+    @Column(name = "name", unique = true, nullable = false, length = 50)
     private String name;
 
-    @Column(name="code",  unique = true, nullable = false, length = 10)
+    @NotBlank(message = "{region.code.required}")
+    @Size(max = 10, message = "{region.code.size}")
+    @Column(name = "code", unique = true, nullable = false, length = 10)
     private String code;
-
 
     @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Department> departments = new ArrayList<>();
@@ -25,7 +31,6 @@ public class Region {
 
     @OneToMany(mappedBy = "region", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FavoritesAlerts> favoritesAlerts = new ArrayList<>();
-
 
     public Region() {}
 

@@ -1,25 +1,25 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import jakarta.validation.constraints.NotNull;
 
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "favorites_alerts")
-public class FavoritesAlerts {
+public class FavoritesAlerts extends Timestamp {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "{alert.user.required}")
     @ManyToOne(optional = false)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @NotNull(message = "{alert.city.required}")
     @ManyToOne(optional = false)
-    @JoinColumn(name = "city_id")
+    @JoinColumn(name = "city_id", nullable = false)
     private City city;
 
     @ManyToOne
@@ -30,17 +30,9 @@ public class FavoritesAlerts {
     @JoinColumn(name = "region_id")
     private Region region;
 
+    @NotNull(message = "{alert.enabled.required}")
     @Column(name = "is_enabled", nullable = false)
-    private boolean isEnabled;
-
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private LocalDateTime createdAt;
-
-    @UpdateTimestamp
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
+    private Boolean isEnabled;
 
     public Long getId() {
         return id;
@@ -48,22 +40,6 @@ public class FavoritesAlerts {
 
     public void setId(Long id) {
         this.id = id;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(LocalDateTime updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
     }
 
     public Region getRegion() {

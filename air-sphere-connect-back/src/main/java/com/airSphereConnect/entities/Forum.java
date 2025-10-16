@@ -1,6 +1,8 @@
 package com.airSphereConnect.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,16 +15,17 @@ public class Forum {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotBlank(message = "{forum.title.required}")
+    @Size(max = 200, message = "{forum.title.size}")
     @Column(name = "title", nullable = false, length = 200)
     private String title;
 
+    @Size(max = 2000, message = "{forum.description.size}")
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-
     @OneToMany(mappedBy = "forum", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ForumRubric> forumRubrics = new ArrayList<>();
-
 
     public Forum() {
     }

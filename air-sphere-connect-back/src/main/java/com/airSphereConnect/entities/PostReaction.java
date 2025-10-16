@@ -2,6 +2,7 @@ package com.airSphereConnect.entities;
 
 import com.airSphereConnect.entities.enums.ReactionType;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -16,18 +17,20 @@ public class PostReaction extends Timestamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @NotNull(message = "{postReaction.user.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @NotNull(message = "{postReaction.post.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id", nullable = false)
     private ForumPost post;
 
+    @NotNull(message = "{postReaction.reactionType.required}")
     @Enumerated(EnumType.STRING)
     @Column(name = "reaction_type", nullable = false)
     private ReactionType reactionType;
-
 
     public PostReaction() {
     }

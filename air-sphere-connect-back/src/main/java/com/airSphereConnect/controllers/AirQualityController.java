@@ -7,12 +7,14 @@ import com.airSphereConnect.dtos.response.AirQualityDataResponseDto;
 import com.airSphereConnect.services.implementations.AirQualityServiceImpl;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/air-quality")
 public class AirQualityController {
 
@@ -28,6 +30,7 @@ public class AirQualityController {
     @GetMapping("/stations")
     public ResponseEntity<List<AirQualityStationResponseDto>> getAllStations() {
         List<AirQualityStationResponseDto> stations = airQualityService.getAllStations();
+
         return ResponseEntity.ok(stations);
     }
 

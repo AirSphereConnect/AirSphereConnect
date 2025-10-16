@@ -2,6 +2,9 @@ package com.airSphereConnect.entities;
 
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -29,25 +32,31 @@ public class WeatherMeasurement {
     @Column(name = "wind_direction", length = 50)
     private Double windDirection;
 
+    @Size(max = 500, message = "{weather.message.size}")
     @Column(name = "message", columnDefinition = "TEXT")
     private String message;
 
+    @NotBlank(message = "{weather.source.required}")
+    @Size(max = 100, message = "{weather.source.size}")
     @Column(name = "source", length = 100)
     private String source;
 
+    @NotNull(message = "{weather.measuredAt.required}")
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
 
+    @NotNull(message = "{weather.alert.required}")
     @Column(name = "alert", nullable = false)
     private Boolean alert;
 
+    @Size(max = 500, message = "{weather.alertMessage.size}")
     @Column(columnDefinition = "TEXT")
     private String alertMessage;
 
+    @NotNull(message = "{weather.city.required}")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "city_id", nullable = false)
     private City city;
-
     public WeatherMeasurement() {
     }
 
