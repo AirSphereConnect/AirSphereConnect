@@ -2,7 +2,6 @@ package com.airSphereConnect.services;
 
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.repositories.UserRepository;
-import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,9 +26,6 @@ public class CustomUserDetailsService implements UserDetailsService {
         User user = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
 
-        if (!user.isEnabled()) {
-            throw new DisabledException("Compte utilisateur désactivé ou supprimé.");
-        }
         // Log utilisateur chargé
         System.out.println("User loaded for authentication: " + user.getUsername());
 
