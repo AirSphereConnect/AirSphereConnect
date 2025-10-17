@@ -10,6 +10,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
@@ -23,21 +24,23 @@ public class CustomUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User non trouvé"));
-        // Assure toi que le role commence bien par ROLE_
-        String roleName = String.valueOf(user.getRole());
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
+
+        // Log utilisateur chargé
+        System.out.println("User loaded for authentication: " + user.getUsername());
+
+        // Optionnel : assure toi que les rôles ont le préfixe "ROLE_" si tu gères plus d'un rôle dans une liste
+        // Ici si tu as une seule propriété role Enum, ce n'est pas nécessaire
+        String roleName = user.getRole() != null ? user.getRole().name() : "ROLE_GUEST";
         if (!roleName.startsWith("ROLE_")) {
             roleName = "ROLE_" + roleName;
         }
         GrantedAuthority authority = new SimpleGrantedAuthority(roleName);
-        System.out.println(authority);
-        return new org.springframework.security.core.userdetails.User(
-                user.getUsername(),
-                user.getPassword(),
-                List.of(authority)
-        );
+        List<GrantedAuthority> authorities = List.of(authority);
+
+        // Si tu souhaites modifier les autorités dans user (plusieurs rôles), fais attention ici
+
+        // Retourne l'entité User qui implémente UserDetails (Spring utilisera getAuthorities() de User)
+        return user;
     }
-
 }
-
-

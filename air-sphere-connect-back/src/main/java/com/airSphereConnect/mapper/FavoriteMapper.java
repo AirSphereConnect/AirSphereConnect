@@ -14,7 +14,8 @@ public class FavoriteMapper {
                 favorite.getCreatedAt(),
                 favorite.getUpdatedAt(),
                 favorite.getUser() != null ? favorite.getUser().getId() : null,
-                favorite.getCity() != null ? favorite.getCity().getId() : null
+                favorite.getCity() != null ? favorite.getCity().getId() : null,
+                favorite.getCity() != null ? favorite.getCity().getName() : null
         );
     }
     // Frontend -> Backend

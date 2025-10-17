@@ -1,12 +1,16 @@
 package com.airSphereConnect.controllers;
 
-import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.request.LoginRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
+import com.airSphereConnect.entities.User;
+import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.security.ActiveTokenService;
 import com.airSphereConnect.services.security.JwtService;
 import com.airSphereConnect.services.security.implementations.JwtServiceImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -17,7 +21,10 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
+
+import static com.airSphereConnect.services.security.implementations.JwtServiceImpl.ACCESS_TOKEN_VALIDITY;
 
 @RestController
 @RequestMapping("/api")
@@ -27,15 +34,17 @@ public class HomeController {
     private final AuthenticationManager authenticationManager;
     private final JwtServiceImpl jwtServiceImpl;
     private final ActiveTokenService activeTokenService;
+    private final UserMapper userMapper;
 
-    public HomeController(JwtService jwtService, AuthenticationManager authenticationManager, JwtServiceImpl jwtServiceImpl, ActiveTokenService activeTokenService) {
+    public HomeController(JwtService jwtService, AuthenticationManager authenticationManager, JwtServiceImpl jwtServiceImpl, ActiveTokenService activeTokenService, UserMapper userMapper) {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.jwtServiceImpl = jwtServiceImpl;
         this.activeTokenService = activeTokenService;
+        this.userMapper = userMapper;
     }
     @GetMapping("/guest-token")
-    public void generateGuestTokenAndRedirect(HttpServletResponse response) throws IOException {
+    public  ResponseEntity<Map<String, Object>> generateGuestToken(HttpServletResponse response) throws IOException {
 
         String guestToken = jwtService.generateGuestToken();
 
@@ -47,41 +56,79 @@ public class HomeController {
         response.addCookie(cookie);
 
         // Rediriger vers /api/home
-        response.sendRedirect("/api/home");
+        Map<String, Object> body = new HashMap<>();
+        body.put("role", "GUEST");
+        return ResponseEntity.ok(body);
     }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
     @GetMapping("/home")
     public ResponseEntity<?> getHomePage() {
         return ResponseEntity.ok("Bienvenue sur la meilleur application");
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserRequestDto loginDto, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginDto, HttpServletResponse response) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
-        String accessToken = jwtServiceImpl.generateAccessToken(userDetails);
-        String refreshToken = jwtServiceImpl.generateRefreshToken(userDetails);
+        User userEntity = (User) auth.getPrincipal();
 
-        activeTokenService.saveRefreshToken(userDetails.getUsername(), refreshToken);
+        String accessToken = jwtServiceImpl.generateToken(userEntity,ACCESS_TOKEN_VALIDITY);
+        String refreshToken = jwtServiceImpl.generateRefreshToken(userEntity);
+
+        activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
 
         Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken);
         accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true);
+        accessCookie.setSecure(false);
         accessCookie.setPath("/");
         accessCookie.setMaxAge(jwtServiceImpl.getAccessTokenExpirySeconds());
         response.addCookie(accessCookie);
 
+        // Log valeur du cookie access token
+        System.out.println("ACCESS_TOKEN cookie set: " + accessCookie.getName() + "=" + accessCookie.getValue());
+
         Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
         refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
+        refreshCookie.setSecure(false);
         refreshCookie.setPath("/api/users/refresh-token");
         refreshCookie.setMaxAge(jwtServiceImpl.getRefreshTokenExpirySeconds());
         response.addCookie(refreshCookie);
 
-        return ResponseEntity.ok(Map.of("message", "Connexion réussie"));
+        // Log valeur du cookie refresh token
+        System.out.println("REFRESH_TOKEN cookie set: " + refreshCookie.getName() + "=" + refreshCookie.getValue());
+
+        UserResponseDto userResponse = userMapper.toDto(userEntity);
+
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "Connexion réussie");
+        body.put("role", userEntity.getRole().name());
+        body.put("user", userResponse);
+
+        return ResponseEntity.ok(body);
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        // Invalider la session si session-based auth (sinon ignore)
+        if (request.getSession(false) != null) {
+            request.getSession(false).invalidate();
+        }
+
+        // Supprimer le cookie d'auth si utilisé
+        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("ACCESS_TOKEN", null);
+
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge(0);
+        response.addCookie(cookie);
+
+        // idem pour autres cookies si nécessaire...
+
+        return ResponseEntity.status(HttpStatus.OK).build();
+    }
+
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
     @PostMapping("/refresh-token")
     public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
