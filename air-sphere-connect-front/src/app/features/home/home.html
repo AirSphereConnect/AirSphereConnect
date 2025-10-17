@@ -1,1 +1,7 @@
-<p>home works!</p>
+<div>
+  @if (profile) {
+    <span>Bienvenue, {{ profile.user.username }}</span>
+  } @else {
+    <span>Bienvenue invité</span>
+  }
+</div>
