@@ -6,13 +6,14 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<app-header class="sticky top-0 z-50"></app-header>
+
 <main class="container mx-auto px-4 py-8">
   <div class="content">
-    <app-login />
-    <router-outlet />
+    <app-header [userRole]="userRole()"></app-header>
+    <router-outlet></router-outlet>
   </div>
 </main>
+
 
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
