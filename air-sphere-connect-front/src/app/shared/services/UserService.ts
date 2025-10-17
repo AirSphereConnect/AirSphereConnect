@@ -45,9 +45,18 @@ export class UserService {
   constructor(private http: HttpClient) {}
 
   fetchUserProfile(): void {
-    this.http.get<UserProfileResponse>(this.apiUrl, { withCredentials: true })
-      .subscribe(profile => this._userProfileSubject.next(profile));
+    this.http.get<UserProfileResponse>('http://localhost:8080/api/profile', { withCredentials: true }).subscribe({
+      next: profile => this._userProfileSubject.next(profile),
+      error: () => {
+        // fallback token invité si non connecté
+        this.http.get<UserProfileResponse>(this.apiUrl, { withCredentials: true }).subscribe({
+          next: guest => this._userProfileSubject.next(guest),
+          error: () => this._userProfileSubject.next(null)
+        });
+      }
+    });
   }
+
 
   setUserProfile(profile: UserProfileResponse): void {
     this._userProfileSubject.next(profile);
