@@ -1,8 +1,6 @@
 package com.airSphereConnect.repositories;
 
-import com.airSphereConnect.dtos.ExportCsvDto;
-import com.airSphereConnect.dtos.response.AirQualityDataResponseDto;
-import com.airSphereConnect.dtos.response.AirQualityStationResponseDto;
+import com.airSphereConnect.dtos.ExportDto;
 import com.airSphereConnect.entities.AirQualityStation;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,5 +34,5 @@ public interface AirQualityStationRepository extends JpaRepository<AirQualitySta
         join c.airQualityIndex aqi
         where aqs.id = :stationId
 """)
-    List<ExportCsvDto> findByStationId(@Param("stationId") Long stationId);
+    List<ExportDto> findByStationId(@Param("stationId") Long stationId);
 }

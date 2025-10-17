@@ -1,6 +1,6 @@
 package com.airSphereConnect.services.implementations;
 
-import com.airSphereConnect.dtos.ExportCsvDto;
+import com.airSphereConnect.dtos.ExportDto;
 import com.airSphereConnect.entities.AirQualityMeasurement;
 import com.airSphereConnect.entities.AirQualityStation;
 import com.airSphereConnect.entities.City;
@@ -34,7 +34,7 @@ public class ExportServiceImpl implements ExportService {
     }
 
     @Override
-    public List<ExportCsvDto> getCompleteDataByCity(String inseeCode, LocalDate dateDebut, LocalDate dateFin) {
+    public List<ExportDto> getCompleteDataByCity(String inseeCode, LocalDate dateDebut, LocalDate dateFin) {
 
         // Récupérer la ville par son code INSEE
         City city =
@@ -48,7 +48,7 @@ public class ExportServiceImpl implements ExportService {
 
         // TODO : récupérer par areaCode si pas de mesure par station avec inseeCode
 
-        List<ExportCsvDto> mergedData = new ArrayList<>();
+        List<ExportDto> mergedData = new ArrayList<>();
 
         for (AirQualityStation station : city.getAirQualityStations()) {
 
@@ -65,7 +65,7 @@ public class ExportServiceImpl implements ExportService {
 
             for (WeatherMeasurement wm : weatherMeasurements) {
                 AirQualityMeasurement aqm = lastestMeasurementsByDate.get(wm.getMeasuredAt().toLocalDate());
-                ExportCsvDto dto = new ExportCsvDto(
+                ExportDto dto = new ExportDto(
 
                         wm.getMeasuredAt().toLocalDate(),
                         city.getName(),

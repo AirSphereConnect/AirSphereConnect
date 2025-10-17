@@ -161,6 +161,13 @@
             <version>1.14.1</version>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/com.itextpdf/itext-core -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itext-core</artifactId>
+            <version>9.3.0</version>
+            <type>pom</type>
+        </dependency>
 
     </dependencies>
 
