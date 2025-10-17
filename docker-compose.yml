@@ -106,7 +106,7 @@ services:
 
 
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "4201:${FRONTEND_PORT}"
 
     depends_on:
       backend:
