@@ -74,11 +74,18 @@ public class HomeController {
 
         User userEntity = (User) auth.getPrincipal();
 
-        String accessToken = jwtServiceImpl.generateToken(userEntity,ACCESS_TOKEN_VALIDITY);
+        String accessToken = jwtServiceImpl.generateToken(userEntity, ACCESS_TOKEN_VALIDITY);
         String refreshToken = jwtServiceImpl.generateRefreshToken(userEntity);
-
         activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
 
+        // Supprime ancien cookie ACCESS_TOKEN
+        Cookie cleanCookie = new Cookie("ACCESS_TOKEN", null);
+        cleanCookie.setHttpOnly(true);
+        cleanCookie.setPath("/");
+        cleanCookie.setMaxAge(0);
+        response.addCookie(cleanCookie);
+
+        // Ajoute nouveau cookie ACCESS_TOKEN
         Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken);
         accessCookie.setHttpOnly(true);
         accessCookie.setSecure(false);
@@ -86,17 +93,16 @@ public class HomeController {
         accessCookie.setMaxAge(jwtServiceImpl.getAccessTokenExpirySeconds());
         response.addCookie(accessCookie);
 
-        // Log valeur du cookie access token
+        // Log cookie
         System.out.println("ACCESS_TOKEN cookie set: " + accessCookie.getName() + "=" + accessCookie.getValue());
 
+        // Cookie refresh token
         Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
         refreshCookie.setHttpOnly(true);
         refreshCookie.setSecure(false);
         refreshCookie.setPath("/api/users/refresh-token");
         refreshCookie.setMaxAge(jwtServiceImpl.getRefreshTokenExpirySeconds());
         response.addCookie(refreshCookie);
-
-        // Log valeur du cookie refresh token
         System.out.println("REFRESH_TOKEN cookie set: " + refreshCookie.getName() + "=" + refreshCookie.getValue());
 
         UserResponseDto userResponse = userMapper.toDto(userEntity);
@@ -109,25 +115,120 @@ public class HomeController {
         return ResponseEntity.ok(body);
     }
 
+
     @PostMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        // Invalider la session si session-based auth (sinon ignore)
         if (request.getSession(false) != null) {
             request.getSession(false).invalidate();
         }
+        // Supprimer cookie JWT utilisateur
+        Cookie deleteCookie = new Cookie("ACCESS_TOKEN", null);
+        deleteCookie.setHttpOnly(true);
+        deleteCookie.setPath("/");
+        deleteCookie.setMaxAge(0);
+        response.addCookie(deleteCookie);
 
-        // Supprimer le cookie d'auth si utilisé
-        jakarta.servlet.http.Cookie cookie = new jakarta.servlet.http.Cookie("ACCESS_TOKEN", null);
+        // Créer cookie invité
+        String guestToken = jwtService.generateGuestToken();
+        Cookie guestCookie = new Cookie("ACCESS_TOKEN", guestToken);
+        guestCookie.setHttpOnly(true);
+        guestCookie.setPath("/");
+        guestCookie.setMaxAge(jwtService.getAccessTokenExpirySeconds());
+        response.addCookie(guestCookie);
 
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setMaxAge(0);
-        response.addCookie(cookie);
-
-        // idem pour autres cookies si nécessaire...
-
-        return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok().build();
     }
+
+
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile(HttpServletRequest request, HttpServletResponse response) {
+
+        Cookie[] cookies = request.getCookies();
+        String jwt = null;
+        boolean isGuest = false;
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("ACCESS_TOKEN".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        if (jwt == null || jwt.isEmpty()) {
+            // Pas de cookie, créer un cookie guest
+            String guestToken = jwtService.generateGuestToken();
+
+            Cookie guestCookie = new Cookie("ACCESS_TOKEN", guestToken);
+            guestCookie.setHttpOnly(true);
+            guestCookie.setPath("/");
+            guestCookie.setMaxAge(jwtService.getAccessTokenExpirySeconds());
+
+            response.addCookie(guestCookie);
+
+            return ResponseEntity.ok(Map.of(
+                    "role", "GUEST",
+                    "user", null  // ou objet guest
+            ));
+        }
+
+        try {
+            UserDetails userDetails = jwtServiceImpl.extractUserDetails(jwt);
+            if (!jwtServiceImpl.validateToken(jwt, userDetails)) {
+                // Token invalide, créer cookie guest
+                String guestToken = jwtService.generateGuestToken();
+
+                Cookie guestCookie = new Cookie("ACCESS_TOKEN", guestToken);
+                guestCookie.setHttpOnly(true);
+                guestCookie.setPath("/");
+                guestCookie.setMaxAge(jwtService.getAccessTokenExpirySeconds());
+
+                response.addCookie(guestCookie);
+
+                return ResponseEntity.ok(Map.of(
+                        "role", "GUEST",
+                        "user", null
+                ));
+            }
+
+            // Token valide, regenérer token avec nouveau expire pour le même user
+            String refreshedToken = jwtServiceImpl.generateToken(userDetails, JwtServiceImpl.ACCESS_TOKEN_VALIDITY);
+
+            Cookie refreshedCookie = new Cookie("ACCESS_TOKEN", refreshedToken);
+            refreshedCookie.setHttpOnly(true);
+            refreshedCookie.setPath("/");
+            refreshedCookie.setMaxAge(jwtService.getAccessTokenExpirySeconds());
+
+            response.addCookie(refreshedCookie);
+
+            // Retourne profil utilisateur
+            User userEntity = (User) userDetails;
+            UserResponseDto userResponseDto = userMapper.toDto(userEntity);
+
+            return ResponseEntity.ok(Map.of(
+                    "role", userEntity.getRole().name(),
+                    "user", userResponseDto
+            ));
+        } catch (Exception e) {
+            // Erreur extraction token, crée token guest
+            String guestToken = jwtService.generateGuestToken();
+
+            Cookie guestCookie = new Cookie("ACCESS_TOKEN", guestToken);
+            guestCookie.setHttpOnly(true);
+            guestCookie.setPath("/");
+            guestCookie.setMaxAge(jwtService.getAccessTokenExpirySeconds());
+
+            response.addCookie(guestCookie);
+
+            return ResponseEntity.ok(Map.of(
+                    "role", "GUEST",
+                    "user", null
+            ));
+        }
+    }
+
 
     @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
     @PostMapping("/refresh-token")
