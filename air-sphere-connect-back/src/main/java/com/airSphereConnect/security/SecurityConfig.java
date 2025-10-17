@@ -58,7 +58,7 @@ public class SecurityConfig {
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info", "/api/refresh-token","/api/guest-token","/api/login").permitAll()
+                        .requestMatchers("/actuator/health", "/actuator/info", "/api/refresh-token","/api/guest-token","/api/login","/api/profile").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         .requestMatchers("/api/home",
                                 "/api/logout",
