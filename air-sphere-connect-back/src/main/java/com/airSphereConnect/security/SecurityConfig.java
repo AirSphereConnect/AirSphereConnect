@@ -5,6 +5,7 @@ import com.airSphereConnect.services.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -59,9 +60,9 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/actuator/health", "/actuator/info", "/api/refresh-token","/api/guest-token","/api/login","/api/profile").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         .requestMatchers("/api/home",
-                                "/api/logout",
                                 "/api/weather/**",
                                 "/api/air-quality/**",
                                 "/api/forums/**", "/forum-posts/**", "/forum-rubrics/**", "/forum-threads/**",
@@ -87,12 +88,27 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.addAllowedOrigin("http://localhost:4200"); // origine frontend Angular
+
+        // Origine frontend Angular explicitement déclarée (pas de wildcard avec credentials)
+        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+
+        // Méthodes HTTP autorisées
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+
+        // Headers autorisés — * autorise tous les headers côté client
         configuration.setAllowedHeaders(List.of("*"));
-        configuration.setAllowCredentials(true); // Indispensable pour autoriser les cookies
+
+        // Doit être true pour autoriser les cookies (dont les JWT HTTPOnly)
+        configuration.setAllowCredentials(true);
+
+        // Expose certains headers si besoin (exemple Authorization)
+        configuration.setExposedHeaders(List.of("Authorization", "Set-Cookie"));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+
+        // Appliquer la configuration pour les endpoints API
         source.registerCorsConfiguration("/api/**", configuration);
         return source;
     }
+
 }
