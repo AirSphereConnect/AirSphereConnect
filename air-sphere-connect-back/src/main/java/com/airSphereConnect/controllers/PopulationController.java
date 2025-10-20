@@ -5,6 +5,7 @@ import com.airSphereConnect.entities.Population;
 import com.airSphereConnect.mapper.PopulationMapper;
 import com.airSphereConnect.repositories.PopulationRepository;
 import com.airSphereConnect.services.PopulationService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
+@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 @RequestMapping("/api/history")
 public class PopulationController {
 

@@ -5,18 +5,33 @@ import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.UserService;
-import org.springframework.security.access.prepost.PostAuthorize;
+import com.airSphereConnect.services.security.ActiveTokenService;
+import com.airSphereConnect.services.security.implementations.JwtServiceImpl;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Arrays;
 import java.util.List;
-//TODO Il faut ajouter l'adresse aux différentes méthodes
+import java.util.Map;
+
+
 @RestController
+@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
 @RequestMapping("/api/users")
 public class UserController {
 
 
     private final UserService userService;
+
 
     public UserController(UserService userService) {
         this.userService = userService;
@@ -38,6 +53,7 @@ public class UserController {
     public UserResponseDto getUserByUsername(@RequestParam String username) {
         return UserMapper.toDto(userService.getUserByUsername(username));
     }
+
     // Par Id utilisateur
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/id")
@@ -46,7 +62,7 @@ public class UserController {
     }
 
     // Création d'un utilisateur
-    @PostMapping("/new")
+    @PostMapping("/signup")
     public UserResponseDto createUser(@RequestBody UserRequestDto reqDto) {
         User user = UserMapper.toEntity(reqDto);
         User created = userService.createUser(user);
