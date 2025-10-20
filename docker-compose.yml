@@ -68,9 +68,8 @@ services:
       - .env
 
 
-
     ports:
-      - "${BACKEND_PORT}:8080"
+      - "8081:8080"
 #      - "${DEBUG_PORT}:5005"
 
     depends_on:
@@ -103,10 +102,8 @@ services:
       API_URL: ${API_URL}
       NODE_ENV: ${NODE_ENV:-development}
 
-
-
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "4201:${FRONTEND_PORT}"
 
     depends_on:
       backend:

@@ -1,1 +1,40 @@
-<p>profile works!</p>
+<div>
+  <router-outlet></router-outlet>
+
+  @if (user) {
+    <section class="profile-header">
+      <h1>Profil utilisateur</h1>
+      <p>Bienvenue, <strong>{{ user.username }}</strong> !</p>
+      <p>Email: {{ user.email }}</p>
+      <p>Rôle: {{ user.role }}</p>
+    </section>
+
+    @if (user.address) {
+      <section class="profile-address">
+        <h2>Adresse</h2>
+        <p>{{ user.address.street }}, {{ user.address.city.name }}</p>
+        <p>Code postal : {{ user.address.city.postalCode }}</p>
+      </section>
+    }
+
+    @if (user.favorites && user.favorites.length > 0) {
+      <section class="profile-favorites">
+        <h2>Favoris</h2>
+        <ul>
+          @for ( favorite of user.favorites; track favorite) {
+            <li>{{ favorite.id }}</li>
+            <li>{{ favorite.favoriteCategory }}</li>
+            <li>{{ favorite.cityName }}</li>
+            <li>{{ favorite.createdAt }}</li>
+            <li>{{ favorite.updatedAt }}</li>
+          }
+        </ul>
+      </section>
+    }
+  } @else {
+    <section class="guest-message">
+      <p>Bienvenue invité, veuillez vous connecter.</p>
+      <app-login></app-login>
+    </section>
+  }
+</div>

@@ -25,7 +25,7 @@ import java.util.Map;
 
 
 @RestController
-@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+@PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
 @RequestMapping("/api/users")
 public class UserController {
 
@@ -62,7 +62,7 @@ public class UserController {
     }
 
     // Création d'un utilisateur
-    @PostMapping("/singup")
+    @PostMapping("/signup")
     public UserResponseDto createUser(@RequestBody UserRequestDto reqDto) {
         User user = UserMapper.toEntity(reqDto);
         User created = userService.createUser(user);

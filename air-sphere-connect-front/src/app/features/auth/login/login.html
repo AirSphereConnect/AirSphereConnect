@@ -1,1 +1,24 @@
-<p>login works!</p>
+<form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+  <app-input-field
+    label="Nom d'utilisateur"
+    [control]="usernameControl">
+    placeholder="Entrez votre nom d'utilisateur"
+  ></app-input-field>
+
+  <app-password-field
+    label="Mot de passe"
+    [control]="passwordControl">
+    placeholder="Entrez votre mot de passe"
+  ></app-password-field>
+
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+
+  }
+
+  <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
+    Connexion
+  </button>
+</form>

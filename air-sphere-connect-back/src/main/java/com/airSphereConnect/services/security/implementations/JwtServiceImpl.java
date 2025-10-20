@@ -27,7 +27,7 @@ public class JwtServiceImpl implements JwtService {
 
     //TODO il faut mette les durée dans la variable d'environnement
     // Durées en millisecondes
-    private static final long ACCESS_TOKEN_VALIDITY = 2 * 60 * 60 * 1000;   // 2 heures
+    public static final long ACCESS_TOKEN_VALIDITY = 2 * 60 * 60 * 1000;   // 2 heures
     private static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60 * 1000; // 7 jours
 
     public JwtServiceImpl(@Value("${jwt.secret:UneCleSecreteSuperLongueEtComplexePourTestUnique1234567890}") String secret,

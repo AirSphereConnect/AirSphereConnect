@@ -1,0 +1,38 @@
+<mat-form-field appearance="fill" class="full-width">
+  <mat-label>{{ label }}</mat-label>
+  <input
+    matInput
+    [type]="type"
+    [placeholder]="placeholder"
+    [formControl]="control"
+  />
+  @if (control.errors?.['required']) {
+    <mat-error>Ce champ est requis.</mat-error>
+  }
+  @if (control.errors?.['email']) {
+    <mat-error>Email invalide.</mat-error>
+
+  }
+</mat-form-field>
+
+<!--
+<div class="form-group">
+  <label>{{ label }}</label>
+  <input
+    [type]="type"
+    [formControl]="control"
+    [placeholder]="placeholder"
+    class="form-control"/>
+  @if (isInvalid) {
+    <div class="error-message">
+      @if (control.errors?.['required']) {
+        <span>Ce champ est requis.</span>
+      }
+      @if (control.errors?.['email']) {
+        <span>Email invalide.</span>
+      }
+    </div>
+  }
+</div>
+
+-->
