@@ -1,5 +1,4 @@
 import { Component, Input } from '@angular/core';
-
 import { Router } from '@angular/router';
 import {UserService} from '../../../services/UserService';
 
@@ -14,8 +13,9 @@ export class Header {
   constructor(private userService: UserService, private router: Router) {}
 
   logout() {
-    this.userService.logout();
-    this.router.navigate(['/home']);
+    this.userService.logout().subscribe(() => {
+      this.router.navigate(['/home']);
+    });
   }
 
   goToLogin() {
@@ -28,5 +28,9 @@ export class Header {
 
   goToProfile() {
     this.router.navigate(['/auth/profile']);
+  }
+
+  goToRegister() {
+    this.router.navigate(['/auth/register']);
   }
 }

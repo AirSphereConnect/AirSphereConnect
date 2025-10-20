@@ -1,1 +1,87 @@
-<p>register works!</p>
+<!-- register.html -->
+<div class="register-container">
+
+  <!-- === ÉTAPE 1 === -->
+  @if (step === 1) {
+    <form [formGroup]="registerFirstForm" (ngSubmit)="onFirstSubmit()">
+
+      <app-input-field
+        label="Nom d'utilisateur"
+        [control]="usernameControl"
+        placeholder="Entrez votre nom d'utilisateur">
+      </app-input-field>
+
+      <app-input-field
+        label="Email"
+        [control]="emailControl"
+        placeholder="exemple@exemple.com">
+      </app-input-field>
+
+      <app-password-field
+        label="Mot de passe"
+        [control]="passwordControl"
+        placeholder="Entrez votre mot de passe">
+      </app-password-field>
+
+      @if (errorMessage) {
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <button mat-raised-button color="primary" type="submit" [disabled]="registerFirstForm.invalid">
+        Continuer
+      </button>
+    </form>
+  }
+
+  @if (step === 2) {
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+      <app-input-field
+        label="Adresse"
+        [control]="addressControl"
+        placeholder="Entrez votre adresse">
+      </app-input-field>
+
+      <app-input-field
+        label="Ville"
+        [control]="cityNameControl"
+        placeholder="Entrez le nom de votre ville"
+        (input)="onCityInput($event)">
+      </app-input-field>
+
+      <!-- Suggestions de villes -->
+      @if (citySuggestions.length) {
+        <ul class="suggestions">
+          @for (city of citySuggestions; track city) {
+            <li (click)="selectCity(city)">
+              {{ city.name }} ({{ city.postalCode }})
+            </li>
+          }
+        </ul>
+      }
+
+      <app-input-field
+        label="Code postal"
+        [control]="cityCodeControl"
+        placeholder="Code postal">
+      </app-input-field>
+
+      @if (errorMessage) {
+        <div class="error-message">
+          {{ errorMessage }}
+        </div>
+      }
+
+      <div class="actions">
+        <button mat-button type="button" (click)="step = 1">Retour</button>
+        <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
+          Créer le compte
+        </button>
+      </div>
+    </form>
+  }
+
+
+</div>

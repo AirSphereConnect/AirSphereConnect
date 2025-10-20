@@ -1,6 +1,6 @@
-import {Component, signal, inject, OnInit} from '@angular/core';
-import { RouterOutlet } from '@angular/router';
-import { ThemeService} from './core/services/theme';
+import { Component, signal } from '@angular/core';
+import { Router, RouterOutlet } from '@angular/router';
+import { UserService } from './shared/services/UserService';
 import {Header} from './shared/components/layout/header/header';
 
 @Component({
@@ -20,6 +20,12 @@ export class App implements OnInit {
 
   ngOnInit() {
     this.themeService.watchSystemTheme();
+  constructor(private userService: UserService) {
+    this.userService.fetchUserProfile();
+
+    this.userService.userProfile$.subscribe(profile => {
+      this.userRole.set(profile?.role ?? 'GUEST');
+    });
   }
 
   toggleTheme() {
