@@ -5,6 +5,7 @@ import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.security.ActiveTokenService;
+import com.airSphereConnect.services.security.CookieService;
 import com.airSphereConnect.services.security.JwtService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,7 +18,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,68 +25,33 @@ import java.util.Map;
 @RequestMapping("/api")
 public class HomeController {
 
+    private final UserMapper userMapper;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final ActiveTokenService activeTokenService;
-    private final UserMapper userMapper;
-
-    // Le flag secure dépend de l'environnement : vrai en prod HTTPS, faux en dev HTTP
-    private final boolean cookieSecure = false; // passez à true en prod
+    private final CookieService cookieService;
 
     public HomeController(JwtService jwtService,
                           AuthenticationManager authenticationManager,
                           ActiveTokenService activeTokenService,
-                          UserMapper userMapper) {
+                          UserMapper userMapper,
+                          CookieService cookieService) {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.activeTokenService = activeTokenService;
         this.userMapper = userMapper;
+        this.cookieService = cookieService;
     }
-
-    private Cookie createCookie(String name, String value) {
-        Cookie cookie = new Cookie(name, value);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(cookieSecure);
-        cookie.setPath("/");
-        // log cookie
-        System.out.println("Set Cookie : " + name + " = " + value + ")");
-        return cookie;
-    }
-
-    private Cookie deleteCookie(String name) {
-        Cookie cookie = new Cookie(name, "");
-        cookie.setMaxAge(0); // expire immédiatement
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(cookieSecure);
-        return cookie;
-    }
-
 
     @NotNull
-    private ResponseEntity<?> getResponseEntity(HttpServletResponse response) {
+    private ResponseEntity<?> getGuestResponse(HttpServletResponse response) {
         String guestToken = jwtService.generateGuestToken();
-        response.addCookie(createCookie("ACCESS_TOKEN", guestToken));
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", guestToken));
 
         Map<String, Object> body = new HashMap<>();
         body.put("role", "GUEST");
         body.put("user", null);
 
-        return ResponseEntity.ok(body);
-    }
-
-    @GetMapping("/guest-token")
-    public ResponseEntity<Map<String, Object>> generateGuestToken(HttpServletResponse response) throws IOException {
-
-        String guestToken = jwtService.generateGuestToken();
-
-        Cookie cookie = createCookie("ACCESS_TOKEN", guestToken);
-        System.out.println("ACCESS_TOKEN GUEST :" + guestToken);
-        response.addCookie(cookie);
-
-
-        Map<String, Object> body = new HashMap<>();
-        body.put("role", "GUEST");
         return ResponseEntity.ok(body);
     }
 
@@ -101,11 +66,8 @@ public class HomeController {
         String refreshToken = jwtService.generateRefreshToken(userEntity);
         activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
 
-        // NE PAS supprimer explicitement l'ancien cookie, posez juste le nouveau
-        Cookie accessCookie = createCookie("ACCESS_TOKEN", accessToken);
-        response.addCookie(accessCookie);
-
-        Cookie refreshCookie = createCookie("REFRESH_TOKEN", refreshToken);
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", accessToken));
+        Cookie refreshCookie = cookieService.createCookie("REFRESH_TOKEN", refreshToken);
         refreshCookie.setPath("/api/token/refresh");
         response.addCookie(refreshCookie);
 
@@ -121,15 +83,9 @@ public class HomeController {
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile(HttpServletRequest request, HttpServletResponse response) {
-        // Headers cache control (bons pratiques)
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Expires", "0");
-
-        Cookie[] cookies = request.getCookies();
         String jwt = null;
-        if (cookies != null) {
-            for (Cookie cookie : cookies) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
                 if ("ACCESS_TOKEN".equals(cookie.getName())) {
                     jwt = cookie.getValue();
                     break;
@@ -138,18 +94,15 @@ public class HomeController {
         }
 
         if (jwt == null || jwt.isEmpty()) {
-            // Pas de token => renvoyer token guest
-            return getResponseEntity(response);
+            return getGuestResponse(response);
         }
 
         try {
             UserDetails userDetails = jwtService.extractUserDetails(jwt);
             if (!jwtService.validateToken(jwt, userDetails)) {
-                // Jeton invalide => token guest
-                return getResponseEntity(response);
+                return getGuestResponse(response);
             }
 
-            // Ne pas réécrire le cookie guest ici si token valide
             User userEntity = (User) userDetails;
             UserResponseDto userResponseDto = userMapper.toDto(userEntity);
 
@@ -159,12 +112,9 @@ public class HomeController {
 
             return ResponseEntity.ok(body);
         } catch (Exception e) {
-            // En cas d'erreur, renvoyer token guest
-            return getResponseEntity(response);
+            return getGuestResponse(response);
         }
     }
-
-
 
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
@@ -172,17 +122,9 @@ public class HomeController {
             request.getSession(false).invalidate();
         }
 
-        response.addCookie(deleteCookie("ACCESS_TOKEN"));
-
-        String guestToken = jwtService.generateGuestToken();
-        Cookie guestCookie = createCookie("ACCESS_TOKEN", guestToken);
-        response.addCookie(guestCookie);
-
-        response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-        response.setHeader("Pragma", "no-cache");
-        response.setHeader("Expires", "0");
+        response.addCookie(cookieService.deleteCookie("ACCESS_TOKEN"));
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", jwtService.generateGuestToken()));
 
         return ResponseEntity.ok().build();
     }
-
 }
