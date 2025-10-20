@@ -1,10 +1,10 @@
 import {City} from './city.model';
-import {Department} from './department.model';
+import {Region} from './region.model';
 
-export interface Region {
+export interface Department {
   id: number;
   name: string;
   code: string;
   cities: City[];
-  departments: Department[];
+  regionName: string;
 }

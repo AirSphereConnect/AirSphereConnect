@@ -22,5 +22,8 @@ export const routes: Routes = [
   { path: 'admin/moderation', loadComponent: () => import('./features/admin/content-moderation/content-moderation').then(m => m.ContentModeration) },
 
   { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: '**', loadComponent: () => import('./features/not-found/not-found').then(m => m.NotFound) }
-];
+  { path: '**', loadComponent: () => import('./features/not-found/not-found').then(m => m.NotFound) },
+
+  { path: 'population-chart', loadComponent: ()=> import('./features/charts/components/chart/population-chart/population-chart').then(m => m.ChartTestComponent) }
+
+]
