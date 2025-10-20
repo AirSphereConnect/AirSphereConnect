@@ -24,12 +24,13 @@ export const iconVariants = tv({
       neutral: 'text-neutral',
 
     }
+
   },
 
   defaultVariants: {
+    color: 'current',
     size: 'md',
-    position: 'left',
-    color: 'current'
+    position: 'left'
   }
 });
 

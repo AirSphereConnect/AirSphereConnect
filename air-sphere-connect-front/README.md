@@ -470,7 +470,7 @@ airsphere-frontend/
 ├── angular.json                           # ⚙️ Configuration Angular CLI
 ├── package.json                           # 📦 Dependencies
 ├── tsconfig.json                          # 🔧 TypeScript config
-├── tailwind.config.js                     # 🎨 Tailwind config
+├── tailwind.config.ts                     # 🎨 Tailwind config
 ├── eslint.config.js                       # 📝 ESLint config
 ├── .prettierrc                           # ✨ Prettier config
 ├── karma.conf.js                          # 🧪 Tests config
@@ -485,7 +485,7 @@ airsphere-frontend/
 ### **Controller** - Components `.ts`
 
 ## 🎨 Configuration Material + Tailwind
-### tailwind.config.js
+### tailwind.config.ts
 ### _material-theme.css
 
 

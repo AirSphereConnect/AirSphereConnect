@@ -1,11 +1,10 @@
-
 import {Component, Input, computed, inject} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { buttonVariants, type ButtonVariants } from '../../../variants/button.variants';
+import {CommonModule} from '@angular/common';
+import {buttonVariants, type ButtonVariants} from '../../../variants/button.variants';
 import {type HeroIconName} from '../../../icons/heroicons.registry';
 import {IconVariants, iconVariants} from '../../../variants/icon.variants';
 import {IconService} from '../../../services/icon';
-import { DomSanitizer } from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 
 
 @Component({
@@ -14,7 +13,7 @@ import { DomSanitizer } from '@angular/platform-browser';
   imports: [CommonModule],
   template: `
     <button
-      [ngClass]="buttonClasses ()"
+      [ngClass]="buttonClasses()"
       [disabled]="disabled || loading"
       [attr.type]="type"
       [attr.aria-label]="ariaLabel"
@@ -42,10 +41,9 @@ import { DomSanitizer } from '@angular/platform-browser';
   `,
   styles: [':host']
 })
-export class ButtonComponent {
+export class Button {
   private iconService = inject(IconService);
   private sanitizer = inject(DomSanitizer);
-
 
   @Input() color: ButtonVariants['color'] = 'primary';
   @Input() size: ButtonVariants['size'] = 'md';
@@ -62,10 +60,11 @@ export class ButtonComponent {
   @Input() icon?: string;
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() iconColor?: IconVariants['color'];
+
   @Input() ariaLabel?: string;
 
 
-  buttonClasses  = computed(() => {
+  buttonClasses = computed(() => {
     return buttonVariants({
       color: this.color,
       size: this.size,
@@ -80,7 +79,7 @@ export class ButtonComponent {
 
   iconHtml = computed(() => {
     if (this.heroIcon) {
-      const sizeClasses  = iconVariants({
+      const sizeClasses = iconVariants({
         size: this.size,
         color: 'current'
       });
