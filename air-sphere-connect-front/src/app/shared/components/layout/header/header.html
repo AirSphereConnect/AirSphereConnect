@@ -1,5 +1,8 @@
 <nav>
   <button (click)="goToHome()">Page d'accueil</button>
+  <app-button color="neutral" variant="outline" size="xs" (click)="toggleTheme()">
+    {{ themeService.isDarkMode() ? '🌙 Dark' : '☀️ Light' }}
+  </app-button>
   @if (userRole === 'GUEST' || !userRole) {
     <button (click)="goToLogin()">Se connecter</button>
   } @else {

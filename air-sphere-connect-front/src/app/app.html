@@ -6,16 +6,9 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<app-header class="sticky top-0 z-50"></app-header>
+<app-header [userRole]="userRole()" class="sticky top-0 z-50"></app-header>
 <main class="container mx-auto px-4 py-8">
   <div class="content">
-    <app-header [userRole]="userRole()"></app-header>
-    <router-outlet></router-outlet>
-    <div class="p-4 flex justify-center">
-      <button class="btn btn-ghost" (click)="toggleTheme()">
-        {{ isDarkTheme() ? '🌙 Dark' : '☀️ Light' }}
-      </button>
-    </div>
     <router-outlet />
   </div>
 </main>
