@@ -63,7 +63,8 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean isTokenExpired(String token) {
-        return false;
+        Date expiration = extractExpiration(token);
+        return expiration.before(new Date());
     }
 
     @Override
@@ -72,14 +73,10 @@ public class JwtServiceImpl implements JwtService {
         return username.equals(userDetails.getUsername()) && !isTokenExpired(token);
     }
 
-    @Override
-    public String generateAccessToken(UserDetails userDetails) {
-        return "";
-    }
 
-    // Génère un access token (durée courte)
+    // Génère un access token (durée configurable)
     @Override
-    public String generateToken(UserDetails userDetails, long validityMillis) {
+    public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         // Ajout des roles dans les claims
         claims.put("roles", userDetails.getAuthorities().stream()
@@ -87,7 +84,7 @@ public class JwtServiceImpl implements JwtService {
                 .collect(Collectors.toList()));
 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + validityMillis);
+        Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -115,11 +112,10 @@ public class JwtServiceImpl implements JwtService {
                 .compact();
     }
 
-
     // Génère un refresh token (durée longue)
     @Override
     public String generateRefreshToken(UserDetails userDetails) {
-        return generateToken(userDetails, REFRESH_TOKEN_VALIDITY);
+        return generateToken(userDetails);
     }
 
     @SuppressWarnings("unchecked")

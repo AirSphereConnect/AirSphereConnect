@@ -176,7 +176,7 @@ airsphere-frontend/
 │   │   │   │   ├── websocket.service.ts
 │   │   │   │   └── error-handler.service.ts
 │   │   │   ├── guards/
-│   │   │   │   ├── auth.guard.ts
+│   │   │   │   ├── AuthGuard.ts
 │   │   │   │   └── role.guard.ts
 │   │   │   ├── interceptors/
 │   │   │   │   ├── auth.interceptor.ts
