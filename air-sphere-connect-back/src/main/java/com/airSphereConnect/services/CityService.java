@@ -2,6 +2,7 @@ package com.airSphereConnect.services;
 
 import com.airSphereConnect.entities.City;
 
+import java.util.Collection;
 import java.util.List;
 
 public interface CityService {
@@ -26,4 +27,5 @@ public interface CityService {
 
     List<City> getCitiesByPopulationBetweenThan(Integer populationMin, Integer populationMax);
 
+    List<City> findByNameContainingIgnoreCase(String query);
 }

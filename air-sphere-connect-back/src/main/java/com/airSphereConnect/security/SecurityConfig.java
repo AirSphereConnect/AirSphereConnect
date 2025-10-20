@@ -50,7 +50,6 @@ public class SecurityConfig {
         };
     }
 
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
@@ -59,8 +58,17 @@ public class SecurityConfig {
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/actuator/health", "/actuator/info", "/api/refresh-token","/api/guest-token","/api/login","/api/profile").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/logout").permitAll()
+                        .requestMatchers("/actuator/health",
+                                "/actuator/info",
+                                "/api/refresh-token",
+                                "/api/guest-token",
+                                "/api/login",
+                                "/api/profile",
+                                "/api/users/check",
+                                "/api/cities/search-name").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/logout",
+                                "/api/users/signup").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         .requestMatchers("/api/home",
                                 "/api/weather/**",

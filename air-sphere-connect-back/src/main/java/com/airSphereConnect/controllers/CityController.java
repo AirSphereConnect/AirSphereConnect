@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+//@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/cities")
 public class CityController {
 
@@ -43,6 +43,14 @@ public class CityController {
     public CityResponseDto getCityByName(@RequestParam String name) {
         City city = cityService.getCityByName(name);
         return cityMapper.toDto(city);
+    }
+
+    // 🔍 Recherche partielle (autocomplétion)
+    @GetMapping("/search-name")
+    public List<CityResponseDto> searchCities(@RequestParam String query) {
+        return cityService.findByNameContainingIgnoreCase(query).stream()
+                .map(cityMapper::toDto)
+                .toList();
     }
 
     @GetMapping("/region/{region}")
