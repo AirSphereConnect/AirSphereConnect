@@ -2,6 +2,7 @@
   <button (click)="goToHome()">Page d'accueil</button>
   @if (userRole === 'GUEST' || !userRole) {
     <button (click)="goToLogin()">Se connecter</button>
+    <button (click)="goToRegister()">Créer un compte</button>
   } @else {
     <button (click)="goToProfile()">Mon compte</button>
     <button (click)="logout()">Déconnexion</button>

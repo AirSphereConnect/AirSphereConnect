@@ -1,7 +1,7 @@
 import { Component, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 import { UserService } from './shared/services/UserService';
-import {Header} from './shared/components/layout/header/header';
+import { Header } from './shared/components/layout/header/header';
 
 @Component({
   selector: 'app-root',
@@ -13,14 +13,11 @@ import {Header} from './shared/components/layout/header/header';
 export class App {
   userRole = signal<string | null>(null);
 
-  constructor(private userService: UserService, private router: Router) {
-    this.loadUserProfile();
+  constructor(private userService: UserService) {
+    this.userService.fetchUserProfile();
+
     this.userService.userProfile$.subscribe(profile => {
       this.userRole.set(profile?.role ?? 'GUEST');
     });
-  }
-
-  loadUserProfile() {
-    this.userService.fetchUserProfile();
   }
 }
