@@ -14,9 +14,8 @@ public interface JwtService {
     Claims extractAllClaims(String token); // Correction ici
     boolean isTokenExpired(String token);
     boolean validateToken(String token, UserDetails userDetails);
-    String generateAccessToken(UserDetails userDetails);
     String generateRefreshToken(UserDetails userDetails);
-    String generateToken(UserDetails userDetails, long validityMillis);
+    String generateToken(UserDetails userDetails);
     String generateGuestToken();// Internal method
     List<String> extractRoles(String token);
     UserDetails extractUserDetails(String token);

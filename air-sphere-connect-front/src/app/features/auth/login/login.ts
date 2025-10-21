@@ -1,33 +1,26 @@
-import {Component, OnInit} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {AuthService, LoginRequest} from '../services/auth-feature.service';
-import {Router} from '@angular/router';
+import { Component, OnInit } from '@angular/core';
+import {FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule} from '@angular/forms';
+import { Router } from '@angular/router';
+import { UserService } from '../../../shared/services/UserService';
+import {CommonModule} from '@angular/common';
 import {InputField} from '../../../shared/components/input-field/input-field';
 import {PasswordField} from '../../../shared/components/password-field/password-field';
-import {UserService} from '../../../shared/services/UserService';
 
 @Component({
+  standalone: true,
+  imports: [CommonModule, FormsModule, ReactiveFormsModule, InputField, PasswordField],
   selector: 'app-login',
   templateUrl: './login.html',
-  imports: [
-    ReactiveFormsModule,
-    InputField,
-    PasswordField
-  ],
-  styleUrls: ['./login.scss']
 })
 export class Login implements OnInit {
   loginForm!: FormGroup;
   errorMessage: string | null = null;
 
-
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private userService: UserService
-  ) {
-  }
+    private userService: UserService,
+    private router: Router
+  ) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -36,35 +29,26 @@ export class Login implements OnInit {
     });
   }
 
-  get usernameControl()
-    :
-    FormControl {
+  get usernameControl(): FormControl {
     return this.loginForm.get('username') as FormControl;
   }
 
-  get passwordControl()
-    :
-    FormControl {
+  get passwordControl(): FormControl {
     return this.loginForm.get('password') as FormControl;
   }
 
   onSubmit() {
     if (this.loginForm.valid) {
-      const credentials: LoginRequest = this.loginForm.value;
-      this.authService.login(credentials).subscribe({
-        next: (profile) => {
-          this.userService.setUserProfile(profile);
-          console.log('Connexion réussie, role:', profile.role);
-          console.log('Connexion réussie, role:', profile.user);
+      const credentials = this.loginForm.value;
+      this.userService.login(credentials).subscribe({
+        next: profile => {
           this.errorMessage = null;
-          this.router.navigate([`/home`]);
+          this.router.navigate(['/home']);
         },
-        error: (err) => {
-          console.error('Erreur de connexion', err);
+        error: err => {
           this.errorMessage = "Nom d'utilisateur ou mot de passe incorrect.";
         }
       });
-
     }
   }
 }

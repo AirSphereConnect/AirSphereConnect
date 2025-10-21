@@ -45,6 +45,14 @@ public class CityController {
         return cityMapper.toDto(city);
     }
 
+    // 🔍 Recherche partielle (autocomplétion)
+    @GetMapping("/search-name")
+    public List<CityResponseDto> searchCities(@RequestParam String query) {
+        return cityService.findByNameContainingIgnoreCase(query).stream()
+                .map(cityMapper::toDto)
+                .toList();
+    }
+
     @GetMapping("/region/{region}")
     public List<CityResponseDto> getCitiesByRegion(@PathVariable String region) {
         return cityService.getCitiesByRegionName(region).stream().map(cityMapper::toDto).toList();

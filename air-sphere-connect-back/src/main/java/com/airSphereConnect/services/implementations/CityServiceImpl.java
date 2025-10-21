@@ -6,6 +6,7 @@ import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.services.CityService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -26,6 +27,8 @@ public class CityServiceImpl implements CityService {
         return cityRepository.findByNameIgnoreCase(name).orElseThrow(() -> new GlobalException.ResourceNotFoundException(
                 "City with name " + name + " not found."));
     }
+
+
 
     @Override
     public City getCityByInseeCode(String inseeCode) {
@@ -89,4 +92,9 @@ public class CityServiceImpl implements CityService {
         }
         return cityRepository.findDistinctByPopulations_PopulationBetween(populationMin, populationMax);
     }
+
+    public List<City> findByNameContainingIgnoreCase(String query) {
+        return cityRepository.findByNameContainingIgnoreCase(query);
+    }
+
 }

@@ -1,27 +1,21 @@
-import {Component, inject, Input} from '@angular/core';
-import { ThemeService} from '../../../../core/services/theme';
-
-
+import { Component, Input } from '@angular/core';
 import { Router } from '@angular/router';
 import {UserService} from '../../../services/UserService';
-import {Button} from '../../ui/button/button';
 
 @Component({
   selector: 'app-header',
   templateUrl: './header.html',
-  imports: [
-    Button
-  ],
   styleUrls: ['./header.scss']
 })
 export class Header {
   @Input() userRole: string | null = null;
-  readonly themeService = inject(ThemeService);
+
   constructor(private userService: UserService, private router: Router) {}
 
   logout() {
-    this.userService.logout();
-    this.router.navigate(['/home']);
+    this.userService.logout().subscribe(() => {
+      this.router.navigate(['/home']);
+    });
   }
 
   goToLogin() {
@@ -36,7 +30,7 @@ export class Header {
     this.router.navigate(['/auth/profile']);
   }
 
-  toggleTheme() {
-    this.themeService.toggleTheme();
+  goToRegister() {
+    this.router.navigate(['/auth/register']);
   }
 }
