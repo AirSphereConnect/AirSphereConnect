@@ -50,6 +50,10 @@ public class City {
     @JoinColumn(name = "department_id", nullable = false)
     private Department department;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "area_code", referencedColumnName = "area_code", insertable = false, updatable = false)
+    private AirQualityIndex airQualityIndex;
+
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Population> populations = new ArrayList<>();
 
@@ -70,8 +74,6 @@ public class City {
 
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<FavoritesAlerts> favoritesAlerts = new ArrayList<>();
-
-
 
     public City() {}
 
@@ -214,9 +216,13 @@ public class City {
         this.favoritesAlerts = favoritesAlerts;
     }
 
+    public AirQualityIndex getAirQualityIndex() {
+        return airQualityIndex;
+    }
+
     @Override
     public boolean equals(Object o) {
-      if(this==o) return true;
+        if(this==o) return true;
         if(o==null || getClass()!=o.getClass()) return false;
         City city = (City) o;
         return Objects.equals(inseeCode, city.inseeCode);
