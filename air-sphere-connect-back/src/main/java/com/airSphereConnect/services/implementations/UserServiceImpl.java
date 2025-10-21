@@ -98,4 +98,13 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByUsername(String username) throws UsernameNotFoundException {
         return Optional.empty();
     }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
 }

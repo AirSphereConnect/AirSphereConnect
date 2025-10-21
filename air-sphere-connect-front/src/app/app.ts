@@ -20,8 +20,10 @@ export class App implements OnInit {
 
   readonly isDarkTheme = this.themeService.isDarkMode;
 
-  constructor(private userService: UserService, private router: Router) {
-    this.loadUserProfile();
+  constructor(private userService: UserService) {
+    this.userService.fetchUserProfile();
+
+
     this.userService.userProfile$.subscribe(profile => {
       this.userRole.set(profile?.role ?? 'GUEST');
     });
@@ -33,9 +35,5 @@ export class App implements OnInit {
 
   toggleTheme() {
     this.themeService.toggleTheme();
-  }
-
-  loadUserProfile() {
-    this.userService.fetchUserProfile();
   }
 }

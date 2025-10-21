@@ -74,7 +74,7 @@ services:
       # ✅ Cache Maven
       - maven_cache:/root/.m2
     ports:
-      - "8081:${BACKEND_PORT}"
+      - "${BACKEND_PORT}:8080"
 #      - "${DEBUG_PORT}:5005"
     depends_on:
       mariadb:
@@ -101,7 +101,7 @@ services:
       API_URL: ${API_URL}
       NODE_ENV: ${NODE_ENV:-development}
     ports:
-      - "4201:${FRONTEND_PORT}"
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
     volumes:
       # ✅ Angular : uniquement src/ et config
       - ./air-sphere-connect-front/src:/app/src:ro
