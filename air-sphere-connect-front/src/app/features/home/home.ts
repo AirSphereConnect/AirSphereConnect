@@ -1,8 +1,8 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Header } from '../../shared/components/layout/header/header';
-import { UserProfileResponse, UserService } from '../../shared/services/UserService';
+import { UserService } from '../../shared/services/UserService';
 import { Subscription } from 'rxjs';
+import {UserProfileResponse} from '../../core/models/user.model';
 
 @Component({
   selector: 'app-home',
