@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule} from '@angular/forms';
 import { Router } from '@angular/router';
-import { UserService } from '../../../shared/services/UserService';
+import { UserService } from '../../../shared/services/user-service';
 import {CommonModule} from '@angular/common';
 import {InputField} from '../../../shared/components/input-field/input-field';
 import {PasswordField} from '../../../shared/components/password-field/password-field';

@@ -1,6 +1,6 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { UserService } from '../../shared/services/UserService';
+import { UserService } from '../../shared/services/user-service';
 import { Subscription } from 'rxjs';
 import {UserProfileResponse} from '../../core/models/user.model';
 

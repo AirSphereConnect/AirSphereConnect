@@ -1,6 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import { UserService } from './shared/services/UserService';
+import { UserService } from './shared/services/user-service';
+import {Component, signal, inject, OnInit} from '@angular/core';
+import { ThemeService} from './core/services/theme';
 import {Header} from './shared/components/layout/header/header';
 
 @Component({
@@ -16,16 +19,21 @@ export class App implements OnInit {
 
   private readonly themeService = inject(ThemeService);
 
+  userRole = signal<string | null>(null);
+
   readonly isDarkTheme = this.themeService.isDarkMode;
 
-  ngOnInit() {
-    this.themeService.watchSystemTheme();
   constructor(private userService: UserService) {
     this.userService.fetchUserProfile();
+
 
     this.userService.userProfile$.subscribe(profile => {
       this.userRole.set(profile?.role ?? 'GUEST');
     });
+  }
+
+  ngOnInit() {
+    this.themeService.watchSystemTheme();
   }
 
   toggleTheme() {
