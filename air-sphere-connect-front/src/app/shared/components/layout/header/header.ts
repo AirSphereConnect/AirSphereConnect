@@ -1,36 +1,18 @@
 import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
-import {UserService} from '../../../services/user-service';
+import { Navbar } from '../../ui/navbar/navbar';
+import { NgOptimizedImage } from '@angular/common';
+import {Logo} from '../../ui/logo/logo';
 
 @Component({
   selector: 'app-header',
+  standalone: true, // ⚠️ important si tu veux importer des composants directement
   templateUrl: './header.html',
-  styleUrls: ['./header.scss']
+  styleUrls: ['./header.scss'],
+  imports: [
+    Navbar,
+    Logo
+  ]
 })
 export class Header {
   @Input() userRole: string | null = null;
-
-  constructor(private userService: UserService, private router: Router) {}
-
-  logout() {
-    this.userService.logout().subscribe(() => {
-      this.router.navigate(['/home']);
-    });
-  }
-
-  goToLogin() {
-    this.router.navigate(['/auth/login']);
-  }
-
-  goToHome() {
-    this.router.navigate(['/home']);
-  }
-
-  goToProfile() {
-    this.router.navigate(['/auth/profile']);
-  }
-
-  goToRegister() {
-    this.router.navigate(['/auth/register']);
-  }
 }

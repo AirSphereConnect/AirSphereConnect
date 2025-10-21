@@ -11,7 +11,7 @@ export interface User {
   id: number;
   username: string;
   email: string;
-  role: string[];
+  role: string;
   address: {
     street: string;
     city: {
