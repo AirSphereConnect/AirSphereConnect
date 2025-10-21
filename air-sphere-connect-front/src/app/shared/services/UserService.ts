@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import {UserProfileResponse } from '../../core/models/user.model';
+import { UserProfileResponse } from '../../core/models/user.model';
 
 
 @Injectable({
