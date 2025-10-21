@@ -1,0 +1,27 @@
+<nav class="min-w-[150px] flex gap-x-1">
+  <app-button [ngClass]="chooseOpacity()" color="primary" (click)="goToHome()" ariaLabel="Page d'accueil">
+    Page d'accueil
+  </app-button>
+  <app-button [ngClass]="chooseOpacity()" color="primary" (click)="goToForum()" ariaLabel="Forum">
+    Forum
+  </app-button>
+
+  @if (userRole === 'GUEST') {
+    <app-button color="primary" (click)="goToLogin()" ariaLabel="Se connecter">
+      Se connecter
+    </app-button>
+    <app-button color="primary" (click)="goToRegister()" ariaLabel="Créer un compte">
+      Créer un compte
+    </app-button>
+  } @else if (userRole === 'USER') {
+    <app-button color="primary" (click)="goToDashBoard()" ariaLabel="Données climatiques">
+      Données climatiques
+    </app-button>
+    <app-button class="opacity-75" color="neutral" (click)="goToProfile()" ariaLabel="Mon compte">
+      Mon compte
+    </app-button>
+    <app-button class="opacity-75" color="warning" (click)="logout()" ariaLabel="Déconnexion">
+      Déconnexion
+    </app-button>
+  }
+</nav>
