@@ -6,6 +6,6 @@ import { Component } from '@angular/core';
   templateUrl: './forum.html',
   styleUrls: ['./forum.scss']
 })
-export class Forum {
+export class ForumComponent {
 
 }

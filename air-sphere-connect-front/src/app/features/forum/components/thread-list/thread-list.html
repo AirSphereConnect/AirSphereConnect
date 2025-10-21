@@ -1,24 +1,7 @@
-<div class="min-h-screen bg-gray-100 p-6">
-  <h1 class="text-2xl font-bold mb-4 text-center">Sujets du forum</h1>
-
-  @if (threads.length > 0) {
-    <div class="grid gap-4">
-      @for (thread of threads; track thread.id) {
-        <div
-          (click)="openThread(thread.id)"
-          class="bg-white rounded-lg shadow p-4 cursor-pointer hover:bg-gray-50 transition"
-        >
-          <h2 class="text-lg font-semibold">{{ thread.title }}</h2>
-          <p class="text-sm text-gray-500">
-            par {{ thread.author }} • {{ thread.posts.length }} posts
-          </p>
-        </div>
-      }
+<div>
+  @for (thread of threads; track thread.id) {
+    <div (click)="openThread(thread.id)" class="cursor-pointer p-2 border-b">
+      {{ thread.title }} — {{ thread.author }}
     </div>
-  } @else {
-    <p class="text-center text-gray-500 mt-10">
-      Aucun sujet pour le moment 😅
-    </p>
   }
 </div>
-

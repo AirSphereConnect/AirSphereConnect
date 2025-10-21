@@ -1,1 +1,10 @@
-<p>post works!</p>
+@if (post) {
+  <div class="p-4 rounded-lg shadow mb-4">
+    <p class="text-sm text-gray-500 mb-1">
+      {{ post.user }} — {{ post.createdAt | date:'short' }}
+    </p>
+    <p class="text-gray-800">{{ post.content }}</p>
+  </div>
+} @else {
+  <p class="text-gray-400 italic">Chargement du post...</p>
+}
