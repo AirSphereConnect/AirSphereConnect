@@ -12,7 +12,7 @@ import {MatInput} from '@angular/material/input';
     MatFormField,
     MatLabel,
     MatInput,
-    MatError
+    MatError,
   ],
   styleUrl: './input-field.scss'
 })

@@ -36,5 +36,6 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     List<City> findDistinctByPopulations_PopulationBetween(Integer populationMin, Integer populationMax);
 
+    List<City> findByNameContainingIgnoreCase(String query);
 }
 

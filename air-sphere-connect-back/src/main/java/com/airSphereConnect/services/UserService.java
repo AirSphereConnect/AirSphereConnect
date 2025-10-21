@@ -20,4 +20,8 @@ public interface UserService {
     User deleteUser(Long id);
 
     Optional<User> findByUsername(String username) throws UsernameNotFoundException;
+
+    boolean existsByUsername(String username);
+
+    boolean existsByEmail(String email);
 }
