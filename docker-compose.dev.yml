@@ -101,7 +101,7 @@ services:
       API_URL: ${API_URL}
       NODE_ENV: ${NODE_ENV:-development}
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "${FRONTEND_PORT}:4200"
     volumes:
       # ✅ Angular : uniquement src/ et config
       - ./air-sphere-connect-front/src:/app/src:ro
