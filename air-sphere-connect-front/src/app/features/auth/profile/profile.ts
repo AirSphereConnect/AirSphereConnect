@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import {RouterOutlet} from '@angular/router';
-import {UserService} from '../../../shared/services/UserService';
+import {UserService} from '../../../shared/services/user-service';
 import {Login} from '../login/login';
 import {User} from '../../../core/models/user.model'; // Ajuste les imports
 

@@ -2,10 +2,10 @@ import {Component, OnInit} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {InputField} from '../../../shared/components/input-field/input-field';
 import {PasswordField} from '../../../shared/components/password-field/password-field';
-import {UserService} from '../../../shared/services/UserService';
+import {UserService} from '../../../shared/services/user-service';
 import {Router} from '@angular/router';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs';
-import {CityService} from '../../../shared/services/CityService';
+import {CityService} from '../../../shared/services/city-service';
 
 @Component({
   selector: 'app-register',
