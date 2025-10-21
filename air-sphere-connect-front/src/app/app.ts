@@ -1,10 +1,8 @@
-import { Router, RouterOutlet } from '@angular/router';
-import { Component, signal } from '@angular/core';
+
 import { RouterOutlet } from '@angular/router';
 import { UserService } from './shared/services/UserService';
 import {Component, signal, inject, OnInit} from '@angular/core';
 import { ThemeService} from './core/services/theme';
-import {Header} from './shared/components/layout/header/header';
 import { Header } from './shared/components/layout/header/header';
 
 @Component({
@@ -25,7 +23,7 @@ export class App implements OnInit {
 
   constructor(private userService: UserService) {
     this.userService.fetchUserProfile();
-}
+  }
 
 
   ngOnInit() {
@@ -34,9 +32,5 @@ export class App implements OnInit {
 
   toggleTheme() {
     this.themeService.toggleTheme();
-  }
-
-  loadUserProfile() {
-    this.userService.fetchUserProfile();
   }
 }
