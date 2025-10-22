@@ -1,27 +1,70 @@
-import { Routes } from '@angular/router';
+import {Routes} from '@angular/router';
 import {AuthGuard} from './core/guards/AuthGuard';
 
 export const routes: Routes = [
-  { path: 'home', loadComponent: () => import('./features/home/home').then(m => m.Home) },
+  {path: 'home', loadComponent: () => import('./features/home/home').then(m => m.Home)},
 
-  { path: 'auth/login', loadComponent: () => import('./features/auth/login/login').then(m => m.Login) },
-  { path: 'auth/register', loadComponent: () => import('./features/auth/register/register').then(m => m.Register) },
-  { path: 'auth/profile', loadComponent: () => import('./features/auth/profile/profile').then(m => m.Profile), canActivate:[AuthGuard] },
-  { path: 'auth/settings', loadComponent: () => import('./features/auth/settings/settings').then(m => m.Settings) },
+  {path: 'auth/login', loadComponent: () => import('./features/auth/login/login').then(m => m.Login)},
+  {path: 'auth/register', loadComponent: () => import('./features/auth/register/register').then(m => m.Register)},
+  {
+    path: 'auth/profile',
+    loadComponent: () => import('./features/auth/profile/profile').then(m => m.Profile),
+    canActivate: [AuthGuard]
+  },
+  {path: 'auth/settings', loadComponent: () => import('./features/auth/settings/settings').then(m => m.Settings)},
 
-  { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard) },
-  { path: 'dashboard/air-quality', loadComponent: () => import('./features/dashboard/widgets/air-quality-widget/air-quality-widget').then(m => m.AirQualityWidget) },
-  { path: 'dashboard/weather', loadComponent: () => import('./features/dashboard/widgets/weather-widget/weather-widget').then(m => m.WeatherWidget) },
-  { path: 'dashboard/pollution-trends', loadComponent: () => import('./features/dashboard/widgets/pollution-trend-widget/pollution-trend-widget').then(m => m.PollutionTrendWidget) },
+  {path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard)},
+  {
+    path: 'dashboard/air-quality',
+    loadComponent: () => import('./features/dashboard/widgets/air-quality-widget/air-quality-widget').then(m => m.AirQualityWidget)
+  },
+  {
+    path: 'dashboard/weather',
+    loadComponent: () => import('./features/dashboard/widgets/weather-widget/weather-widget').then(m => m.WeatherWidget)
+  },
+  {
+    path: 'dashboard/pollution-trends',
+    loadComponent: () => import('./features/dashboard/widgets/pollution-trend-widget/pollution-trend-widget').then(m => m.PollutionTrendWidget)
+  },
 
-  { path: 'forum', loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.ForumComponent) },
-  { path: 'forum/thread-detail/:id', loadComponent: () => import('./features/forum/components/thread-detail/thread-detail').then(m => m.ThreadDetailComponent) },
-  { path: 'forum/thread-list', loadComponent: () => import('./features/forum/components/thread-list/thread-list').then(m => m.ThreadListComponent) },
-  { path: 'forum/posts', loadComponent: () => import('./features/forum/components/post/post').then(m => m.PostComponent) },
+  {
+    path: 'forum',
+    loadComponent: () =>
+      import('./features/forum/components/forum/forum')
+        .then(m => m.ForumComponent),
+    children: [
+      {
+        path: '',
+        pathMatch: 'full',
+        loadComponent: () =>
+          import('./features/forum/components/section/section')
+            .then(m => m.SectionComponent),
+      },
+      {
+        path: 'section/:sectionId',
+        loadComponent: () =>
+          import('./features/forum/components/thread-list/thread-list')
+            .then(m => m.ThreadListComponent)
+      },
+      {
+        path: 'section/:sectionId/:threadId',
+        loadComponent: () =>
+          import('./features/forum/components/thread-detail/thread-detail')
+            .then(m => m.ThreadDetailComponent)
+      },
+    ]
+  },
 
-  { path: 'admin/users', loadComponent: () => import('./features/admin/user-management/user-management').then(m => m.UserManagement) },
-  { path: 'admin/moderation', loadComponent: () => import('./features/admin/content-moderation/content-moderation').then(m => m.ContentModeration) },
 
-  { path: '', redirectTo: 'home', pathMatch: 'full' },
-  { path: '**', loadComponent: () => import('./features/not-found/not-found').then(m => m.NotFound) }
+  {
+    path: 'admin/users',
+    loadComponent: () => import('./features/admin/user-management/user-management').then(m => m.UserManagement)
+  },
+  {
+    path: 'admin/moderation',
+    loadComponent: () => import('./features/admin/content-moderation/content-moderation').then(m => m.ContentModeration)
+  },
+
+  {path: '', redirectTo: 'home', pathMatch: 'full'},
+  {path: '**', loadComponent: () => import('./features/not-found/not-found').then(m => m.NotFound)}
 ];

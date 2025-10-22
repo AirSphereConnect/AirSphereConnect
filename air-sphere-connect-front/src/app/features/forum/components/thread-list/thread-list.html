@@ -1,7 +1,21 @@
-<div>
-  @for (thread of threads; track thread.id) {
-    <div (click)="openThread(thread.id)" class="cursor-pointer p-2 border-b">
-      {{ thread.title }} — {{ thread.author }}
-    </div>
+<div class="p-6">
+  <h1 class="text-3xl font-bold mb-6 text-center">Sujets du forum</h1>
+  <a [routerLink]="['/forum']" class="text-blue-600 hover:underline mb-4 inline-block">← Retour à la liste des Sections</a>
+
+  @if (section) {
+    <h2 class="text-2xl font-semibold mb-4">{{ section.title }}</h2>
+    @for (thread of threads; track thread.id) {
+      <div class="thread border p-4 mb-4 rounded">
+        <a [routerLink]="['/forum/section', section.id, thread.id]" class="block">
+          {{ thread.title}}
+          <h2 class="thread-title text-xl font-semibold text-gray-800 dark:text-gray-100 hover:underline">{{ thread.title }}</h2>
+        </a>
+        <p>{{ getPostCount(thread.id) || 0 }} posts</p>
+        <p class="thread-meta">
+          {{ thread.author }}
+          {{ thread.createdAt | date:'short' }}
+        </p>
+      </div>
+    }
   }
 </div>

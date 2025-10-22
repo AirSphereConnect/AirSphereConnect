@@ -1,26 +1,23 @@
-<div class="p-6 min-h-screen">
-  <button
-    (click)="goBack()"
-    class="mb-4 px-4 py-2 bg-gray-300 hover:bg-gray-400 rounded">
-    ← Retour à la liste
-  </button>
-  @if (thread) {
-    <h1 class="text-2xl font-bold mb-4">{{ thread.title }}</h1>
-    <p class="text-sm text-gray-500 mb-6">Par {{ thread.author }}</p>
+<div class="p-6">
+  <a [routerLink]="['/forum/section', sectionId()]" class="text-blue-600 hover:underline mb-4 inline-block">← Retour à la liste des Threads</a>
 
-    @if (posts.length > 0) {
-      @for (post of posts; track post.id) {
-        <div class="p-4 rounded-lg shadow mb-4">
-          <p class="text-sm text-gray-500 mb-1">
-            {{ post.user }} — {{ post.createdAt | date:'short' }}
-          </p>
-          <p class="text-gray-800">{{ post.content }}</p>
+  @let currentThread = thread();
+  @if (currentThread) {
+    <h1 class="text-2xl font-bold mb-4">{{ currentThread.title }}</h1>
+    <p class="text-gray-600">Auteur: {{ currentThread.author }}</p>
+    <p class="text-gray-600">Créé le: {{ currentThread.createdAt | date:'short' }}</p>
+    <div class="mt-4">
+      <h2 class="text-xl font-semibold">Posts</h2>
+      @for (post of posts(); track post.id) {
+        <div class="border p-4 my-2 rounded">
+          <p>{{ post.content }}</p>
+          <p class="text-sm text-gray-500">Par {{ post.user }} le {{ post.createdAt | date:'short' }}</p>
         </div>
+      } @empty {
+        <p>Aucun post pour ce thread.</p>
       }
-    } @else {
-      <p class="text-gray-500 italic">Aucun post pour le moment.</p>
-    }
+    </div>
   } @else {
-    <p class="text-center text-gray-500">Thread introuvable.</p>
+    <p>Thread introuvable.</p>
   }
 </div>
