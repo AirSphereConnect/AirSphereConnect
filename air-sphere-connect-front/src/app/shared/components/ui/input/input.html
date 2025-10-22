@@ -1,0 +1,24 @@
+<div class="form-control w-full">
+  <label class="label">
+    <span class="label-text">{{ label }}</span>
+  </label>
+  <input
+    [type]="type"
+    [placeholder]="placeholder"
+    [formControl]="control"
+    class="input input-bordered w-full {{ isInvalid ? 'input-error' : '' }}"
+  />
+  @if (isInvalid) {
+    <div class="label">
+      @if (control.errors?.['required']) {
+        <span class="label-text-alt text-error">Ce champ est requis.</span>
+      }
+      @if (control.errors?.['email']) {
+        <span class="label-text-alt text-error">Email invalide.</span>
+      }
+    </div>
+  }
+</div>
+
+
+
