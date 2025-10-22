@@ -13,11 +13,13 @@ export class ThreadService {
   private postService = inject(PostService);
 
   private threads: Thread[] = [
-    { id: 1, title: 'bonjour eco', author: 'admin' },
-    { id: 2, title: 'projet', author: 'cyril' },
-    { id: 3, title: 'Vive le vert', author: 'Greta' },
+    { id: 1, title: 'Thread bonjour eco', author: 'admin', createdAt: new Date(), sectionId:1 },
+    { id: 2, title: 'Thread vive l\' eco', author: 'Nuno', createdAt: new Date(), sectionId:1 },
+    { id: 3, title: 'Thread vive Montpellier tout vert', author: 'Sandrine', createdAt: new Date(), sectionId: 1 },
+    { id: 4, title: 'Thread projet', author: 'cyril',  createdAt: new Date(), sectionId: 2 },
+    { id: 5, title: 'Thread Vive la pluie', author: 'Guest',  createdAt: new Date(), sectionId: 2 },
+    { id: 6, title: 'Thread Vive le vert', author: 'Greta',  createdAt: new Date(), sectionId: 3 },
   ]
-
 
 
   getAllThreads() {
@@ -30,9 +32,5 @@ export class ThreadService {
    // return this.http.get<Thread>(`${this.apiUrl}/${id}`);
     return this.threads.find(thread => thread.id === id);
   }
-
-
-
-
 
 }

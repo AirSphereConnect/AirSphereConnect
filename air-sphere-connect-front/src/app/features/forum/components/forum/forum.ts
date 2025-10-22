@@ -1,8 +1,11 @@
 import { Component } from '@angular/core';
+import {RouterOutlet} from '@angular/router';
 
 @Component({
   selector: 'app-forum',
-  imports: [],
+  imports: [
+    RouterOutlet
+  ],
   templateUrl: './forum.html',
   styleUrls: ['./forum.scss']
 })

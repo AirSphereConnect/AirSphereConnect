@@ -39,6 +39,39 @@ export class PostService {
       content: 'Ultime post',
       createdAt: new Date(),
       threadId: 3
+    },{
+      id: 6,
+      user: 'Cyril',
+      content: '5eme !',
+      createdAt: new Date(),
+      threadId: 4
+    },
+    {
+      id: 7,
+      user: 'Bob',
+      content: '6eme !',
+      createdAt: new Date(),
+      threadId: 5
+    },{
+      id: 8,
+      user: 'Sandrine',
+      content: 'Ouai !',
+      createdAt: new Date(),
+      threadId: 6
+    },
+    {
+      id: 9,
+      user: 'Nuno',
+      content: 'Post igjzipgf',
+      createdAt: new Date(),
+      threadId: 6
+    },
+    {
+      id: 10,
+      user: 'Pierre',
+      content: 'Ultime post 2',
+      createdAt: new Date(),
+      threadId: 4
     },
   ];
 
@@ -46,8 +79,12 @@ export class PostService {
     return this.posts;
   }
 
-  getPostByThreadId(threadId: number) {
+  getPostByThreadId(threadId: number): Post[] {
     return this.posts.filter(post => post.threadId === threadId);
+  }
+
+  getPostCountByThreadId(threadId: number): number {
+    return this.getPostByThreadId(threadId).length;
   }
 
   addPost(threadId: number, user: string, content: string) {
