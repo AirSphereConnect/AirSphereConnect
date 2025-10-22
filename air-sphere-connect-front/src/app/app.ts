@@ -10,33 +10,23 @@ import {Footer} from './shared/components/layout/footer/footer/footer';
 @Component({
   selector: 'app-root',
   imports: [RouterOutlet, Header, Footer],
-  standalone: true,
   templateUrl: './app.html',
-  styleUrls: ['./app.scss']
+  styleUrls: ['./app.scss'],
+  providers: [
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+  ]
 })
 
 
-export class App implements OnInit {
+export class App {
   protected readonly title = signal('AirSphereConnect');
 
-  private readonly themeService = inject(ThemeService);
-
   userRole = signal<string | null>(null);
-
-  readonly isDarkTheme = this.themeService.isDarkMode;
 
   constructor(private userService: UserService) {
     this.userService.fetchUserProfile();
     this.userService.userProfile$.subscribe(profile => {
       this.userRole.set(profile?.role ?? 'GUEST');
     });
-  }
-
-  ngOnInit() {
-    this.themeService.watchSystemTheme();
-  }
-
-  toggleTheme() {
-    this.themeService.toggleTheme();
   }
 }

@@ -1,27 +1,66 @@
-<nav class="min-w-[150px] flex gap-x-1">
-  <app-button [ngClass]="chooseOpacity()"  color="primary" (click)="goToHome()" ariaLabel="Page d'accueil">
+<div role="tablist" class="tabs tabs-box min-w-[150px] flex gap-x-1">
+  <a
+    routerLink="/home"
+    routerLinkActive="tab-active tab-active-primary"
+    role="tab"
+    class="tab"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
     Page d'accueil
-  </app-button>
-  <app-button [ngClass]="chooseOpacity()" color="primary" (click)="goToForum()" ariaLabel="Forum">
+  </a>
+
+  <a
+    routerLink="/forum"
+    routerLinkActive="tab-active tab-active-primary"
+    role="tab"
+    class="tab"
+  >
     Forum
-  </app-button>
+  </a>
 
   @if (userRole === 'GUEST') {
-    <app-button color="primary" (click)="goToLogin()" ariaLabel="Se connecter">
+    <a
+      routerLink="/auth/login"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
       Se connecter
-    </app-button>
-    <app-button color="primary" (click)="goToRegister()" ariaLabel="Créer un compte">
+    </a>
+
+    <a
+      routerLink="/auth/register"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
       Créer un compte
-    </app-button>
+    </a>
   } @else if (userRole === 'USER') {
-    <app-button color="primary" (click)="goToDashBoard()" ariaLabel="Données climatiques">
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
       Données climatiques
-    </app-button>
-    <app-button class="opacity-75" color="neutral" (click)="goToProfile()" ariaLabel="Mon compte">
+    </a>
+
+    <a
+      routerLink="/auth/profile"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
       Mon compte
-    </app-button>
-    <app-button class="opacity-75" color="warning" (click)="logout()" ariaLabel="Déconnexion">
+    </a>
+
+    <a
+      (click)="logout()"
+      role="tab"
+      class="tab"
+    >
       Déconnexion
-    </app-button>
+    </a>
   }
-</nav>
+</div>
