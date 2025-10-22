@@ -1,55 +1,28 @@
 import {Component, Input, OnInit} from '@angular/core';
-import {ButtonComponent} from '../button/button';
 import {NavigationService} from '../../../services/navigation-service';
-import {NgClass} from '@angular/common';
+import {RouterLink, RouterLinkActive} from '@angular/router';
 
 @Component({
   selector: 'app-navbar',
   imports: [
-    ButtonComponent,
-    NgClass
+    RouterLink,
+    RouterLinkActive
   ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.scss'
 })
 export class Navbar {
   @Input() userRole!: string | null;
+  activeTab: string = 'home';
 
   constructor(private navigationService: NavigationService) {}
 
+  setActive(tab: string) {
+    this.activeTab = tab;
+  }
+
   logout() {
+    this.setActive('home');
     this.navigationService.logout();
-  }
-
-  goToLogin() {
-    this.navigationService.goToLogin();
-  }
-
-  goToHome() {
-    this.navigationService.goToHome();
-  }
-
-  goToProfile() {
-    this.navigationService.goToProfile();
-  }
-
-  goToRegister() {
-    this.navigationService.goToRegister();
-  }
-
-  goToForum() {
-    this.navigationService.goToForum();
-  }
-
-  goToDashBoard() {
-    this.navigationService.goToDashBoard();
-  }
-
-  chooseOpacity(): string{
-    if (this.userRole === 'GUEST') {
-      return "opacity-50"
-    } else {
-      return "opacity-100"
-    }
   }
 }
