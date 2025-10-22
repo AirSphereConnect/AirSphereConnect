@@ -1,17 +1,16 @@
-import { Component, signal } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { UserService } from './shared/services/UserService';
-import { UserService } from './shared/services/user-service';
-import {Component, signal, inject, OnInit} from '@angular/core';
-import { ThemeService} from './core/services/theme';
+import {Router, RouterOutlet} from '@angular/router';
+import {UserService} from './shared/services/user-service';
+import {Component, signal, inject, OnInit, NgModule} from '@angular/core';
+import {ThemeService} from './core/services/theme';
 import {Header} from './shared/components/layout/header/header';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AuthInterceptor} from './core/interceptors/auth-interceptor';
+import {Footer} from './shared/components/layout/footer/footer/footer';
 
 @Component({
   selector: 'app-root',
+  imports: [RouterOutlet, Header, Footer],
   standalone: true,
-  imports: [RouterOutlet, Header],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
@@ -28,8 +27,6 @@ export class App implements OnInit {
 
   constructor(private userService: UserService) {
     this.userService.fetchUserProfile();
-
-
     this.userService.userProfile$.subscribe(profile => {
       this.userRole.set(profile?.role ?? 'GUEST');
     });
