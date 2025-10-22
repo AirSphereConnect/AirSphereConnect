@@ -5,10 +5,11 @@ import {ThemeService} from './core/services/theme';
 import {Header} from './shared/components/layout/header/header';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AuthInterceptor} from './core/interceptors/auth-interceptor';
+import {Footer} from './shared/components/layout/footer/footer/footer';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header],
+  imports: [RouterOutlet, Header, Footer],
   templateUrl: './app.html',
   styleUrls: ['./app.scss']
 })
