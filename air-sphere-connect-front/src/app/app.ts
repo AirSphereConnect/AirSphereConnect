@@ -29,4 +29,5 @@ export class App {
       this.userRole.set(profile?.role ?? 'GUEST');
     });
   }
+
 }
