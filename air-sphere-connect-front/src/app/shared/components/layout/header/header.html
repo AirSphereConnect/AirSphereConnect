@@ -3,15 +3,15 @@
   <div class="flex flex-row gap-2 items-center">
     <app-navbar [userRole]="userRole"></app-navbar>
     <div class="tabs tabs-box">
-      <button class="btn btn-ghost" (click)="toggleTheme()">
-        <img
-          [ngSrc]="isDarkTheme() ? 'icons/Soleil.png' : 'icons/Lune-croissante-noire.png'"
-          alt="Theme icon"
-          width="20"
-        />
-        <span>{{ isDarkTheme() ? 'Light' : 'Dark' }}</span>
 
-      </button>
+      <app-button variant="ghost" shape="circle" (click)="toggleTheme()">
+        <app-icon
+          [name]="isDarkTheme() ? 'sun' : 'darkMoon'"
+          color="current"
+          size="md"
+        />
+      </app-button>
+
     </div>
   </div>
 </div>
