@@ -11,23 +11,17 @@
             type="text"
             [control]="usernameControl"
             [required]="true"
-            iconLeft="user"
             placeholder="Entrez votre nom d'utilisateur"
             autocomplete="username"
-            fieldName="username"
           ></app-input>
 
           <app-input
             label="Mot de passe"
-            [type]="passwordType()"
+            type="password"
             [control]="passwordControl"
             [required]="true"
-            iconLeft="lockClosed"
-            [iconRight]="passwordIcon()"
-            (iconRightClick)="togglePasswordVisibility()"
             placeholder="••••••••"
             autocomplete="current-password"
-            fieldName="password"
           ></app-input>
 
           @if (errorMessage()) {
@@ -50,7 +44,7 @@
         </form>
 
         <div class="divider">OU</div>
-        <a routerLink="/auth/register" class="btn btn-outline btn-info btn-block">
+        <a routerLink="/auth/register" class="btn btn-outline btn-info  btn-block">
           Créer un compte
         </a>
 
