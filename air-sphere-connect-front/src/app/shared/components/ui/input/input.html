@@ -9,6 +9,7 @@
   </label>
 
   <div [class]="inputWrapperClass()">
+    <!-- Icône gauche -->
     @if (iconLeft) {
       <div [class]="iconLeftWrapperClass()">
         <app-icon
@@ -31,7 +32,6 @@
       [class]="inputClass()"
       [attr.autocomplete]="autocomplete"
       [readonly]="readonly"
-      [attr.maxlength]="maxLength()"
       [class.pointer-events-none]="readonly"
       [class.cursor-not-allowed]="readonly"
       [class.bg-base-200]="readonly"
@@ -53,6 +53,7 @@
     }
   </div>
 
+  <!-- Messages et compteur -->
   <div class="flex justify-between items-start gap-2 mt-1">
     <div class="flex-1">
       <!-- Message d'erreur - ✅ Utilise errorTextClass() -->
@@ -89,9 +90,9 @@
         <span
           [class]="characterCountClass()"
           class="flex-shrink-0"
-          [class.text-error]="characterCount() > maxLength!"
-          [class.text-base-content]="characterCount() <= maxLength!"
-        [class.font-bold]="characterCount() > maxLength!"
+          [class.text-error]="characterCount() > maxLength()!"
+          [class.text-base-content]="characterCount() <= maxLength()!"
+        [class.font-bold]="characterCount() > maxLength()!"
         >
         {{ characterCount() }}/{{ maxLength() }}
         </span>
