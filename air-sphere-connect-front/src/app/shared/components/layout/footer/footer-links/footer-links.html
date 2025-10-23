@@ -1,0 +1,13 @@
+<div>
+  <h3 class="text-lg font-semibold mb-4">Liens utiles</h3>
+  <ul class="space-y-2 text-sm">
+    <li><a routerLink="/home" class="hover:underline">Accueil</a></li>
+    <li><a routerLink="/forum" class="hover:underline">Forum</a></li>
+    @if (userRole === 'GUEST') {
+      <li><a routerLink="/auth/login" class="hover:underline">Connexion</a></li>
+    } @else if (userRole === 'USER') {
+      <li><a routerLink="/home" (click)="logout()" class="hover:underline">Déconnexion</a></li>
+      <li><a routerLink="/dashboard" class="hover:underline">Données climatiques</a></li>
+    }
+  </ul>
+</div>

@@ -1,36 +1,32 @@
-import { Component, Input } from '@angular/core';
-import { Router } from '@angular/router';
-import {UserService} from '../../../services/UserService';
+import {Component, inject, Input, OnInit, signal} from '@angular/core';
+import { Navbar } from '../../ui/navbar/navbar';
+import { NgOptimizedImage } from '@angular/common';
+import {Logo} from '../../ui/logo/logo';
+import {ThemeService} from '../../../../core/services/theme';
 
 @Component({
   selector: 'app-header',
+  standalone: true, // ⚠️ important si tu veux importer des composants directement
   templateUrl: './header.html',
-  styleUrls: ['./header.scss']
+  styleUrls: ['./header.scss'],
+  imports: [
+    Navbar,
+    Logo,
+    NgOptimizedImage
+  ]
 })
-export class Header {
+export class Header implements OnInit {
   @Input() userRole: string | null = null;
 
-  constructor(private userService: UserService, private router: Router) {}
+  private readonly themeService = inject(ThemeService);
 
-  logout() {
-    this.userService.logout().subscribe(() => {
-      this.router.navigate(['/home']);
-    });
+  readonly isDarkTheme = this.themeService.isDarkMode;
+
+  ngOnInit() {
+    this.themeService.watchSystemTheme();
   }
 
-  goToLogin() {
-    this.router.navigate(['/auth/login']);
-  }
-
-  goToHome() {
-    this.router.navigate(['/home']);
-  }
-
-  goToProfile() {
-    this.router.navigate(['/auth/profile']);
-  }
-
-  goToRegister() {
-    this.router.navigate(['/auth/register']);
+  toggleTheme() {
+    this.themeService.toggleTheme();
   }
 }
