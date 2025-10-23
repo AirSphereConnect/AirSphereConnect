@@ -1,11 +1,10 @@
-
-import {Component, Input, computed, inject} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { buttonVariants, type ButtonVariants } from '../../../variants/button.variants';
+import {Component, Input, computed, inject, Output, EventEmitter, input, ChangeDetectorRef} from '@angular/core';
+import {CommonModule} from '@angular/common';
+import {buttonVariants, type ButtonVariants} from '../../../variants/button.variants';
 import {type HeroIconName} from '../../../icons/heroicons.registry';
 import {IconVariants, iconVariants} from '../../../variants/icon.variants';
 import {IconService} from '../../../services/icon';
-import { DomSanitizer } from '@angular/platform-browser';
+import {DomSanitizer} from '@angular/platform-browser';
 
 
 @Component({
@@ -14,10 +13,11 @@ import { DomSanitizer } from '@angular/platform-browser';
   imports: [CommonModule],
   template: `
     <button
-      [ngClass]="buttonClasses ()"
+      [ngClass]="buttonClasses()"
       [disabled]="disabled || loading"
-      [attr.type]="type"
+      [type]="type"
       [attr.aria-label]="ariaLabel"
+      (click)="handleClick($event)"
     >
       @if (loading) {
         <span class="loading loading-spinner"></span>
@@ -40,12 +40,15 @@ import { DomSanitizer } from '@angular/platform-browser';
       }
     </button>
   `,
-  styles: [':host']
+  styles: [`
+    :host {
+      display: inline-block;
+    }
+  `]
 })
-export class ButtonComponent {
+export class Button {
   private iconService = inject(IconService);
   private sanitizer = inject(DomSanitizer);
-
 
   @Input() color: ButtonVariants['color'] = 'primary';
   @Input() size: ButtonVariants['size'] = 'md';
@@ -62,10 +65,12 @@ export class ButtonComponent {
   @Input() icon?: string;
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() iconColor?: IconVariants['color'];
+
   @Input() ariaLabel?: string;
+  @Output() click = new EventEmitter<MouseEvent>();
 
 
-  buttonClasses  = computed(() => {
+  buttonClasses = computed(() => {
     return buttonVariants({
       color: this.color,
       size: this.size,
@@ -73,14 +78,14 @@ export class ButtonComponent {
       fullWidth: this.fullWidth,
       shape: this.shape,
       wide: this.wide,
-      disabled: this.disabled,
+      //isDisabled: this.disabled || this.loading,
       class: this.class
     });
   });
 
   iconHtml = computed(() => {
     if (this.heroIcon) {
-      const sizeClasses  = iconVariants({
+      const sizeClasses = iconVariants({
         size: this.size,
         color: 'current'
       });
@@ -96,5 +101,16 @@ export class ButtonComponent {
     const colorClass = this.iconColor ? `text-${this.iconColor}` : 'text-current';
     return `flex-shrink-0 ${colorClass}`;
   });
+
+
+
+  handleClick(event: MouseEvent): void {
+
+    if (!this.disabled && !this.loading) {
+      this.click.emit(event);
+    }
+
+    console.log(event)
+  }
 
 }

@@ -1,87 +1,159 @@
-<!-- register.html -->
-<div class="register-container">
+<div class="flex items-center justify-center p-4 bg-base-200">
+  <div class="w-full max-w-md">
 
-  <!-- === ÉTAPE 1 === -->
-  @if (step === 1) {
-    <form [formGroup]="registerFirstForm" (ngSubmit)="onFirstSubmit()">
+    @if (step() === 1) {
+      <div class="card bg-base-100 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title text-primary/90 text-2xl font-bold mb-16">Créer un compte</h2>
 
-      <app-input-field
-        label="Nom d'utilisateur"
-        [control]="usernameControl"
-        placeholder="Entrez votre nom d'utilisateur">
-      </app-input-field>
+          <form [formGroup]="registerFirstForm" (ngSubmit)="onFirstSubmit()" class="flex flex-col gap-6">
 
-      <app-input-field
-        label="Email"
-        [control]="emailControl"
-        placeholder="exemple@exemple.com">
-      </app-input-field>
+            <app-input
+              label="Nom d'utilisateur"
+              type="text"
+              [control]="usernameControl"
+              [required]="true"
+              iconLeft="user"
+              placeholder="Entrez votre nom d'utilisateur"
+              autocomplete="username"
+            ></app-input>
 
-      <app-password-field
-        label="Mot de passe"
-        [control]="passwordControl"
-        placeholder="Entrez votre mot de passe">
-      </app-password-field>
+            <app-input
+              label="Email"
+              type="email"
+              [control]="emailControl"
+              [required]="true"
+              iconLeft="envelope"
+              placeholder="exemple@exemple.com"
+              autocomplete="email"
+            ></app-input>
 
-      @if (errorMessage) {
-        <div class="error-message">
-          {{ errorMessage }}
+            <app-input
+              label="Mot de passe"
+              [type]="passwordType()"
+              [control]="passwordControl"
+              [required]="true"
+              iconLeft="lockClosed"
+              [iconRight]="passwordIcon()"
+              (iconRightClick)="togglePasswordVisibility()"
+              placeholder="••••••••"
+              autocomplete="new-password"
+            ></app-input>
+
+            @if (errorMessage()) {
+              <div class="alert alert-error">
+                <app-icon name="exclamationTriangle" size="md" color="current" />
+                <span>{{ errorMessage() }}</span>
+                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (click)="clearError()" heroIcon="xMark"></app-button>
+              </div>
+            }
+
+            <app-button
+              type="submit"
+              [fullWidth]="true"
+              [disabled]="!canSubmitStep1() || isLoadingStep1()"
+            >
+              @if (isLoadingStep1()) {
+                <span class="loading loading-spinner"></span>
+              }
+              {{ isLoadingStep1() ? 'Vérification...' : 'Continuer' }}
+            </app-button>
+            <div class="divider">OU</div>
+            <a routerLink="/auth/login" class="btn btn-outline btn-info btn-block">
+              Se connecter
+            </a>
+          </form>
         </div>
-      }
-
-      <button mat-raised-button color="primary" type="submit" [disabled]="registerFirstForm.invalid">
-        Continuer
-      </button>
-    </form>
-  }
-
-  @if (step === 2) {
-    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-
-      <app-input-field
-        label="Adresse"
-        [control]="addressControl"
-        placeholder="Entrez votre adresse">
-      </app-input-field>
-
-      <app-input-field
-        label="Ville"
-        [control]="cityNameControl"
-        placeholder="Entrez le nom de votre ville"
-        (input)="onCityInput($event)">
-      </app-input-field>
-
-      <!-- Suggestions de villes -->
-      @if (citySuggestions.length) {
-        <ul class="suggestions">
-          @for (city of citySuggestions; track city) {
-            <li (click)="selectCity(city)">
-              {{ city.name }} ({{ city.postalCode }})
-            </li>
-          }
-        </ul>
-      }
-
-      <app-input-field
-        label="Code postal"
-        [control]="cityCodeControl"
-        placeholder="Code postal">
-      </app-input-field>
-
-      @if (errorMessage) {
-        <div class="error-message">
-          {{ errorMessage }}
-        </div>
-      }
-
-      <div class="actions">
-        <button mat-button type="button" (click)="step = 1">Retour</button>
-        <button mat-raised-button color="primary" type="submit" [disabled]="registerForm.invalid">
-          Créer le compte
-        </button>
       </div>
-    </form>
-  }
+    }
+
+    @if (step() === 2) {
+      <div class="card bg-base-100 shadow-xl">
+        <div class="card-body">
+          <h2 class="card-title text-primary/90 text-2xl font-bold mb-16">Informations d'adresse</h2>
+
+          <form [formGroup]="registerForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-8">
+            <app-input
+              label="Adresse"
+              type="text"
+              [control]="addressControl"
+              [required]="true"
+              placeholder="Entrez votre adresse"
+              autocomplete="street-address"
+            ></app-input>
+
+            <app-input
+              label="Ville"
+              type="text"
+              [control]="cityNameControl"
+              [required]="true"
+              placeholder="Entrez le nom de votre ville"
+              autocomplete="address-level2"
+              (input)="onCityInput($event)"
+            ></app-input>
+
+            <!-- Suggestions de villes -->
+            @if (citySuggestions.length) {
+              <ul class="menu bg-base-100 w-full rounded-box">
+                @for (city of citySuggestions; track city) {
+                  <li>
+                    <a (click)="selectCity(city)">
+                      {{ city.name }} ({{ city.postalCode }})
+                    </a>
+                  </li>
+                }
+              </ul>
+            }
+
+            <app-input
+              label="Code postal"
+              type="text"
+              [control]="cityCodeControl"
+              placeholder="Code postal"
+              autocomplete="postal-code"
+              [readonly]="true"
+            ></app-input>
+
+            @if (errorMessage()) {
+              <div class="alert alert-error">
+                <app-icon name="exclamationTriangle" size="md" color="current" />
+                <span>{{ errorMessage() }}</span>
+                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (click)="clearError()" heroIcon="xMark"></app-button>
+              </div>
+            }
 
 
+            <div class="actions w-100 flex gap-4">
+              <app-button
+                type="button"
+                variant="outline"
+                [wide]="true"
+                color="info"
+                (click)="goBackToStep1()"
+                class="flex-1"
+                [disabled]="isLoadingStep2()"
+              >
+                Retour
+              </app-button>
+
+              <app-button
+                type="submit"
+                [wide]="true"
+                color="primary"
+                [disabled]="!canSubmitStep2() || isLoadingStep2()"
+                class="flex-1"
+              >
+                @if (isLoadingStep2()) {
+                  <span class="loading loading-spinner"></span>
+                }
+                {{ isLoadingStep2() ? 'Inscription...' : 'Inscription' }}
+              </app-button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    }
+
+  </div>
 </div>
