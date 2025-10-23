@@ -1,7 +1,7 @@
 import { Component, OnInit, signal, computed } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
-import { UserService } from '../../../shared/services/UserService';
+import { UserService } from '../../../shared/services/user-service';
 import { CommonModule } from '@angular/common';
 import {InputComponent} from '../../../shared/components/ui/input/input';
 import {Button} from '../../../shared/components/ui/button/button';
