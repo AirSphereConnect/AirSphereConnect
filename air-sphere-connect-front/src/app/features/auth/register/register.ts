@@ -1,9 +1,9 @@
 import {Component, computed, OnInit, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
-import {UserService} from '../../../shared/services/UserService';
+import {UserService} from '../../../shared/services/user-service';
 import {Router, RouterLink} from '@angular/router';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs';
-import {CityService} from '../../../shared/services/CityService';
+import {CityService} from '../../../shared/services/city-service';
 import {InputComponent} from '../../../shared/components/ui/input/input';
 import {Button} from '../../../shared/components/ui/button/button';
 import {IconComponent} from '../../../shared/components/ui/icon/icon';
