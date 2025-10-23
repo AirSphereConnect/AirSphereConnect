@@ -37,7 +37,6 @@ export class UserService {
     this._userProfileSubject.next(profile);
   }
 
-
   // L'authentification
   login(credentials: { username: string; password: string }): Observable<UserProfileResponse> {
     return new Observable(observer => {
@@ -80,7 +79,13 @@ export class UserService {
     );
   }
 
+  //Ajout nouveau user
   register(userData: any) {
     return this.http.post(`${this.apiUrl}/users/signup`, userData, { withCredentials: true });
+  }
+
+  //Mettre à jour les infos de l'user
+  updateUser(userData: any, id: string) {
+    return this.http.put(`${this.apiUrl}/users/${id}`, userData, { withCredentials: true });
   }
 }
