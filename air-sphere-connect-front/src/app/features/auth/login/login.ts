@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import {InputComponent} from '../../../shared/components/ui/input/input';
 import {Button} from '../../../shared/components/ui/button/button';
 import {IconComponent} from '../../../shared/components/ui/icon/icon';
+import {HeroIconName} from '../../../shared/icons/heroicons.registry';
 
 @Component({
   standalone: true,
@@ -27,6 +28,7 @@ export class Login implements OnInit {
   // 🎯 Signals
   errorMessage = signal<string | null>(null);
   isLoading = signal<boolean>(false);
+  passwordVisible = signal(false);
 
   // 🎯 Computed signals
   isFormValid = computed(() => this.loginForm?.valid ?? false);
@@ -43,7 +45,6 @@ export class Login implements OnInit {
       username: ['', [Validators.required]],
       password: ['', [Validators.required]]
     });
-
   }
 
   get usernameControl(): FormControl {
@@ -53,6 +54,13 @@ export class Login implements OnInit {
   get passwordControl(): FormControl {
     return this.loginForm.get('password') as FormControl;
   }
+
+  togglePasswordVisibility() {
+    this.passwordVisible.set(!this.passwordVisible());
+  }
+
+  passwordIcon = computed<HeroIconName>(() => this.passwordVisible() ? 'eyeSlash' : 'eye');
+  passwordType = computed(() => this.passwordVisible() ? 'text' : 'password');
 
   onSubmit() {
     if (this.loginForm.valid && !this.isLoading()) {
@@ -82,7 +90,6 @@ export class Login implements OnInit {
           } else {
             this.errorMessage.set("Une erreur est survenue lors de la connexion.");
           }
-
         }
       });
     }
