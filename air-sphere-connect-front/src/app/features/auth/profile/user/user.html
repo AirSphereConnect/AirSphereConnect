@@ -1,0 +1,50 @@
+<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4" style="width: 100%;">
+  @if (user) {
+    <div class="flex flex-content">
+      <div class="flex items-center flex-1">
+        <label for="_username" class="label"><strong>Nom utilisateur</strong></label>
+        <input id="_username" type="text" class="input min-w-min-w-[200px]" placeholder="{{ user.username }}" disabled/>
+      </div>
+
+      <div class="flex items-center flex-1">
+        <label for="emailUser" class="label"><strong>Email</strong></label>
+        <input id="emailUser" type="text" class="input min-w-[200px]" placeholder="{{ user.email }}" disabled/>
+      </div>
+
+      <div class="flex items-center flex-1">
+        <label for="role" class="label"><strong>Rôle</strong></label>
+        <input id="role" type="text" class="input min-w-[200px]" placeholder="{{ user.role }}" disabled/>
+      </div>
+    </div>
+
+    @if (user.address) {
+      <div class="flex flex-content">
+        <div class="flex flex-content flex-1">
+          <label for="address" class="label"><strong>Adresse</strong></label>
+          <input id="address" type="text" class="input" placeholder="{{ user.address.street }}" disabled/>
+        </div>
+
+        <div class="flex flex-content flex-1">
+          <label for="cityName" class="label"><strong>Ville</strong></label>
+          <input id="cityName" type="text" class="input" placeholder="{{ user.address.city.name }}" disabled/>
+        </div>
+
+        <div class="flex flex-content flex-1">
+          <label for="Postalcode" class="label"><strong>Code postal</strong></label>
+          <input id="Postalcode" type="text" class="input" placeholder="{{ user.address.city.postalCode }}" disabled/>
+        </div>
+      </div>
+    }
+
+  }
+</fieldset>
+<app-button
+  color="primary"
+  size="md"
+  variant="solid"
+  [disabled]="false"
+  (click)="onEditUser()"
+  ariaLabel="Modifier utilisateur"
+>
+  Modifier
+</app-button>
