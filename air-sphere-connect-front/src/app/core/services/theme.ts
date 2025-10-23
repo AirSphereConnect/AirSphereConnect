@@ -1,59 +1,44 @@
-// src/app/core/services/theme.service.ts
-import { Injectable, signal, effect } from '@angular/core';
+import { Injectable, signal, computed, effect } from '@angular/core';
 
 export type Theme = 'airsphere' | 'airspheredark';
 
-@Injectable({
-  providedIn: 'root'
-})
-
+@Injectable({ providedIn: 'root' })
 export class ThemeService {
+  private readonly STORAGE_KEY = 'airsphere-theme';
   private readonly themeSignal = signal<Theme>('airsphere');
 
-  readonly isDarkMode = signal(false);
-
   readonly currentTheme = this.themeSignal.asReadonly();
-
-  private readonly STORAGE_KEY = 'airsphere-theme';
+  readonly isDarkMode = computed(() => this.themeSignal() === 'airspheredark');
 
   constructor() {
     this.initializeTheme();
 
+    // 🔥 Effect qui s'exécute à chaque changement de thème
     effect(() => {
       const theme = this.themeSignal();
       this.applyTheme(theme);
-      this.isDarkMode.set(theme === 'airspheredark');
     });
   }
 
   private initializeTheme(): void {
     const savedTheme = this.getStoredTheme();
-
-    if (savedTheme) {
-      this.themeSignal.set(savedTheme);
-      return;
-    }
-
-    this.themeSignal.set('airsphere');
-
-    // const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    // this.themeSignal.set(prefersDark ? 'airspheredark' : 'airsphere');
+    const initialTheme = savedTheme ?? 'airsphere';
+    this.themeSignal.set(initialTheme);
   }
-
 
   private applyTheme(theme: Theme): void {
     document.documentElement.setAttribute('data-theme', theme);
-
     this.saveTheme(theme);
 
-    console.log(`🎨 Thème appliqué: ${theme}`);
+    // 🔥 Vérification que l'attribut est bien appliqué
+    const appliedTheme = document.documentElement.getAttribute('data-theme');
   }
 
   private saveTheme(theme: Theme): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, theme);
     } catch (error) {
-      console.error('Erreur lors de la sauvegarde du thème:', error);
+      console.error('❌ Erreur lors de la sauvegarde du thème:', error);
     }
   }
 
@@ -61,39 +46,18 @@ export class ThemeService {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
       return stored === 'airsphere' || stored === 'airspheredark' ? stored : null;
-    } catch (error) {
-      console.error('Erreur lors de la lecture du thème:', error);
+    } catch {
       return null;
     }
   }
 
   toggleTheme(): void {
-    const newTheme: Theme = this.isDarkMode() ? 'airsphere' : 'airspheredark';
-    this.themeSignal.set(newTheme);
+    const current = this.themeSignal();
+    const next: Theme = current === 'airsphere' ? 'airspheredark' : 'airsphere';
+    this.themeSignal.set(next);
   }
 
   setTheme(theme: Theme): void {
     this.themeSignal.set(theme);
-  }
-
-  setLightMode(): void {
-    this.setTheme('airsphere');
-  }
-
-
-  setDarkMode(): void {
-    this.setTheme('airspheredark');
-  }
-
-
-  watchSystemTheme(): void {
-    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-
-    mediaQuery.addEventListener('change', (e) => {
-      // Ne changer que si l'utilisateur n'a pas de préférence sauvegardée
-      if (!this.getStoredTheme()) {
-        this.themeSignal.set(e.matches ? 'airspheredark' : 'airsphere');
-      }
-    });
   }
 }
