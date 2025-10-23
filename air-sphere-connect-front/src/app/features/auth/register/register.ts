@@ -1,29 +1,22 @@
 import {Component, computed, OnInit, signal} from '@angular/core';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators
-} from '@angular/forms';
-import {UserService} from '../../../shared/services/user-service';
+import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {UserService} from '../../../shared/services/UserService';
 import {Router, RouterLink} from '@angular/router';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs';
-import {CityService} from '../../../shared/services/city-service';
+import {CityService} from '../../../shared/services/CityService';
 import {InputComponent} from '../../../shared/components/ui/input/input';
 import {Button} from '../../../shared/components/ui/button/button';
 import {IconComponent} from '../../../shared/components/ui/icon/icon';
+import {AsyncPipe} from '@angular/common';
 import {HeroIconName} from '../../../shared/icons/heroicons.registry';
 
 @Component({
   selector: 'app-register',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     InputComponent,
     Button,
+    InputComponent,
     RouterLink,
     IconComponent,
   ],
@@ -31,7 +24,7 @@ import {HeroIconName} from '../../../shared/icons/heroicons.registry';
   styleUrls: ['./register.scss']
 })
 export class Register implements OnInit {
-  step = signal<number>(1);
+  step = signal<number>(1); // 🎯 Converti en signal
   registerForm!: FormGroup;
   registerFirstForm!: FormGroup;
   citySuggestions: any[] = [];
@@ -41,9 +34,12 @@ export class Register implements OnInit {
   errorMessage = signal<string | null>(null);
   isLoadingStep1 = signal<boolean>(false);
   isLoadingStep2 = signal<boolean>(false);
+  showPassword = signal<boolean>(false);
 
   passwordVisible = signal(false);
 
+
+  // 🎯 Computed signals pour les validations
   canSubmitStep1 = signal<boolean>(false);
   canSubmitStep2 = signal<boolean>(false);
 
@@ -54,62 +50,11 @@ export class Register implements OnInit {
     private router: Router
   ) {}
 
-  private strictEmailValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return null;
-
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-
-    if (!emailRegex.test(control.value)) {
-      return { invalidEmail: true };
-    }
-
-    const parts = control.value.split('@');
-    if (parts.length !== 2) return { invalidEmail: true };
-
-    const domain = parts[1];
-    if (!domain.includes('.')) return { invalidEmail: true };
-
-    const domainParts = domain.split('.');
-    if (domainParts.some((part: string) => part.length < 2)) {
-      return { invalidEmail: true };
-    }
-
-    return null;
-  }
-
-  private validUsernameValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return null;
-
-    const usernameRegex = /^[a-zA-Z0-9_-]+$/;
-
-    if (!usernameRegex.test(control.value)) {
-      return { invalidUsername: true };
-    }
-
-    return null;
-  }
-
-  private strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) return null;
-
-    const hasUpperCase = /[A-Z]/.test(control.value);
-    const hasLowerCase = /[a-z]/.test(control.value);
-    const hasNumber = /[0-9]/.test(control.value);
-
-    const errors: ValidationErrors = {};
-
-    if (!hasUpperCase) errors['noUpperCase'] = true;
-    if (!hasLowerCase) errors['noLowerCase'] = true;
-    if (!hasNumber) errors['noNumber'] = true;
-
-    return Object.keys(errors).length > 0 ? errors : null;
-  }
-
   ngOnInit() {
     this.registerFirstForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(25), this.validUsernameValidator]],
-      email: ['', [Validators.required, this.strictEmailValidator ]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(25), this.strongPasswordValidator]]
+      username: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
+      email: ['', [Validators.required, Validators.email]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]]
     });
 
     this.registerForm = this.fb.group({
@@ -128,6 +73,7 @@ export class Register implements OnInit {
     });
     this.canSubmitStep2.set(this.registerForm.valid);
 
+    // Recherche de villes
     this.cityNameControl.valueChanges
       .pipe(
         debounceTime(300),
@@ -179,29 +125,21 @@ export class Register implements OnInit {
     this.passwordVisible.set(!this.passwordVisible());
     console.log('Password visible:', this.passwordVisible());
   }
+
   passwordIcon = computed<HeroIconName>(() => this.passwordVisible() ? 'eyeSlash' : 'eye');
   passwordType = computed(() => this.passwordVisible() ? 'text' : 'password');
 
-  // 🔥 Plus besoin de ces computed ! Le service s'en occupe
-  // usernameErrorMessage, emailErrorMessage, passwordErrorMessage, etc. sont supprimés
-
-
   onFirstSubmit() {
-    if (this.registerFirstForm.invalid) {
-      this.registerFirstForm.markAllAsTouched();
-      return;
-    }
+    if (this.registerFirstForm.invalid || this.isLoadingStep1()) return;
 
-    if (this.isLoadingStep1()) return;
-
-    this.isLoadingStep1.set(true);
-    this.errorMessage.set(null);
+    this.isLoadingStep1.set(true); // 🔥 Début du chargement
+    this.errorMessage.set(null);   // 🔥 Réinitialiser l'erreur
 
     const {username, email} = this.registerFirstForm.value;
 
     this.userService.checkAvailability(username, email).subscribe({
       next: (res) => {
-        this.isLoadingStep1.set(false);
+        this.isLoadingStep1.set(false); // 🔥 Fin du chargement
 
         if (res.usernameTaken) {
           this.errorMessage.set("Nom d'utilisateur déjà pris.");
@@ -213,7 +151,7 @@ export class Register implements OnInit {
         }
       },
       error: (err) => {
-        this.isLoadingStep1.set(false);
+        this.isLoadingStep1.set(false); // 🔥 Fin du chargement
         console.error('❌ Erreur:', err);
 
         if (err.status === 0) {
@@ -246,12 +184,7 @@ export class Register implements OnInit {
 
 
   onSubmit() {
-    if (this.registerForm.invalid || this.registerFirstForm.invalid) {
-      this.registerForm.markAllAsTouched();
-      return;
-    }
-
-    if (this.isLoadingStep2()) return;
+    if (this.registerForm.invalid || this.registerFirstForm.invalid || this.isLoadingStep2()) return;
 
     this.isLoadingStep2.set(true);
     this.errorMessage.set(null);
@@ -274,23 +207,10 @@ export class Register implements OnInit {
       },
       error: (err) => {
         this.isLoadingStep2.set(false); // 🔥 Fin du chargement
-        if (err.status === 400) {
-          if (err.error?.message?.includes('email')) {
-            this.errorMessage.set("Format d'email invalide.");
-          } else if (err.error?.message?.includes('username')) {
-            this.errorMessage.set("Nom d'utilisateur invalide.");
-          } else {
-            this.errorMessage.set(err.error?.message || "Données invalides.");
-          }
-        } else if (err.status === 409) {
-          this.errorMessage.set("Cet utilisateur existe déjà.");
-        } else {
-          this.errorMessage.set("Erreur lors de l'inscription.");
-        }
+        this.errorMessage.set("Erreur lors de l'inscription.");
       }
     });
   }
-
 
   goBackToStep1() {
     this.step.set(1);
