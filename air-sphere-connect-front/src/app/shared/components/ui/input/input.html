@@ -1,24 +1,102 @@
-<div class="form-control w-full">
-  <label class="label">
-    <span class="label-text">{{ label }}</span>
-  </label>
-  <input
-    [type]="type"
-    [placeholder]="placeholder"
-    [formControl]="control"
-    class="input input-bordered w-full {{ isInvalid ? 'input-error' : '' }}"
-  />
-  @if (isInvalid) {
-    <div class="label">
-      @if (control.errors?.['required']) {
-        <span class="label-text-alt text-error">Ce champ est requis.</span>
+<div [class]="wrapperClass()">
+  <label [class]="labelClass()">
+    <span [class]="labelTextClass()">
+      {{ label }}
+      @if (required) {
+        <span [class]="labelRequiredClass()">*</span>
       }
-      @if (control.errors?.['email']) {
-        <span class="label-text-alt text-error">Email invalide.</span>
+    </span>
+  </label>
+
+  <div [class]="inputWrapperClass()">
+    <!-- Icône gauche -->
+    @if (iconLeft) {
+      <div [class]="iconLeftWrapperClass()">
+        <app-icon
+          [name]="iconLeft"
+          [size]="size === 'xs' ? 'xs' : size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'"
+        />
+      </div>
+    }
+
+    <input
+      [ngClass]="{
+          'pl-16': iconLeft,
+          'pr-8': iconRight,
+          'w-full': true,
+          'input input-bordered': true
+        }"
+      [type]="inputType()"
+      [placeholder]="placeholder"
+      [formControl]="control"
+      [class]="inputClass()"
+      [attr.autocomplete]="autocomplete"
+      [readonly]="readonly"
+      [class.pointer-events-none]="readonly"
+      [class.cursor-not-allowed]="readonly"
+      [class.bg-base-200]="readonly"
+      [class.select-none]="readonly"
+
+    />
+
+    @if (iconRight) {
+      <div
+        [class]="iconRightWrapperClass()"
+        (click)="iconRightClick.emit()"
+        [class.cursor-pointer]="iconRightClick.observed"
+      >
+        <app-icon
+          [name]="iconRight"
+          [size]="size === 'xs' ? 'xs' : size === 'sm' ? 'sm' : size === 'lg' ? 'lg' : 'md'"
+        />
+      </div>
+    }
+  </div>
+
+  <!-- Messages et compteur -->
+  <div class="flex justify-between items-start gap-2 mt-1">
+    <div class="flex-1">
+      <!-- Message d'erreur - ✅ Utilise errorTextClass() -->
+      @if (isInvalid() && errorMessage()) {
+        <div [class]="helperWrapperClass()">
+          <span [class]="errorTextClass()">
+            {{ errorMessage() }}
+          </span>
+        </div>
+      }
+
+      <!-- Message de succès - ✅ Utilise successTextClass() -->
+      @if (isSuccess() && successMessage) {
+        <div [class]="helperWrapperClass()">
+          <span [class]="successTextClass()">
+            {{ successMessage }}
+          </span>
+        </div>
+      }
+
+      <!-- Texte d'aide -->
+      @if (helperText && !isInvalid() && !isSuccess()) {
+        <div [class]="helperWrapperClass()">
+          <span [class]="helperTextClass()">
+            {{ helperText }}
+          </span>
+        </div>
       }
     </div>
-  }
+
+    <!-- Compteur de caractères -->
+    @if (showCharacterCount()) {
+      <div [class]="helperWrapperClass()">
+        <span
+          [class]="characterCountClass()"
+          class="flex-shrink-0"
+          [class.text-error]="characterCount() > maxLength()!"
+          [class.text-base-content]="characterCount() <= maxLength()!"
+        [class.font-bold]="characterCount() > maxLength()!"
+        >
+        {{ characterCount() }}/{{ maxLength() }}
+        </span>
+      </div>
+    }
+  </div>
 </div>
-
-
-
