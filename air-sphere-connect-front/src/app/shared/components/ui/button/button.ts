@@ -78,6 +78,7 @@ export class Button {
       fullWidth: this.fullWidth,
       shape: this.shape,
       wide: this.wide,
+      //isDisabled: this.disabled || this.loading,
       class: this.class
     });
   });
@@ -104,10 +105,12 @@ export class Button {
 
 
   handleClick(event: MouseEvent): void {
-    event.stopPropagation();
+
     if (!this.disabled && !this.loading) {
       this.click.emit(event);
     }
+
+    console.log(event)
   }
 
 }
