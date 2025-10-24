@@ -1,9 +1,11 @@
-import {Component, Input} from '@angular/core';
+import {Component, inject, input, Input, output} from '@angular/core';
 import {DatePipe} from '@angular/common';
-import { Post } from '../../../../core/models/post.model';
+import {Post} from '../../../../core/models/post.model';
+import {PostService} from '../../../../core/services/post.service';
 
 @Component({
   selector: 'app-post',
+  standalone: true,
   imports: [
     DatePipe
   ],
@@ -12,5 +14,13 @@ import { Post } from '../../../../core/models/post.model';
 })
 export class PostComponent {
 
-  @Input() post!: Post;
+  private postService = inject(PostService);
+
+  post = input.required<Post>()
+  onLike = output<number>();
+
+  onLikePost(): void {
+    this.onLike.emit(this.post().id);
+  }
+
 }

@@ -47,6 +47,7 @@
   --color-base-200: oklch(97% 0.001 106.424);    /* BG Body */
   --color-base-300: oklch(92% 0.003 48.717);     /* BG Besoins spécifiques */
   --color-base-content: oklch(21% 0.006 56.043); /* Texte général */
+  --background-overlay: transparent; /*BG pour le Logo*/
 
   /* Radius */
   --radius-box: 0.5rem;       /* Card, modal, alert, form */
@@ -108,6 +109,7 @@
   --color-base-200: oklch(26% 0.007 34.298);    /* BG Body */
   --color-base-300: oklch(37% 0.01 67.558);     /* BG spécifique */
   --color-base-content: oklch(98% 0.001 106.423); /* Texte clair */
+  --background-overlay: oklch(100% 0 75 / 0.2); /*BG pour le Logo*/
 
   /* Radius */
   --radius-box: 0.5rem;

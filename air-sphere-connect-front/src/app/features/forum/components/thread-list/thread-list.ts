@@ -46,5 +46,24 @@ export class ThreadListComponent implements OnInit {
     return this.postService.getPostCountByThreadId(theadId);
   }
 
+  getTotalLikesByThread(threadId: number): number {
+    return this.postService.getPostLikesByThreadId(threadId);
+  }
+
+
+  sortThreads(criteria: string) {
+    switch (criteria) {
+      case 'date':
+        this.threads.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
+        break;
+      case 'popularite':
+        this.threads.sort(
+          (a, b) => this.getTotalLikesByThread(b.id) - this.getTotalLikesByThread(a.id));
+        break;
+    }
+
+  }
 
 }

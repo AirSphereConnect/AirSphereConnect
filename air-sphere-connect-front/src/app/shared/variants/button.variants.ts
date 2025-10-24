@@ -47,10 +47,6 @@ export const buttonVariants = tv({
       square: 'btn-square'
     },
 
-
-    disabled: {
-      true: 'btn-disabled opacity-50'
-    }
   },
 
   compoundVariants: [
@@ -64,7 +60,7 @@ export const buttonVariants = tv({
     shape: 'default',
     fullWidth: false,
     loading: false,
-    disabled: false,
+    //disabled: false,
     wide: false
   }
 });

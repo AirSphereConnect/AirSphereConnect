@@ -26,9 +26,6 @@ export class ThemeService {
     });
   }
 
-  /**
-   * 🎬 Initialiser le thème au chargement
-   */
   private initializeTheme(): void {
     const savedTheme = this.getStoredTheme();
 
@@ -37,30 +34,21 @@ export class ThemeService {
       return;
     }
 
-    this.themeSignal.set('airsphere');  // ← Force toujours light au début
+    this.themeSignal.set('airsphere');
 
-    // ⚠️ Si vous voulez suivre les préférences système, décommentez :
     // const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     // this.themeSignal.set(prefersDark ? 'airspheredark' : 'airsphere');
   }
 
-  /**
-   * 🎨 Appliquer le thème au DOM
-   */
+
   private applyTheme(theme: Theme): void {
-    // Appliquer l'attribut data-theme sur le HTML
     document.documentElement.setAttribute('data-theme', theme);
 
-    // Sauvegarder dans localStorage
     this.saveTheme(theme);
 
-    // Logger pour debug (optionnel)
     console.log(`🎨 Thème appliqué: ${theme}`);
   }
 
-  /**
-   * 💾 Sauvegarder le thème dans localStorage
-   */
   private saveTheme(theme: Theme): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, theme);
@@ -69,9 +57,6 @@ export class ThemeService {
     }
   }
 
-  /**
-   * 📖 Lire le thème depuis localStorage
-   */
   private getStoredTheme(): Theme | null {
     try {
       const stored = localStorage.getItem(this.STORAGE_KEY);
@@ -82,38 +67,25 @@ export class ThemeService {
     }
   }
 
-  /**
-   * 🔄 Toggle entre light et dark
-   */
   toggleTheme(): void {
     const newTheme: Theme = this.isDarkMode() ? 'airsphere' : 'airspheredark';
     this.themeSignal.set(newTheme);
   }
 
-  /**
-   * 🎯 Définir un thème spécifique
-   */
   setTheme(theme: Theme): void {
     this.themeSignal.set(theme);
   }
 
-  /**
-   * 🌞 Passer en mode light
-   */
   setLightMode(): void {
     this.setTheme('airsphere');
   }
 
-  /**
-   * 🌙 Passer en mode dark
-   */
+
   setDarkMode(): void {
     this.setTheme('airspheredark');
   }
 
-  /**
-   * 🔍 Observer les changements de préférence système (OPTIONNEL)
-   */
+
   watchSystemTheme(): void {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 

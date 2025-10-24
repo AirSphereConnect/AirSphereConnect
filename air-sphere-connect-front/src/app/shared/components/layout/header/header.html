@@ -1,10 +1,17 @@
-<nav>
-  <button (click)="goToHome()">Page d'accueil</button>
-  @if (userRole === 'GUEST' || !userRole) {
-    <button (click)="goToLogin()">Se connecter</button>
-    <button (click)="goToRegister()">Créer un compte</button>
-  } @else {
-    <button (click)="goToProfile()">Mon compte</button>
-    <button (click)="logout()">Déconnexion</button>
-  }
-</nav>
+<div class="flex justify-between items-center p-4">
+  <app-logo></app-logo>
+  <div class="flex flex-row gap-2 items-center">
+    <app-navbar [userRole]="userRole"></app-navbar>
+    <div class="tabs tabs-box">
+      <button class="btn btn-ghost" (click)="toggleTheme()">
+        <img
+          [ngSrc]="isDarkTheme() ? 'icons/Soleil.png' : 'icons/Lune-croissante-noire.png'"
+          alt="Theme icon"
+          width="20"
+        />
+        <span>{{ isDarkTheme() ? 'Light' : 'Dark' }}</span>
+
+      </button>
+    </div>
+  </div>
+</div>

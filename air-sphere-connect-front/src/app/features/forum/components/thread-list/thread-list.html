@@ -22,9 +22,8 @@
           </svg>
         </div>
         <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a>Trier par date</a></li>
-          <li><a>Trier par popularité</a></li>
-          <li><a>Trier par réponses</a></li>
+          <li><a (click)="sortThreads('date')">Trier par date</a></li>
+          <li><a (click)="sortThreads('like')">Trier par popularité</a></li>
         </ul>
       </div>
     </div>
@@ -58,7 +57,7 @@
             <!-- Avatar de l'auteur -->
             <div class="avatar placeholder flex-shrink-0">
               <div class="bg-secondary text-secondary-content rounded-full w-12 flex items-center justify-center">
-                <span class="text-sm font-bold">{{ thread.author.at(0) }}</span>
+                <span class="text-xl font-bold">{{ thread.author.at(0) }}</span>
               </div>
             </div>
 
@@ -99,19 +98,18 @@
 
               <!-- Actions -->
               <div class="flex items-center justify-between">
-                <div class="flex items-center gap-2">
-                  <button class="btn btn-ghost btn-xs">
+                <div class="flex items-center gap-1">
+                  {{ getTotalLikesByThread(thread.id)}}
+                  @if (getTotalLikesByThread(thread.id) > 0) {
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                  } @else {
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
-                    J'aime
-                  </button>
-                  <button class="btn btn-ghost btn-xs">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z" />
-                    </svg>
-                    Partager
-                  </button>
+                  }
+
                 </div>
 
                 <a [routerLink]="['/forum/section', section?.id, thread.id]"
