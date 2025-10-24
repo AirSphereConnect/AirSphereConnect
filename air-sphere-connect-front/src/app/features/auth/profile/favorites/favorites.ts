@@ -1,6 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { User } from '../../../../core/models/user.model';
-import {ButtonComponent} from '../../../../shared/components/ui/button/button';
+import {Button} from '../../../../shared/components/ui/button/button';
 import {Router} from '@angular/router';
 
 @Component({
@@ -8,7 +8,7 @@ import {Router} from '@angular/router';
   standalone: true,
   templateUrl: './favorites.html',
   imports: [
-    ButtonComponent
+    Button
   ],
   styleUrls: ['./favorites.scss']
 })

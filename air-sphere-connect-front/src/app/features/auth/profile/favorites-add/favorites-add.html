@@ -1,19 +1,47 @@
 <form [formGroup]="addFavoritesForm" (ngSubmit)="addFavorite()">
 
-  <app-input-field
+  <app-input
     label="Ville"
+    type="text"
     [control]="cityNameControl"
     placeholder="Entrez le nom de votre ville"
     (input)="onCityInput($event)">
-  </app-input-field>
+  ></app-input>
 
-  <app-input-field
+  <app-input
     label="favoriteCategory"
+    type="text"
     [control]="favoriteCategoryControl"
-    placeholder="favoriteCategory">
-  </app-input-field>
+    placeholder="favoriteCategory"
+  ></app-input>
 
 
+
+  @if (errorMessage) {
+    <div class="error-message">
+      {{ errorMessage }}
+    </div>
+  }
+
+  <button
+      (click)="addFavorite()"
+
+  >
+      Ajouter
+
+  </button>
+<!--
+    <app-button
+      type="button"
+      variant="outline"
+      color="info"
+      class="flex-1"
+
+    >
+    </app-button>
+
+    -->
+</form>
   <!-- Suggestions de villes -->
   @if (citySuggestions.length) {
     <ul class="suggestions">
@@ -24,16 +52,3 @@
       }
     </ul>
   }
-
-  @if (errorMessage) {
-    <div class="error-message">
-      {{ errorMessage }}
-    </div>
-  }
-
-  <div class="actions">
-    <button mat-raised-button color="primary" type="submit" [disabled]="addFavoritesForm.invalid">
-      Créer le compte
-    </button>
-  </div>
-</form>
