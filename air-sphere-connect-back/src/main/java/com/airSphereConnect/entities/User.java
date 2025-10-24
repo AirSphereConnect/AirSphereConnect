@@ -210,10 +210,19 @@ public class User extends Timestamp implements UserDetails {
                 '}';
     }
 
-    //Besoin pour la gestion des rôles dans spring sécurity
+//    //Besoin pour la gestion des rôles dans spring sécurity
+//    @Override
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        return List.of(new SimpleGrantedAuthority(role.name()));
+//    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority(role.name()));
+        String roleName = role.name();
+        if (!roleName.startsWith("ROLE_")) {
+            roleName = "ROLE_" + roleName;
+        }
+        return List.of(new SimpleGrantedAuthority(roleName));
     }
 
 }
