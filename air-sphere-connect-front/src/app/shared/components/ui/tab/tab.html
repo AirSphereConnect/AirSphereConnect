@@ -1,0 +1,23 @@
+<nav role="tablist" class="tabs flex" [class]="navClass">
+  <ng-container>
+    @for (tab of tabs; track tab.label; let i = $index) {
+      <a
+        role="tab"
+        class="tab flex-1 text-center"
+        [class.tab-active]="activeIndex() === i"
+        (click)="setActive(i)">
+        {{ tab.label }}
+      </a>
+    }
+  </ng-container>
+</nav>
+
+<section role="tabpanel">
+  <ng-container>
+    @for (tab of tabs; track tab.label; let i = $index) {
+      @if (activeIndex() === i) {
+        <ng-container [ngTemplateOutlet]="tab.template"></ng-container>
+      }
+    }
+  </ng-container>
+</section>

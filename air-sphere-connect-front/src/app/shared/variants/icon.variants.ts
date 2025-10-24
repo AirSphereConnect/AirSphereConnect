@@ -1,7 +1,7 @@
 import { tv, type VariantProps } from 'tailwind-variants';
 
 export const iconVariants = tv({
-  base: 'flex-shrink-0',
+  base: 'flex-shrink-0 transition-all duration-200',
 
   variants: {
     size: {
@@ -24,13 +24,11 @@ export const iconVariants = tv({
       neutral: 'text-neutral',
 
     }
-
   },
 
   defaultVariants: {
     color: 'current',
     size: 'md',
-    position: 'left'
   }
 });
 
