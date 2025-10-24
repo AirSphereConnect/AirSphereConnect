@@ -72,12 +72,12 @@ public class SecurityConfig {
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         .requestMatchers("/api/home",
                                 "/api/weather/**",
+                                "/api/favorites/**",
                                 "/api/air-quality/**",
                                 "/api/forums/**", "/forum-posts/**", "/forum-rubrics/**", "/forum-threads/**",
                                 "/api/cities/**",
                                 "/api/history/**",
                                 "/api/regions/**",
-                                "/api/favorites/**",
                                 "/api/alert/configurations/**")
                         .hasAnyRole("USER", "ADMIN", "GUEST")
                         .anyRequest().authenticated()
