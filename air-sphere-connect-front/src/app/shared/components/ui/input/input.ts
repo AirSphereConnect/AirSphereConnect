@@ -16,6 +16,22 @@ import { type HeroIconName } from '../../../icons/heroicons.registry';
 import {IconComponent} from '../icon/icon';
 import { FormErrorService } from '../../../../features/auth/services/form-error.service';
 
+/**
+ * Composant principal input
+ *
+ * @example
+ * ```html
+ * <app-input
+ * label="Nom d'utilisateur"
+ * type="text"
+ * [control]="usernameControl"
+ * [required]="true"
+ * iconLeft="user"
+ * placeholder="Entrez votre nom d'utilisateur"
+ * autocomplete="username"
+ * fieldName="username"></app-input>
+ * ```
+ */
 @Component({
   selector: 'app-input',
   templateUrl: './input.html',

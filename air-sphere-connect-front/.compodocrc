@@ -1,0 +1,10 @@
+{
+  "tsconfig": "tsconfig.app.json",
+  "output": "documentation",
+  "theme": "material",
+  "assetsFolder": "src/compodoc-theme",
+  "customFavicon": "src/assets/favicon.ico",
+  "includes": "src",
+  "includesName": "Guides",
+  "serve": true
+}

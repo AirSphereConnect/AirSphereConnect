@@ -4,6 +4,14 @@ import {IconService} from '../../../services/icon';
 import { type HeroIconName } from '../../../icons/heroicons.registry';
 import { iconVariants, type IconVariants } from '../../../variants/icon.variants';
 
+/**
+ * Composant principal icon
+ *
+ * @example
+ * ```html
+ * <app-icon name="heart" size="md" color="error" />
+ * ```
+ */
 @Component({
   selector: 'app-icon',
   standalone: true,

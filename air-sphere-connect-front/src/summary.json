@@ -1,0 +1,17 @@
+{
+  "name": "Documentation AirSphere",
+  "pages": [
+    {
+      "name": "Aperçu du thème",
+      "path": "src/documentation.html"
+    },
+    {
+      "name": "Palette de couleurs",
+      "path": "src/compodoc-theme/colors.html"
+    },
+    {
+      "name": "Composants UI",
+      "path": "src/compodoc-theme/components.html"
+    }
+  ]
+}
