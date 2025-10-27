@@ -19,8 +19,4 @@ export class FavoritesService {
     return this.http.put(`${this.apiUrl}/favorites/${id}`, favoriteData, { withCredentials: true });
   }
 
-  getFavorites(): Observable<any> {
-    return this.http.get(`${this.apiUrl}/favorites/`, { withCredentials: true });
-  }
-
 }

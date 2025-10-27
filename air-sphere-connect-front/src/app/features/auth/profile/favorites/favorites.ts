@@ -1,7 +1,6 @@
 import {Component, Input, signal} from '@angular/core';
 import {FavoritesForm} from '../../../../shared/components/ui/favorites-form/favorites-form';
 import {Button} from '../../../../shared/components/ui/button/button';
-import {FavoritesService} from '../../../../shared/services/favorites-service';
 
 
 @Component({
@@ -16,18 +15,6 @@ export class Favorites {
   editingFavoriteId: number | null = null;
   initialData: any = null;
 
-  constructor(private favoritesService: FavoritesService) {}
-
-  ngOnInit() {
-    this.loadFavorites();
-  }
-
-  loadFavorites() {
-    this.favoritesService.getFavorites().subscribe({
-      next: (user) => (this.user = user),
-      error: (err) => console.error(err)
-    });
-  }
 
   addFavorites() {
     this.editingFavoriteId = null;
@@ -49,7 +36,4 @@ export class Favorites {
     this.isModalOpen.set(false);
   }
 
-  onSubmitSuccess() {
-    this.loadFavorites();
-  }
 }

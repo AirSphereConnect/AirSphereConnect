@@ -3,7 +3,6 @@
     <table class="w-full border border-gray-200 rounded-lg shadow-sm">
       <thead class="bg-gray-100">
       <tr>
-        <th class="p-2">ID</th>
         <th class="p-2">Catégorie</th>
         <th class="p-2">Ville</th>
         <th class="p-2">Créé le</th>
@@ -14,12 +13,11 @@
       <tbody>
         @for (favorite of user.favorites; track favorite) {
           <tr class="border-t">
-            <td class="p-2">{{ favorite.id }}</td>
-            <td class="p-2">{{ favorite.favoriteCategory }}</td>
-            <td class="p-2">{{ favorite.cityName }}</td>
-            <td class="p-2">{{ favorite.createdAt }}</td>
-            <td class="p-2">{{ favorite.updatedAt }}</td>
-            <td class="p-2">
+            <td class="p-2 text-center">{{ favorite.favoriteCategory }}</td>
+            <td class="p-2 text-center">{{ favorite.cityName }}</td>
+            <td class="p-2 text-center">{{ favorite.createdAt }}</td>
+            <td class="p-2 text-center">{{ favorite.updatedAt }}</td>
+            <td class="p-2 text-center">
               <app-button
                 color="primary"
                 size="md"
@@ -36,7 +34,7 @@
   } @else {
     <p>Aucun favori trouvé.</p>
   }
-
+  <br>
   <app-button color="primary" size="md" variant="solid" (click)="addFavorites()">
     Ajouter
   </app-button>
@@ -48,5 +46,4 @@
   [editingFavoriteId]="editingFavoriteId"
   [initialData]="initialData"
   (close)="onModalClose()"
-  (submitSuccess)="onSubmitSuccess()"
 ></app-favorites-form>

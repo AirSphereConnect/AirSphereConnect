@@ -1,0 +1,49 @@
+<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4" style="width: 100%;">
+  @if (user && user.alerts && user.alerts.length > 0) {
+    <h2>Favoris</h2>
+    <table>
+      <thead>
+      <tr>
+        <th>ID</th>
+        <th>Ville</th>
+        <th>Créé le</th>
+        <th>Modifié le</th>
+        <th>Activé</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (alert of user.alerts; track alert) {
+          <tr>
+            <td>{{ alert.id }}</td>
+            <td>{{ alert.cityName }}</td>
+            <td>{{ alert.createdAt }}</td>
+            <td>{{ alert.updatedAt }}</td>
+            <td>{{ alert.isEnabled }}</td>
+            <td>
+              <app-button
+                color="primary"
+                size="md"
+                variant="solid"
+                (click)="editAlerts(alert.id)"
+              >
+                Modifier
+              </app-button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p>Aucun favori trouvé.</p>
+  }
+</fieldset>
+<app-button color="primary" size="md" variant="solid" (click)="addAlerts()">
+  Ajouter
+</app-button>
+
+<app-alerts-form
+  [isOpen]="isModalOpen"
+  [editingAlertsId]="editingAlertsId"
+  [initialAlertsData]="initiaAlertlData"
+  (close)="onModalClose()"
+></app-alerts-form>
