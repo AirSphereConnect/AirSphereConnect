@@ -1,6 +1,7 @@
 import {Router, RouterOutlet} from '@angular/router';
 import {UserService} from './shared/services/user-service';
 import {Component, signal, inject, OnInit, NgModule} from '@angular/core';
+import {ThemeService} from './core/services/theme';
 import {Header} from './shared/components/layout/header/header';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
 import {AuthInterceptor} from './core/interceptors/auth-interceptor';

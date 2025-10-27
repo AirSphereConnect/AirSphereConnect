@@ -9815,10 +9815,11 @@ CREATE TABLE IF NOT EXISTS `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
 INSERT IGNORE INTO `users` (`created_at`, `email`, `password`, `role`, `username`)
-VALUES (NOW(6), 'admin@example.com','$2a$04$/ZmWSnCVEzO/wEivIRRHj.PUvjrf5a7BdmeO7Ca.M1pmUiuyd8BY2', 'ADMIN', 'admin');
+VALUES (NOW(6), 'admin@example.com','$2a$04$IhD7AP26WtbWUjMyT1E6ye7JnblpTAwWAciS2ZADpc9GCdN5D5cQO', 'ADMIN', 'admin');
 
 INSERT IGNORE INTO `users` (`created_at`, `email`, `password`, `role`, `username`)
-VALUES (NOW(6), 'user@example.com', '$2a$04$1Nzv0pkpEASFt4LRpD7TnO51.67Np8hVjhalhiyIZpxyqC4sa0F.G', 'USER', 'user');
+VALUES (NOW(6), 'user@example.com', '$2a$04$v0AOXnYQA6RYykkeRnQvYuZtEhHCQlBaGBePBYXdAGiwisTh12/3G', 'USER', 'user');
+
 
 -- Listage de la structure de table air-sphere-connect. weather_measurements
 CREATE TABLE IF NOT EXISTS `weather_measurements` (
@@ -18740,4 +18741,3 @@ INSERT INTO `weather_measurements` (`id`, `alert`, `alert_message`, `humidity`, 
 /*!40014 SET FOREIGN_KEY_CHECKS=IFNULL(@OLD_FOREIGN_KEY_CHECKS, 1) */;
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40111 SET SQL_NOTES=IFNULL(@OLD_SQL_NOTES, 1) */;
-
