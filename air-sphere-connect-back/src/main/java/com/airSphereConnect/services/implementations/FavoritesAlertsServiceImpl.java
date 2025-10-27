@@ -1,8 +1,10 @@
 package com.airSphereConnect.services.implementations;
 import com.airSphereConnect.dtos.FavoritesAlertsDto;
 import com.airSphereConnect.entities.*;
+import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.FavoritesAlertsMapper;
 import com.airSphereConnect.repositories.FavoritesAlertsRepository;
+import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.FavoritesAlertsService;
 import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
@@ -14,9 +16,11 @@ import java.util.stream.Collectors;
 public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
 
     private final FavoritesAlertsRepository favoritesAlertsRepository;
+    private final UserRepository userRepository;
 
-    public FavoritesAlertsServiceImpl(FavoritesAlertsRepository favoritesAlertsRepository) {
+    public FavoritesAlertsServiceImpl(FavoritesAlertsRepository favoritesAlertsRepository, UserRepository userRepository) {
         this.favoritesAlertsRepository = favoritesAlertsRepository;
+        this.userRepository = userRepository;
     }
 
     @Override
@@ -28,7 +32,10 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
     }
 
     @Override
-    public FavoritesAlertsDto createAlertConfig(FavoritesAlertsDto dto) {
+    public FavoritesAlertsDto createAlertConfig(Long userId,FavoritesAlertsDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + userId));
+
         FavoritesAlerts entity = FavoritesAlertsMapper.toEntity(dto);
         entity = favoritesAlertsRepository.save(entity);
         return FavoritesAlertsMapper.toDto(entity);

@@ -9,6 +9,13 @@ public class FavoritesAlertsMapper {
         if (dto == null) return null;
 
         FavoritesAlerts entity = new FavoritesAlerts();
+        if (dto.getUserId() != null) {
+            User user = new User();
+            user.setId(dto.getUserId());
+            entity.setUser(user);
+        } else {
+            entity.setUser(null);
+        }
         entity.setId(dto.getId());
         entity.setEnabled(dto.getIsEnabled());
 
