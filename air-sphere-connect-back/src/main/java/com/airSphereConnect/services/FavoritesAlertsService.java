@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface FavoritesAlertsService {
     List<FavoritesAlertsDto> getAllFavoritesAlerts();
-    FavoritesAlertsDto createAlertConfig(FavoritesAlertsDto dto);
+    FavoritesAlertsDto createAlertConfig(Long id, FavoritesAlertsDto dto);
     List<FavoritesAlertsDto> getUserAlerts(Long userId);
     FavoritesAlertsDto updateAlertConfig(FavoritesAlertsDto dto, Long userId);
     void deleteAlertConfig(Long alertConfigId);

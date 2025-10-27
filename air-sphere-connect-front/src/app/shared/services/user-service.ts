@@ -44,6 +44,7 @@ export class UserService {
         .subscribe({
           next: profile => {
             this.setUserProfile(profile);
+            console.log(profile);
             // Re-synchronisation optionnelle pour garantir la cohérence cookie/vue
             this.fetchUserProfile();
             observer.next(profile);
