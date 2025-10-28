@@ -1,49 +1,38 @@
-<section class="profile-favorites justify-between p-4">
-  @if (user && user.favorites && user.favorites.length > 0) {
-    <table class="w-full border border-gray-200 rounded-lg shadow-sm">
-      <thead class="bg-gray-100">
-      <tr>
-        <th class="p-2">Catégorie</th>
-        <th class="p-2">Ville</th>
-        <th class="p-2">Créé le</th>
-        <th class="p-2">Modifié le</th>
-        <th class="p-2">Actions</th>
-      </tr>
-      </thead>
-      <tbody>
-        @for (favorite of user.favorites; track favorite) {
-          <tr class="border-t">
-            <td class="p-2 text-center">{{ favorite.favoriteCategory }}</td>
-            <td class="p-2 text-center">{{ favorite.cityName }}</td>
-            <td class="p-2 text-center">{{ favorite.createdAt }}</td>
-            <td class="p-2 text-center">{{ favorite.updatedAt }}</td>
-            <td class="p-2 text-center">
-              <app-button
-                color="primary"
-                size="md"
-                variant="solid"
-                (click)="editFavorites(favorite.id)"
-              >
-                Modifier
-              </app-button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
-  } @else {
-    <p>Aucun favori trouvé.</p>
+<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4" style="width: 100%;">
+  @if (user) {
+    @if (user.favorites && user.favorites.length > 0) {
+      <section class="profile-favorites">
+        <h2>Favoris</h2>
+        <ul>
+          @for (favorite of user.favorites; track favorite) {
+            <li>{{ favorite.id }}</li>
+            <li>{{ favorite.favoriteCategory }}</li>
+            <li>{{ favorite.cityName }}</li>
+            <li>{{ favorite.createdAt }}</li>
+            <li>{{ favorite.updatedAt }}</li>
+            <app-button
+              color="primary"
+              size="md"
+              variant="solid"
+              [disabled]="false"
+              (click)="editFavorites()"
+              ariaLabel="Modifier utilisateur"
+            >
+              Modifier
+            </app-button>
+          }
+        </ul>
+      </section>
+    }
   }
-  <br>
-  <app-button color="primary" size="md" variant="solid" (click)="addFavorites()">
-    Ajouter
-  </app-button>
-</section>
-
-<!-- 🟣 Modal -->
-<app-favorites-form
-  [isOpen]="isModalOpen"
-  [editingFavoriteId]="editingFavoriteId"
-  [initialData]="initialData"
-  (close)="onModalClose()"
-></app-favorites-form>
+</fieldset>
+<app-button
+  color="primary"
+  size="md"
+  variant="solid"
+  [disabled]="false"
+  (click)="addFavorites()"
+  ariaLabel="Modifier utilisateur"
+>
+  Ajouter
+</app-button>

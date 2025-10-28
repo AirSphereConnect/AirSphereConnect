@@ -1,39 +1,28 @@
-import {Component, Input, signal} from '@angular/core';
-import {FavoritesForm} from '../../../../shared/components/ui/favorites-form/favorites-form';
+import { Component, Input } from '@angular/core';
+import { User } from '../../../../core/models/user.model';
 import {Button} from '../../../../shared/components/ui/button/button';
-
+import {Router} from '@angular/router';
 
 @Component({
-  selector: 'app-favorites',
-  templateUrl: './favorites.html',
+  selector: 'app-favorite-dashboard',
   standalone: true,
-  imports: [FavoritesForm, Button]
+  templateUrl: './favorites.html',
+  imports: [
+    Button
+  ],
+  styleUrls: ['./favorites.scss']
 })
 export class Favorites {
-  @Input() user: any = null;
-  isModalOpen = signal(false);
-  editingFavoriteId: number | null = null;
-  initialData: any = null;
+  @Input() user!: User | null;
 
+  constructor(private router: Router) {}
 
   addFavorites() {
-    this.editingFavoriteId = null;
-    this.initialData = null;
-    this.isModalOpen.set(true);
+    this.router.navigate(['/auth/profile/favorites/add']).then(r => r);
   }
 
-  editFavorites(id: number) {
-    const favorite = this.user?.favorites.find((f: any) => f.id === id);
-    console.log(favorite);
-    if (favorite) {
-      this.editingFavoriteId = id;
-      this.initialData = favorite;
-      this.isModalOpen.set(true);
-    }
+  editFavorites() {
+    this.router.navigate(['/auth/profile/favorites/edit']).then(r => r);
   }
-
-  onModalClose() {
-    this.isModalOpen.set(false);
-  }
-
 }
+

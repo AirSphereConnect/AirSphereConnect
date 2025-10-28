@@ -44,7 +44,6 @@ export class UserService {
         .subscribe({
           next: profile => {
             this.setUserProfile(profile);
-            console.log(profile);
             // Re-synchronisation optionnelle pour garantir la cohérence cookie/vue
             this.fetchUserProfile();
             observer.next(profile);
@@ -88,9 +87,5 @@ export class UserService {
   //Mettre à jour les infos de l'user
   updateUser(userData: any, id: string) {
     return this.http.put(`${this.apiUrl}/users/${id}`, userData, { withCredentials: true });
-  }
-
-  getUserName(): string {
-    return this._userProfileSubject.value?.user.username || '';
   }
 }

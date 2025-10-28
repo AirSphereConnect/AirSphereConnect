@@ -1,8 +1,7 @@
 package com.airSphereConnect.dtos.response;
 
-import com.airSphereConnect.dtos.AlertsDto;
 import com.airSphereConnect.dtos.FavoriteDto;
-import com.airSphereConnect.dtos.FavoritesAlertsDto;
+import com.airSphereConnect.entities.Favorite;
 import com.airSphereConnect.entities.enums.UserRole;
 
 import java.time.LocalDateTime;
@@ -19,20 +18,10 @@ public class UserResponseDto {
     private List<FavoriteDto> favorites;
 
 
-    private List<FavoritesAlertsDto> alerts;
-
-
     public UserResponseDto() {
     }
 
-    public UserResponseDto(Long id,
-                           String username,
-                           String email,
-                           UserRole role,
-                           LocalDateTime createdAt,
-                           AddressResponseDto address,
-                           List<FavoriteDto> favorites,
-                           List<FavoritesAlertsDto> alerts) {
+    public UserResponseDto(Long id, String username, String email, UserRole role, LocalDateTime createdAt, AddressResponseDto address, List<FavoriteDto> favorites) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -40,7 +29,6 @@ public class UserResponseDto {
         this.createdAt = createdAt;
         this.address = address;
         this.favorites = favorites;
-        this.alerts = alerts;
     }
 
     public Long getId() {
@@ -107,11 +95,4 @@ public class UserResponseDto {
         this.favorites = favorites;
     }
 
-    public List<FavoritesAlertsDto> getAlerts() {
-        return alerts;
-    }
-
-    public void setAlerts(List<FavoritesAlertsDto> alerts) {
-        this.alerts = alerts;
-    }
 }
