@@ -1,0 +1,106 @@
+@if (isOpen()) {
+  <div class="flex items-center justify-center p-4 bg-base-200">
+    <div class="w-full max-w-md">
+
+      <!-- Step 1 : username/email/password -->
+      @if (step() === 1) {
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h2 class="card-title text-primary text-2xl mb-6">Modifier mes informations</h2>
+            <form [formGroup]="userForm" (ngSubmit)="onStep1Submit()" class="flex flex-col gap-4">
+
+              <div class="flex flex-col gap-1">
+                <label class="label font-bold">Nom d'utilisateur</label>
+                <input type="text" class="input w-full" placeholder="Nom d'utilisateur" [formControl]="usernameControl" />
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <label class="label font-bold">Email</label>
+                <input type="email" class="input w-full" placeholder="Email" [formControl]="emailControl" />
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <label class="label font-bold">Mot de passe</label>
+                <input
+                  [type]="passwordType()"
+                  class="input w-full"
+                  placeholder="••••••••"
+                  [formControl]="passwordControl"
+                />
+                <button type="button" class="mt-1 text-sm text-blue-600" (click)="togglePasswordVisibility()">
+                  {{ passwordVisible() ? 'Masquer' : 'Afficher' }}
+                </button>
+              </div>
+
+              @if (errorMessage()) {
+                <div class="alert alert-error">{{ errorMessage() }}</div>
+              }
+
+              <button type="submit" class="btn btn-primary" [disabled]="isLoadingStep1()">
+                @if (isLoadingStep1()) { <span class="loading loading-spinner"></span> }
+                Continuer
+              </button>
+            </form>
+          </div>
+        </div>
+      }
+
+      <!-- Step 2 : adresse/ville -->
+      @if (step() === 2) {
+        <div class="card bg-base-100 shadow-lg">
+          <div class="card-body">
+            <h2 class="card-title text-primary text-2xl mb-6">Modifier mon adresse</h2>
+            <form [formGroup]="addressForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-4">
+
+              <div class="flex flex-col gap-1">
+                <label class="label font-bold">Adresse</label>
+                <input type="text" class="input w-full" placeholder="Adresse" [formControl]="addressControl" />
+              </div>
+
+              <div class="flex flex-col gap-1">
+                <label class="label font-bold">Ville</label>
+                <input
+                  type="text"
+                  class="input w-full"
+                  placeholder="Ville"
+                  [formControl]="cityNameControl"
+                  (input)="onCityInput($event)"
+                />
+              </div>
+
+              @if (citySuggestions.length) {
+                <ul class="menu bg-base-100 w-full rounded-box">
+                  @for (city of citySuggestions; track city.id) {
+                    <li>
+                      <a (click)="selectCity(city)">
+                        {{ city.name }} ({{ city.postalCode }})
+                      </a>
+                    </li>
+                  }
+                </ul>
+              }
+
+              <div class="flex flex-col gap-1">
+                <label class="label font-bold">Code postal</label>
+                <input type="text" class="input w-full" [formControl]="cityCodeControl" readonly />
+              </div>
+
+              @if (errorMessage()) {
+                <div class="alert alert-error">{{ errorMessage() }}</div>
+              }
+
+              <div class="flex gap-4 mt-4">
+                <button type="button" class="btn btn-outline btn-info" (click)="goBackToStep1()">Retour</button>
+                <button type="submit" class="btn btn-primary" [disabled]="isLoadingStep2()">
+                  @if (isLoadingStep2()) { <span class="loading loading-spinner"></span> }
+                  Sauvegarder
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      }
+
+    </div>
+  </div>
+}

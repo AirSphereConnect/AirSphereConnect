@@ -7,10 +7,9 @@ export const routes: Routes = [
   { path: 'auth/login', loadComponent: () => import('./features/auth/login/login').then(m => m.Login) },
   { path: 'auth/register', loadComponent: () => import('./features/auth/register/register').then(m => m.Register) },
   { path: 'auth/profile', loadComponent: () => import('./features/auth/profile/profile/profile').then(m => m.Profile)},
-  { path: 'auth/profile/user/edit', loadComponent: () => import('./features/auth/profile/user-edit/user-edit').then(m => m.UserEdit)},
   { path: 'auth/settings', loadComponent: () => import('./features/auth/settings/settings').then(m => m.Settings) },
-
-  /*{ path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard), canActivate:[AuthGuard] },
+/*
+  { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard), canActivate:[AuthGuard] },
   { path: 'dashboard/air-quality', loadComponent: () => import('./features/dashboard/widgets/air-quality-widget/air-quality-widget').then(m => m.AirQualityWidget), canActivate:[AuthGuard] },
   { path: 'dashboard/weather', loadComponent: () => import('./features/dashboard/widgets/weather-widget/weather-widget').then(m => m.WeatherWidget) },
   { path: 'dashboard/pollution-trends', loadComponent: () => import('./features/dashboard/widgets/pollution-trend-widget/pollution-trend-widget').then(m => m.PollutionTrendWidget), canActivate:[AuthGuard] },
