@@ -1,16 +1,22 @@
 package com.airSphereConnect.controllers;
 
+import com.airSphereConnect.dtos.request.AddressRequestDto;
 import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.response.AddressResponseDto;
+import com.airSphereConnect.dtos.response.CityIdResponseDto;
 import com.airSphereConnect.dtos.response.UserResponseDto;
+import com.airSphereConnect.entities.Address;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.repositories.UserRepository;
+import com.airSphereConnect.services.AddressService;
 import com.airSphereConnect.services.AuthService;
 import com.airSphereConnect.services.UserService;
 import com.airSphereConnect.services.security.ActiveTokenService;
 import com.airSphereConnect.services.security.JwtService;
 import com.airSphereConnect.services.security.implementations.JwtServiceImpl;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -38,11 +44,13 @@ public class UserController {
     private final UserService userService;
     private final AuthService authService;
     private final UserRepository userRepository;
+    private final AddressService addressService;
 
-    public UserController(UserService userService, AuthService authService, UserRepository userRepository) {
+    public UserController(UserService userService, AuthService authService, UserRepository userRepository, AddressService addressService) {
         this.userService = userService;
         this.authService = authService;
         this.userRepository = userRepository;
+        this.addressService = addressService;
     }
 
     // Tous les utilisateurs
@@ -94,26 +102,24 @@ public class UserController {
     // Mettre à jour un utilisateur
     @PreAuthorize("hasRole('USER')")
     @PutMapping("/{id}")
-    public UserResponseDto updateUser(@PathVariable Long id, @RequestBody UserRequestDto reqDto, @AuthenticationPrincipal UserDetails userDetails) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id,
+                                        @RequestBody UserRequestDto reqDto,
+                                        @AuthenticationPrincipal UserDetails userDetails,
+                                        HttpServletRequest request,
+                                        HttpServletResponse response) {
 
-        // Récupère l'utilisateur connecté
         User currentUser = userRepository.findByUsername(userDetails.getUsername())
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
 
-        // Vérifie que l'ID dans le path correspond à l'utilisateur connecté
         if (!currentUser.getId().equals(id)) {
             throw new GlobalException.BadRequestException("Vous ne pouvez modifier que votre propre profil.");
         }
 
-        // Convertit le DTO en entité (sans toucher à l'ID)
-        User userToUpdate = UserMapper.toEntity(reqDto);
-
-        // Met à jour l'utilisateur via le service
-        User updatedUser = userService.updateUser(currentUser.getId(), userToUpdate);
-
-        // Retourne le DTO mis à jour
-        return UserMapper.toDto(updatedUser);
+        // Si username ou password changés, il faudra que le frontend appelle /api/profile
+        // Ici, on retourne juste le DTO mis à jour
+        return authService.EditUserLogin(reqDto, currentUser,request, response);
     }
+
 
 
     // Supprimer un utilisateur

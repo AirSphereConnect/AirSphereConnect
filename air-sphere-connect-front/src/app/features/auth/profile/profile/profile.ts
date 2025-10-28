@@ -1,4 +1,4 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {AfterViewInit, ChangeDetectorRef, Component, Input, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {UserService} from '../../../../shared/services/user-service';
 import {User} from '../../../../core/models/user.model';
@@ -17,7 +17,7 @@ import {UserDashboard} from '../user/users';
 
 export class Profile implements OnInit, AfterViewInit {
 
-  user: User | null = null;
+  @Input() user: User | null = null;
 
   constructor(private userService: UserService, private cdr: ChangeDetectorRef) {}
 

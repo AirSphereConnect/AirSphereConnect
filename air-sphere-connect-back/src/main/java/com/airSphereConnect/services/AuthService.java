@@ -5,6 +5,7 @@ import com.airSphereConnect.dtos.request.LoginRequestDto;
 import com.airSphereConnect.dtos.request.UserRequestDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,22 @@ public class AuthService {
         return homeController.login(loginDto, response);
     }
 
+    public ResponseEntity<?> EditUserLogin(UserRequestDto reqDto, User currentUser,
+                                           HttpServletRequest request, HttpServletResponse response) {
+        User userToUpdate = UserMapper.toEntity(reqDto);
+        User updatedUser = userService.updateUser(currentUser.getId(), userToUpdate);
+
+        boolean usernameChanged = reqDto.getUsername() != null && !reqDto.getUsername().isEmpty();
+        boolean passwordChanged = reqDto.getPassword() != null && !reqDto.getPassword().isEmpty();
+
+        if (usernameChanged || passwordChanged) {
+            // Invalide session + remplace token par "guest" (logout forcé)
+            return homeController.logout(request, response);
+        }
+
+        // Sinon, retourne utilisateur mis à jour normalement
+        return ResponseEntity.ok(UserMapper.toDto(updatedUser));
+    }
 
 }
 
