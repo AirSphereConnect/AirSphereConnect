@@ -1,16 +1,16 @@
 import {AfterViewInit, ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {UserService} from '../../../../shared/services/user-service';
-import {Login} from '../../login/login';
 import {User} from '../../../../core/models/user.model';
 import {Users} from '../user/users';
 import {Tab, TabItem} from '../../../../shared/components/ui/tab/tab';
 import {Favorites} from '../favorites/favorites';
+import {Alerts} from '../alerts/alerts';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterOutlet, Users, Tab, Favorites],
+  imports: [RouterOutlet, Users, Tab, Favorites, Alerts],
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss']
 })
@@ -32,13 +32,15 @@ export class Profile implements OnInit, AfterViewInit {
 
   @ViewChild('profilUser', { static: true }) profilUser!: TemplateRef<unknown>;
   @ViewChild('favorites', { static: true }) favorites!: TemplateRef<unknown>;
+  @ViewChild('alerts', { static: true }) alerts!: TemplateRef<unknown>;
 
   tabs: TabItem[] = [];
 
   ngAfterViewInit() {
     this.tabs = [
       { label: "Mon profil", template: this.profilUser },
-      { label: 'Mes alertes', template: this.favorites },
+      { label: 'Mes favoris', template: this.favorites },
+      { label: 'Mes alertes', template: this.alerts },
     ];
     this.cdr.detectChanges();
   }
