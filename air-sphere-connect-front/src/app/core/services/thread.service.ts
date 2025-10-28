@@ -26,7 +26,7 @@ export class ThreadService {
   addThread(title: string, content: string, sectionId: number): Observable<Post> {
     const newThread = {
       title,
-      author: this.userService.getUserName(),
+      author: this.userService.getUsername(),
       createdAt: new Date(),
       sectionId
     };
