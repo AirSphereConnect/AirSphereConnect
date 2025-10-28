@@ -1,21 +1,27 @@
 package com.airSphereConnect.dtos;
 
+import com.airSphereConnect.entities.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+
 import java.time.LocalDateTime;
 
 public class FavoritesAlertsDto {
     private Long id;
-    private Long userId;
+    private Long user;
     private Long cityId;
+    private String cityName;
     private Long departmentId;
     private Long regionId;
     private boolean isEnabled;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime updatedAt;
 
     public FavoritesAlertsDto() {}
 
-    public FavoritesAlertsDto(Long userId, Long cityId, Long departmentId, Long regionId, boolean isEnabled) {
-        this.userId = userId;
+    public FavoritesAlertsDto(Long user, Long cityId, Long departmentId, Long regionId, boolean isEnabled) {
+        this.user = user;
         this.cityId = cityId;
         this.departmentId = departmentId;
         this.regionId = regionId;
@@ -30,12 +36,12 @@ public class FavoritesAlertsDto {
         this.id = id;
     }
 
-    public Long getUserId() {
-        return userId;
+    public Long getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(Long user) {
+        this.user = user;
     }
 
     public Long getCityId() {
@@ -54,6 +60,13 @@ public class FavoritesAlertsDto {
         this.departmentId = departmentId;
     }
 
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
     public Long getRegionId() {
         return regionId;
     }
@@ -85,4 +98,5 @@ public class FavoritesAlertsDto {
     public void setUpdatedAt(LocalDateTime updatedAt) {
         this.updatedAt = updatedAt;
     }
+
 }
