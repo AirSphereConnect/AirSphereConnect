@@ -1,36 +1,38 @@
-import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {Thread} from '../models/thread.model';
-import {PostService} from './post.service';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Thread } from '../models/thread.model';
+import { PostService } from './post.service';
+import { UserService } from '../../shared/services/user-service';
+import { Observable, switchMap } from 'rxjs';
 import {Post} from '../models/post.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThreadService {
-  //private apiUrl = "http://localhost:8080/api/forum-threads";
-  //constructor(private http: HttpClient) { }
+  private apiUrl = "http://localhost:8080/api/forum-threads";
+  private http = inject(HttpClient);
   private postService = inject(PostService);
+  private userService = inject(UserService);
 
-  private threads: Thread[] = [
-    { id: 1, title: 'Thread bonjour eco', author: 'admin', createdAt: new Date(), sectionId:1 },
-    { id: 2, title: 'Thread vive l\' eco', author: 'Nuno', createdAt: new Date(), sectionId:1 },
-    { id: 3, title: 'Thread vive Montpellier tout vert', author: 'Sandrine', createdAt: new Date(), sectionId: 1 },
-    { id: 4, title: 'Thread projet', author: 'cyril',  createdAt: new Date(), sectionId: 2 },
-    { id: 5, title: 'Thread Vive la pluie', author: 'Guest',  createdAt: new Date(), sectionId: 2 },
-    { id: 6, title: 'Thread Vive le vert', author: 'Greta',  createdAt: new Date(), sectionId: 3 },
-  ]
-
-
-  getAllThreads() {
-  //  return this.http.get<Thread[]>(`${this.apiUrl}`);
-    return this.threads;
+  getAllThreads(): Observable<Thread[]> {
+    return this.http.get<Thread[]>(`${this.apiUrl}`);
   }
 
-
-  getThreadById(id: number) {
-   // return this.http.get<Thread>(`${this.apiUrl}/${id}`);
-    return this.threads.find(thread => thread.id === id);
+  getThreadById(id: number): Observable<Thread> {
+    return this.http.get<Thread>(`${this.apiUrl}/${id}`);
   }
 
+  addThread(title: string, content: string, sectionId: number): Observable<Post> {
+    const newThread = {
+      title,
+      author: this.userService.getUserName(),
+      createdAt: new Date(),
+      sectionId
+    };
+
+    return this.http.post<Thread>(`${this.apiUrl}`, newThread).pipe(
+      switchMap(thread => this.postService.addPost(thread.id, thread.author, content))
+    );
+  }
 }

@@ -1,22 +1,16 @@
+@let currentThread = thread$ | async;
+@let posts = posts$ | async;
+@let publishing = isPublishing | async;
+
 <div class="space-y-6">
   <!-- Header avec breadcrumb et actions -->
-  @let currentThread = thread();
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div class="breadcrumbs text-sm">
       <ul>
         <li><a [routerLink]="['/forum']" class="text-primary hover:text-primary-focus">Forum</a></li>
-        <li><a [routerLink]="['/forum/section', sectionId()]" class="text-primary hover:text-primary-focus">{{ thread()?.title || 'Section' }}</a></li>
+        <li><a [routerLink]="['/forum/section', sectionId]" class="text-primary hover:text-primary-focus">{{ currentThread?.title || 'Section' }}</a></li>
         <li class="text-base-content/70">Discussion</li>
       </ul>
-    </div>
-
-    <div class="flex gap-2">
-      <button class="btn btn-primary btn-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-        </svg>
-        Répondre
-      </button>
     </div>
   </div>
 
@@ -29,7 +23,7 @@
           <!-- Avatar de l'auteur -->
           <div class="avatar placeholder flex-shrink-0">
             <div class="bg-primary text-primary-content rounded-full w-16 flex items-center justify-center">
-              <span class="text-lg font-bold">{{ thread()?.author || 'A' }}</span>
+              <span class="text-2xl font-bold">{{ currentThread.author.charAt(0)?.toUpperCase() }}</span>
             </div>
           </div>
 
@@ -56,36 +50,13 @@
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                 </svg>
-                <span>{{ posts().length }} réponses</span>
+                <span>{{ posts?.length || 0 }} réponses</span>
               </div>
-            </div>
-
-            <!-- Actions du thread -->
-            <div class="flex items-center gap-3">
-              <button class="btn btn-ghost btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                J'aime
-              </button>
-              <button class="btn btn-ghost btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z" />
-                </svg>
-                Sauvegarder
-              </button>
-              <button class="btn btn-ghost btn-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-                </svg>
-                Signaler
-              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-
     <!-- Zone de réponse rapide -->
     <div class="card bg-base-100 shadow-lg border border-base-300">
       <div class="card-body p-6">
@@ -96,10 +67,25 @@
           Répondre à cette discussion
         </h3>
         <div class="form-control">
-          <textarea class="textarea textarea-bordered h-24" placeholder="Partagez vos pensées..."></textarea>
+          <textarea
+            class="textarea textarea-bordered h-24"
+            placeholder="Partagez vos pensées..."
+            [formControl]="newPostContent"
+            [disabled]="publishing ?? false">
+          </textarea>
         </div>
         <div class="card-actions justify-end mt-4">
-          <button class="btn btn-primary">Publier la réponse</button>
+          <button
+            class="btn btn-primary"
+            [disabled]="!newPostContent.value?.trim() || (publishing ?? false)"
+            (click)="publishPost()">
+            @if (publishing) {
+              <span class="loading loading-spinner loading-sm mr-2"></span>
+              Publication...
+            } @else {
+              Publier la réponse
+            }
+          </button>
         </div>
       </div>
     </div>
@@ -110,73 +96,20 @@
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
         </svg>
-        Réponses ({{ posts().length }})
+        Réponses ({{ posts?.length || 0 }})
       </h2>
 
-      @for (post of posts(); track post.id) {
-        <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-300">
-          <div class="card-body p-6">
-            <div class="flex items-start gap-4">
-              <!-- Avatar de l'utilisateur -->
-              <div class="avatar placeholder flex-shrink-0">
-                <div class="bg-secondary text-secondary-content rounded-full w-12 flex items-center justify-center">
-                  <span class="text-sm font-bold">{{ post.user.charAt(0) || 'U' }}</span>
-                </div>
-              </div>
+      <hr class="w-48 h-0.5 my-4 bg-gray-100 border-0 rounded-sm md:my-10 dark:bg-gray-700">
 
-              <!-- Contenu du post -->
-              <div class="flex-1 min-w-0">
-                <!-- En-tête du post -->
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center gap-3">
-                    <h4 class="font-semibold text-base-content">{{ post.user }}</h4>
-                    <div class="badge badge-outline badge-sm">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                      </svg>
-                      {{ post.createdAt | date:'short' }}
-                    </div>
-                  </div>
-
-                  <div class="dropdown dropdown-end">
-                    <div tabindex="0" role="button" class="btn btn-ghost btn-xs">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                      </svg>
-                    </div>
-                    <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
-                      <li><a>Citer</a></li>
-                      <li><a>Répondre</a></li>
-                      <li><a>Signaler</a></li>
-                    </ul>
-                  </div>
-                </div>
-
-                <!-- Contenu du message -->
-                <div class="prose prose-sm max-w-none text-base-content mb-4">
-                  <p class="whitespace-pre-wrap">{{ post.content }}</p>
-                </div>
-
-                <!-- Actions du post -->
-                <div class="flex items-center gap-4">
-                  <button class="btn btn-ghost btn-xs">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                    J'aime
-                  </button>
-                  <button class="btn btn-ghost btn-xs">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                    </svg>
-                    Répondre
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      } @empty {
+      @if (posts?.length) {
+        @for (post of posts; track post.id) {
+          <app-post
+            [post]="post"
+            (onLike)="onPostLike(post.id)"
+            (onFlag)="onPostFlagged(post)">
+          </app-post>
+        }
+      } @else {
         <div class="text-center py-12">
           <div class="avatar placeholder mb-6">
             <div class="bg-base-300 text-base-content rounded-full w-20">

@@ -1,102 +1,94 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {Post} from '../models/post.model';
+import {map, Observable} from 'rxjs';
+import {HttpClient} from '@angular/common/http';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostService {
-  private posts: Post[] = [
-    {
-      id: 1,
-      user: 'Cyril',
-      content: 'Premier PostLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry\'s standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.',
-      createdAt: new Date(),
-      threadId: 1
-    },
-    {
-      id: 2,
-      user: 'Bob',
-      content: 'deuxieme Post',
-      createdAt: new Date(),
-      threadId: 2
-    },{
-      id: 3,
-      user: 'Sandrine',
-      content: 'troisieme Post',
-      createdAt: new Date(),
-      threadId: 1
-    },
-    {
-      id: 4,
-      user: 'Nuno',
-      content: 'quatrieme Post',
-      createdAt: new Date(),
-      threadId: 2
-    },
-    {
-      id: 5,
-      user: 'Pierre',
-      content: 'Ultime post',
-      createdAt: new Date(),
-      threadId: 3
-    },{
-      id: 6,
-      user: 'Cyril',
-      content: '5eme !',
-      createdAt: new Date(),
-      threadId: 4
-    },
-    {
-      id: 7,
-      user: 'Bob',
-      content: '6eme !',
-      createdAt: new Date(),
-      threadId: 5
-    },{
-      id: 8,
-      user: 'Sandrine',
-      content: 'Ouai !',
-      createdAt: new Date(),
-      threadId: 6
-    },
-    {
-      id: 9,
-      user: 'Nuno',
-      content: 'Post igjzipgf',
-      createdAt: new Date(),
-      threadId: 6
-    },
-    {
-      id: 10,
-      user: 'Pierre',
-      content: 'Ultime post 2',
-      createdAt: new Date(),
-      threadId: 4
-    },
-  ];
+  private apiUrlPosts = "http://localhost:8080/api/forum-posts";
+  private http = inject(HttpClient);
 
-  getPosts(): Post[] {
-    return this.posts;
+
+  getPosts(): Observable<Post[]> {
+    return this.http.get<Post[]>(`${this.apiUrlPosts}`);
   }
 
-  getPostByThreadId(threadId: number): Post[] {
-    return this.posts.filter(post => post.threadId === threadId);
+  // retrieve all the posts of a thread
+  getPostByThreadId(threadId: number): Observable<Post[]> {
+    return this.getPosts().pipe(
+      map(posts => posts.filter(post => post.threadId === threadId))
+    );
   }
 
-  getPostCountByThreadId(threadId: number): number {
-    return this.getPostByThreadId(threadId).length;
+  getPostCountByThreadId(threadId: number): Observable<number> {
+    return this.getPostByThreadId(threadId).pipe(
+      map(posts => posts.length)
+    );
   }
 
-  addPost(threadId: number, user: string, content: string) {
-    const newPost: Post = {
-      id: this.posts.length + 1,
+  getLikesByThreadId(threadId: number): Observable<number> {
+    return this.getPostByThreadId(threadId).pipe(
+      map(posts => posts.reduce((sum, post) => sum + post.likes, 0))
+    );
+  }
+
+  // add a post
+  addPost(threadId: number, author: string, content: string): Observable<Post> {
+    const newPost = {
       threadId,
-      user,
+      author,
       content,
       createdAt: new Date(),
+      likes: 0,
+      isLiked: false,
+      isFlagged: false
     };
-    this.posts.push(newPost);
+    return this.http.post<Post>(this.apiUrlPosts, newPost);
   }
 
+  updatePost(post: Post): Observable<Post> {
+    return this.http.put<Post>(`${this.apiUrlPosts}/${post.id}`, post);
+  }
 
+  getPostStats(threadId: number) {
+    return this.getPostByThreadId(threadId).pipe(
+      map(posts => ({
+        totalPosts: posts.length,
+        totalLikes: posts.reduce((sum, post) => sum + post.likes, 0)
+      }))
+    );
+  }
+
+  // press the button Like !
+  toggleLike(postId: number): Observable<Post> {
+    return this.getPosts().pipe(
+      map(posts => {
+        const post = posts.find(p => p.id === postId);
+        if (!post) throw new Error('Post not found');
+        return {
+          ...post,
+          isLiked: !post.isLiked,
+          likes: post.isLiked ? Math.max(0, post.likes - 1) : post.likes + 1,
+        };
+      })
+    );
+  }
+
+  toggleFlag(postId: number): Observable<Post> {
+
+    return this.getPosts().pipe(
+      map(posts => {
+        const post = posts.find(p => p.id === postId);
+        if (!post) throw new Error('Post not found');
+        return {
+          ...post,
+          isLiked: !post.isFlagged,
+          likes: post.isLiked ? Math.max(0, post.likes - 1) : post.likes + 1,
+        };
+      })
+    );
+  }
 }
+

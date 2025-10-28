@@ -15,19 +15,6 @@
                 {{ post().createdAt | date:'short' }}
               </div>
             </div>
-
-            <div class="dropdown dropdown-end">
-              <div tabindex="0" role="button" class="btn btn-ghost btn-xs">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                </svg>
-              </div>
-              <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
-                <li><a>Citer</a></li>
-                <li><a>Répondre</a></li>
-                <li><a>Signaler</a></li>
-              </ul>
-            </div>
           </div>
 
           <!-- Contenu du message -->
@@ -36,20 +23,94 @@
           </div>
 
           <!-- Actions du post -->
-          <div class="flex items-center gap-4">
-            <app-button variant="ghost"
-                        shape="circle" (click)="onLikePost()" >
-              <app-icon
-                name="heart" [color]="onLike ? 'primary' : 'current'"
-                [filled]="post().isLiked" />
-            </app-button>
-
-              {{ post().isLiked ? 'Aimé' : 'J\'aime' }} ({{ post().likes }})
+          <div class="flex items-center gap-7">
+            <div class="flex items-center">
+              <!-- liker -->
+              <app-button variant="ghost"
+                          size="sm"
+                          shape="circle"
+                          (click)="onLikePost()"
+              >
+                <app-icon
+                  name="heart" [color]="post().isLiked ? 'primary' : 'current'"
+                  [filled]="post().isLiked" />
+              </app-button>
+              <span> {{ post().isLiked ? 'Aimé' : 'J\'aime' }} ({{ post().likes }}) </span>
+            </div>
+            <div class="flex items-center">
+              <!-- signaler -->
+              <app-button variant="ghost"
+                          size="sm"
+                          shape="circle"
+                          [disabled]="post().isFlagged"
+                          (click)="openFlagModal()" >
+                <app-icon
+                  name="flag"
+                  [color]="post().isFlagged ? 'primary' : 'current'"
+                  [filled]="post().isFlagged" />
+              </app-button>
+              <span [class.text-primary]="post().isFlagged" [class.font-semibold]="post().isFlagged">
+                {{ post().isFlagged? 'Signalé !' : 'Signaler' }}
+              </span>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </div>
+  @if (showFlagModal()) {
+    <div class="modal modal-open">
+      <div class="modal-box">
+        @if (!flagConfirmed()) {
+          <!-- ✅ ÉTAPE 1 : Demande de confirmation -->
+          <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            Signaler ce message
+          </h3>
+
+          <p class="py-4 text-base-content/80">
+            Êtes-vous sûr de vouloir signaler ce message aux modérateurs ?
+            Cette action ne peut pas être annulée.
+          </p>
+
+          <div class="modal-action">
+            <button class="btn btn-ghost" (click)="closeFlagModal()">
+              Annuler
+            </button>
+            <button class="btn btn-warning" (click)="confirmFlag()">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
+              </svg>
+              Confirmer le signalement
+            </button>
+          </div>
+        } @else {
+          <!-- Message de confirmation -->
+          <div class="text-center py-6">
+            <div class="flex justify-center mb-4">
+              <div class="rounded-full bg-success/20 p-3">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+            </div>
+
+            <h3 class="font-bold text-xl mb-2 text-success">Message signalé !</h3>
+            <p class="text-base-content/70 mb-6">
+              Merci pour votre contribution. Notre équipe de modération examinera ce message dans les plus brefs délais.
+            </p>
+
+            <button class="btn btn-primary" (click)="closeFlagModal()">
+              Fermer
+            </button>
+          </div>
+        }
+      </div>
+    </div>
+
+  }
 } @else {
   <div class="card bg-base-100 shadow-lg border border-base-300">
     <div class="card-body p-6">

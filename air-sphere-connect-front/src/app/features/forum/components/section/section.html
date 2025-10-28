@@ -16,71 +16,80 @@
   </div>
 
   <!-- Grille des sections -->
-  <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-    @for (section of sections; track section.id) {
-      <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all  border border-base-300 duration-300 hover:-translate-y-2 group">
-        <div class="card-body p-6">
-          <!-- Icône de section -->
-          <div class="flex items-center justify-between mb-4">
-            <div class="avatar placeholder">
-              <div class="bg-primary text-primary-content rounded-xl w-12 flex items-center justify-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                </svg>
+  @if (sections$ | async; as sections) {
+    <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      @for (section of sections; track section.id) {
+        <div
+          class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all  border border-base-300 duration-300 hover:-translate-y-2 group">
+          <div class="card-body p-6">
+            <!-- Icône de section -->
+            <div class="flex items-center justify-between mb-4">
+              <div class="avatar placeholder">
+                <div class="bg-primary text-primary-content rounded-xl w-12 flex items-center justify-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="badge badge-primary badge-outline group-hover:badge-primary">
+                {{ getThreadCount(section.id) }} discussions
               </div>
             </div>
-            <div class="badge badge-primary badge-outline group-hover:badge-primary">
-              {{ getThreadCount(section.id) }} discussions
-            </div>
-          </div>
 
-          <!-- Titre -->
-          <h2 class="card-title text-xl font-bold text-base-content group-hover:text-primary transition-colors">
-            <a [routerLink]="['/forum/section', section.id]" class="hover:no-underline">
-              {{ section.title }}
-            </a>
-          </h2>
+            <!-- Titre -->
+            <h2 class="card-title text-xl font-bold text-base-content group-hover:text-primary transition-colors">
+              <a [routerLink]="['/forum/section', section.id]" class="hover:no-underline">
+                {{ section.title }}
+              </a>
+            </h2>
 
-          <!-- Description -->
-          <p class="text-base-content/70 text-sm leading-relaxed mb-4">
-            {{ section.description }}
-          </p>
+            <!-- Description -->
+            <p class="text-base-content/70 text-sm leading-relaxed mb-4">
+              {{ section.description }}
+            </p>
 
-          <!-- Actions -->
-          <div class="card-actions justify-between items-center">
-            <a [routerLink]="['/forum/section', section.id]"
-               class="btn btn-primary btn-sm group-hover:btn-primary-focus transition-all">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-              Explorer
-            </a>
+            <!-- Actions -->
+            <div class="card-actions justify-between items-center">
+              <a [routerLink]="['/forum/section', section.id]"
+                 class="btn btn-primary btn-sm group-hover:btn-primary-focus transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
+                </svg>
+                Explorer
+              </a>
 
-            <!-- Stats supplémentaires -->
-            <div class="flex items-center gap-2 text-xs text-base-content/50">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <span>Actif</span>
+              <!-- Stats supplémentaires -->
+              <div class="flex items-center gap-2 text-xs text-base-content/50">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                <span>Actif</span>
+              </div>
             </div>
           </div>
         </div>
+      }
+    </div>
+
+
+    <!-- Message si aucune section -->
+    @if (sections.length === 0) {
+      <div class="text-center py-12">
+        <div class="avatar placeholder mb-4">
+          <div class="bg-base-300 text-base-content rounded-full w-16">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+            </svg>
+          </div>
+        </div>
+        <h3 class="text-xl font-semibold text-base-content mb-2">Aucune section disponible</h3>
+        <p class="text-base-content/70">Les sections du forum seront bientôt disponibles.</p>
       </div>
     }
-  </div>
-
-  <!-- Message si aucune section -->
-  @if (sections.length === 0) {
-    <div class="text-center py-12">
-      <div class="avatar placeholder mb-4">
-        <div class="bg-base-300 text-base-content rounded-full w-16">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-          </svg>
-        </div>
-      </div>
-      <h3 class="text-xl font-semibold text-base-content mb-2">Aucune section disponible</h3>
-      <p class="text-base-content/70">Les sections du forum seront bientôt disponibles.</p>
-    </div>
   }
 </div>

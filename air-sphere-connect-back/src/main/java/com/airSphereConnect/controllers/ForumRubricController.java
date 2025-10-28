@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
-@RequestMapping("/forum-rubrics")
+@RequestMapping("/api/forum-rubrics")
 public class ForumRubricController {
     private final ForumRubricService forumRubricService;
 

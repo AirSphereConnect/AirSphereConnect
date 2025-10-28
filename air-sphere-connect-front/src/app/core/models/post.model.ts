@@ -5,4 +5,7 @@ export interface Post {
   content: string;
   createdAt: Date;
   threadId: number;
+  likes: number;
+  isLiked: boolean;
+  isFlagged: boolean;
 }

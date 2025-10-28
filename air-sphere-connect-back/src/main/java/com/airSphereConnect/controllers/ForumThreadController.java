@@ -13,7 +13,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
-@RequestMapping("/forum-threads")
+@RequestMapping("/api/forum-threads")
 public class ForumThreadController {
     private final ForumThreadService forumThreadService;
 
