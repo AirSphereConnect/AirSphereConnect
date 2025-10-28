@@ -32,11 +32,12 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
     }
 
     @Override
-    public FavoritesAlertsDto createAlertConfig(Long userId,FavoritesAlertsDto dto) {
+    public FavoritesAlertsDto createAlertConfig(Long  userId,FavoritesAlertsDto dto) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + userId));
 
         FavoritesAlerts entity = FavoritesAlertsMapper.toEntity(dto);
+        entity.setUser(user);
         entity = favoritesAlertsRepository.save(entity);
         return FavoritesAlertsMapper.toDto(entity);
     }
@@ -54,9 +55,9 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
         FavoritesAlerts entity = favoritesAlertsRepository.findByIdAndUserId(dto.getId(), userId)
                 .orElseThrow(() -> new IllegalArgumentException("Alert config not found or not owned by this user"));
 
-        if (dto.getUserId() != null) {
+        if (dto.getUser() != null) {
             User user = new User();
-            user.setId(dto.getUserId());
+            user.setId(dto.getUser());
             entity.setUser(user);
         }
 

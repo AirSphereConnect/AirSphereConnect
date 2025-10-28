@@ -7,6 +7,14 @@ export interface Favorite {
   favoriteCategory: string;
 }
 
+export interface Alerts {
+  id: number;
+  cityName: string;
+  createdAt: string;
+  updatedAt: string;
+  isEnabled: boolean;
+}
+
 export interface User {
   id: number;
   username: string;
@@ -20,6 +28,7 @@ export interface User {
     };
   };
   favorites: Favorite[];
+  alerts: Alerts[];
 }
 
 export interface UserProfileResponse {
