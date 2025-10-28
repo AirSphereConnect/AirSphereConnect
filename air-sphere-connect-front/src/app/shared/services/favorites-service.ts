@@ -19,4 +19,8 @@ export class FavoritesService {
     return this.http.put(`${this.apiUrl}/favorites/${id}`, favoriteData, { withCredentials: true });
   }
 
+  deleteFavorites(id :number) {
+    return this.http.delete(`${this.apiUrl}/favorites/${id}`, { withCredentials: true });
+
+  }
 }

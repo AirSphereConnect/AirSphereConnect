@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { FavoritesService } from '../../../services/favorites-service';
 import { CityService } from '../../../services/city-service';
 import { InputComponent } from '../input/input';
+import {UserService} from '../../../services/user-service';
 
 @Component({
   selector: 'app-favorites-form',
@@ -14,7 +15,7 @@ import { InputComponent } from '../input/input';
 export class FavoritesForm implements OnInit, OnChanges {
   @Input() isOpen = signal(false);
   @Input() editingFavoriteId: number | null = null;
-  @Input() initialData: any = null;
+  @Input() initialFavoriteData: any = null;
   @Output() close = new EventEmitter<void>();
   @Output() submitSuccess = new EventEmitter<void>();
 
@@ -22,11 +23,13 @@ export class FavoritesForm implements OnInit, OnChanges {
   citySuggestions: any[] = [];
   cityIdSelected: number | null = null;
   errorMessage: string | null = null;
+  isDeleteMode = false;
 
   constructor(
     private fb: FormBuilder,
     private favoritesService: FavoritesService,
-    private cityService: CityService
+    private cityService: CityService,
+    private userService: UserService
   ) {}
 
   ngOnInit() {
@@ -38,18 +41,18 @@ export class FavoritesForm implements OnInit, OnChanges {
 
   /** ✅ Ajout : réagit quand initialData change (ex: ouverture modal en mode édition) */
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['initialData'] && this.initialData) {
+    if (changes['initialFavoriteData'] && this.initialFavoriteData) {
       this.patchFormData();
     }
   }
 
   private patchFormData() {
     this.favoritesForm.patchValue({
-      favoriteCategory: this.initialData.favoriteCategory || '',
-      cityName: this.initialData.cityName || ''
+      favoriteCategory: this.initialFavoriteData.favoriteCategory || '',
+      cityName: this.initialFavoriteData.cityName || ''
     });
-
-    this.cityIdSelected = this.initialData.cityId || null;
+    this.cityIdSelected = this.initialFavoriteData.cityId || null;
+    this.isDeleteMode = false;
   }
 
   onCityInput(event: any) {
@@ -72,6 +75,15 @@ export class FavoritesForm implements OnInit, OnChanges {
   }
 
   submitForm() {
+    if (this.isDeleteMode) {
+      if (!this.editingFavoriteId) return;
+      this.favoritesService.deleteFavorites(this.editingFavoriteId).subscribe({
+        next: () => this.handleSuccess(),
+        error: () => this.errorMessage = "Erreur lors de la suppression de l'alerte."
+      });
+      return;
+    }
+
     if (!this.favoritesForm.valid || !this.cityIdSelected) {
       this.errorMessage = 'Veuillez remplir tous les champs et sélectionner une ville.';
       return;
@@ -105,8 +117,18 @@ export class FavoritesForm implements OnInit, OnChanges {
     });
 
     this.cityIdSelected = null;
-
+    this.isDeleteMode = false;
     this.isOpen.set(false);
     this.close.emit();
+  }
+
+  private handleSuccess() {
+    this.errorMessage = null;
+    this.favoritesForm.reset();
+    this.cityIdSelected = null;
+    this.isDeleteMode = false;
+    this.userService.fetchUserProfile();
+    this.submitSuccess.emit();
+    this.closeModal();
   }
 }

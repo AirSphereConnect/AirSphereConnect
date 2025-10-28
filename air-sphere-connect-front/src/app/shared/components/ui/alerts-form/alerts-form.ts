@@ -22,6 +22,7 @@ export class AlertsForm implements OnInit, OnChanges {
   citySuggestions: any[] = [];
   cityIdSelected: number | null = null;
   errorMessage: string | null = null;
+  isDeleteMode = false;
 
   constructor(
     private fb: FormBuilder,
@@ -32,24 +33,24 @@ export class AlertsForm implements OnInit, OnChanges {
 
   ngOnInit() {
     this.alertsForm = this.fb.group({
-      activeAlert: [false],
+      activeAlert: [false, Validators.required],
       cityName: ['', Validators.required]
     });
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['initialAlertsData'] && this.initialAlertsData) {
+    if (this.alertsForm && changes['initialAlertsData'] && this.initialAlertsData) {
       this.patchFormData();
     }
   }
 
   private patchFormData() {
     this.alertsForm.patchValue({
-      activeAlert: this.initialAlertsData.activeAlert === true,
+      activeAlert: this.initialAlertsData.enabled === true,
       cityName: this.initialAlertsData.cityName || ''
     });
-
     this.cityIdSelected = this.initialAlertsData.cityId || null;
+    this.isDeleteMode = false; // Reset delete mode when modal opens
   }
 
   onCityInput(event: any) {
@@ -72,13 +73,22 @@ export class AlertsForm implements OnInit, OnChanges {
   }
 
   submitForm() {
+    if (this.isDeleteMode) {
+      if (!this.editingAlertsId) return;
+      this.alertsService.deleteAlerts(this.editingAlertsId).subscribe({
+        next: () => this.handleSuccess(),
+        error: () => this.errorMessage = "Erreur lors de la suppression de l'alerte."
+      });
+      return;
+    }
+
     if (!this.alertsForm.valid || !this.cityIdSelected) {
       this.errorMessage = 'Veuillez remplir tous les champs et sélectionner une ville.';
       return;
     }
 
     const payload = {
-      activeAlert: this.alertsForm.value.activeAlert,
+      enabled: !!this.alertsForm.value.activeAlert,
       cityId: this.cityIdSelected
     };
 
@@ -87,16 +97,24 @@ export class AlertsForm implements OnInit, OnChanges {
       : this.alertsService.addAlerts(payload);
 
     request$.subscribe({
-      next: () => {
-        this.errorMessage = null;
-        this.alertsForm.reset();
-        this.cityIdSelected = null;
-        this.userService.fetchUserProfile();
-        this.submitSuccess.emit();
-        this.closeModal();
-      },
-      error: () => (this.errorMessage = "Erreur lors de l'enregistrement de l'alerte.")
+      next: () => this.handleSuccess(),
+      error: () => this.errorMessage = "Erreur lors de l'enregistrement de l'alerte."
     });
+  }
+
+  onDelete() {
+    this.isDeleteMode = true;
+    this.submitForm();
+  }
+
+  private handleSuccess() {
+    this.errorMessage = null;
+    this.alertsForm.reset();
+    this.cityIdSelected = null;
+    this.isDeleteMode = false;
+    this.userService.fetchUserProfile();
+    this.submitSuccess.emit();
+    this.closeModal();
   }
 
   closeModal() {
@@ -104,8 +122,8 @@ export class AlertsForm implements OnInit, OnChanges {
       activeAlert: false,
       cityName: ''
     });
-
     this.cityIdSelected = null;
+    this.isDeleteMode = false;
     this.isOpen.set(false);
     this.close.emit();
   }

@@ -12,7 +12,7 @@ export interface Alerts {
   cityName: string;
   createdAt: string;
   updatedAt: string;
-  isEnabled: boolean;
+  enabled: boolean;
 }
 
 export interface User {

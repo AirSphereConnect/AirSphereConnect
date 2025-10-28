@@ -11,7 +11,7 @@ import { UserProfileResponse } from '../../core/models/user.model';
 export class UserService {
 
   private readonly apiUrl = 'http://localhost:8080/api';
-  private readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
+  readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
   public readonly userProfile$ = this._userProfileSubject.asObservable();
 
   constructor(private http: HttpClient) {
@@ -86,7 +86,12 @@ export class UserService {
   }
 
   //Mettre à jour les infos de l'user
-  updateUser(userData: any, id: string) {
-    return this.http.put(`${this.apiUrl}/users/${id}`, userData, { withCredentials: true });
+  editUser(userId: number | null, payload: any) {
+    return this.http.put(`${this.apiUrl}/users/${userId}`, payload, { withCredentials: true });
+  }
+
+  deleteUser() {
+    return this.http.put(`${this.apiUrl}/users`, { withCredentials: true });
+
   }
 }

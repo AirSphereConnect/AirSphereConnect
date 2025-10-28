@@ -5,18 +5,21 @@ import {HttpClient} from '@angular/common/http';
   providedIn: 'root'
 })
 export class AlertsService {
-  private readonly apiUrl = 'http://localhost:8080/api';
+  private readonly apiUrl = 'http://localhost:8080/api/alert/configurations';
 
   constructor(private http: HttpClient) {}
 
 
-  editAlerts(payload: { activeAlert: any; cityId: number }, editingAlertsId: number) {
-    return this.http.put(`${this.apiUrl}/favorites/${editingAlertsId}`, payload, { withCredentials: true });
+  editAlerts(payload: { enabled: boolean; cityId: number | null }, editingAlertsId: number) {
+    return this.http.put(`${this.apiUrl}/${editingAlertsId}`, payload, { withCredentials: true });
 
   }
 
-  addAlerts(payload: { activeAlert: any; cityId: number }) {
-    return this.http.post(`${this.apiUrl}/alerts/new`, payload, { withCredentials: true });
+  addAlerts(payload: { enabled: boolean; cityId: number | null }) {
+    return this.http.post(`${this.apiUrl}`, payload, { withCredentials: true });
+  }
 
+  deleteAlerts(editingAlertsId: number) {
+    return this.http.delete(`${this.apiUrl}/${editingAlertsId}`, { withCredentials: true });
   }
 }

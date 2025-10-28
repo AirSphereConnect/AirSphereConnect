@@ -21,6 +21,7 @@ public class FavoritesAlertsController {
     private final FavoritesAlertsService favoritesAlertsService;
     private final UserRepository userRepository;
 
+
     public FavoritesAlertsController(FavoritesAlertsService favoritesAlertsService, UserRepository userRepository) {
         this.favoritesAlertsService = favoritesAlertsService;
         this.userRepository = userRepository;
@@ -47,9 +48,13 @@ public class FavoritesAlertsController {
         return favoritesAlertsService.getUserAlerts(userId);
     }
 
-    @PutMapping
-    public FavoritesAlertsDto update(@RequestBody FavoritesAlertsDto dto, @RequestParam Long userId) {
-        return favoritesAlertsService.updateAlertConfig(dto, userId);
+    @PutMapping("/{id}")
+    public FavoritesAlertsDto update(@PathVariable Long id,@RequestBody FavoritesAlertsDto dto, @AuthenticationPrincipal UserDetails userDetails) {
+
+        User user = userRepository.findByUsername(userDetails.getUsername())
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
+
+        return favoritesAlertsService.updateAlertConfig(dto, user.getId(), id);
     }
 
 

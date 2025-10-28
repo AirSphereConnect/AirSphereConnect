@@ -1,7 +1,7 @@
-<section class="profile-favorites justify-between p-4">
+<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4" style="width: 100%;">
   @if (user && user.favorites && user.favorites.length > 0) {
     <table class="w-full border border-gray-200 rounded-lg shadow-sm">
-      <thead class="bg-gray-100">
+      <thead>
       <tr>
         <th class="p-2">Catégorie</th>
         <th class="p-2">Ville</th>
@@ -11,20 +11,29 @@
       </tr>
       </thead>
       <tbody>
-        @for (favorite of user.favorites; track favorite) {
+        @for (favorite of user.favorites; track favorite.id) {
           <tr class="border-t">
             <td class="p-2 text-center">{{ favorite.favoriteCategory }}</td>
             <td class="p-2 text-center">{{ favorite.cityName }}</td>
             <td class="p-2 text-center">{{ favorite.createdAt }}</td>
             <td class="p-2 text-center">{{ favorite.updatedAt }}</td>
-            <td class="p-2 text-center">
+            <td class="p-2 flex justify-center">
               <app-button
+                class="w-30 h-10 divider-horizontal divider-start"
                 color="primary"
-                size="md"
                 variant="solid"
                 (click)="editFavorites(favorite.id)"
               >
                 Modifier
+              </app-button>
+              <div class="divider divider-horizontal"> </div>
+              <app-button
+                class="w-30 h-10 divider-horizontal divider-start"
+                color="warning"
+                variant="solid"
+                (click)="deleteFavorites(favorite.id)"
+              >
+                Supprimer
               </app-button>
             </td>
           </tr>
@@ -34,16 +43,16 @@
   } @else {
     <p>Aucun favori trouvé.</p>
   }
+</fieldset>
   <br>
   <app-button color="primary" size="md" variant="solid" (click)="addFavorites()">
     Ajouter
   </app-button>
-</section>
 
 <!-- 🟣 Modal -->
 <app-favorites-form
   [isOpen]="isModalOpen"
   [editingFavoriteId]="editingFavoriteId"
-  [initialData]="initialData"
+  [initialFavoriteData]="initialFavoriteData"
   (close)="onModalClose()"
 ></app-favorites-form>
