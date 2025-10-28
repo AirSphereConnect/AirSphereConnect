@@ -7,4 +7,5 @@ export interface Post {
   threadId: number;
   likes: number;
   isLiked: boolean;
+  isFlagged: boolean;
 }

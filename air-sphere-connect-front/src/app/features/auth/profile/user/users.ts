@@ -1,13 +1,13 @@
 import {Component, Input} from '@angular/core';
 import {User} from '../../../../core/models/user.model';
-import {ButtonComponent} from '../../../../shared/components/ui/button/button';
+import {Button} from '../../../../shared/components/ui/button/button';
 import {Router} from '@angular/router';
 
 
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [ButtonComponent],
+  imports: [Button],
   templateUrl: './user.html',
   styleUrls: ['./user.scss']
 })

@@ -88,4 +88,8 @@ export class UserService {
   updateUser(userData: any, id: string) {
     return this.http.put(`${this.apiUrl}/users/${id}`, userData, { withCredentials: true });
   }
+
+  getUserName(): string {
+    return this._userProfileSubject.value?.user.username || '';
+  }
 }
