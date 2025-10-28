@@ -42,7 +42,7 @@ public class AirQualityIndex {
     private String source;
 
     @NotNull(message = "{airquality.areaCode.required}")
-    @Column(name = "area_code", unique = true)
+    @Column(name = "area_code")
     private String areaCode;
 
     @NotBlank(message = "{airquality.areaName.required}")
