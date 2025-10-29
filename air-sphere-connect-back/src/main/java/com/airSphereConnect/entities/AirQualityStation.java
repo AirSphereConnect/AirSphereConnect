@@ -31,9 +31,13 @@ public class AirQualityStation {
     @Column(name = "area_code", length = 10)
     private String areaCode;
 
+    @Size(max = 10, message = "{station.inseeCode.size}")
+    @Column(name = "insee_code", length = 10)
+    private String inseeCode;
+
     @NotNull(message = "{station.city.required}")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "insee_code", referencedColumnName = "insee_code", nullable = false)
+    @JoinColumn(name = "city_id", nullable = false)
     private City city;
 
     @OneToMany(mappedBy = "station", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -41,10 +45,11 @@ public class AirQualityStation {
 
     public AirQualityStation() {}
 
-    public AirQualityStation(String name, String code, String areaCode, City city) {
+    public AirQualityStation(String name, String code, String areaCode, String inseeCode, City city) {
         this.name = name;
         this.code = code;
         this.areaCode = areaCode;
+        this.inseeCode = inseeCode;
         this.city = city;
     }
 
@@ -78,6 +83,14 @@ public class AirQualityStation {
 
     public void setAreaCode(String areaCode) {
         this.areaCode = areaCode;
+    }
+
+    public String getInseeCode() {
+        return inseeCode;
+    }
+
+    public void setInseeCode(String inseeCode) {
+        this.inseeCode = inseeCode;
     }
 
     public City getCity() {

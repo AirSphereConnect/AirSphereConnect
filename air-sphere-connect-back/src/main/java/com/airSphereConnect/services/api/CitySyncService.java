@@ -8,9 +8,14 @@ import com.airSphereConnect.mapper.ApiCityMapper;
 import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.DepartmentRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
 import java.util.Map;
@@ -19,7 +24,9 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class CitySyncService {
+public class CitySyncService implements DataSyncService {
+
+    private static final Logger log = LoggerFactory.getLogger(CitySyncService.class);
 
     // codeepci = areaCode
     private static final String SOURCE_URL = "/communes?codeRegion=76&fields=code,nom,codesPostaux,codeEpci," +
@@ -29,10 +36,59 @@ public class CitySyncService {
     private final CityRepository cityRepository;
     private final DepartmentRepository departmentRepository;
 
+    @Value("${app.api.city.enabled:true}")
+    private boolean enabled;
+
+    @Value("${app.api.city.sync-interval-hours:720}")
+    private int syncIntervalHours; // 30 jours par défaut
+
+    private LocalDateTime lastSync;
+    private int consecutiveErrors = 0;
+
     public CitySyncService(WebClient populationApiWebClient, CityRepository cityRepository, DepartmentRepository departmentRepository) {
         this.populationApiWebClient = populationApiWebClient;
         this.departmentRepository = departmentRepository;
         this.cityRepository = cityRepository;
+    }
+
+    @Override
+    public String getServiceName() {
+        return "CITY";
+    }
+
+    @Override
+    public void syncData() {
+        log.info("🔄 Début synchronisation des villes...");
+        try {
+            importCitiesOccitanie();
+            lastSync = LocalDateTime.now();
+            consecutiveErrors = 0;
+            log.info("✅ [CITY] Sync terminée");
+        } catch (Exception e) {
+            consecutiveErrors++;
+            log.error("❌ [CITY] Erreur sync (tentative {}/3) : {}", consecutiveErrors, e.getMessage(), e);
+            throw new RuntimeException("Sync failed for CITY", e);
+        }
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled && consecutiveErrors < 3;
+    }
+
+    @Override
+    public Duration getSyncInterval() {
+        return Duration.ofHours(syncIntervalHours);
+    }
+
+    @Override
+    public LocalDateTime getLastSync() {
+        return lastSync;
+    }
+
+    @Override
+    public int getConsecutiveErrors() {
+        return consecutiveErrors;
     }
 
     public void importCitiesOccitanie() {

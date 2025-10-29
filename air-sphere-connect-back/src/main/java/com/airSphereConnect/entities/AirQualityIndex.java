@@ -42,7 +42,7 @@ public class AirQualityIndex {
     private String source;
 
     @NotNull(message = "{airquality.areaCode.required}")
-    @Column(name = "area_code")
+    @Column(name = "area_code", nullable = false)
     private String areaCode;
 
     @NotBlank(message = "{airquality.areaName.required}")
@@ -171,4 +171,11 @@ public class AirQualityIndex {
         return Objects.hashCode(id);
     }
 
+    public List<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(List<City> cities) {
+        this.cities = cities;
+    }
 }
