@@ -11,7 +11,9 @@ import { UserProfileResponse } from '../../core/models/user.model';
 export class UserService {
 
   private readonly apiUrl = 'http://localhost:8080/api';
-  readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
+
+  private readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
+
   public readonly userProfile$ = this._userProfileSubject.asObservable();
 
   constructor(private http: HttpClient) {
@@ -19,6 +21,10 @@ export class UserService {
     if (storedProfile) {
       this._userProfileSubject.next(JSON.parse(storedProfile));
     }
+  }
+
+  get currentUserProfile(): UserProfileResponse | null {
+    return this._userProfileSubject.value;
   }
 
   fetchUserProfile(): void {

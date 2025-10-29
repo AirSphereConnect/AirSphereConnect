@@ -15,12 +15,12 @@ export class AuthInterceptor implements HttpInterceptor {
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     const authReq = req.clone({ withCredentials: true });
     console.log('Requête envoyée avec headers:', req.headers);
+
     return next.handle(authReq).pipe(
       catchError((error: HttpErrorResponse) => {
         if (
           error.status === 401 &&
-          !req.url.endsWith('/api/profile') &&
-          !req.url.endsWith('/api/favorites/new')
+          !req.url.endsWith('/api/profile')
         ) {
           this.userService.logout().subscribe(() => {
             this.router.navigate(['/auth/login']);

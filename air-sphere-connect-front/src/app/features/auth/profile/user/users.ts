@@ -22,7 +22,7 @@ export class UserDashboard {
   constructor(private userService: UserService, private router: Router) {
     // 👀 Met à jour automatiquement "user" quand le profil change
     effect(() => {
-      const currentProfile = this.userService._userProfileSubject.value;
+      const currentProfile = this.userService.currentUserProfile;
       if (currentProfile) {
         this.user = currentProfile.user;
       }
@@ -43,7 +43,9 @@ export class UserDashboard {
   /** 🗑️ Supprime le compte utilisateur */
   deleteUser() {
     if (confirm('Voulez-vous vraiment supprimer votre compte ?')) {
-      this.userService.deleteUser().subscribe({
+      this.userService.deleteUser()
+        .pipe()
+        .subscribe({
         next: () => {
           // ✅ Déconnexion automatique après suppression
           this.userService.logout().subscribe({

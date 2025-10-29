@@ -6,7 +6,7 @@ import {
   OnInit,
   OnDestroy,
   Output,
-  EventEmitter, input,
+  EventEmitter, input, inject, DestroyRef,
 } from '@angular/core';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { inputVariants, type InputVariants } from '../../../variants/input.variants';
@@ -14,6 +14,7 @@ import { NgClass } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { type HeroIconName } from '../../../icons/heroicons.registry';
 import {IconComponent} from '../icon/icon';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-input',
@@ -22,7 +23,7 @@ import {IconComponent} from '../icon/icon';
   styleUrl: './input.scss'
 })
 
-export class InputComponent implements OnInit, OnDestroy {
+export class InputComponent implements OnInit {
 
   @Input() label!: string;
   @Input()
@@ -54,8 +55,7 @@ export class InputComponent implements OnInit, OnDestroy {
   private formValid = signal(false);
   private formDisabled = signal(false);
   private formErrors = signal<any>(null);
-
-  private destroy$ = new Subject<void>();
+  private readonly destroyRef = inject(DestroyRef);
 
   inputType = computed(() => this._typeSignal());
 
@@ -67,21 +67,16 @@ export class InputComponent implements OnInit, OnDestroy {
     }
 
     this.control.statusChanges
-      ?.pipe(takeUntil(this.destroy$))
+      ?.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.updateSignalsFromControl());
 
     this.control.valueChanges
-      ?.pipe(takeUntil(this.destroy$))
+      ?.pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.updateSignalsFromControl());
 
     this.updateSignalsFromControl();
   }
 
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
 
   private updateSignalsFromControl() {
     this.formValid.set(this.control.valid);
@@ -91,21 +86,10 @@ export class InputComponent implements OnInit, OnDestroy {
     this.formErrors.set(this.control.errors);
   }
 
-  shouldShowValidation = computed(() =>
-    this.formTouched() || this.formDirty()
-  );
-
-  isInvalid = computed(() =>
-    this.shouldShowValidation() && !this.formValid()
-  );
-
-  isSuccess = computed(() =>
-    this.shouldShowValidation() && this.formValid() && !!this.successMessage
-  );
-
-  isDisabled = computed(() =>
-    this.formDisabled()
-  );
+  shouldShowValidation = computed(() => this.formTouched() || this.formDirty());
+  isInvalid = computed(() => this.shouldShowValidation() && !this.formValid());
+  isSuccess = computed(() => this.shouldShowValidation() && this.formValid() && !!this.successMessage);
+  isDisabled = computed(() => this.formDisabled());
 
 
   state = computed<InputVariants['state']>(() => {

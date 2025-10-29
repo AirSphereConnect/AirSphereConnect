@@ -1,4 +1,4 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import {Component, OnInit, signal, computed, OnDestroy, inject, DestroyRef} from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import {Router, RouterLink} from '@angular/router';
 import { UserService } from '../../../shared/services/user-service';
@@ -6,6 +6,7 @@ import { CommonModule } from '@angular/common';
 import {InputComponent} from '../../../shared/components/ui/input/input';
 import {Button} from '../../../shared/components/ui/button/button';
 import {IconComponent} from '../../../shared/components/ui/icon/icon';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   standalone: true,
@@ -22,6 +23,12 @@ import {IconComponent} from '../../../shared/components/ui/icon/icon';
   templateUrl: './login.html',
 })
 export class Login implements OnInit {
+  private readonly fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
+
+  private readonly destroyRef = inject(DestroyRef);
+
   loginForm!: FormGroup;
 
   // 🎯 Signals
@@ -32,11 +39,6 @@ export class Login implements OnInit {
   isFormValid = computed(() => this.loginForm?.valid ?? false);
   canSubmit = computed(() => this.isFormValid() && !this.isLoading());
 
-  constructor(
-    private fb: FormBuilder,
-    private userService: UserService,
-    private router: Router
-  ) {}
 
   ngOnInit() {
     this.loginForm = this.fb.group({
@@ -45,6 +47,7 @@ export class Login implements OnInit {
     });
 
   }
+
 
   get usernameControl(): FormControl {
     return this.loginForm.get('username') as FormControl;
@@ -61,12 +64,14 @@ export class Login implements OnInit {
 
       const credentials = this.loginForm.value;
 
-      this.userService.login(credentials).subscribe({
-        next: profile => {
-          this.isLoading.set(false);
-          this.errorMessage.set(null);
-          this.router.navigate(['/home']).then();
-        },
+      this.userService.login(credentials)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.isLoading.set(false);
+            this.errorMessage.set(null);
+            this.router.navigate(['/home']).then();
+          },
         error: err => {
           this.isLoading.set(false);
           if (err.status === 0) {
