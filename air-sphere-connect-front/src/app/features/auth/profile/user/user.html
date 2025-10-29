@@ -2,70 +2,93 @@
   @if (user) {
     <div class="flex flex-wrap gap-4 mb-4">
       <div class="flex flex-col flex-1">
-        <label class="label font-bold">Nom utilisateur</label>
-        <input type="text" class="input w-full" [value]="user.username" disabled />
+        <div class="flex flex-raw flex-1 items-center">
+          <label class="label font-bold">Nom utilisateur</label>
+          <input type="text" class="input w-full" [value]="user.username" disabled/>
+        </div>
+        <button class="btn btn-primary" (click)="editUser()">Modifier nom utilisateur</button>
       </div>
 
-      <div class="flex flex-col flex-1">
-        <label class="label font-bold">Email</label>
-        <input type="text" class="input w-full" [value]="user.email" disabled />
-      </div>
+      <div class="divider divider-horizontal"></div>
 
       <div class="flex flex-col flex-1">
+        <div class="flex flex-raw flex-1 items-center">
+          <label class="label font-bold">Email</label>
+          <input type="text" class="input w-full" [value]="user.email" disabled/>
+        </div>
+        <button class="btn btn-primary" (click)="editEmail()">Modifier email</button>
+      </div>
+
+      <div class="divider divider-horizontal"></div>
+
+      <div class="flex flex-col flex-1 justify-between items-center">
         <label class="label font-bold">Rôle</label>
-        <input type="text" class="input w-full" [value]="user.role" disabled />
+        <input type="text" class="input w-full  text-center " [value]="user.role" disabled/>
+      </div>
+
+      <div class="divider divider-horizontal"></div>
+
+      <div class="flex flex-raw items-center">
+        <button class="btn btn-primary" (click)="editPassword()">Modifier mon mot de passe</button>
       </div>
     </div>
+    <div class="divider divider-vertical"></div>
 
     @if (user.address) {
       <div class="flex flex-wrap gap-4 mb-4">
         <div class="flex flex-col flex-1">
           <label class="label font-bold">Adresse</label>
-          <input type="text" class="input w-full" [value]="user.address.street" disabled />
+          <input type="text" class="input w-full" [value]="user.address.street" disabled/>
         </div>
 
         <div class="flex flex-col flex-1">
           <label class="label font-bold">Ville</label>
-          <input type="text" class="input w-full" [value]="user.address.city.name" disabled />
+          <input type="text" class="input w-full" [value]="user.address.city.name" disabled/>
         </div>
 
         <div class="flex flex-col flex-1">
           <label class="label font-bold">Code postal</label>
-          <input type="text" class="input w-full" [value]="user.address.city.postalCode" disabled />
+          <input type="text" class="input w-full" [value]="user.address.city.postalCode" disabled/>
         </div>
+        <button class="btn btn-secondary" (click)="editAddress()">Modifier mon adresse</button>
       </div>
     }
 
 
   }
 </fieldset>
-@if (user) {
-  <div class="flex justify-center gap-6 mt-6">
-    <app-button
-      class="w-30 h-10 divider-horizontal divider-start"
-      color="primary"
-      variant="solid"
-      (click)="editUser(user.id)"
-    >
-      Modifier
-    </app-button>
-    <div class="divider divider-horizontal"></div>
-    <app-button
-      class="w-30 h-10 divider-horizontal divider-end"
-      color="warning"
-      variant="solid"
-      (click)="deleteUser()"
-    >
-      Supprimer
-    </app-button>
-  </div>
-}
-<!-- 🟣 Modal
--->
-  <app-user-form
-    [isOpen]="isModalOpen"
-    [editingUserId]="editingUserId"
-    [initialUserData]="initialUserData"
-    (close)="onModalClose()"
-  ></app-user-form>
+
+
+<app-user-form
+  [isOpen]="isUserModalOpen"
+  [editingUserId]="editingUserId"
+  [initialUserData]="initialUserData"
+  (close)="onUserModalClose()"
+  (updated)="userService.fetchUserProfile()">
+</app-user-form>
+
+<app-email-form
+  [isOpen]="isEmailModalOpen"
+  [editingUserId]="editingUserId"
+  [initialEmailData]="initialEmailData"
+  (close)="onEmailModalClose()"
+  (updated)="userService.fetchUserProfile()">
+</app-email-form>
+
+<app-password-form
+  [isOpen]="isPasswordModalOpen"
+  [editingUserId]="editingUserId"
+  [initialPasswordData]="initialPasswordData"
+  (close)="onPasswordModalClose()"
+  (updated)="userService.fetchUserProfile()">
+</app-password-form>
+
+<app-address-form
+  [isOpen]="isAddressModalOpen"
+  [editingUserId]="editingUserId"
+  [addressData]="initialAddressData"
+  (close)="onAddressModalClose()"
+  (updated)="userService.fetchUserProfile()">
+</app-address-form>
+
 

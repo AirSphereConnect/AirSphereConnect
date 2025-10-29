@@ -93,11 +93,22 @@ export class UserService {
 
   //Mettre à jour les infos de l'user
   editUser(userId: number | null, payload: any) {
-    return this.http.put(`${this.apiUrl}/users/${userId}`, payload, { withCredentials: true });
+    return this.http.put<UserProfileResponse>(
+      `${this.apiUrl}/users/${userId}`,
+      payload,
+      { withCredentials: true }
+    ).pipe(
+      tap(profile => this.setUserProfile(profile)) // met à jour localStorage et signal
+    );
   }
+
 
   deleteUser() {
     return this.http.put(`${this.apiUrl}/users`, { withCredentials: true });
 
+  }
+
+  editAddress(id: number | null, payload: any) {
+    return this.http.put(`${this.apiUrl}/address/${id}`, payload, { withCredentials: true });
   }
 }

@@ -1,30 +1,32 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 
 @Component({
-  selector: 'app-user-form',
-  standalone: true,
-  imports: [ReactiveFormsModule],
-  templateUrl: './user-form.html',
+  selector: 'app-password-form',
+  imports: [
+    ReactiveFormsModule
+  ],
+  templateUrl: './password-form.html',
+  styleUrl: './password-form.scss'
 })
-export class UserForm implements OnChanges, OnInit {
+export class PasswordForm implements OnChanges, OnInit {
   @Input() user: any = null;
   @Input() isOpen = signal(false);
   @Input() editingUserId!: number | null;
-  @Input() initialUserData: any = null;
+  @Input() initialPasswordData: any = null;
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
-  userForm: FormGroup;
+  passwordForm: FormGroup;
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
   constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
-    this.userForm = this.fb.group({
-      username: ['', Validators.required]
+    this.passwordForm = this.fb.group({
+      password: ['****']
     });
   }
 
@@ -38,36 +40,36 @@ export class UserForm implements OnChanges, OnInit {
   }
 
   ngOnChanges() {
-    if (this.initialUserData) {
-      this.userForm.patchValue({
-        username: this.initialUserData.username
+    if (this.initialPasswordData) {
+      this.passwordForm.patchValue({
+        password: ''
       });
     }
   }
 
   submit() {
-    if (this.userForm.invalid) {
-      console.log("[UserForm] Formulaire invalide");
+    if (this.passwordForm.invalid) {
+      console.log("[PasswordForm] Formulaire invalide");
       return;
     }
 
     this.isLoading.set(true);
-    const payload = { ...this.userForm.value };
+    const payload = { ...this.passwordForm.value };
 
-    console.log("[UserForm] Soumission des données:", payload);
+    console.log("[PasswordForm] Soumission des données:", payload);
 
     this.userService.editUser(this.editingUserId, payload).subscribe({
       next: (res) => {
-        console.log("[UserForm] Réponse backend:", res);
+        console.log("[PasswordForm] Réponse backend:", res);
 
         if (!res || Object.keys(res).length === 0) {
-          console.log("[UserForm] Session invalidée côté backend, déconnexion forcée");
+          console.log("[PasswordForm] Session invalidée côté backend, déconnexion forcée");
 
           this.userService.setUserProfile(null);
           this.userService.fetchUserProfile();
           this.router.navigate(['/home']);
         } else {
-          console.log("[UserForm] Mise à jour normale, rafraîchissement du profil");
+          console.log("[PasswordForm] Mise à jour normale, rafraîchissement du profil");
 
           this.userService.fetchUserProfile();
           this.updated.emit();
@@ -76,12 +78,11 @@ export class UserForm implements OnChanges, OnInit {
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error("[UserForm] Erreur lors de la mise à jour:", err);
+        console.error("[PasswordForm] Erreur lors de la mise à jour:", err);
         this.isLoading.set(false);
         this.errorMessage.set('Erreur lors de la mise à jour.');
       }
     });
   }
-
 
 }
