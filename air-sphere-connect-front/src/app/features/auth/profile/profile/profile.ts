@@ -1,4 +1,13 @@
-import {AfterViewInit, ChangeDetectorRef, Component, OnInit, TemplateRef, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectorRef,
+  Component,
+  DestroyRef,
+  inject,
+  OnInit,
+  TemplateRef,
+  ViewChild
+} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {UserService} from '../../../../shared/services/user-service';
 import {User} from '../../../../core/models/user.model';
