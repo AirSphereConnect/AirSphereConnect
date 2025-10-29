@@ -1,5 +1,13 @@
 import {Component, computed, DestroyRef, inject, OnDestroy, OnInit, signal} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
 import {UserService} from '../../../shared/services/user-service';
 import {Router, RouterLink} from '@angular/router';
 import {debounceTime, distinctUntilChanged, Subject, switchMap, takeUntil} from 'rxjs';
@@ -49,12 +57,78 @@ export class Register implements OnInit {
   canSubmitStep1 = signal<boolean>(false);
   canSubmitStep2 = signal<boolean>(false);
 
+  private strictEmailValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
+    if (!emailRegex.test(control.value)) {
+      return { invalidEmail: true };
+    }
+
+    const parts = control.value.split('@');
+    if (parts.length !== 2) return { invalidEmail: true };
+
+    const domain = parts[1];
+    if (!domain.includes('.')) return { invalidEmail: true };
+
+    const domainParts = domain.split('.');
+    if (domainParts.some((part: string) => part.length < 2)) {
+      return { invalidEmail: true };
+    }
+
+    return null;
+  }
+
+  private validUsernameValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+
+    const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+
+    if (!usernameRegex.test(control.value)) {
+      return { invalidUsername: true };
+    }
+
+    return null;
+  }
+
+  private strongPasswordValidator(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) return null;
+
+    const hasUpperCase = /[A-Z]/.test(control.value);
+    const hasLowerCase = /[a-z]/.test(control.value);
+    const hasNumber = /[0-9]/.test(control.value);
+    const hasSpecialChar = /[@$!%*?&#]/.test(control.value);
+
+    const errors: ValidationErrors = {};
+
+    if (!hasUpperCase) errors['noUpperCase'] = true;
+    if (!hasLowerCase) errors['noLowerCase'] = true;
+    if (!hasNumber) errors['noNumber'] = true;
+    if (!hasSpecialChar) errors['noSpecialChar'] = true;
+
+    return Object.keys(errors).length > 0 ? errors : null;
+  }
+
 
   ngOnInit() {
     this.registerFirstForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(1), Validators.maxLength(20)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(50)]]
+      username: ['', [
+        Validators.required,
+        Validators.minLength(3),
+        Validators.maxLength(25),
+        this.validUsernameValidator
+      ]],
+      email: ['', [
+        Validators.required,
+        this.strictEmailValidator
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.maxLength(25),
+        this.strongPasswordValidator
+      ]]
     });
 
     this.registerForm = this.fb.group({

@@ -15,6 +15,7 @@ import { Subject, takeUntil } from 'rxjs';
 import { type HeroIconName } from '../../../icons/heroicons.registry';
 import {IconComponent} from '../icon/icon';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import { FormErrorService } from '../../../../features/auth/services/form-error.service';
 
 @Component({
   selector: 'app-input',
@@ -45,6 +46,7 @@ export class InputComponent implements OnInit {
   @Input() iconRight?: HeroIconName;
   @Input() autocomplete?: string;
   @Input() readonly: boolean = false;
+  @Input() fieldName?: string; // 🆕 Nom du champ pour les messages d'erreur personnalisés
 
   @Output() iconRightClick = new EventEmitter<void>();
 
@@ -56,6 +58,7 @@ export class InputComponent implements OnInit {
   private formDisabled = signal(false);
   private formErrors = signal<any>(null);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly formErrorService = inject(FormErrorService);
 
   inputType = computed(() => this._typeSignal());
 
@@ -133,48 +136,10 @@ export class InputComponent implements OnInit {
   characterCountClass = computed(() => this.variantsConfig().characterCount());
 
 
+  // 🔥 Utilisation du service centralisé pour les messages d'erreur
   errorMessage = computed<string | null>(() => {
     if (!this.isInvalid()) return null;
-
-    const errors = this.formErrors();
-    if (!errors) return null;
-
-    if (errors['required']) {
-      return 'Ce champ est requis';
-    }
-
-    if (errors['email']) {
-      return 'Veuillez entrer une adresse email valide';
-    }
-
-    if (errors['minlength']) {
-      const { requiredLength, actualLength } = errors['minlength'];
-      const remaining = requiredLength - actualLength;
-      return `${remaining} caractère${remaining > 1 ? 's' : ''} manquant${remaining > 1 ? 's' : ''} (minimum ${requiredLength})`;
-    }
-
-    if (errors['maxlength']) {
-      const { requiredLength, actualLength } = errors['maxlength'];
-      const excess = actualLength - requiredLength;
-      return `${excess} caractère${excess > 1 ? 's' : ''} en trop (maximum ${requiredLength})`;
-    }
-
-    if (errors['pattern']) {
-      if (this.type === 'email') {
-        return 'Format d\'email invalide';
-      }
-
-      return 'Format invalide';
-    }
-
-    if (errors['min']) {
-      return `La valeur doit être au minimum ${errors['min'].min}`;
-    }
-
-    if (errors['max']) {
-      return `La valeur ne doit pas dépasser ${errors['max'].max}`;
-    }
-    return 'Ce champ contient une erreur';
+    return this.formErrorService.getErrorMessage(this.formErrors(), this.fieldName);
   });
 
   // 📊 Compteur de caractères

@@ -16,6 +16,7 @@
               iconLeft="user"
               placeholder="Entrez votre nom d'utilisateur"
               autocomplete="username"
+              fieldName="username"
             ></app-input>
 
             <app-input
@@ -26,6 +27,7 @@
               iconLeft="envelope"
               placeholder="exemple@exemple.com"
               autocomplete="email"
+              fieldName="email"
             ></app-input>
 
             <app-input
@@ -38,6 +40,7 @@
               (iconRightClick)="togglePasswordVisibility()"
               placeholder="••••••••"
               autocomplete="new-password"
+              fieldName="password"
             ></app-input>
 
             @if (errorMessage()) {
@@ -80,6 +83,7 @@
               [required]="true"
               placeholder="Entrez votre adresse"
               autocomplete="street-address"
+              fieldName="address"
             ></app-input>
 
             <app-input
@@ -90,6 +94,7 @@
               placeholder="Entrez le nom de votre ville"
               autocomplete="address-level2"
               (input)="onCityInput($event)"
+              fieldName="cityName"
             ></app-input>
 
             <!-- Suggestions de villes -->
