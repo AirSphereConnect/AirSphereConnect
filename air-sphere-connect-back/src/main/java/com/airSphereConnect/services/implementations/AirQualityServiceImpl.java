@@ -126,7 +126,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         List<AirQualityIndex> indices = indexRepository
                 .findByAreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
-                        Integer.parseInt(city.getAreaCode()), period[0], period[1]);
+                        city.getAreaCode(), period[0], period[1]);
 
         return indices.stream()
                 .map(index -> {
