@@ -84,8 +84,8 @@ public class ExportServiceImpl implements ExportService {
                         aqm.getNo2(),
                         aqm.getO3(),
                         aqm.getUnit(),
-                        aqm.getStation().getCity().getAirQualityIndex().getQualityIndex(),
-                        aqm.getStation().getCity().getAirQualityIndex().getQualityLabel()
+                        aqm.getStation().getCity().getAirQualityIndex() != null ? aqm.getStation().getCity().getAirQualityIndex().getQualityIndex() : null,
+                        aqm.getStation().getCity().getAirQualityIndex() != null ? aqm.getStation().getCity().getAirQualityIndex().getQualityLabel() : null
                 );
 
                 mergedData.add(dto);
