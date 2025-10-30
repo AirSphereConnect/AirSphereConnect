@@ -181,8 +181,26 @@ public class ApiAirQualityService implements DataSyncService {
 
         for (AirQualityIndexMeasureResponseDto indexDto : indexDtos) {
             try {
-                AirQualityIndex index = mapper.toEntity(indexDto);
-                index.setMeasuredAt(syncDateTime);
+                // Chercher l'index existant par areaCode
+                Optional<AirQualityIndex> existingIndex = indexRepository.findFirstByAreaCodeOrderByMeasuredAtDesc(indexDto.areaCode());
+
+                AirQualityIndex index;
+                if (existingIndex.isPresent()) {
+                    // Mettre à jour l'index existant
+                    index = existingIndex.get();
+                    index.setQualityIndex(Integer.valueOf(indexDto.qualityIndex()));
+                    index.setQualityLabel(indexDto.qualityLabel());
+                    index.setQualityColor(indexDto.qualityColor());
+                    index.setSource(indexDto.source());
+                    index.setAreaName(indexDto.areaName());
+                    index.setMeasuredAt(syncDateTime);
+                    log.debug("🔄 [ATMO] Mise à jour indice existant pour {}", indexDto.areaCode());
+                } else {
+                    // Créer un nouvel index
+                    index = mapper.toEntity(indexDto);
+                    index.setMeasuredAt(syncDateTime);
+                    log.debug("🆕 [ATMO] Création nouvel indice pour {}", indexDto.areaCode());
+                }
 
                 String alertMessage = AirQualityAlertUtils.determineAlertMessageWithArea(
                         Integer.valueOf(indexDto.qualityIndex()),
@@ -194,6 +212,9 @@ public class ApiAirQualityService implements DataSyncService {
                     alertCount++;
                     index.setAlert(true);
                     log.warn("⚠️ [ATMO] Alerte qualité air : {}", alertMessage);
+                } else {
+                    index.setAlertMessage(null);
+                    index.setAlert(false);
                 }
 
                 indexRepository.save(index);
@@ -265,6 +286,8 @@ public class ApiAirQualityService implements DataSyncService {
         // ✅ CORRECTION : Chercher la ville AVANT de sauvegarder
         if (dto.inseeCode() != null) {
             String inseeCode = String.valueOf(dto.inseeCode());
+            newStation.setInseeCode(inseeCode);
+
             cityRepository.findByInseeCode(inseeCode)
                     .ifPresentOrElse(
                             city -> {

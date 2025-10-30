@@ -35,28 +35,65 @@ public class ApiDataSyncScheduler {
     public void initSync() {
         log.info("🔍 Démarrage de la synchronisation initiale...");
 
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+        // 1️⃣ Synchroniser les services de base dans l'ordre : REGION → DEPARTMENT → CITY
+        syncBaseDataServices();
 
+        // 2️⃣ Synchroniser les autres services (qui dépendent des villes)
         syncServices.stream()
+                .filter(service -> {
+                    String name = service.getServiceName();
+                    // Exclure les services de base déjà synchronisés
+                    return !name.equals("REGION") && !name.equals("DEPARTMENT") && !name.equals("CITY");
+                })
                 .filter(service -> service.getLastSync() == null)
                 .filter(DataSyncService::isEnabled)
                 .forEach(service -> {
                     log.info("🔄 Première sync: {}", service.getServiceName());
-                    syncService(service);
+                    try {
+                        syncService(service);
+                    } catch (Exception e) {
+                        log.error("❌ Erreur sync initiale {}: {}", service.getServiceName(), e.getMessage());
+                    }
                 });
 
         log.info("✅ Synchronisation initiale terminée");
     }
 
     /**
+     * Synchronise les services de base dans l'ordre : REGION → DEPARTMENT → CITY
+     * Ces services doivent être synchronisés avant les autres
+     */
+    private void syncBaseDataServices() {
+        log.info("📋 Synchronisation des données de base...");
+
+        // Ordre d'exécution : REGION → DEPARTMENT → CITY
+        String[] baseServicesOrder = {"REGION", "DEPARTMENT", "CITY"};
+
+        for (String serviceName : baseServicesOrder) {
+            syncServices.stream()
+                    .filter(service -> service.getServiceName().equals(serviceName))
+                    .filter(service -> service.getLastSync() == null)
+                    .filter(DataSyncService::isEnabled)
+                    .findFirst()
+                    .ifPresent(service -> {
+                        log.info("🔄 Sync données de base: {}", service.getServiceName());
+                        try {
+                            syncService(service);
+                        } catch (Exception e) {
+                            log.error("❌ Erreur critique sync {}: {}", service.getServiceName(), e.getMessage(), e);
+                            throw new RuntimeException("Échec critique de la synchronisation de " + serviceName, e);
+                        }
+                    });
+        }
+
+        log.info("✅ Données de base synchronisées");
+    }
+
+    /**
      * Cycle de synchronisation global toutes les 12 heures
      * Parcourt tous les services enregistrés et exécute leur synchronisation si activée
      */
-    @Scheduled(fixedRate = 43200000) // 12h = 43200000ms
+    @Scheduled(fixedRate = 43200000, initialDelay = 180000) // 12h, délai initial 3min
     public void globalSynchronization() {
         log.info("🔄 [{}] Début cycle de synchronisation (12h)", LocalDateTime.now());
 

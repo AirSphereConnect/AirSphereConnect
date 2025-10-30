@@ -77,12 +77,14 @@ public class UserMapper {
         }
         if (user.getFavorites() != null) {
             List<FavoriteDto> favoriteDtos = user.getFavorites().stream()
+                    .filter(fav -> fav.getDeletedAt() == null)
                     .map(favoriteMapper::toDto)
                     .collect(Collectors.toList());
             response.setFavorites(favoriteDtos);
         }
         if (user.getFavoritesAlerts() != null) {
             List<FavoritesAlertsDto> favoritesAlertsDtos = user.getFavoritesAlerts().stream()
+                    .filter(fav -> fav.getDeletedAt() == null)
                     .map(FavoritesAlertsMapper::toDto)
                     .collect(Collectors.toList());
             System.out.println("favoritesAlertsDtos: " + favoritesAlertsDtos);

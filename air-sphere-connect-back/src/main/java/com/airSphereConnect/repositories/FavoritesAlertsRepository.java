@@ -10,5 +10,5 @@ import java.util.Optional;
 @Repository
 public interface FavoritesAlertsRepository extends JpaRepository<FavoritesAlerts, Long> {
     Optional<FavoritesAlerts> findByIdAndUserId(Long id, Long userId);
-    List<FavoritesAlerts> findByCityIdAndIsEnabled(Long cityId, boolean isEnabled);
+    List<FavoritesAlerts> findByCityIdAndEnabled(Long cityId, boolean enabled);
 }

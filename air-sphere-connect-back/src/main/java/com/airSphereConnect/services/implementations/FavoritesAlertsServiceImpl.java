@@ -31,16 +31,6 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public FavoritesAlertsDto createAlertConfig(Long  userId,FavoritesAlertsDto dto) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + userId));
-
-        FavoritesAlerts entity = FavoritesAlertsMapper.toEntity(dto);
-        entity.setUser(user);
-        entity = favoritesAlertsRepository.save(entity);
-        return FavoritesAlertsMapper.toDto(entity);
-    }
 
     @Override
     public List<FavoritesAlertsDto> getUserAlerts(Long userId) {
@@ -50,42 +40,46 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
     }
 
     @Override
-    @Transactional
-    public FavoritesAlertsDto updateAlertConfig(FavoritesAlertsDto dto, Long userId) {
-        FavoritesAlerts entity = favoritesAlertsRepository.findByIdAndUserId(dto.getId(), userId)
+    public FavoritesAlertsDto createAlertConfig(Long userId, FavoritesAlertsDto dto) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + userId));
+
+        // Convertir null en false pour enabled
+        if (dto.getEnabled() == null) {
+            dto.setEnabled(false);
+        }
+
+        FavoritesAlerts entity = FavoritesAlertsMapper.toEntity(user.getId(), dto);
+        entity = favoritesAlertsRepository.save(entity);
+        return FavoritesAlertsMapper.toDto(entity);
+    }
+
+    @Override
+    public FavoritesAlertsDto updateAlertConfig(FavoritesAlertsDto dto, Long userId, Long id) {
+        FavoritesAlerts entity = favoritesAlertsRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new IllegalArgumentException("Alert config not found or not owned by this user"));
 
+        // User
         if (dto.getUser() != null) {
             User user = new User();
             user.setId(dto.getUser());
             entity.setUser(user);
         }
 
+        // City
         if (dto.getCityId() != null) {
             City city = new City();
             city.setId(dto.getCityId());
             entity.setCity(city);
         }
 
-        if (dto.getDepartmentId() != null) {
-            Department department = new Department();
-            department.setId(dto.getDepartmentId());
-            entity.setDepartment(department);
-        } else {
-            entity.setDepartment(null);
-        }
-
-        if (dto.getRegionId() != null) {
-            Region region = new Region();
-            region.setId(dto.getRegionId());
-            entity.setRegion(region);
-        }
-
-        entity.setEnabled(dto.getIsEnabled());
+        // Enabled : convert null → false
+        entity.setEnabled(Boolean.TRUE.equals(dto.getEnabled()));
 
         entity = favoritesAlertsRepository.save(entity);
         return FavoritesAlertsMapper.toDto(entity);
     }
+
 
     @Override
     public void deleteAlertConfig(Long alertConfigId) {

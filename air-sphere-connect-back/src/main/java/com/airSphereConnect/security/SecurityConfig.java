@@ -76,6 +76,7 @@ public class SecurityConfig {
                                 "/api/air-quality/**",
                                 "/api/forums/**", "/forum-posts/**", "/forum-rubrics/**", "/forum-threads/**",
                                 "/api/cities/**",
+                                "/api/address/**",
                                 "/api/history/**",
                                 "/api/regions/**",
                                 "/api/alert/configurations/**")
