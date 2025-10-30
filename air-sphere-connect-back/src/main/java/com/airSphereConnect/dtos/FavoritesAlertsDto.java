@@ -12,7 +12,7 @@ public class FavoritesAlertsDto {
     private String cityName;
     private Long departmentId;
     private Long regionId;
-    private boolean isEnabled;
+    private Boolean enabled;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
     private LocalDateTime createdAt;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd-MM-yyyy")
@@ -20,12 +20,12 @@ public class FavoritesAlertsDto {
 
     public FavoritesAlertsDto() {}
 
-    public FavoritesAlertsDto(Long user, Long cityId, Long departmentId, Long regionId, boolean isEnabled) {
+    public FavoritesAlertsDto(Long user, Long cityId, Long departmentId, Long regionId, boolean enabled) {
         this.user = user;
         this.cityId = cityId;
         this.departmentId = departmentId;
         this.regionId = regionId;
-        this.isEnabled = isEnabled;
+        this.enabled = enabled;
     }
 
     public Long getId() {
@@ -75,13 +75,9 @@ public class FavoritesAlertsDto {
         this.regionId = regionId;
     }
 
-    public boolean getIsEnabled() {
-        return isEnabled;
-    }
+    public Boolean getEnabled() { return enabled; }
 
-    public void setEnabled(boolean enabled) {
-        this.isEnabled = enabled;
-    }
+    public void setEnabled(Boolean enabled) { this.enabled = enabled; }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,10 +44,15 @@ public class HomeController {
         this.cookieService = cookieService;
     }
 
+    private void writeAccessTokenCookie(HttpServletResponse response, String token) {
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", token));
+    }
+
+
     @NotNull
     private ResponseEntity<?> getGuestResponse(HttpServletResponse response) {
         String guestToken = jwtService.generateGuestToken();
-        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", guestToken));
+        writeAccessTokenCookie(response, guestToken);
 
         Map<String, Object> body = new HashMap<>();
         body.put("role", "GUEST");
@@ -54,6 +60,7 @@ public class HomeController {
 
         return ResponseEntity.ok(body);
     }
+
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginDto, HttpServletResponse response) {
@@ -66,7 +73,8 @@ public class HomeController {
         String refreshToken = jwtService.generateRefreshToken(userEntity);
         activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
 
-        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", accessToken));
+        writeAccessTokenCookie(response, accessToken);
+
         Cookie refreshCookie = cookieService.createCookie("REFRESH_TOKEN", refreshToken);
         refreshCookie.setPath("/api/token/refresh");
         response.addCookie(refreshCookie);
@@ -80,6 +88,7 @@ public class HomeController {
 
         return ResponseEntity.ok(body);
     }
+
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile(HttpServletRequest request, HttpServletResponse response) {
@@ -104,6 +113,10 @@ public class HomeController {
             }
 
             User userEntity = (User) userDetails;
+
+            String newToken = jwtService.generateToken(userEntity);
+            writeAccessTokenCookie(response, newToken);
+
             UserResponseDto userResponseDto = userMapper.toDto(userEntity);
 
             Map<String, Object> body = new HashMap<>();
@@ -118,13 +131,21 @@ public class HomeController {
 
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        if (request.getSession(false) != null) {
+        if (request != null && request.getSession(false) != null) {
             request.getSession(false).invalidate();
         }
 
-        response.addCookie(cookieService.deleteCookie("ACCESS_TOKEN"));
+        // Remplacer le cookie ACCESS_TOKEN par un token guest
         response.addCookie(cookieService.createCookie("ACCESS_TOKEN", jwtService.generateGuestToken()));
+
+        // Supprimer le refresh token
+        response.addCookie(cookieService.deleteCookie("REFRESH_TOKEN"));
+
+        // Nettoyer le contexte pour éviter résidus
+        SecurityContextHolder.clearContext();
 
         return ResponseEntity.ok().build();
     }
+
+
 }

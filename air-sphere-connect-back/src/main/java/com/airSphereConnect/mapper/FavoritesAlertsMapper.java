@@ -8,26 +8,18 @@ import org.springframework.stereotype.Component;
 public class FavoritesAlertsMapper {
 
     // Frontend → Backend
-    public static FavoritesAlerts toEntity(FavoritesAlertsDto dto) {
+    public static FavoritesAlerts toEntity(Long userId, FavoritesAlertsDto dto) {
         if (dto == null) return null;
 
         FavoritesAlerts entity = new FavoritesAlerts();
-        if (dto.getId() != null) {
-            User user = new User();
-            user.setId(dto.getId());
-            entity.setUser(user);
-        } else {
-            entity.setUser(null);
-        }
-        entity.setId(dto.getId());
-        entity.setEnabled(dto.getIsEnabled());
 
-        // User
-        if (dto.getUser() != null) {
-            User user = new User();
-            user.setId(dto.getUser());
-            entity.setUser(user);
-        }
+        User user = new User();
+        user.setId(userId);
+        entity.setUser(user);
+
+        entity.setId(dto.getId());
+        entity.setEnabled(Boolean.TRUE.equals(dto.getEnabled()));
+
 
         // City
         if (dto.getCityId() != null) {
@@ -63,7 +55,7 @@ public class FavoritesAlertsMapper {
             dto.setRegionId(entity.getRegion().getId());
         }
 
-        dto.setEnabled(entity.getIsEnabled());
+        dto.setEnabled(entity.isEnabled());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
 

@@ -41,6 +41,7 @@ export class FormErrorService {
     noUpperCase: () => 'Doit contenir au moins 1 majuscule',
     noLowerCase: () => 'Doit contenir au moins 1 minuscule',
     noNumber: () => 'Doit contenir au moins 1 chiffre',
+    noSpecialChar: () => 'Doit contenir au moins 1 caractère spécial (@$!%*?&#)',
   };
 
 
@@ -63,6 +64,7 @@ export class FormErrorService {
       noUpperCase: () => 'Doit contenir au moins 1 majuscule',
       noLowerCase: () => 'Doit contenir au moins 1 minuscule',
       noNumber: () => 'Doit contenir au moins 1 chiffre',
+      noSpecialChar: () => 'Doit contenir au moins 1 caractère spécial (@$!%*?&#)',
     },
     address: {
       required: () => 'Adresse requise',

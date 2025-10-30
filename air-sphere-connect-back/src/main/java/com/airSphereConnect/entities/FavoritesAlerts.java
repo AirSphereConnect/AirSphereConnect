@@ -31,8 +31,8 @@ public class FavoritesAlerts extends Timestamp {
     private Region region;
 
     @NotNull(message = "{alert.enabled.required}")
-    @Column(name = "is_enabled", nullable = false)
-    private Boolean isEnabled;
+    @Column(name = "enabled", nullable = false)
+    private boolean enabled;
 
     public Long getId() {
         return id;
@@ -74,12 +74,7 @@ public class FavoritesAlerts extends Timestamp {
         this.user = user;
     }
 
-    public boolean getIsEnabled() {
-        return isEnabled;
-    }
-
-    public void setEnabled(boolean enabled) {
-        this.isEnabled = enabled;
-    }
+    public boolean isEnabled() { return enabled; }
+    public void setEnabled(boolean enabled) { this.enabled = enabled; }
 
 }

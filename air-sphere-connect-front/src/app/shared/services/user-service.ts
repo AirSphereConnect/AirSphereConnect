@@ -11,7 +11,9 @@ import { UserProfileResponse } from '../../core/models/user.model';
 export class UserService {
 
   private readonly apiUrl = 'http://localhost:8080/api';
+
   private readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
+
   public readonly userProfile$ = this._userProfileSubject.asObservable();
 
   constructor(private http: HttpClient) {
@@ -19,6 +21,10 @@ export class UserService {
     if (storedProfile) {
       this._userProfileSubject.next(JSON.parse(storedProfile));
     }
+  }
+
+  get currentUserProfile(): UserProfileResponse | null {
+    return this._userProfileSubject.value;
   }
 
   fetchUserProfile(): void {
@@ -85,7 +91,23 @@ export class UserService {
   }
 
   //Mettre à jour les infos de l'user
-  updateUser(userData: any, id: string) {
-    return this.http.put(`${this.apiUrl}/users/${id}`, userData, { withCredentials: true });
+  editUser(userId: number | null, payload: any) {
+    return this.http.put<UserProfileResponse>(
+      `${this.apiUrl}/users/${userId}`,
+      payload,
+      { withCredentials: true }
+    ).pipe(
+      tap(profile => this.setUserProfile(profile)) // met à jour localStorage et signal
+    );
+  }
+
+
+  deleteUser() {
+    return this.http.put(`${this.apiUrl}/users`, { withCredentials: true });
+
+  }
+
+  editAddress(id: number | null, payload: any) {
+    return this.http.put(`${this.apiUrl}/address/${id}`, payload, { withCredentials: true });
   }
 }

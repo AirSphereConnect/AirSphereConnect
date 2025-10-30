@@ -1,6 +1,8 @@
 package com.airSphereConnect.mapper;
 
+import com.airSphereConnect.dtos.AlertsDto;
 import com.airSphereConnect.dtos.FavoriteDto;
+import com.airSphereConnect.dtos.FavoritesAlertsDto;
 import com.airSphereConnect.dtos.request.UserRequestDto;
 import com.airSphereConnect.dtos.response.AddressResponseDto;
 import com.airSphereConnect.dtos.response.CityIdResponseDto;
@@ -17,10 +19,12 @@ import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
-    private static FavoriteMapper favoriteMapper = null;
+    private static FavoriteMapper favoriteMapper;
+    private static FavoritesAlertsMapper favoritesAlertsMapper;
 
-    public UserMapper(FavoriteMapper favoriteMapper) {
+    public UserMapper(FavoriteMapper favoriteMapper, FavoritesAlertsMapper favoritesAlertsMapper) {
         UserMapper.favoriteMapper = favoriteMapper;
+        UserMapper.favoritesAlertsMapper = favoritesAlertsMapper;
     }
 
     // Frontend -> Backend
@@ -73,10 +77,20 @@ public class UserMapper {
         }
         if (user.getFavorites() != null) {
             List<FavoriteDto> favoriteDtos = user.getFavorites().stream()
+                    .filter(fav -> fav.getDeletedAt() == null)
                     .map(favoriteMapper::toDto)
                     .collect(Collectors.toList());
             response.setFavorites(favoriteDtos);
         }
+        if (user.getFavoritesAlerts() != null) {
+            List<FavoritesAlertsDto> favoritesAlertsDtos = user.getFavoritesAlerts().stream()
+                    .filter(fav -> fav.getDeletedAt() == null)
+                    .map(FavoritesAlertsMapper::toDto)
+                    .collect(Collectors.toList());
+            System.out.println("favoritesAlertsDtos: " + favoritesAlertsDtos);
+            response.setAlerts(favoritesAlertsDtos);
+        }
+
 
         return response;
     }
