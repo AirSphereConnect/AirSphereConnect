@@ -41,9 +41,9 @@ public class WeatherMapper {
                 weather.getMeasuredAt(),
                 weather.getTemperature(),
                 weather.getHumidity(),
+                weather.getPressure(),
                 weather.getWindSpeed(),
                 weather.getWindDirection(),
-                weather.getPressure(),
                 messageDto,
                 weather.getAlert(),
                 alertMessageDto

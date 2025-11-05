@@ -1,5 +1,6 @@
 package com.airSphereConnect.repositories;
 
+import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.WeatherMeasurement;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -12,6 +13,6 @@ public interface WeatherRepository extends JpaRepository <WeatherMeasurement, Lo
     List<WeatherMeasurement> findByMeasuredAtBetweenAndAlertTrue(LocalDateTime start, LocalDateTime end);
 
     List<WeatherMeasurement> findByCityId(Long cityId);
-
+    boolean existsByCityAndMeasuredAtBetween(City city, LocalDateTime start, LocalDateTime end);
 
 }
