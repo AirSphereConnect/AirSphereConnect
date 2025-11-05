@@ -4,6 +4,7 @@ import com.airSphereConnect.entities.City;
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.services.CityService;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -95,6 +96,11 @@ public class CityServiceImpl implements CityService {
 
     public List<City> findByNameContainingIgnoreCase(String query) {
         return cityRepository.findByNameContainingIgnoreCase(query);
+    }
+
+    @Override
+    public List<City> getTopCitiesByAreaCode(String areaCode, int limit) {
+        return cityRepository.findByAreaCodeOrderByPopulationDesc(areaCode, PageRequest.of(0, limit));
     }
 
 }
