@@ -6,8 +6,8 @@ WORKDIR /app
 # Copier package.json et package-lock.json
 COPY package*.json ./
 
-# Installer les dépendances
-RUN npm ci
+# Installer les dépendances avec legacy-peer-deps en attendant la MAJ d'Unovis pour Angular 20
+RUN npm ci --legacy-peer-deps
 
 # Copier le code source
 COPY . .
