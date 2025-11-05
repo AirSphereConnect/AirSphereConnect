@@ -34,10 +34,12 @@ export class Login implements OnInit {
   // 🎯 Signals
   errorMessage = signal<string | null>(null);
   isLoading = signal<boolean>(false);
+  passwordType = signal<'password' | 'text'>('password');
 
   // 🎯 Computed signals
   isFormValid = computed(() => this.loginForm?.valid ?? false);
   canSubmit = computed(() => this.isFormValid() && !this.isLoading());
+  passwordIcon = computed(() => this.passwordType() === 'password' ? 'eye' : 'eyeSlash');
 
 
   ngOnInit() {
@@ -95,5 +97,9 @@ export class Login implements OnInit {
 
   clearError() {
     this.errorMessage.set(null);
+  }
+
+  togglePasswordVisibility() {
+    this.passwordType.set(this.passwordType() === 'password' ? 'text' : 'password');
   }
 }

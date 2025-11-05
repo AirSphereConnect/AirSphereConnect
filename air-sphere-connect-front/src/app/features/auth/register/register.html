@@ -86,29 +86,30 @@
               fieldName="address"
             ></app-input>
 
-            <app-input
-              label="Ville"
-              type="text"
-              [control]="cityNameControl"
-              [required]="true"
-              placeholder="Entrez le nom de votre ville"
-              autocomplete="address-level2"
-              (input)="onCityInput($event)"
-              fieldName="cityName"
-            ></app-input>
+              <app-input
+                label="Ville"
+                type="text"
+                [control]="cityNameControl"
+                [required]="true"
+                placeholder="Entrez le nom de votre ville (min. 2 caractères)"
+                autocomplete="off"
+                fieldName="cityName"
+              ></app-input>
 
-            <!-- Suggestions de villes -->
-            @if (citySuggestions.length) {
-              <ul class="menu bg-base-100 w-full rounded-box">
-                @for (city of citySuggestions; track city) {
-                  <li>
-                    <a (click)="selectCity(city)">
-                      {{ city.name }} ({{ city.postalCode }})
-                    </a>
-                  </li>
-                }
-              </ul>
-            }
+              <!-- Suggestions de villes en dropdown -->
+              @if (citySuggestions.length > 0) {
+                <ul class="absolute z-50 w-full mt-1 menu bg-base-200 rounded-box shadow-lg max-h-60 overflow-y-auto border border-base-300">
+                  @for (city of citySuggestions; track city.id) {
+                    <li>
+                      <a (click)="selectCity(city)" class="hover:bg-primary hover:text-primary-content">
+                        <span class="font-medium">{{ city.name }}</span>
+                        <span class="text-sm opacity-70">({{ city.postalCode }})</span>
+                      </a>
+                    </li>
+                  }
+                </ul>
+              }
+
 
             <app-input
               label="Code postal"
