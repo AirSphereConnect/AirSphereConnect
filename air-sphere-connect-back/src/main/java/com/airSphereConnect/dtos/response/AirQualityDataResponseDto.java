@@ -1,6 +1,7 @@
 package com.airSphereConnect.dtos.response;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AirQualityDataResponseDto {
 
@@ -21,6 +22,11 @@ public class AirQualityDataResponseDto {
     private Double o3;
     private Double so2;
     private LocalDateTime pollutantsMeasuredAt;
+
+    private AirQualityMeasurementResponseDto latestMeasurement;
+    private AirQualityIndexResponseDto latestIndex;
+    private List<AirQualityMeasurementResponseDto> measurementHistory;
+    private List<AirQualityIndexResponseDto> indexHistory;
 
     public AirQualityDataResponseDto() {}
 
@@ -143,5 +149,37 @@ public class AirQualityDataResponseDto {
 
     public void setPollutantsMeasuredAt(LocalDateTime pollutantsMeasuredAt) {
         this.pollutantsMeasuredAt = pollutantsMeasuredAt;
+    }
+
+    public AirQualityMeasurementResponseDto getLatestMeasurement() {
+        return latestMeasurement;
+    }
+
+    public void setLatestMeasurement(AirQualityMeasurementResponseDto latestMeasurement) {
+        this.latestMeasurement = latestMeasurement;
+    }
+
+    public AirQualityIndexResponseDto getLatestIndex() {
+        return latestIndex;
+    }
+
+    public void setLatestIndex(AirQualityIndexResponseDto latestIndex) {
+        this.latestIndex = latestIndex;
+    }
+
+    public List<AirQualityMeasurementResponseDto> getMeasurementHistory() {
+        return measurementHistory;
+    }
+
+    public void setMeasurementHistory(List<AirQualityMeasurementResponseDto> measurementHistory) {
+        this.measurementHistory = measurementHistory;
+    }
+
+    public List<AirQualityIndexResponseDto> getIndexHistory() {
+        return indexHistory;
+    }
+
+    public void setIndexHistory(List<AirQualityIndexResponseDto> indexHistory) {
+        this.indexHistory = indexHistory;
     }
 }
