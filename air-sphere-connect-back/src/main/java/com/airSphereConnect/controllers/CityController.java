@@ -82,4 +82,11 @@ public class CityController {
         }
         return cityService.getAllCities().stream().map(cityMapper::toDto).toList();
     }
+
+    @GetMapping("/area/{areaCode}/top/{limit}")
+    public List<CityResponseDto> getTopCitiesByArea(@PathVariable String areaCode, @PathVariable int limit) {
+        return cityService.getTopCitiesByAreaCode(areaCode, limit).stream()
+                .map(cityMapper::toDto)
+                .toList();
+    }
 }

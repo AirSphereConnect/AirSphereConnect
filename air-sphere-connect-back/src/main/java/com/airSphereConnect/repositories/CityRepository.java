@@ -2,6 +2,7 @@ package com.airSphereConnect.repositories;
 
 import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.Department;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -37,5 +38,10 @@ public interface CityRepository extends JpaRepository<City, Long> {
     List<City> findDistinctByPopulations_PopulationBetween(Integer populationMin, Integer populationMax);
 
     List<City> findByNameContainingIgnoreCase(String query);
+
+    boolean existsByInseeCode(String inseeCode);
+
+    List<City> findByAreaCodeOrderByPopulationDesc(String areaCode, Pageable pageable);
+
 }
 

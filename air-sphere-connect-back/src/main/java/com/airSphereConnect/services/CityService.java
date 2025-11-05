@@ -28,4 +28,6 @@ public interface CityService {
     List<City> getCitiesByPopulationBetweenThan(Integer populationMin, Integer populationMax);
 
     List<City> findByNameContainingIgnoreCase(String query);
+
+    List<City> getTopCitiesByAreaCode(String areaCode, int limit);
 }

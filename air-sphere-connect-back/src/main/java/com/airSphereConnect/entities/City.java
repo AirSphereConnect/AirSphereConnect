@@ -50,13 +50,7 @@ public class City {
     private Department department;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(
-        name = "area_code",
-        referencedColumnName = "area_code",
-        insertable = false,
-        updatable = false,
-        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
-    )
+    @JoinColumn(name = "air_quality_index_id")
     private AirQualityIndex airQualityIndex;
 
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)

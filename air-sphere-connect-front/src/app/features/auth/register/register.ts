@@ -11,7 +11,7 @@ import {
 import {UserService} from '../../../shared/services/user-service';
 import {Router, RouterLink} from '@angular/router';
 import {debounceTime, distinctUntilChanged, Subject, switchMap, takeUntil} from 'rxjs';
-import {CityService} from '../../../shared/services/city-service';
+import {CityService} from '../../../core/services/city';
 import {InputComponent} from '../../../shared/components/ui/input/input';
 import {Button} from '../../../shared/components/ui/button/button';
 import {IconComponent} from '../../../shared/components/ui/icon/icon';
@@ -152,13 +152,13 @@ export class Register implements OnInit {
         distinctUntilChanged(),
         switchMap((query) =>
           query && query.length > 1
-            ? this.cityService.searchCities(query)
+            ? this.cityService.searchCitiesPublic(query)
             : []
         ),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
-        next: (cities: any[]) => {
+        next: (cities: City[]) => {
           this.citySuggestions = cities || [];
         },
         error: (err) => {
@@ -230,15 +230,15 @@ export class Register implements OnInit {
     const query = event.target.value;
     if (query.length < 2) return;
 
-    this.cityService.searchCities(query)
+    this.cityService.searchCitiesPublic(query)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (cities: any[]) => this.citySuggestions = cities,
+        next: (cities: City[]) => this.citySuggestions = cities,
         error: () => this.citySuggestions = []
       });
   }
 
-  selectCity(city: any) {
+  selectCity(city: City) {
     this.cityNameControl.setValue(city.name);
     this.registerForm.get('cityCode')?.setValue(city.postalCode);
     this.cityIdSelected = city.id;
