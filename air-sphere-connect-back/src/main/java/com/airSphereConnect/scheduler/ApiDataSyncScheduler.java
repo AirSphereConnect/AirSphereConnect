@@ -90,10 +90,12 @@ public class ApiDataSyncScheduler {
     }
 
     /**
-     * Cycle de synchronisation global toutes les 12 heures
-     * Parcourt tous les services enregistrés et exécute leur synchronisation si activée
+     * ❌ DÉSACTIVÉ - Cycle de synchronisation global toutes les 12 heures
+     * Remplacé par des synchros à heures fixes : 10h (matin) et 18h (soir)
+     *
+     * Raison : fixedRate créait des doublons aléatoires selon l'heure de démarrage
      */
-    @Scheduled(fixedRate = 43200000, initialDelay = 180000) // 12h, délai initial 3min
+    // @Scheduled(fixedRate = 43200000, initialDelay = 180000)
     public void globalSynchronization() {
         log.info("🔄 [{}] Début cycle de synchronisation (12h)", LocalDateTime.now());
 
@@ -132,11 +134,32 @@ public class ApiDataSyncScheduler {
                 .filter(service -> morningServices.contains(service.getServiceName()))
                 .filter(DataSyncService::isEnabled)
                 .forEach(service -> {
-                    System.out.println("Sync matinale: " + service.getServiceName());
+                    log.info("✅ Sync matinale: {}", service.getServiceName());
                     syncService(service);
                 });
 
         log.info("✅ Synchronisation matinale terminée");
+    }
+
+    /**
+     * 🌆 Synchronisation du soir à 18h00
+     * Actualise les données de qualité de l'air et météo pour la soirée
+     */
+    @Scheduled(cron = "0 0 18 * * *")
+    public void eveningBulletinSync() {
+        log.info("🌆 [{}] Synchronisation bulletin du soir (18h)", LocalDateTime.now());
+
+        List<String> eveningServices = Arrays.asList("AIR_QUALITY", "WEATHER");
+
+        syncServices.stream()
+                .filter(service -> eveningServices.contains(service.getServiceName()))
+                .filter(DataSyncService::isEnabled)
+                .forEach(service -> {
+                    log.info("✅ Sync soirée: {}", service.getServiceName());
+                    syncService(service);
+                });
+
+        log.info("✅ Synchronisation soirée terminée");
     }
 
     /*

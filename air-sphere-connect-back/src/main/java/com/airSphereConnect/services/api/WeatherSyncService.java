@@ -115,13 +115,15 @@ public class WeatherSyncService implements DataSyncService {
                             WeatherMeasurement weather = new WeatherMeasurement();
                             weather.setCity(city);
                             if (response.weatherMainDto() != null) {
-                                weather.setTemperature(response.weatherMainDto().temp());
-                                weather.setPressure(response.weatherMainDto().pressure());
-                                weather.setHumidity(response.weatherMainDto().humidity());
+                                weather.setTemperature(round(response.weatherMainDto().temp(), 1));
+                                weather.setPressure(round(response.weatherMainDto().pressure(), 0));
+                                weather.setHumidity(round(response.weatherMainDto().humidity(), 0));
                             }
                             if (response.weatherWindDto() != null) {
-                                weather.setWindDirection(response.weatherWindDto().deg());
-                                weather.setWindSpeed(response.weatherWindDto().speed());
+                                weather.setWindDirection(round(response.weatherWindDto().deg(), 0));
+                                // Convert wind speed from m/s to km/h (multiply by 3.6)
+                                Double windSpeedMs = response.weatherWindDto().speed();
+                                weather.setWindSpeed(windSpeedMs != null ? round(windSpeedMs * 3.6, 2) : null);
                             }
                             if (response.weatherDescriptionDto() != null && response.weatherDescriptionDto().length > 0) {
                                 try {
@@ -159,10 +161,35 @@ public class WeatherSyncService implements DataSyncService {
                 .block();
 
         if (weatherList != null && !weatherList.isEmpty()) {
-            weatherRepository.saveAll(weatherList);
-            logger.info("Synchronisation météo : {} mesures insérées.", weatherList.size());
+            LocalDateTime currentHour = LocalDateTime.now().withMinute(0).withSecond(0).withNano(0);
+            LocalDateTime nextHour = currentHour.plusHours(1);
+
+            List<WeatherMeasurement> toSave = weatherList.stream()
+                .filter(weather -> {
+                    boolean exists = weatherRepository.existsByCityAndMeasuredAtBetween(
+                        weather.getCity(),
+                        currentHour,
+                        nextHour
+                    );
+                    return !exists;
+                })
+                .toList();
+
+            if (!toSave.isEmpty()) {
+                weatherRepository.saveAll(toSave);
+                logger.info("Synchronisation météo : {} mesures insérées ({} doublons ignorés).",
+                    toSave.size(), weatherList.size() - toSave.size());
+            } else {
+                logger.info("Synchronisation météo : aucune nouvelle mesure (toutes existent déjà).");
+            }
         } else {
             logger.warn("Aucune mesure météo à insérer.");
         }
+    }
+
+    private Double round(Double value, int decimals) {
+        if (value == null) return null;
+        double scale = Math.pow(10, decimals);
+        return Math.round(value * scale) / scale;
     }
 }
