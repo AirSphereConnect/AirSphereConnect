@@ -20,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -119,7 +120,8 @@ public class ApiAirQualityService implements DataSyncService {
         Map<String, List<AirQualityDailyMeasureResponseDto>> groupedByStation =
                 groupMeasuresByStation(measureDtos);
 
-        LocalDateTime syncDateTime = LocalDateTime.now();
+        // ✅ Toujours sauvegarder à minuit pour cohérence avec l'historique
+        LocalDateTime syncDateTime = LocalDate.now().atStartOfDay();
 
         int savedCount = 0;
         for (Map.Entry<String, List<AirQualityDailyMeasureResponseDto>> entry : groupedByStation.entrySet()) {
@@ -217,7 +219,27 @@ public class ApiAirQualityService implements DataSyncService {
                     index.setAlert(false);
                 }
 
-                indexRepository.save(index);
+                Optional<AirQualityIndex> existingOpt =
+                        indexRepository.findByAreaCodeAndMeasuredAt(index.getAreaCode(), index.getMeasuredAt());
+
+
+                if (existingOpt.isPresent()) {
+                    AirQualityIndex existing = existingOpt.get();
+
+                    // 🔄 Mise à jour des champs nécessaires
+                    existing.setQualityIndex(index.getQualityIndex());
+                    existing.setQualityLabel(index.getQualityLabel());
+                    existing.setQualityColor(index.getQualityColor());
+                    existing.setAlertMessage(index.getAlertMessage());
+                    existing.setSource(index.getSource());
+
+                    indexRepository.save(existing);
+                    log.debug("♻️ [ATMO] Index mis à jour pour {}", existing.getAreaCode());
+                } else {
+                    indexRepository.save(index);
+                    log.debug("🆕 [ATMO] Nouvel index ajouté pour {}", index.getAreaCode());
+                }
+
                 savedCount++;
 
             } catch (Exception e) {
@@ -296,8 +318,17 @@ public class ApiAirQualityService implements DataSyncService {
                                 log.debug("🔗 [ATMO] Station {} liée à {}", dto.codeStation(), city.getName());
                             },
                             () -> {
-                                log.warn("⚠️ [ATMO] Ville introuvable pour INSEE {}, station {} ignorée",
-                                        inseeCode, dto.codeStation());
+                                log.warn("""
+                    ⚠️ [ATMO] Ville introuvable pour INSEE {} (station {}).
+                    Vérifions si elle existe réellement dans la base :
+                    """, inseeCode, dto.codeStation());
+
+                                boolean existsInDb = cityRepository.existsByInseeCode(inseeCode);
+                                if (existsInDb) {
+                                    log.error("🚨 [ATMO] Incohérence détectée : la ville avec code INSEE {} existe en DB, mais la recherche JPA ne l’a pas trouvée !", inseeCode);
+                                } else {
+                                    log.warn("⚠️ [ATMO] Code INSEE {} inexistant en base : probablement une erreur de l’API ATMO ou une zone non communale.", inseeCode);
+                                }
                             }
                     );
         }

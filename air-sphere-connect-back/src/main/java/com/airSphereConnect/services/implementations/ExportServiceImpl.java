@@ -6,6 +6,7 @@ import com.airSphereConnect.entities.AirQualityStation;
 import com.airSphereConnect.entities.City;
 import com.airSphereConnect.entities.WeatherMeasurement;
 import com.airSphereConnect.exceptions.GlobalException;
+import com.airSphereConnect.repositories.AirQualityIndexRepository;
 import com.airSphereConnect.repositories.AirQualityStationRepository;
 import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.WeatherRepository;
@@ -26,11 +27,13 @@ public class ExportServiceImpl implements ExportService {
     private final AirQualityStationRepository airQualityStationRepository;
     private final CityRepository cityRepository;
     private final WeatherRepository weatherRepository;
+    private final AirQualityIndexRepository airQualityIndexRepository;
 
-    public ExportServiceImpl(AirQualityStationRepository airQualityStationRepository, CityRepository cityRepository, WeatherRepository weatherRepository, CsvExporter csvExporter) {
+    public ExportServiceImpl(AirQualityStationRepository airQualityStationRepository, CityRepository cityRepository, WeatherRepository weatherRepository, AirQualityIndexRepository airQualityIndexRepository, CsvExporter csvExporter) {
         this.airQualityStationRepository = airQualityStationRepository;
         this.cityRepository = cityRepository;
         this.weatherRepository = weatherRepository;
+        this.airQualityIndexRepository = airQualityIndexRepository;
     }
 
     @Override
@@ -65,6 +68,17 @@ public class ExportServiceImpl implements ExportService {
 
             for (WeatherMeasurement wm : weatherMeasurements) {
                 AirQualityMeasurement aqm = lastestMeasurementsByDate.get(wm.getMeasuredAt().toLocalDate());
+
+                // Skip if no air quality measurement for this date
+                if (aqm == null) {
+                    continue;
+                }
+
+                // Récupérer le dernier AirQualityIndex via repository au lieu de la relation
+                var latestIndex = city.getAreaCode() != null
+                    ? airQualityIndexRepository.findFirstByAreaCodeOrderByMeasuredAtDesc(city.getAreaCode()).orElse(null)
+                    : null;
+
                 ExportDto dto = new ExportDto(
 
                         wm.getMeasuredAt().toLocalDate(),
@@ -84,8 +98,8 @@ public class ExportServiceImpl implements ExportService {
                         aqm.getNo2(),
                         aqm.getO3(),
                         aqm.getUnit(),
-                        aqm.getStation().getCity().getAirQualityIndex() != null ? aqm.getStation().getCity().getAirQualityIndex().getQualityIndex() : null,
-                        aqm.getStation().getCity().getAirQualityIndex() != null ? aqm.getStation().getCity().getAirQualityIndex().getQualityLabel() : null
+                        latestIndex != null ? latestIndex.getQualityIndex() : null,
+                        latestIndex != null ? latestIndex.getQualityLabel() : null
                 );
 
                 mergedData.add(dto);

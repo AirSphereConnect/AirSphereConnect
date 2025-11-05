@@ -64,15 +64,32 @@ public class AirQualityServiceImpl implements AirQualityService {
     public AirQualityMeasurementResponseDto getLatestMeasurementForCity(String cityName) {
         City city = findCityByName(cityName);
 
-        if (city.getAreaCode() == null) {
-            throw new GlobalException.ResourceNotFoundException(
-                    "Aucun areaCode pour la ville: " + cityName);
+        AirQualityMeasurement measurement = null;
+
+        if (city.getInseeCode() != null) {
+            measurement = measurementRepository
+                    .findTopByInseeCodeOrderByMeasuredAtDesc(city.getInseeCode())
+                    .orElse(null);
+
+            if (measurement != null) {
+                log.debug("✅ Mesures trouvées pour {} via inseeCode", cityName);
+            }
         }
 
-        AirQualityMeasurement measurement = measurementRepository
-                .findTopByAreaCodeOrderByMeasuredAtDesc(city.getAreaCode())
-                .orElseThrow(() -> new GlobalException.ResourceNotFoundException(
-                        "Aucune mesure trouvée pour: " + cityName));
+        if (measurement == null && city.getAreaCode() != null) {
+            measurement = measurementRepository
+                    .findTopByAreaCodeOrderByMeasuredAtDesc(city.getAreaCode())
+                    .orElse(null);
+
+            if (measurement != null) {
+                log.debug("✅ Mesures trouvées pour {} via areaCode (fallback)", cityName);
+            }
+        }
+
+        if (measurement == null) {
+            throw new GlobalException.ResourceNotFoundException(
+                    "Aucune mesure trouvée pour: " + cityName);
+        }
 
         return mapper.toDto(measurement);
     }
@@ -80,7 +97,11 @@ public class AirQualityServiceImpl implements AirQualityService {
     @Override
     public AirQualityIndexResponseDto getLatestIndexQualityForCity(String cityName) {
         City city = findCityByName(cityName);
-        validateAreaCode(city, cityName);
+
+        if (city.getAreaCode() == null) {
+            throw new GlobalException.ResourceNotFoundException(
+                    "Aucun areaCode pour la ville: " + cityName);
+        }
 
         AirQualityIndex index = indexRepository
                 .findFirstByAreaCodeOrderByMeasuredAtDesc(
@@ -100,13 +121,35 @@ public class AirQualityServiceImpl implements AirQualityService {
             LocalDate endDate) {
 
         City city = findCityByName(cityName);
-        validateAreaCode(city, cityName);
-
         LocalDateTime[] period = getDateRange(startDate, endDate);
 
-        List<AirQualityMeasurement> measurements = measurementRepository
-                .findByAreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
-                        city.getAreaCode(), period[0], period[1]);
+        List<AirQualityMeasurement> measurements = null;
+
+        if (city.getInseeCode() != null) {
+            measurements = measurementRepository
+                    .findByInseeCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+                            city.getInseeCode(), period[0], period[1]);
+
+            if (!measurements.isEmpty()) {
+                log.debug("✅ Historique mesures pour {} via inseeCode: {} entrées",
+                         cityName, measurements.size());
+            }
+        }
+
+        if ((measurements == null || measurements.isEmpty()) && city.getAreaCode() != null) {
+            measurements = measurementRepository
+                    .findByAreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+                            city.getAreaCode(), period[0], period[1]);
+
+            if (!measurements.isEmpty()) {
+                log.debug("✅ Historique mesures pour {} via areaCode (fallback): {} entrées",
+                         cityName, measurements.size());
+            }
+        }
+
+        if (measurements == null) {
+            measurements = List.of();
+        }
 
         return measurements.stream()
                 .map(mapper::toDto)
@@ -120,7 +163,11 @@ public class AirQualityServiceImpl implements AirQualityService {
             LocalDate endDate) {
 
         City city = findCityByName(cityName);
-        validateAreaCode(city, cityName);
+
+        if (city.getAreaCode() == null) {
+            throw new GlobalException.ResourceNotFoundException(
+                    "Aucun areaCode pour la ville: " + cityName);
+        }
 
         LocalDateTime[] period = getDateRange(startDate, endDate);
 
@@ -141,6 +188,8 @@ public class AirQualityServiceImpl implements AirQualityService {
     public AirQualityDataResponseDto getCompleteDataForCity(String cityName) {
         City city = findCityByName(cityName);
 
+        log.info("🔍 getCompleteDataForCity pour: {}, areaCode: {}", cityName, city.getAreaCode());
+
         AirQualityDataResponseDto dto = new AirQualityDataResponseDto();
         dto.setCityId(city.getId());
         dto.setCityName(city.getName());
@@ -158,33 +207,56 @@ public class AirQualityServiceImpl implements AirQualityService {
                             dto.setQualityLabel(index.getQualityLabel());
                             dto.setQualityColor(index.getQualityColor());
                             dto.setIndexMeasuredAt(index.getMeasuredAt());
-                            dto.setAlertMessage(AirQualityAlertUtils.determineAlertMessage(index.getQualityIndex()));
+
+                            String alertMessage = AirQualityAlertUtils.determineAlertMessage(index.getQualityIndex());
+                            dto.setAlertMessage(alertMessage);
+
+                            dto.setLatestIndex(mapper.toDto(index, alertMessage));
                         });
             } catch (NumberFormatException e) {
                 log.error("Code EPCI invalide pour la ville : ", city.getName());
             }
         }
 
-        // 🌬️ Mesures de polluants
-        if (city.getAreaCode() != null) {
-            List<AirQualityMeasurement> measurements =
-                    measurementRepository.findByAreaCodeOrderByMeasuredAtDesc(city.getAreaCode());
+        List<AirQualityMeasurement> measurements = null;
 
+        if (city.getInseeCode() != null) {
+            measurements = measurementRepository.findByInseeCodeOrderByMeasuredAtDesc(city.getInseeCode());
             if (!measurements.isEmpty()) {
-                dto.setPm10(findFirstNonNull(measurements, AirQualityMeasurement::getPm10));
-                dto.setPm25(findFirstNonNull(measurements, AirQualityMeasurement::getPm25));
-                dto.setNo2(findFirstNonNull(measurements, AirQualityMeasurement::getNo2));
-                dto.setO3(findFirstNonNull(measurements, AirQualityMeasurement::getO3));
-                dto.setSo2(findFirstNonNull(measurements, AirQualityMeasurement::getSo2));
-
-                dto.setPollutantsMeasuredAt(
-                        measurements.stream()
-                                .map(AirQualityMeasurement::getMeasuredAt)
-                                .max(LocalDateTime::compareTo)
-                                .orElse(null)
-                );
+                log.info("📊 {} mesures trouvées pour {} via inseeCode", measurements.size(), cityName);
             }
         }
+
+        if ((measurements == null || measurements.isEmpty()) && city.getAreaCode() != null) {
+            measurements = measurementRepository.findByAreaCodeOrderByMeasuredAtDesc(city.getAreaCode());
+            if (!measurements.isEmpty()) {
+                log.info("📊 {} mesures trouvées pour {} via areaCode (fallback)", measurements.size(), cityName);
+            }
+        }
+
+        if (measurements != null && !measurements.isEmpty()) {
+            dto.setPm10(findFirstNonNull(measurements, AirQualityMeasurement::getPm10));
+            dto.setPm25(findFirstNonNull(measurements, AirQualityMeasurement::getPm25));
+            dto.setNo2(findFirstNonNull(measurements, AirQualityMeasurement::getNo2));
+            dto.setO3(findFirstNonNull(measurements, AirQualityMeasurement::getO3));
+            dto.setSo2(findFirstNonNull(measurements, AirQualityMeasurement::getSo2));
+
+            dto.setPollutantsMeasuredAt(
+                    measurements.stream()
+                            .map(AirQualityMeasurement::getMeasuredAt)
+                            .max(LocalDateTime::compareTo)
+                            .orElse(null)
+            );
+
+            dto.setLatestMeasurement(mapper.toDto(measurements.get(0)));
+        }
+
+        dto.setMeasurementHistory(
+            getMeasurementsHistoryForCity(cityName, null, null)
+        );
+        dto.setIndexHistory(
+            getIndicesHistoryForCity(cityName, null, null)
+        );
 
         return dto;
     }

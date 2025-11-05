@@ -23,5 +23,8 @@ public interface AirQualityIndexRepository extends JpaRepository<AirQualityIndex
             LocalDateTime start,
             LocalDateTime end
     );
+    Optional<AirQualityIndex> findByAreaCodeAndMeasuredAt(String areaCode, LocalDateTime measuredAt);
+
+
 
 }

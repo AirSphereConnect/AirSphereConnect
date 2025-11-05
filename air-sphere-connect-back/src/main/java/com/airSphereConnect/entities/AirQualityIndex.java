@@ -61,7 +61,7 @@ public class AirQualityIndex {
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
 
-    @OneToMany(mappedBy = "airQualityIndex", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "airQualityIndex", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private List<City> cities = new ArrayList<>();
 
     public AirQualityIndex() {

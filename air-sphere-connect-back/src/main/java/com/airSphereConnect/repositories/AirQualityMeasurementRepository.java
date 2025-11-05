@@ -15,34 +15,21 @@ import java.util.Optional;
 @Repository
 public interface AirQualityMeasurementRepository extends JpaRepository<AirQualityMeasurement, Long> {
 
-    @Query("SELECT m FROM AirQualityMeasurement m " +
-            "WHERE m.station.city.areaCode = :areaCode " +
-            "ORDER BY m.measuredAt DESC " +
-            "LIMIT 1")
-    Optional<AirQualityMeasurement> findTopByAreaCodeOrderByMeasuredAtDesc(@Param("areaCode") String areaCode);
+    Optional<AirQualityMeasurement> findTopByStation_City_InseeCodeOrderByMeasuredAtDesc(String inseeCode);
 
-    @Query("SELECT m FROM AirQualityMeasurement m " +
-            "WHERE m.station.city.areaCode = :areaCode " +
-            "ORDER BY m.measuredAt DESC")
-    List<AirQualityMeasurement> findByAreaCodeOrderByMeasuredAtDesc(@Param("areaCode") String areaCode);
+    List<AirQualityMeasurement> findByStation_City_InseeCodeOrderByMeasuredAtDesc(String inseeCode);
 
+    List<AirQualityMeasurement> findByStation_City_InseeCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+            String inseeCode, LocalDateTime start, LocalDateTime end);
 
-    @Query("SELECT m FROM AirQualityMeasurement m " +
-            "WHERE m.station.city.areaCode = :areaCode " +
-            "AND m.measuredAt BETWEEN :start AND :end " +
-            "ORDER BY m.measuredAt DESC")
-    List<AirQualityMeasurement> findByAreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
-            @Param("areaCode") String areaCode,
-            @Param("start") LocalDateTime start,
-            @Param("end") LocalDateTime end
-    );
+    Optional<AirQualityMeasurement> findTopByStation_City_AreaCodeOrderByMeasuredAtDesc(String areaCode);
+
+    List<AirQualityMeasurement> findByStation_City_AreaCodeOrderByMeasuredAtDesc(String areaCode);
+
+    List<AirQualityMeasurement> findByStation_City_AreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+            String areaCode, LocalDateTime start, LocalDateTime end);
 
     boolean existsByStationAndMeasuredAt(AirQualityStation station, LocalDateTime measuredAt);
 
-    @Query("SELECT m FROM AirQualityMeasurement m " +
-            "WHERE m.measuredAt > :since " +
-            "ORDER BY m.station.id ASC, m.measuredAt DESC")
-    List<AirQualityMeasurement> findByMeasuredAtAfterOrderByStationIdAscMeasuredAtDesc(@Param("since") LocalDateTime since);
-
-
+    List<AirQualityMeasurement> findByMeasuredAtAfterOrderByStation_IdAscMeasuredAtDesc(LocalDateTime since);
 }
