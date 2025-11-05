@@ -1,0 +1,18 @@
+.leaflet-popup-content-wrapper {
+  border-radius: 12px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2) !important;
+}
+
+.leaflet-popup-content {
+  margin: 15px !important;
+  min-width: 250px;
+}
+
+.leaflet-popup-tip {
+  border-radius: 2px;
+}
+
+.leaflet-interactive:hover {
+  transform: scale(1.1);
+  transition: transform 0.2s;
+}
