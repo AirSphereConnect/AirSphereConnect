@@ -70,7 +70,7 @@ services:
 
     ports:
       - "8081:${BACKEND_PORT}"
-#      - "${DEBUG_PORT}:5005"
+    #      - "${DEBUG_PORT}:5005"
 
     depends_on:
       mariadb:
@@ -110,7 +110,7 @@ services:
         condition: service_healthy
 
     networks:
-      - ${NETWORK_NAME:-air-sphere-connect-network}
+      - ${NETWORK_NAME}
 
     # ✅ Health check avec curl (cohérent avec backend)
     healthcheck:
@@ -123,7 +123,7 @@ services:
 # VOLUMES
 # ==============================
 volumes:
-  air-sphere-connect_db_data:
+  air_sphere_connect_db_data:
     name: ${DB_VOLUME_NAME}
     driver: local
 
@@ -131,6 +131,6 @@ volumes:
 # NETWORKS
 # ==============================
 networks:
-  air-sphere-connect-network:
+  air_sphere_connect_network:
     name: ${NETWORK_NAME}
     driver: bridge

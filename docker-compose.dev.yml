@@ -75,7 +75,7 @@ services:
       - maven_cache:/root/.m2
     ports:
       - "${BACKEND_PORT}:8080"
-#      - "${DEBUG_PORT}:5005"
+    #      - "${DEBUG_PORT}:5005"
     depends_on:
       mariadb:
         condition: service_healthy
@@ -107,7 +107,7 @@ services:
       - ./air-sphere-connect-front/src:/app/src
       - ./air-sphere-connect-front/angular.json:/app/angular.json
       - ./air-sphere-connect-front/package.json:/app/package.json
-#      - node_modules:/app/node_modules
+    #      - node_modules:/app/node_modules
     depends_on:
       backend:
         condition: service_healthy
@@ -125,7 +125,7 @@ services:
 # VOLUMES
 # ==============================
 volumes:
-  air-sphere-connect_db_data:
+  air_sphere_connect_db_data:
     name: ${DB_VOLUME_NAME}
     driver: local
   maven_cache:
@@ -135,6 +135,6 @@ volumes:
 # NETWORKS
 # ==============================
 networks:
-  air-sphere-connect-network:
+  air_sphere_connect_network:
     name: ${NETWORK_NAME}
     driver: bridge

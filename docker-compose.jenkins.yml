@@ -1,0 +1,46 @@
+services:
+    jenkins:
+      image: jenkins/jenkins:lts-jdk21
+      container_name: air_sphere_connect_jenkins
+      restart: unless-stopped
+
+      ports:
+        - "8090:8080"
+        - "50000:50000"
+      volumes:
+        - jenkins_home:/var/jenkins_home
+        - /var/run/docker.sock:/var/run/docker.sock
+        - ./jenkins/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
+        - ./jenkins/init.groovy.d:/usr/share/jenkins/ref/init.groovy.d:ro
+
+      environment:
+        - TZ=Europe/Paris
+
+      networks:
+        - ${NETWORK_NAME}
+
+      user: root
+
+    nginx:
+      image: nginx
+      container_name: nginx_reverse_proxy
+      depends_on:
+        - jenkins
+      ports:
+        - "80:80"
+        - "443:443"
+      volumes:
+        - ./nginx/conf.d:/etc/nginx/conf.d
+        - ./certbot/www:/var/www/certbot
+        - ./certbot/conf:/etc/letsencrypt
+      restart: unless-stopped
+
+
+volumes:
+  jenkins_home:
+    driver: local
+
+networks:
+  air_sphere_connect_network:
+    name: ${NETWORK_NAME}
+    driver: bridge
