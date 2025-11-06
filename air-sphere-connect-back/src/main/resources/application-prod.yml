@@ -1,0 +1,53 @@
+# Profil production
+spring:
+  datasource:
+    url: jdbc:mariadb://${DB_HOST}:3306/${DB_NAME}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.mariadb.jdbc.Driver
+
+  docker:
+    compose:
+      enabled: false
+
+  jpa:
+    hibernate:
+      ddl-auto: ${JPA_DDL_AUTO}
+    show-sql: ${JPA_SHOW_SQL}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MariaDBDialect
+
+  mail:
+    host: ${MAIL_HOST}
+    port: ${MAIL_PORT}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  # Configuration sécurité pour health check
+  security:
+    web:
+      ignoring:
+        - "/actuator/**"
+
+# CORS
+cors:
+  allowed-origins: ${CORS_ORIGINS}
+  allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
+  allowed-headers: "*"
+
+# API Keys
+weather:
+  api:
+    key: ${WEATHER_API_KEY}
+
+mailjet:
+  api:
+    key: ${MAILJET_API_KEY}
+    secret: ${MAILJET_API_SECRET}
