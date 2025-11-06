@@ -1,6 +1,6 @@
 pipeline {
     // 🧩 Utilisation d'un agent "docker" si tu en as un, sinon "any"
-    agent { label 'jenkins-custom-agent' }
+    agent any
 
     environment {
         DOCKER_COMPOSE_FILE = 'docker-compose.dev.yml'
