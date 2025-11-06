@@ -1,4 +1,5 @@
 pipeline {
+    // 🧩 Utilisation d'un agent "docker" si tu en as un, sinon "any"
     agent { label 'docker' }
 
     environment {
@@ -13,44 +14,58 @@ pipeline {
         }
 
         stage('Build Backend') {
-            dir('air_sphere_connect_back'){
-                sh 'mvn clean package -DskipTests' 
+            steps {
+                dir('air-sphere-connect-back') {
+                    sh '''
+                        echo "=== Build du backend Spring Boot ==="
+                        mvn clean package -DskipTests
+                    '''
+                }
             }
         }
 
         stage('Build Frontend') {
-            dir('air_sphere_connect_front') {
-                sh '''
-                cd air-sphere-connect-front
-                npm install
-                npm run build
-                '''
+            steps {
+                dir('air-sphere-connect-front') {
+                    sh '''
+                        echo "=== Build du frontend Angular ==="
+                        npm install
+                        npm run build
+                    '''
+                }
             }
         }
 
         stage('Docker Build & Deploy') {
             steps {
-                sh """
-                docker-compose -f ${DOCKER_COMPOSE_FILE} down
-                docker-compose -f ${DOCKER_COMPOSE_FILE} build
-                docker-compose -f ${DOCKER_COMPOSE_FILE} up -d
-                """
+                sh '''
+                    echo "=== (Re)construction et déploiement Docker Compose ==="
+                    docker compose -f ${DOCKER_COMPOSE_FILE} down || true
+                    docker compose -f ${DOCKER_COMPOSE_FILE} build --no-cache
+                    docker compose -f ${DOCKER_COMPOSE_FILE} up -d
+                '''
             }
         }
-      
+
         stage('SonarQube Analysis') {
             steps {
-                withSonarQubeEnv('SonarQube') {
-                    sh './mvnw sonar:sonar'
+                script {
+                    echo "=== Analyse SonarQube ==="
+                    withSonarQubeEnv('SonarQube') {
+                        dir('air-sphere-connect-back') {
+                            sh 'mvn sonar:sonar'
+                        }
+                    }
                 }
             }
         }
-      
-        stage('Tests Integration') {
+
+        stage('Integration Tests') {
             steps {
                 sh '''
-                curl -f http://localhost:8080/actuator/health
-                curl -f http://localhost:4200
+                    echo "=== Vérification de la santé des services ==="
+                    curl -f http://localhost:8080/actuator/health || exit 1
+                    curl -f http://localhost:4200 || exit 1
                 '''
             }
         }
@@ -58,10 +73,10 @@ pipeline {
 
     post {
         success {
-            echo 'Pipeline terminé avec succès!'
+            echo '✅ Pipeline terminé avec succès !'
         }
         failure {
-            echo 'Échec du pipeline.'
+            echo '❌ Échec du pipeline.'
         }
     }
 }
