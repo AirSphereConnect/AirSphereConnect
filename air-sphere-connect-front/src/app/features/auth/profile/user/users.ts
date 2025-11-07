@@ -2,7 +2,7 @@ import {Component, DestroyRef, inject, Input, signal} from '@angular/core';
 import { UserService } from '../../../../shared/services/user-service';
 import { User } from '../../../../core/models/user.model';
 import { UserForm } from '../../../../shared/components/ui/user-form/user-form';
-import {AddressForm} from '../../../../shared/components/ui/adress-form/address-form';
+import {AddressForm} from '../../../../shared/components/ui/address-form/address-form';
 import {EmailForm} from '../../../../shared/components/ui/email-form/email-form';
 import {PasswordForm} from '../../../../shared/components/ui/password-form/password-form';
 import {Button} from '../../../../shared/components/ui/button/button';

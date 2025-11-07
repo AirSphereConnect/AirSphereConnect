@@ -11,9 +11,8 @@ import {
 } from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {AlertsService} from '../../../services/alerts-service';
-import {CityService} from '../../../services/city-service';
+import {CityService} from '../../../../core/services/city';
 import {UserService} from '../../../services/user-service';
-import {Subject, takeUntil} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Button} from '../button/button';
 import {inputCitySearch} from '../../../utils/city-utils/city-utils';
