@@ -3,11 +3,13 @@ import {FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule} fr
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 import {Button} from '../button/button';
+import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
+import {InputComponent} from '../input/input';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [ReactiveFormsModule, Button],
+  imports: [ReactiveFormsModule, ButtonCloseModal, InputComponent],
   templateUrl: './user-form.html',
 })
 export class UserForm implements OnChanges, OnInit {

@@ -4,11 +4,12 @@ import { UserService } from '../../../services/user-service';
 import { CityService } from '../../../services/city-service';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import {Button} from '../button/button';
+import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [ReactiveFormsModule, Button],
+  imports: [ReactiveFormsModule, ButtonCloseModal],
   templateUrl: './address-form.html',
 })
 export class AddressForm implements OnChanges {

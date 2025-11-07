@@ -1,14 +1,9 @@
 @if (isOpen()) {
   <div class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
     <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md relative">
-      <app-button
-        type="button"
-        heroIcon="xMark"
-        color="info"
-        (click)="closeModal()"
-        class="absolute -top-2 -right-3"
-      >
-      </app-button>
+      <app-button-close-modal
+        (close)="closeModal()">
+      </app-button-close-modal>
       <h3 class="text-lg font-bold mb-4">
         {{ editingAlertsId ? 'Modifier l\'alerte' : 'Ajouter une alerte' }}
       </h3>
@@ -16,17 +11,21 @@
       <form [formGroup]="alertsForm" (ngSubmit)="submitForm()">
         <label class="block mb-2 font-semibold">Alerte activée</label>
         <label class="flex items-center gap-2 mb-4">
-          <input type="checkbox" formControlName="activeAlert" class="checkbox checkbox-primary" />
+          <input type="checkbox" formControlName="activeAlert" class="checkbox checkbox-primary"/>
           <span>Activer cette alerte</span>
         </label>
 
-        <label class="block mt-4 mb-2 font-semibold">Ville</label>
-        <input formControlName="cityName" (input)="onCityInput($event)" class="border p-2 rounded-2xl" />
+        <app-input
+          formControlName="cityName"
+          (input)="onCityInput($event)"
+          label="Ville"
+        ></app-input>
 
         <div class="bg-white rounded mt-2 max-h-32 overflow-y-auto">
           @if (citySuggestions().length) {
             @for (city of citySuggestions(); track city.id) {
-              <button type="button" class="block w-full text-left px-2 py-1 hover:bg-gray-200" (click)="selectCity(city)">
+              <button type="button" class="block w-full text-left px-2 py-1 hover:bg-gray-200"
+                      (click)="selectCity(city)">
                 {{ city.name }}
               </button>
             }
@@ -36,9 +35,11 @@
         <p class="text-red-700 mt-2" [hidden]="!errorMessage">{{ errorMessage }}</p>
 
         <div class="flex justify-end gap-2 mt-4">
-          <button type="submit" class="btn btn-primary">
+          <app-button
+            type="submit"
+          >
             {{ editingAlertsId ? 'Modifier' : 'Ajouter' }}
-          </button>
+          </app-button>
         </div>
       </form>
     </div>

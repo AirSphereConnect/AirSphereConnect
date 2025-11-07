@@ -1,14 +1,9 @@
 @if (isOpen()) {
   <div class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
     <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md relative">
-      <app-button
-        type="button"
-        heroIcon="xMark"
-        color="info"
-        (click)="close.emit()"
-        class="absolute -top-2 -right-3"
-      >
-      </app-button>
+      <app-button-close-modal
+        (close)="close.emit()">
+      </app-button-close-modal>
       <h2 class="text-xl font-bold mb-4">Modifier mon adresse</h2>
       <form [formGroup]="addressForm" (ngSubmit)="submit()">
         <input formControlName="street" placeholder="Adresse" class="text-black input mb-2 w-full" />

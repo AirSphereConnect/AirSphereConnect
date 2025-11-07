@@ -18,13 +18,14 @@ import {UserService} from '../../../services/user-service';
 import {Subject, takeUntil} from 'rxjs';
 import {Button} from '../button/button';
 import {inputCitySearch} from '../../../utils/city-utils/city-utils';
+import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 
 @Component({
   selector: 'app-favorites-form',
   templateUrl: './favorites-form.html',
   styleUrls: ['./favorites-form.scss'],
   standalone: true,
-  imports: [ReactiveFormsModule, Button]
+  imports: [ReactiveFormsModule, Button, ButtonCloseModal, InputComponent]
 })
 export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   @Input() isOpen = signal(false);
@@ -37,7 +38,6 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   private readonly favoritesService = inject(FavoritesService);
   private readonly cityService = inject(CityService);
   private readonly userService = inject(UserService);
-
   private readonly destroy$ = new Subject<void>();
 
   favoritesForm!: FormGroup;
@@ -70,11 +70,13 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
 
   private patchFormData() {
     this.favoritesForm.patchValue({
+
       favoriteCategory: this.initialFavoriteData.favoriteCategory || '',
       cityName: this.initialFavoriteData.cityName || ''
     });
     this.cityIdSelected = this.initialFavoriteData.cityId || null;
     this.isDeleteMode = false;
+    console.log('initialFavoriteData:', this.initialFavoriteData);
   }
 
   onCityInput(event: any) {
@@ -103,8 +105,8 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
     const isNewEntry = !this.editingFavoriteId;
     const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
 
-    if (!this.favoritesForm.valid || (isNewEntry && !cityIdValid)) {
-      this.errorMessage = 'Veuillez remplir tous les champs et sélectionner une ville.';
+    if (!this.favoritesForm.valid || !this.favoritesForm.dirty || (isNewEntry && !cityIdValid)) {
+      this.errorMessage = 'Veuillez modifier au moins un champ et sélectionner une ville.';
       return;
     }
 
@@ -130,7 +132,6 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
       favoriteCategory: '',
       cityName: ''
     });
-
     this.cityIdSelected = null;
     this.isDeleteMode = false;
     this.isOpen.set(false);

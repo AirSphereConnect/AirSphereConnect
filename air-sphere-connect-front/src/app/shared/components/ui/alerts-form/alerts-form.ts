@@ -17,11 +17,13 @@ import {Subject, takeUntil} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Button} from '../button/button';
 import {inputCitySearch} from '../../../utils/city-utils/city-utils';
+import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
+import {InputComponent} from '../input/input';
 
 @Component({
   selector: 'app-alerts-form',
   standalone: true,
-  imports: [ReactiveFormsModule, Button],
+  imports: [ReactiveFormsModule, Button, ButtonCloseModal, InputComponent],
   templateUrl: './alerts-form.html',
   styleUrl: './alerts-form.scss'
 })
@@ -103,8 +105,8 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
     const isNewEntry = !this.editingAlertsId;
     const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
 
-    if (!this.alertsForm.valid || (isNewEntry && !cityIdValid)) {
-      this.errorMessage = 'Veuillez remplir tous les champs et sélectionner une ville.';
+    if (!this.alertsForm.valid || !this.alertsForm.dirty || (isNewEntry && !cityIdValid)) {
+      this.errorMessage = 'Veuillez modifier au moins un champ et sélectionner une ville.';
       return;
     }
 
