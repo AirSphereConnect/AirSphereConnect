@@ -7,10 +7,12 @@ import { AirQualityService } from './air-quality';
 import { PopulationService } from './population';
 import {
   DashboardData,
+} from '../models/data.model';
+import {
   FavoriteCityData,
   CityHistoryData,
   CityDailySnapshot
-} from '../models/data.model';
+} from '../models/city.model'
 
 @Injectable({ providedIn: 'root' })
 export class DataOrchestratorService {

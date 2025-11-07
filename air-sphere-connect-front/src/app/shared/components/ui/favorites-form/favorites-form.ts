@@ -12,7 +12,7 @@ import {
 } from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {FavoritesService} from '../../../services/favorites-service';
-import {CityService} from '../../../services/city-service';
+import {CityService} from '../../../../core/services/city';
 import {InputComponent} from '../input/input';
 import {UserService} from '../../../services/user-service';
 import {Subject, takeUntil} from 'rxjs';
