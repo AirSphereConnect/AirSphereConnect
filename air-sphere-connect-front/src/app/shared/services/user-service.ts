@@ -110,4 +110,8 @@ export class UserService {
   editAddress(id: number | null, payload: any) {
     return this.http.put(`${this.apiUrl}/address/${id}`, payload, { withCredentials: true });
   }
+
+  getUsername() {
+    return this._userProfileSubject.value ? this._userProfileSubject.value.user.username : null;
+  }
 }

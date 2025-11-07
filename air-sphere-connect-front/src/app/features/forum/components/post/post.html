@@ -1,123 +1,164 @@
-@if (post()) {
-  <div class="card bg-base-200 shadow-xl hover:shadow-xl transition-all duration-300 mb-2">
-    <div class="card-body p-6">
-      <div class="flex items-start gap-4">
-        <!-- Contenu du post -->
-        <div class="flex-1 min-w-0">
-          <!-- En-tête du post -->
-          <div class="flex items-center justify-between mb-3">
-            <div class="flex items-center gap-3">
-              <h4 class="font-semibold text-base-content">{{ post().user }}</h4>
-              <div class="badge badge-outline badge-sm ">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                {{ post().createdAt | date:'short' }}
-              </div>
-            </div>
+<div class="card bg-base-100 shadow-lg border border-base-300 mt-3">
+  <div class="card-body p-6">
+    <!-- Header avec avatar et infos utilisateur -->
+    <div class="flex items-start justify-between mb-4">
+      <div class="flex items-start gap-3">
+        <!-- Avatar -->
+        <div class="avatar placeholder">
+          <div class="bg-primary text-secondary-content rounded-full w-10 flex items-center justify-center">
+            <span class="text-lg font-bold">{{ post().username.charAt(0) || 'A' }}</span>
           </div>
+        </div>
 
-          <!-- Contenu du message -->
-          <div class="prose prose-sm max-w-none text-base-content mb-4">
-            <p class="whitespace-pre-wrap">{{ post().content }}</p>
-          </div>
-
-          <!-- Actions du post -->
-          <div class="flex items-center gap-7">
-            <div class="flex items-center">
-              <!-- liker -->
-              <app-button variant="ghost"
-                          size="sm"
-                          shape="circle"
-                          (click)="onLikePost()"
-              >
-                <app-icon
-                  name="heart" [color]="post().isLiked ? 'primary' : 'current'"
-                  [filled]="post().isLiked" />
-              </app-button>
-              <span> {{ post().isLiked ? 'Aimé' : 'J\'aime' }} ({{ post().likes }}) </span>
-            </div>
-            <div class="flex items-center">
-              <!-- signaler -->
-              <app-button variant="ghost"
-                          size="sm"
-                          shape="circle"
-                          [disabled]="post().isFlagged"
-                          (click)="openFlagModal()" >
-                <app-icon
-                  name="flag"
-                  [color]="post().isFlagged ? 'primary' : 'current'"
-                  [filled]="post().isFlagged" />
-              </app-button>
-              <span [class.text-primary]="post().isFlagged" [class.font-semibold]="post().isFlagged">
-                {{ post().isFlagged? 'Signalé !' : 'Signaler' }}
-              </span>
-            </div>
+        <!-- Infos utilisateur -->
+        <div>
+          <div class="font-semibold text-base-content">{{ post().username }}</div>
+          <div class="text-xs text-base-content/60">
+            {{ post().createdAt | date:'dd/MM/yyyy à HH:mm' }}
           </div>
         </div>
       </div>
+
+      <!-- ✅ Bouton supprimer (visible uniquement pour l'auteur ou admin) -->
+      @if (canDelete()) {
+        <button
+          class="btn btn-ghost btn-sm btn-circle text-error hover:bg-error/10"
+          (click)="openDeleteModal()"
+          title="Supprimer ce post"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      }
     </div>
+
+    <!-- Contenu du post -->
+    <div class="prose prose-sm max-w-none mb-4">
+      <p class="text-base-content whitespace-pre-wrap">{{ post().content }}</p>
+    </div>
+
+    <!-- Actions (Like, Dislike, Flag) - Visible uniquement pour les utilisateurs authentifiés -->
+    @if (isAuthenticated()) {
+      <div class="flex items-center gap-7 pt-4 border-t border-base-300">
+        <!-- LIKE -->
+        <div class="flex items-center gap-1">
+          <app-button
+            variant="ghost"
+            size="sm"
+            shape="circle"
+            (click)="onLikePost(post().id)"
+          >
+            <app-icon
+              name="like"
+              [color]="isLiked() ? 'primary' : 'current'"
+              [filled]="isLiked()"
+            />
+          </app-button>
+          <span class="text-sm" [class.text-primary]="isLiked()" [class.font-semibold]="isLiked()">
+            {{ isLiked() ? 'Aimé' : 'J\'aime' }} ({{ post().likeCount }})
+          </span>
+        </div>
+
+        <!-- DISLIKE -->
+        <div class="flex items-center gap-1">
+          <app-button
+            variant="ghost"
+            size="sm"
+            shape="circle"
+            (click)="onDislikePost(post().id)"
+          >
+            <app-icon
+              name="dislike"
+              [color]="isDisliked() ? 'error' : 'current'"
+              [filled]="isDisliked()"
+            />
+          </app-button>
+          <span class="text-sm" [class.text-error]="isDisliked()" [class.font-semibold]="isDisliked()">
+            {{ isDisliked() ? 'N\'aime plus' : 'Je n\'aime pas' }} ({{ post().dislikeCount || 0 }})
+          </span>
+        </div>
+
+        <!-- FLAG -->
+        <div class="flex items-center gap-1">
+          <app-button
+            variant="ghost"
+            size="sm"
+            shape="circle"
+            [disabled]="post().isFlagged || false"
+            (click)="openFlagModal()"
+          >
+            <app-icon
+              name="flag"
+              [color]="post().isFlagged ? 'warning' : 'current'"
+              [filled]="post().isFlagged || false"
+            />
+          </app-button>
+          <span class="text-sm" [class.text-warning]="post().isFlagged" [class.font-semibold]="post().isFlagged">
+            {{ post().isFlagged ? 'Signalé !' : 'Signaler' }}
+          </span>
+        </div>
+      </div>
+    } @else {
+      <!-- Message pour les guests -->
+      <div class="alert alert-info mt-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <span class="text-sm">Connectez-vous pour interagir avec ce post</span>
+      </div>
+    }
   </div>
-  @if (showFlagModal()) {
-    <div class="modal modal-open">
-      <div class="modal-box">
-        @if (!flagConfirmed()) {
-          <!-- ✅ ÉTAPE 1 : Demande de confirmation -->
-          <h3 class="font-bold text-lg mb-4 flex items-center gap-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-warning" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
-            </svg>
-            Signaler ce message
-          </h3>
+</div>
 
-          <p class="py-4 text-base-content/80">
-            Êtes-vous sûr de vouloir signaler ce message aux modérateurs ?
-            Cette action ne peut pas être annulée.
-          </p>
-
-          <div class="modal-action">
-            <button class="btn btn-ghost" (click)="closeFlagModal()">
-              Annuler
-            </button>
-            <button class="btn btn-warning" (click)="confirmFlag()">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 21v-4m0 0V5a2 2 0 012-2h6.5l1 1H21l-3 6 3 6h-8.5l-1-1H5a2 2 0 00-2 2zm9-13.5V9" />
-              </svg>
-              Confirmer le signalement
-            </button>
-          </div>
-        } @else {
-          <!-- Message de confirmation -->
-          <div class="text-center py-6">
-            <div class="flex justify-center mb-4">
-              <div class="rounded-full bg-success/20 p-3">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-success" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-
-            <h3 class="font-bold text-xl mb-2 text-success">Message signalé !</h3>
-            <p class="text-base-content/70 mb-6">
-              Merci pour votre contribution. Notre équipe de modération examinera ce message dans les plus brefs délais.
-            </p>
-
-            <button class="btn btn-primary" (click)="closeFlagModal()">
-              Fermer
-            </button>
-          </div>
-        }
+<!-- Modal de confirmation de signalement -->
+@if (showFlagModal()) {
+  <dialog class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Signaler ce post ?</h3>
+      <p class="mb-4">Êtes-vous sûr de vouloir signaler ce post comme inapproprié ?</p>
+      <div class="modal-action">
+        <button class="btn btn-ghost" (click)="closeFlagModal()">Annuler</button>
+        <button class="btn btn-error" (click)="confirmFlag()">Signaler</button>
       </div>
     </div>
+    <form method="dialog" class="modal-backdrop">
+      <button (click)="closeFlagModal()">close</button>
+    </form>
+  </dialog>
+}
 
-  }
-} @else {
-  <div class="card bg-base-100 shadow-lg border border-base-300">
-    <div class="card-body p-6">
-      <div class="flex items-center gap-4">
-        <div class="loading loading-spinner loading-md"></div>
-        <p class="text-base-content/70 italic">Chargement du post...</p>
+<!-- ✅ Modal de confirmation de suppression -->
+@if (showDeleteModal()) {
+  <dialog class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4 flex items-center gap-2 text-error">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+        </svg>
+        Supprimer ce post ?
+      </h3>
+      <p class="mb-4">
+        Cette action est <strong>irréversible</strong>. Le post sera définitivement supprimé.
+      </p>
+      <div class="alert alert-warning mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-5 w-5" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+        </svg>
+        <span class="text-sm">Toutes les réactions et signalements seront également supprimés.</span>
+      </div>
+      <div class="modal-action">
+        <button class="btn btn-ghost" (click)="closeDeleteModal()">Annuler</button>
+        <button class="btn btn-error" (click)="confirmDelete()">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          Supprimer définitivement
+        </button>
       </div>
     </div>
-  </div>
+    <form method="dialog" class="modal-backdrop">
+      <button (click)="closeDeleteModal()">close</button>
+    </form>
+  </dialog>
 }

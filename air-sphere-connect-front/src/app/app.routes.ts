@@ -1,5 +1,4 @@
-import { Routes } from '@angular/router';
-import {AuthGuard} from './core/guards/AuthGuard';
+import {Routes} from '@angular/router';
 
 export const routes: Routes = [
   { path: 'home', loadComponent: () => import('./features/home/home').then(m => m.Home) },
@@ -16,7 +15,7 @@ export const routes: Routes = [
 
   {
     path: 'forum',
-    loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.ForumComponent),
+    loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.Forum),
     children: [
       { path: '', pathMatch: 'full', loadComponent: () => import('./features/forum/components/section/section').then(m => m.SectionComponent)},
       { path: 'section/:sectionId', loadComponent: () => import('./features/forum/components/thread-list/thread-list').then(m => m.ThreadListComponent)},
@@ -29,11 +28,6 @@ export const routes: Routes = [
   { path: 'dashboard/weather', loadComponent: () => import('./features/dashboard/widgets/weather-widget/weather-widget').then(m => m.WeatherWidget) },
   { path: 'dashboard/pollution-trends', loadComponent: () => import('./features/dashboard/widgets/pollution-trend-widget/pollution-trend-widget').then(m => m.PollutionTrendWidget), canActivate:[AuthGuard] },
 */
-  { path: 'forum', loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.Forum) },
-  { path: 'forum/thread-detail/:id', loadComponent: () => import('./features/forum/components/thread-detail/thread-detail').then(m => m.ThreadDetail) },
-  { path: 'forum/thread-list/:id', loadComponent: () => import('./features/forum/components/thread-list/thread-list').then(m => m.ThreadList) },
-  { path: 'forum/post/:id', loadComponent: () => import('./features/forum/components/post/post').then(m => m.Post) },
-
   { path: 'admin/users', loadComponent: () => import('./features/admin/user-management/user-management').then(m => m.UserManagement) },
   { path: 'admin/moderation', loadComponent: () => import('./features/admin/content-moderation/content-moderation').then(m => m.ContentModeration) },
 
