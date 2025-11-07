@@ -1,10 +1,9 @@
-import { inject, Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Thread } from '../models/thread.model';
-import { PostService } from './post.service';
-import { UserService } from '../../shared/services/user-service';
-import { Observable, switchMap } from 'rxjs';
-import {Post} from '../models/post.model';
+import {inject, Injectable} from '@angular/core';
+import {HttpClient} from '@angular/common/http';
+import {Thread} from '../models/thread.model';
+import {PostService} from './post.service';
+import {UserService} from '../../shared/services/user-service';
+import {map, Observable} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,27 +11,36 @@ import {Post} from '../models/post.model';
 export class ThreadService {
   private apiUrl = "http://localhost:8080/api/forum-threads";
   private http = inject(HttpClient);
-  private postService = inject(PostService);
   private userService = inject(UserService);
 
   getAllThreads(): Observable<Thread[]> {
-    return this.http.get<Thread[]>(`${this.apiUrl}`);
+    return this.http.get<Thread[]>(`${this.apiUrl}`,
+      {withCredentials: true});
   }
 
   getThreadById(id: number): Observable<Thread> {
-    return this.http.get<Thread>(`${this.apiUrl}/${id}`);
+    return this.http.get<Thread>(`${this.apiUrl}/${id}`,
+      { withCredentials: true});
   }
 
-  addThread(title: string, content: string, sectionId: number): Observable<Post> {
+  getThreadsBySectionId(id: number): Observable<Thread[]> {
+    return this.getAllThreads().pipe(
+      map(threads => threads.filter((thread) => thread.rubricId === id)
+        )
+    );
+  }
+
+  addThread(title: string, content: string, sectionId: number, userId: number): Observable<Thread> {
     const newThread = {
-      title,
+      title: title,
+      content: content,
       author: this.userService.getUsername(),
       createdAt: new Date(),
-      sectionId
+      rubricId: sectionId,
     };
 
-    return this.http.post<Thread>(`${this.apiUrl}`, newThread).pipe(
-      switchMap(thread => this.postService.addPost(thread.id, thread.author, content))
+    return this.http.post<Thread>(`${this.apiUrl}/new/${userId}`, newThread,
+      { withCredentials: true}
     );
   }
 }

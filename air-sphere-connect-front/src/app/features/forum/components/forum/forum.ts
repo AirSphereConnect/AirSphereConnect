@@ -13,7 +13,7 @@ import {SectionService} from '../../../../core/services/section.service';
   templateUrl: './forum.html',
   styleUrls: ['./forum.scss']
 })
-export class ForumComponent implements OnInit {
+export class Forum implements OnInit {
   private sectionService = inject(SectionService);
 
   sections$ = this.sectionService.getSections();
@@ -22,7 +22,7 @@ export class ForumComponent implements OnInit {
   ngOnInit() {
     this.sections$.subscribe({
       next: (sections: Section[]) => console.log('Loaded sections:', sections),
-      error: (err) => console.error('Error loading sections:', err)
+      error: (err) => console.error('erreurs de section', err)
     });
   }
 }

@@ -1,21 +1,18 @@
-@let currentThread = thread$ | async;
-@let posts = posts$ | async;
-@let publishing = isPublishing | async;
-
 <div class="space-y-6">
   <!-- Header avec breadcrumb et actions -->
   <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
     <div class="breadcrumbs text-sm">
       <ul>
         <li><a [routerLink]="['/forum']" class="text-primary hover:text-primary-focus">Forum</a></li>
-        <li><a [routerLink]="['/forum/section', sectionId]" class="text-primary hover:text-primary-focus">{{ currentThread?.title || 'Section' }}</a></li>
+        <li><a [routerLink]="['/forum/section', sectionId()]"
+               class="text-primary hover:text-primary-focus">{{ thread()?.title || 'Section' }}</a></li>
         <li class="text-base-content/70">Discussion</li>
       </ul>
     </div>
   </div>
 
 
-  @if (currentThread) {
+  @if (thread()) {
     <!-- En-tête du thread -->
     <div class="card bg-gradient-to-r from-primary/5 to-secondary/5 border border-primary/20">
       <div class="card-body p-8">
@@ -23,98 +20,108 @@
           <!-- Avatar de l'auteur -->
           <div class="avatar placeholder flex-shrink-0">
             <div class="bg-primary text-primary-content rounded-full w-16 flex items-center justify-center">
-              <span class="text-2xl font-bold">{{ currentThread.author.charAt(0)?.toUpperCase() }}</span>
+              <span class="text-2xl font-bold">{{ thread()?.username?.at(0) }}</span>
             </div>
           </div>
 
           <!-- Informations du thread -->
           <div class="flex-1">
-            <h1 class="text-3xl font-bold text-base-content mb-4">{{ currentThread.title }}</h1>
+            <h1 class="text-3xl font-bold text-base-content mb-4">{{ thread()?.title }}</h1>
 
             <div class="flex items-center gap-6 text-sm text-base-content/70 mb-4">
               <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
-                <span class="font-semibold">{{ currentThread.author }}</span>
+                <span class="font-semibold">{{ thread()?.username }}</span>
               </div>
 
               <div class="flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <span>{{ currentThread.createdAt | date:'short' }}</span>
+                <span>{{ thread()?.createdAt | date:'short' }}</span>
               </div>
 
               <div class="flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                 </svg>
-                <span>{{ posts?.length || 0 }} réponses</span>
+                <span>{{ posts().length || 0 }} réponses</span>
               </div>
             </div>
           </div>
         </div>
       </div>
     </div>
-    <!-- Zone de réponse rapide -->
-    <div class="card bg-base-100 shadow-lg border border-base-300">
-      <div class="card-body p-6">
-        <h3 class="card-title text-lg mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-          Répondre à cette discussion
-        </h3>
-        <div class="form-control">
-          <textarea
-            class="textarea textarea-bordered h-24"
-            placeholder="Partagez vos pensées..."
-            [formControl]="newPostContent"
-            [disabled]="publishing ?? false">
-          </textarea>
-        </div>
-        <div class="card-actions justify-end mt-4">
-          <button
-            class="btn btn-primary"
-            [disabled]="!newPostContent.value?.trim() || (publishing ?? false)"
-            (click)="publishPost()">
-            @if (publishing) {
-              <span class="loading loading-spinner loading-sm mr-2"></span>
-              Publication...
-            } @else {
-              Publier la réponse
-            }
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <!-- Liste des posts -->
+      <!-- Liste des posts -->
     <div class="space-y-6">
       <h2 class="text-2xl font-bold text-base-content flex items-center gap-2">
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
         </svg>
-        Réponses ({{ posts?.length || 0 }})
+        Réponses ({{ posts().length || 0 }})
       </h2>
 
       <hr class="w-48 h-0.5 my-4 bg-gray-100 border-0 rounded-sm md:my-10 dark:bg-gray-700">
 
-      @if (posts?.length) {
-        @for (post of posts; track post.id) {
+      @if (posts().length) {
+        @for (post of posts(); track post.id) {
           <app-post
             [post]="post"
-            (onLike)="onPostLike(post.id)"
-            (onFlag)="onPostFlagged(post)">
+            (onLike)="onPostLike($event)"
+            (onDislike)="onPostDislike($event)"
+            (onDelete)="onPostDeleted($event)"
+            (onFlag)="onPostFlagged($event)">
           </app-post>
         }
+
+        <!-- Zone de réponse -->
+        <form [formGroup]="newPostForm" (ngSubmit)="publishPost()">
+          <div class="w-full my-3 border border-base-300 rounded-lg">
+            <div class="px-4 py-2 rounded-t-lg bg-base-100">
+              <label for="comment" class="sr-only">Votre commentaire</label>
+              <textarea
+                id="comment"
+                formControlName="content"
+                rows="6"
+                class="w-full px-0 text-sm text-gray-900 bg-transparent border-0 focus:ring-0 focus:outline-none dark:text-white"
+                placeholder="Écrivez votre commentaire..."
+                required
+              ></textarea>
+            </div>
+
+            <div class="flex items-center justify-between px-3 py-2 border-t border-base-300">
+              <button
+                type="submit"
+                class="inline-flex items-center py-2.5 px-4 text-xs font-medium text-center text-white bg-primary rounded-lg hover:bg-primary-focus disabled:opacity-50"
+                [disabled]="newPostForm.invalid || isPublishing()"
+              >
+                @if (isPublishing()) {
+                  <span class="loading loading-spinner loading-xs mr-2"></span>
+                }
+                Répondre
+              </button>
+            </div>
+          </div>
+        </form>
+
+
       } @else {
         <div class="text-center py-12">
           <div class="avatar placeholder mb-6">
-            <div class="bg-base-300 text-base-content rounded-full w-20">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            <div class="bg-base-300 text-base-content rounded-full w-20 flex items-center justify-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+                   stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
               </svg>
             </div>
           </div>
@@ -123,8 +130,9 @@
             Soyez le premier à répondre à cette discussion !
           </p>
           <button class="btn btn-primary">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
             </svg>
             Répondre maintenant
           </button>
@@ -137,8 +145,10 @@
     <div class="text-center py-16">
       <div class="avatar placeholder mb-6">
         <div class="bg-error text-error-content rounded-full w-20">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"/>
           </svg>
         </div>
       </div>
@@ -147,8 +157,9 @@
         Le thread que vous recherchez n'existe pas ou a été supprimé.
       </p>
       <a [routerLink]="['/forum']" class="btn btn-primary">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
         </svg>
         Retour au forum
       </a>

@@ -5,6 +5,7 @@ import com.airSphereConnect.dtos.response.ForumPostResponseDto;
 import com.airSphereConnect.entities.ForumPost;
 import com.airSphereConnect.entities.ForumThread;
 import com.airSphereConnect.entities.User;
+import com.airSphereConnect.entities.enums.UserRole;
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.ForumPostMapper;
 import com.airSphereConnect.repositories.ForumPostRepository;
@@ -48,8 +49,13 @@ public class ForumPostServiceImpl implements ForumPostService {
     }
 
     private void validatePostAuthor(ForumPost post, Long userId) {
-        if (!post.getUser().getId().equals(userId)) {
-            throw new GlobalException.UnauthorizedException("Vous n'êtes pas autorisé à modérer ce post.");
+        User user = userRepository.findById(userId).orElseThrow( () ->
+                new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + userId));
+
+
+        boolean isAdmin = user.getRole() == UserRole.ADMIN;
+        if (!isAdmin && !post.getUser().getId().equals(userId)) {
+            throw new GlobalException.UnauthorizedException("Vous n'êtes pas autorisé à modifier ce post.");
         }
     }
 

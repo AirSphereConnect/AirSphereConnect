@@ -1,101 +1,201 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ThreadService } from '../../../../core/services/thread.service';
 import { PostService } from '../../../../core/services/post.service';
-import { Thread } from '../../../../core/models/thread.model';
-import { Post } from '../../../../core/models/post.model';
-import { DatePipe, AsyncPipe } from '@angular/common';
+import { DatePipe } from '@angular/common';
 import { PostComponent } from '../post/post';
-import { BehaviorSubject, Observable, switchMap, tap } from 'rxjs';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { switchMap, tap } from 'rxjs';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UserService } from '../../../../shared/services/user-service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Post } from '../../../../core/models/post.model';
 
 @Component({
   selector: 'app-thread-detail',
   standalone: true,
-  imports: [
-    DatePipe,
-    RouterLink,
-    PostComponent,
-    ReactiveFormsModule,
-    AsyncPipe
-  ],
+  imports: [DatePipe, RouterLink, PostComponent, ReactiveFormsModule],
   templateUrl: './thread-detail.html',
   styleUrls: ['./thread-detail.scss']
 })
-export class ThreadDetailComponent implements OnInit {
+export class ThreadDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private threadService = inject(ThreadService);
   private postService = inject(PostService);
+  private userService = inject(UserService);
+  private fb = inject(FormBuilder);
 
-  thread$!: Observable<Thread>;
-  posts$!: Observable<Post[]>;
-  sectionId: number | null = null;
+  // Forms & State
+  newPostForm = this.fb.group({
+    content: ['', [Validators.required, Validators.minLength(2)]]
+  });
 
-  newPostContent = new FormControl('');
-  isPublishing = new BehaviorSubject<boolean>(false);
+  isPublishing = signal(false);
+  isLoadingPosts = signal(false);
+  errorMessage = signal<string | null>(null);
 
-  private refreshPosts$ = new BehaviorSubject<void>(undefined);
+  postsSignal = signal<Post[]>([]);
+  posts = computed(() => this.postsSignal());
 
-  ngOnInit(): void {
-    const sectionId = this.route.snapshot.paramMap.get('sectionId');
-    const threadId = Number(this.route.snapshot.paramMap.get('threadId'));
+  private routeParams = toSignal(this.route.paramMap);
 
-    if (!sectionId || isNaN(Number(sectionId)) || isNaN(threadId)) {
-      this.router.navigate(['/forum']);
-      return;
+  // Route params
+  sectionId = computed(() => {
+    const id = Number(this.routeParams()?.get('sectionId'));
+    return isNaN(id) ? null : id;
+  });
+
+  threadId = computed(() => {
+    const id = Number(this.routeParams()?.get('threadId'));
+    return isNaN(id) ? null : id;
+  });
+
+  // Thread data
+  thread = toSignal(
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        const id = Number(params.get('threadId'));
+        if (isNaN(id)) {
+          this.router.navigate(['/forum']);
+          throw new Error('Invalid thread ID');
+        }
+        return this.threadService.getThreadById(id);
+      })
+    )
+  );
+
+  constructor() {
+    this.loadPosts();
+  }
+
+  private loadPosts(): void {
+    this.isLoadingPosts.set(true);
+
+    this.route.paramMap
+      .pipe(
+        takeUntilDestroyed(),
+        tap(() => this.isLoadingPosts.set(true)),
+        switchMap(params => {
+          const id = Number(params.get('threadId'));
+          if (isNaN(id)) {
+            this.router.navigate(['/forum']);
+            throw new Error('Invalid thread ID');
+          }
+          return this.postService.getPostByThreadId(id);
+        })
+      )
+      .subscribe({
+        next: posts => {
+          this.postsSignal.set(posts);
+          this.isLoadingPosts.set(false);
+        },
+        error: err => {
+          console.error('Erreur chargement posts:', err);
+          this.isLoadingPosts.set(false);
+          this.errorMessage.set('Erreur lors du chargement des posts');
+        }
+      });
+  }
+
+  private getUserId(): number | null {
+    const userId = this.userService.currentUserProfile?.user.id;
+    if (!userId) {
+      this.errorMessage.set('Vous devez être connecté');
     }
+    return userId ?? null;
+  }
 
-    this.sectionId = Number(sectionId);
-    this.thread$ = this.threadService.getThreadById(threadId);
-
-    this.posts$ = this.refreshPosts$.pipe(
-      switchMap(() => this.postService.getPostByThreadId(threadId))
+  private updatePost(updated: Post): void {
+    this.postsSignal.update(posts =>
+      posts.map(p => (p.id === updated.id ? updated : p))
     );
   }
 
-  onPostLike(postId: number): void {
-    this.postService.toggleLike(postId).pipe(
-      tap(() => this.refreshPosts$.next())
-    ).subscribe({
-      error: (error) => console.error('Erreur lors du like:', error)
-    });
-  }
-
-  onPostFlagged(post: Post): void {
-    this.postService.toggleFlag(post.id).pipe(
-      tap(() => this.refreshPosts$.next())
-    ).subscribe({
-      error: (error) => console.error('Erreur lors du signalement:', error)
-    });
-  }
-
   publishPost(): void {
-    const content = this.newPostContent.value?.trim();
+    if (this.newPostForm.invalid || this.isPublishing()) return;
 
-    if (!content) {
-      console.log('Le contenu ne peut pas être vide');
-      return;
-    }
+    const content = this.newPostForm.value.content!.trim();
+    const threadId = this.threadId();
+    const currentUser = this.userService.currentUserProfile?.user;
+    const userId = this.userService.currentUserProfile?.user.id;
 
-    const threadId = Number(this.route.snapshot.paramMap.get('threadId'));
     if (!threadId) {
-      console.log('Thread introuvable');
+      this.errorMessage.set('Thread introuvable');
       return;
     }
 
-    this.isPublishing.next(true);
+    if (!currentUser) {
+      this.errorMessage.set('Vous devez être connecté');
+      return;
+    }
 
-    this.postService.addPost(threadId, 'Utilisateur actuel', content).pipe(
-      tap(() => {
-        this.newPostContent.reset();
-        this.refreshPosts$.next();
-        this.isPublishing.next(false);
-      })
-    ).subscribe({
-      error: (error) => {
-        console.error('Erreur lors de la publication:', error);
-        this.isPublishing.next(false);
+    this.isPublishing.set(true);
+
+    this.postService.addPost(threadId, currentUser.username, content, userId).subscribe({
+      next: newPost => {
+        this.postsSignal.update(posts => [...posts, newPost]);
+        this.newPostForm.reset();
+        this.isPublishing.set(false);
+      },
+      error: err => {
+        console.error('Erreur publication:', err);
+        this.isPublishing.set(false);
+      }
+    });
+  }
+
+  onPostLike(postId: number): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.postService.toggleReaction(postId, userId, 'LIKE').subscribe({
+      next: updated => this.updatePost(updated),
+      error: err => {
+        console.error('Erreur like:', err);
+        this.errorMessage.set('Erreur lors du like');
+      }
+    });
+  }
+
+  onPostDislike(postId: number): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.postService.toggleReaction(postId, userId, 'DISLIKE').subscribe({
+      next: updated => this.updatePost(updated),
+      error: err => {
+        console.error('Erreur dislike:', err);
+        this.errorMessage.set('Erreur lors du dislike');
+      }
+    });
+  }
+
+  onPostFlagged(postId: number): void {
+
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.postService.toggleFlag(postId).subscribe({
+      next: updated => this.updatePost(updated),
+      error: err => {
+        console.error('Erreur flag:', err);
+        this.errorMessage.set('Erreur lors du signalement');
+      }
+    });
+  }
+
+  onPostDeleted(postId: number): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.postService.deletePost(postId, userId).subscribe({
+      next: () => {
+        this.postsSignal.update(posts => posts.filter(p => p.id !== postId));
+      },
+      error: err => {
+        console.error('Erreur suppression:', err);
+        this.errorMessage.set('Erreur lors de la suppression');
       }
     });
   }

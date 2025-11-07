@@ -1,103 +1,122 @@
-import {Component, computed, effect, inject, OnInit, signal} from '@angular/core';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {Thread} from '../../../../core/models/thread.model';
-import {CommonModule} from '@angular/common';
-import {Section} from '../../../../core/models/section.model';
-import {SectionService} from '../../../../core/services/section.service';
+import {Component, computed, inject, signal} from '@angular/core';
+import {ActivatedRoute, RouterLink} from '@angular/router';
+import {toSignal} from '@angular/core/rxjs-interop';
+import {tap} from 'rxjs';
+
+// Services et modèles
 import {PostService} from '../../../../core/services/post.service';
-import {firstValueFrom, map, Observable, of} from 'rxjs';
 import {ThreadService} from '../../../../core/services/thread.service';
-import {UserService} from '../../../../shared/services/user-service';
+import {SectionService} from '../../../../core/services/section.service';
 import {FormsModule} from '@angular/forms';
-import {toSignal} from "@angular/core/rxjs-interop";
+import {UserService} from '../../../../shared/services/user-service';
 
 @Component({
   selector: 'app-thread-list',
   standalone: true,
-  imports: [
-    CommonModule,
-    RouterLink,
-    FormsModule
-  ],
+  imports: [RouterLink, FormsModule],
   templateUrl: './thread-list.html',
   styleUrls: ['./thread-list.scss']
 })
-export class ThreadListComponent implements OnInit {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private sectionService = inject(SectionService);
-  private postService = inject(PostService);
-  private threadService = inject(ThreadService);
-  userService = inject(UserService);
+export class ThreadListComponent {
+  // 🔹 Injections
+  private readonly route = inject(ActivatedRoute);
+  private readonly postService = inject(PostService);
+  private readonly threadService = inject(ThreadService);
+  private readonly sectionService = inject(SectionService);
+  protected readonly userService = inject(UserService);
 
-  // Signals pour le tri
-  sortCriteria = signal<string>('date');
-  isAscending = signal<boolean>(true);
+  // 🔹 Signaux pour IDs
+  readonly sectionId = signal<number>(Number(this.route.snapshot.paramMap.get('sectionId')));
+  readonly threadId = signal<number>(Number(this.route.snapshot.paramMap.get('threadId')));
 
-  // Signals pour les données
-  section = signal<Section | null>(null);
-  threads = signal<Thread[]>([]);
 
-  // Signals pour le formulaire
-  newThreadTitle = signal<string>('');
-  newThreadContent = signal<string>('');
-  showModal = signal<boolean>(false);
+  // 🔹 Données principales
+  readonly section = toSignal(this.sectionService.getSectionById(this.sectionId()), {initialValue: undefined});
+  readonly threads = toSignal(
+    this.threadService.getThreadsBySectionId(this.sectionId()).pipe(
+      tap(threads => console.log('Threads chargés pour la section', this.sectionId(), ':', threads))
+    ),
+    {initialValue: []}
+  );
+  readonly posts = toSignal(this.postService.getPosts(), {initialValue: []});
+  readonly postsLikes = toSignal(this.postService.getLikesByThreadId(this.threadId()), {initialValue: 0});
 
-  // Signal computed pour les threads triés
-  sortedThreads = computed(() => {
-    const currentThreads = this.threads();
+
+  // 🔹 Computed pour threads enrichis avec postCount et likeCount
+  readonly threadsWithCounts = computed(() => {
+
+    const allThreads = this.threads();
+    const allPosts = this.posts();
+
+    console.log('Threads:', allThreads);
+    console.log('Posts:', allPosts);
+
+
+    console.log('🔍 Threads:', allThreads); // ✅ Ajoute ça
+
+    return allThreads.map(thread => {
+      console.log('📝 Thread individuel:', thread); // ✅ Et ça
+      const threadPosts = allPosts.filter(p => {
+        console.log(`Comparing post.threadId (${p.threadId}) with thread.id (${thread.id})`);
+        return p.threadId === thread.id;
+      });
+
+      console.log(`Thread ${thread.id} has ${threadPosts.length} posts`, threadPosts);
+
+      const likeCount = threadPosts.reduce((sum, post) => sum + (post.likeCount || 0), 0);
+
+      return {
+        ...thread,
+        postCount: threadPosts.length,
+        likeCount
+      };
+    });
+  });
+
+  // 🔹 Computed pour UI
+  readonly threadCount = computed(() => this.threads().length);
+
+
+  // 🔹 Signaux pour UI (modal, tri, formulaire)
+  readonly showModal = signal(false);
+  readonly newThreadTitle = signal('');
+  readonly newThreadContent = signal('');
+  readonly sortCriteria = signal<string>('date');
+  readonly isAscending = signal<boolean>(true);
+  readonly isSubmitting = signal<boolean>(false);
+
+  // 🔹 Tri des threads
+  readonly sortedThreads = computed(() => {
+    const threads = [...this.threadsWithCounts()];
     const criteria = this.sortCriteria();
     const ascending = this.isAscending();
 
-    if (!currentThreads || currentThreads.length === 0) return [];
-
-    const sorted = [...currentThreads];
-
-    switch (criteria) {
-      case 'date':
-        return sorted.sort((a, b) => {
-          const dateA = new Date(a.createdAt).getTime();
-          const dateB = new Date(b.createdAt).getTime();
-          return ascending ? dateA - dateB : dateB - dateA;
-        });
-
-      case 'titre':
-        return sorted.sort((a, b) => {
-          const titleA = a.title.toLowerCase();
-          const titleB = b.title.toLowerCase();
+    return threads.sort((a, b) => {
+      switch (criteria) {
+        case 'date':
           return ascending
-            ? titleA.localeCompare(titleB)
-            : titleB.localeCompare(titleA);
-        });
-
-      default:
-        return sorted;
-    }
+            ? new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+            : new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+        case 'titre':
+          return ascending
+            ? a.title.localeCompare(b.title)
+            : b.title.localeCompare(a.title);
+        case 'reponses':
+          return ascending
+            ? a.postCount - b.postCount
+            : b.postCount - a.postCount;
+        case 'popularite':
+          return ascending
+            ? a.likeCount - b.likeCount
+            : b.likeCount - a.likeCount;
+        default:
+          return 0;
+      }
+    });
   });
 
-  // Initialisation avec effect
- // constructor() {
-  //  effect(() => {
-    //  this.loadThreadsForSection();
-   // });
- // }
-
-  ngOnInit(): void {
-    const sectionId = Number(this.route.snapshot.paramMap.get('sectionId'));
-    this.loadSection(sectionId);
-  }
-
-  private async loadSection(sectionId: number): Promise<void> {
-    try {
-      const sectionData = await firstValueFrom(this.sectionService.getSectionById(sectionId));
-      this.section.set(sectionData);
-    } catch (error) {
-      console.error('Erreur lors du chargement de la section:', error);
-      this.router.navigate(['/forum']);
-    }
-  }
-
-  sortThreads(criteria: string): void {
+  // 🔹 Méthodes UI
+  sortThreads(criteria: 'date' | 'titre' | 'reponses' | 'popularite') {
     if (this.sortCriteria() === criteria) {
       this.isAscending.update(v => !v);
     } else {
@@ -107,60 +126,60 @@ export class ThreadListComponent implements OnInit {
   }
 
   getSortIndicator(criteria: string): string {
-    if (this.sortCriteria() !== criteria) {
-      return '↕';
-    }
+    if (this.sortCriteria() !== criteria) return '↕';
     return this.isAscending() ? '↑' : '↓';
   }
 
-  async addThread(event?: Event): Promise<void> {
-    if (event) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-
-    const title = this.newThreadTitle().trim();
-    const content = this.newThreadContent().trim();
-    const currentSection = this.section();
-
-    if (!currentSection || !title || !content) {
-      return;
-    }
-
-    try {
-      const created = await firstValueFrom(
-        this.threadService.addThread(title, content, currentSection.id)
-      );
-
-      // Mettre à jour la liste des threads
-      //this.threads.update(current => [...current, created]);
-
-      // Fermer la modale et réinitialiser le formulaire
-      this.closeModal();
-    } catch (error) {
-      console.error('Erreur lors de l\'ajout du thread:', error);
-    }
-  }
-
-  openModal(): void {
+  openModal() {
     this.showModal.set(true);
   }
 
-  closeModal(): void {
+  closeModal() {
     this.showModal.set(false);
     this.newThreadTitle.set('');
     this.newThreadContent.set('');
   }
 
-  protected getTotalLikesByThread(threadId: number): Observable<number> {
-    return this.postService.getPostByThreadId(threadId).pipe(
-      map(posts => posts.reduce((total, post) => total + (post.likes || 0), 0))
-    );
-  }
+  createThread() {
+    const title = this.newThreadTitle().trim();
+    const content = this.newThreadContent().trim();
+    const sectionId = this.sectionId();
+    const userId = this.userService.currentUserProfile?.user?.id;
 
-  protected getPostCount(threadId: number): Observable<number> {
-    return this.postService.getPostByThreadId(threadId).pipe(
-      map(posts => posts.length)
-    );
+    if(!userId) {
+      alert('Vous devez être connecté pour créer un thread.');
+      return;
+    }
+
+    if (!title) {
+      alert('le titre est obligatoire');
+      return;
+    }
+    if (!content) {
+      alert('le contenu est obligatoire');
+      return;
+    }
+
+    // appel du service pour créer le thread et le post initial
+    this.isSubmitting.set(true);
+
+    this.threadService.addThread(title, content, sectionId, userId).subscribe({
+      next: (newPost) => {
+        console.log('Nouveau thread créé avec le post initial:', newPost);
+
+        this.closeModal();
+        this.isSubmitting.set(false);
+
+        // rafraîchir la liste des threads
+        this.threadService.getThreadsBySectionId(sectionId).subscribe(() => {
+          window.location.reload();
+        });
+      },
+      error: (error) => {
+        console.error('Erreur lors de la création du thread:', error);
+        alert('Erreur lors de la création du thread. Veuillez réessayer.');
+        this.isSubmitting.set(false);
+      }
+    });
   }
 }
