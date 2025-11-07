@@ -98,9 +98,9 @@
             ></app-input>
 
             <!-- Suggestions de villes -->
-            @if (citySuggestions.length) {
+            @if (citySuggestions().length) {
               <ul class="menu bg-base-100 w-full rounded-box">
-                @for (city of citySuggestions; track city) {
+                @for (city of citySuggestions(); track city.id) {
                   <li>
                     <a (click)="selectCity(city)">
                       {{ city.name }} ({{ city.postalCode }})

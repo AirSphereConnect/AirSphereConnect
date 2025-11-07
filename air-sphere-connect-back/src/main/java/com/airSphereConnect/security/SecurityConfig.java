@@ -54,6 +54,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // active CORS avec configuration source
+                //TODO activer csrf pour la production (sinon problème aux attaques XSRF → récupération du cookie dans le header)
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

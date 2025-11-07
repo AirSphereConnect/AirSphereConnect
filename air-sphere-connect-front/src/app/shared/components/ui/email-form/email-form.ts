@@ -1,12 +1,14 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {UserService} from '../../../services/user-service';
+import {Button} from '../button/button';
 
 @Component({
   selector: 'app-email-form',
-    imports: [
-        ReactiveFormsModule
-    ],
+  imports: [
+    ReactiveFormsModule,
+    Button
+  ],
   templateUrl: './email-form.html',
   styleUrl: './email-form.scss'
 })

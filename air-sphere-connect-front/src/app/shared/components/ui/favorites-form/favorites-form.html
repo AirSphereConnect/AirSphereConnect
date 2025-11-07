@@ -3,7 +3,15 @@
   <div
     class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
     <!-- Contenu de la modal -->
-    <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md">
+    <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md relative">
+      <app-button
+        type="button"
+        heroIcon="xMark"
+        color="info"
+        (click)="closeModal()"
+        class="absolute -top-2 -right-3"
+      >
+      </app-button>
       <h3 class="text-lg font-bold mb-4">
         {{ editingFavoriteId ? 'Modifier le favori' : 'Ajouter un favori' }}
       </h3>
@@ -28,8 +36,8 @@
         ></app-input>
 -->
         <div class="bg-white rounded mt-2 max-h-32 overflow-y-auto">
-          @if (citySuggestions) {
-            @for (city of citySuggestions; track city) {
+          @if (citySuggestions().length) {
+            @for (city of citySuggestions(); track city.id) {
               <button
                 type="button"
                 class="block w-full text-left px-2 py-1 hover:bg-gray-200"

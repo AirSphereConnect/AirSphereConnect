@@ -2,11 +2,13 @@ import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from 
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
+import {Button} from '../button/button';
 
 @Component({
   selector: 'app-password-form',
   imports: [
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    Button
   ],
   templateUrl: './password-form.html',
   styleUrl: './password-form.scss'

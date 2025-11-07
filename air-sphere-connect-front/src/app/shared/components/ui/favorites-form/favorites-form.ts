@@ -16,13 +16,15 @@ import {CityService} from '../../../services/city-service';
 import {InputComponent} from '../input/input';
 import {UserService} from '../../../services/user-service';
 import {Subject, takeUntil} from 'rxjs';
+import {Button} from '../button/button';
+import {inputCitySearch} from '../../../utils/city-utils/city-utils';
 
 @Component({
   selector: 'app-favorites-form',
   templateUrl: './favorites-form.html',
   styleUrls: ['./favorites-form.scss'],
   standalone: true,
-  imports: [ReactiveFormsModule]
+  imports: [ReactiveFormsModule, Button]
 })
 export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   @Input() isOpen = signal(false);
@@ -39,11 +41,13 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   private readonly destroy$ = new Subject<void>();
 
   favoritesForm!: FormGroup;
-  citySuggestions: any[] = [];
+  cityQuery = signal<string>('');
+  citySuggestions = signal<any[]>([]);
   cityIdSelected: number | null = null;
   errorMessage: string | null = null;
   isDeleteMode = false;
 
+  citySearchEffect = inputCitySearch(this.cityService, this.cityQuery, this.citySuggestions);
 
   ngOnInit() {
     this.favoritesForm = this.fb.group({
@@ -74,24 +78,14 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   }
 
   onCityInput(event: any) {
-    const query = event.target.value;
-    if (query.length < 2) {
-      this.citySuggestions = [];
-      return;
-    }
-
-    this.cityService.searchCities(query)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (cities: any[]) => (this.citySuggestions = cities || []),
-        error: () => (this.citySuggestions = [])
-      });
+    this.cityQuery.set(event.target.value);
   }
+
 
   selectCity(city: any) {
     this.favoritesForm.get('cityName')?.setValue(city.name);
     this.cityIdSelected = city.id;
-    this.citySuggestions = [];
+    this.citySuggestions.set([]);
   }
 
   submitForm() {
@@ -106,7 +100,10 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
       return;
     }
 
-    if (!this.favoritesForm.valid || !this.cityIdSelected) {
+    const isNewEntry = !this.editingFavoriteId;
+    const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
+
+    if (!this.favoritesForm.valid || (isNewEntry && !cityIdValid)) {
       this.errorMessage = 'Veuillez remplir tous les champs et sélectionner une ville.';
       return;
     }
