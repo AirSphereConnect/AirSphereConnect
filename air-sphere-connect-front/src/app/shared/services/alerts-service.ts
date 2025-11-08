@@ -1,13 +1,16 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { ApiConfigService } from '../../core/services/api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertsService {
-  private readonly apiUrl = 'http://localhost:8080/api/alert/configurations';
+  private readonly http = inject(HttpClient);
+  private readonly apiConfig = inject(ApiConfigService);
+  private readonly apiUrl = `${this.apiConfig.apiUrl}/alert/configurations`;
 
-  constructor(private http: HttpClient) {}
+  constructor() {}
 
 
   editAlerts(payload: { enabled: boolean; cityId: number | null }, editingAlertsId: number) {

@@ -1,5 +1,7 @@
 # Environment variables
 .env
+.env.prod
+.env.active
 
 # Docker
 *.log
@@ -21,4 +23,7 @@ target/
 # Build outputs (quand on les ajoutera)
 dist/
 build/
+
+airsphereconnect-serveur
+docs
 

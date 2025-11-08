@@ -1,0 +1,129 @@
+services:
+  # ==============================
+  # BASE DE DONNÉES MARIADB
+  # ==============================
+  mariadb:
+    image: mariadb:${MARIADB_VERSION}
+    container_name: ${DB_CONTAINER_NAME}
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_CHARSET: ${DB_CHARSET}
+      MYSQL_COLLATION: ${DB_COLLATION}
+
+    # Ports non exposés en production pour plus de sécurité
+    # Décommenter si besoin d'accès direct depuis l'hôte
+    # ports:
+    #   - "127.0.0.1:3306:3306"
+
+    volumes:
+      - ${DB_VOLUME_NAME}:/var/lib/mysql
+
+    networks:
+      - ${NETWORK_NAME}
+
+    healthcheck:
+      test: ["CMD", "mariadb", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}", "-e", "SELECT 1"]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+      start_period: ${HEALTHCHECK_START_PERIOD}
+
+
+  # ==============================
+  # MAILHOG - DÉSACTIVÉ EN PRODUCTION
+  # En prod, on utilise Mailjet (SMTP réel configuré dans .env.prod)
+  # ==============================
+  # mailhog:
+  #   image: mailhog/mailhog:latest
+  #   container_name: ${MAILHOG_CONTAINER_NAME:-mailhog}
+  #   restart: unless-stopped
+  #   ports:
+  #     - "127.0.0.1:1025:1025"
+  #     - "127.0.0.1:8025:8025"
+  #   networks:
+  #     - ${NETWORK_NAME}
+
+  # ==============================
+  # BACKEND SPRING BOOT
+  # ==============================
+  backend:
+    build:
+      context: ${BACKEND_CONTEXT}
+      dockerfile: ${BACKEND_DOCKERFILE}
+
+    container_name: ${BACKEND_CONTAINER_NAME}
+    restart: always
+
+    env_file:
+      - .env.prod
+
+    # Port bindé sur 127.0.0.1 uniquement (nginx sera le seul accès public)
+    ports:
+      - "127.0.0.1:8081:${BACKEND_PORT}"
+
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+    networks:
+      - ${NETWORK_NAME}
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/actuator/health || exit 1"]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: ${HEALTHCHECK_RETRIES}
+      start_period: ${HEALTHCHECK_START_PERIOD}
+
+  # ==============================
+  # FRONTEND ANGULAR
+  # ==============================
+  frontend:
+    build:
+      context: ${FRONTEND_CONTEXT}
+      dockerfile: ${FRONTEND_DOCKERFILE}
+
+    container_name: ${FRONTEND_CONTAINER_NAME}
+    restart: always
+
+    environment:
+      API_URL: ${API_URL}
+      NODE_ENV: ${NODE_ENV}
+
+    # Port bindé sur 127.0.0.1 uniquement (nginx sera le seul accès public)
+    ports:
+      - "127.0.0.1:4201:${FRONTEND_PORT}"
+
+    depends_on:
+      backend:
+        condition: service_healthy
+
+    networks:
+      - ${NETWORK_NAME}
+
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4200 || exit 1"]
+      interval: ${HEALTHCHECK_INTERVAL}
+      timeout: ${HEALTHCHECK_TIMEOUT}
+      retries: 3
+
+# ==============================
+# VOLUMES
+# ==============================
+volumes:
+  air_sphere_connect_db_data:
+    name: ${DB_VOLUME_NAME}
+    driver: local
+
+# ==============================
+# NETWORKS
+# ==============================
+networks:
+  air_sphere_connect_network:
+    name: ${NETWORK_NAME}
+    driver: bridge

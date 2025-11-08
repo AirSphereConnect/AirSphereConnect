@@ -51,3 +51,13 @@ mailjet:
   api:
     key: ${MAILJET_API_KEY}
     secret: ${MAILJET_API_SECRET}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET}
+  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:7200000}   # 2 heures en ms
+  refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000} # 7 jours en ms
+
+# Cookie Configuration
+cookie:
+  secure: ${COOKIE_SECURE:true}  # OBLIGATOIREMENT true en production (HTTPS)
