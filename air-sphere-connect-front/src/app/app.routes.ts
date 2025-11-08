@@ -13,10 +13,10 @@ export const routes: Routes = [
   { path: 'dashboard/weather', loadComponent: () => import('./features/dashboard/widgets/weather-widget/weather-widget').then(m => m.WeatherWidget) },
   { path: 'dashboard/pollution-trends', loadComponent: () => import('./features/dashboard/widgets/pollution-trend-widget/pollution-trend-widget').then(m => m.PollutionTrendWidget) },
 
-  { path: 'forum', loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.Forum) },
-  { path: 'forum/thread-detail/:id', loadComponent: () => import('./features/forum/components/thread-detail/thread-detail').then(m => m.ThreadDetail) },
-  { path: 'forum/thread-list/:id', loadComponent: () => import('./features/forum/components/thread-list/thread-list').then(m => m.ThreadList) },
-  { path: 'forum/post/:id', loadComponent: () => import('./features/forum/components/post/post').then(m => m.Post) },
+  { path: 'forum', loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.ForumComponent) },
+  { path: 'forum/thread-detail/:id', loadComponent: () => import('./features/forum/components/thread-detail/thread-detail').then(m => m.ThreadDetailComponent) },
+  { path: 'forum/thread-list/:id', loadComponent: () => import('./features/forum/components/thread-list/thread-list').then(m => m.ThreadListComponent) },
+  { path: 'forum/post/:id', loadComponent: () => import('./features/forum/components/post/post').then(m => m.PostComponent) },
 
   { path: 'admin/users', loadComponent: () => import('./features/admin/user-management/user-management').then(m => m.UserManagement) },
   { path: 'admin/moderation', loadComponent: () => import('./features/admin/content-moderation/content-moderation').then(m => m.ContentModeration) },
