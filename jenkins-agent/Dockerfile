@@ -15,10 +15,10 @@ RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
     && apt-get install -y nodejs
 
 # Install Maven 3.9.x
-RUN wget https://downloads.apache.org/maven/maven-3/3.9.9/binaries/apache-maven-3.9.9-bin.tar.gz \
-    && tar -xzf apache-maven-3.9.9-bin.tar.gz -C /opt \
-    && ln -s /opt/apache-maven-3.9.9 /opt/maven \
-    && rm apache-maven-3.9.9-bin.tar.gz
+RUN wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-maven-3.9.6-bin.tar.gz \
+    && tar -xzf apache-maven-3.9.6-bin.tar.gz -C /opt \
+    && ln -s /opt/apache-maven-3.9.6 /opt/maven \
+    && rm apache-maven-3.9.6-bin.tar.gz
 
 ENV MAVEN_HOME=/opt/maven
 ENV PATH="${MAVEN_HOME}/bin:${PATH}"
