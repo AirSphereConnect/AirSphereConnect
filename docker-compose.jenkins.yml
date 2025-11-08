@@ -47,8 +47,10 @@ services:
 
     environment:
       - JENKINS_URL=http://jenkins:8080/jenkins
+      - JENKINS_SECRET=80c99e5903b79a2c696c5e0b175a2285056f5d28e9cc9087ec7b3c7deffcda25
       - JENKINS_AGENT_NAME=docker-agent
       - JENKINS_AGENT_WORKDIR=/home/jenkins/agent
+      - JENKINS_WEB_SOCKET=true
 
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
