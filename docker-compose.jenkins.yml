@@ -1,45 +1,82 @@
 services:
-    jenkins:
-      image: jenkins/jenkins:lts-jdk21
-      container_name: air_sphere_connect_jenkins
-      restart: unless-stopped
+  # ==============================
+  # JENKINS CONTROLLER
+  # ==============================
+  jenkins:
+    image: jenkins/jenkins:lts-jdk21
+    container_name: air_sphere_connect_jenkins
+    restart: unless-stopped
 
-      ports:
-        - "8090:8080"
-        - "50000:50000"
-      volumes:
-        - jenkins_home:/var/jenkins_home
-        - /var/run/docker.sock:/var/run/docker.sock
-        - ./jenkins/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
-        - ./jenkins/init.groovy.d:/usr/share/jenkins/ref/init.groovy.d:ro
+    # Ports bindés sur 127.0.0.1 uniquement (nginx sera le seul accès public)
+    ports:
+      - "127.0.0.1:8090:8080"
+      - "50000:50000"
 
-      environment:
-        - TZ=Europe/Paris
+    volumes:
+      - jenkins_home:/var/jenkins_home
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./jenkins/plugins.txt:/usr/share/jenkins/ref/plugins.txt:ro
+      - ./jenkins/init.groovy.d:/usr/share/jenkins/ref/init.groovy.d:ro
 
-      networks:
-        - ${NETWORK_NAME}
+    environment:
+      - TZ=Europe/Paris
+      - JENKINS_OPTS=--prefix=/jenkins
+      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 
-      user: root
+    networks:
+      - ${NETWORK_NAME}
 
-#    nginx:
-#      image: nginx
-#      container_name: nginx_reverse_proxy
-#      depends_on:
-#        - jenkins
-#      ports:
-#        - "80:80"
-#        - "443:443"
-#      volumes:
-#        - ./nginx/conf.d:/etc/nginx/conf.d
-#        - ./certbot/www:/var/www/certbot
-#        - ./certbot/conf:/etc/letsencrypt
-#      restart: unless-stopped
+    user: root
 
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/jenkins/login || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
 
+  # ==============================
+  # JENKINS AGENT
+  # ==============================
+  jenkins-agent:
+    build:
+      context: ./jenkins-agent
+      dockerfile: Dockerfile
+
+    container_name: air_sphere_connect_jenkins_agent
+    restart: unless-stopped
+
+    environment:
+      - JENKINS_URL=http://jenkins:8080/jenkins
+      - JENKINS_AGENT_NAME=docker-agent
+      - JENKINS_AGENT_WORKDIR=/home/jenkins/agent
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - jenkins_agent_workdir:/home/jenkins/agent
+
+    depends_on:
+      jenkins:
+        condition: service_healthy
+
+    networks:
+      - ${NETWORK_NAME}
+
+# ==============================
+# VOLUMES
+# ==============================
 volumes:
   jenkins_home:
+    name: air_sphere_connect_jenkins_home
     driver: local
 
+  jenkins_agent_workdir:
+    name: air_sphere_connect_jenkins_agent_workdir
+    driver: local
+
+# ==============================
+# NETWORKS
+# ==============================
 networks:
   air_sphere_connect_network:
     name: ${NETWORK_NAME}
