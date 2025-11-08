@@ -6,6 +6,7 @@ USER root
 RUN apt-get update && apt-get install -y \
     curl \
     docker.io \
+    docker-compose-plugin \
     wget \
     gnupg \
     && apt-get clean
@@ -24,6 +25,6 @@ ENV MAVEN_HOME=/opt/maven
 ENV PATH="${MAVEN_HOME}/bin:${PATH}"
 
 # Verify installations
-RUN java -version && mvn -v && node -v && npm -v && docker --version
+RUN java -version && mvn -v && node -v && npm -v && docker --version && docker compose version
 
 USER jenkins
