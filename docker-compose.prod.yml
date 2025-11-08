@@ -94,10 +94,6 @@ services:
     env_file:
       - .env.prod
 
-    environment:
-      API_URL: ${API_URL}
-      NODE_ENV: ${NODE_ENV}
-
     # Port bindé sur 127.0.0.1 uniquement (nginx sera le seul accès public)
     ports:
       - "127.0.0.1:4201:${FRONTEND_PORT}"
