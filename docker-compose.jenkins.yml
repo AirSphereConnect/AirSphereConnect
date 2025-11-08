@@ -21,7 +21,6 @@ services:
     environment:
       - TZ=Europe/Paris
       - JENKINS_OPTS=--prefix=/jenkins
-      - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
 
     networks:
       - ${NETWORK_NAME}
