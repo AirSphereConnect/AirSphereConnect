@@ -23,8 +23,8 @@ FROM nginx:alpine
 # Installer curl et gettext (pour envsubst) pour health check et injection d'env
 RUN apk add --no-cache curl gettext
 
-# Copier les fichiers buildés (production ne crée pas de sous-dossier /browser)
-COPY --from=builder /app/dist/air-sphere-connect-front /usr/share/nginx/html
+# Copier les fichiers buildés depuis le dossier browser
+COPY --from=builder /app/dist/air-sphere-connect-front/browser /usr/share/nginx/html
 
 # Configuration Nginx pour Angular (production)
 COPY nginx.prod.conf /etc/nginx/conf.d/default.conf
