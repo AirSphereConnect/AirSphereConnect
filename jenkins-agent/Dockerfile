@@ -27,8 +27,8 @@ RUN wget https://archive.apache.org/dist/maven/maven-3/3.9.6/binaries/apache-mav
 ENV MAVEN_HOME=/opt/maven
 ENV PATH="${MAVEN_HOME}/bin:${PATH}"
 
-# Add jenkins user to docker group
-RUN groupadd -f docker && usermod -aG docker jenkins
+# Add jenkins user to docker group with GID 988 (matches host)
+RUN groupadd -f -g 988 docker && usermod -aG docker jenkins
 
 # Verify installations
 RUN java -version && mvn -v && node -v && npm -v && docker --version && docker-compose --version
