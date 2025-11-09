@@ -86,57 +86,67 @@ pipeline {
         }
 
         stage('Deploy') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'jenkins'
-                }
-            }
             steps {
-                echo '=== Déploiement des containers ==='
                 script {
-                    def composeFile = env.BRANCH_NAME == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
-                    def environment = env.BRANCH_NAME == 'main' ? 'PRODUCTION' : 'DEVELOPMENT'
+                    // Détecter la branche actuelle de manière robuste
+                    def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
 
-                    echo "Déploiement en ${environment}"
+                    // Nettoyer le nom de branche (enlever origin/ si présent)
+                    def branchName = currentBranch.replaceAll(/^origin\//, '')
 
-                    sh """
-                        docker-compose -p airsphereconnect -f ${composeFile} down --remove-orphans || true
-                        docker-compose -p airsphereconnect -f ${composeFile} up -d --force-recreate
-                    """
+                    echo "Branche détectée: ${branchName}"
+
+                    if (branchName == 'main' || branchName == 'jenkins') {
+                        echo '=== Déploiement des containers ==='
+                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
+                        def environment = branchName == 'main' ? 'PRODUCTION' : 'DEVELOPMENT'
+
+                        echo "Déploiement en ${environment}"
+
+                        sh """
+                            docker-compose -p airsphereconnect -f ${composeFile} down --remove-orphans || true
+                            docker-compose -p airsphereconnect -f ${composeFile} up -d --force-recreate
+                        """
+                    } else {
+                        echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
+                    }
                 }
             }
         }
 
         stage('Health Check') {
-            when {
-                anyOf {
-                    branch 'main'
-                    branch 'jenkins'
-                }
-            }
             steps {
-                echo '=== Vérification de la santé des services ==='
                 script {
-                    def composeFile = env.BRANCH_NAME == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
+                    // Détecter la branche actuelle de manière robuste
+                    def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
 
-                    sh """
-                        echo "Attente du démarrage des services..."
-                        sleep 30
+                    // Nettoyer le nom de branche (enlever origin/ si présent)
+                    def branchName = currentBranch.replaceAll(/^origin\//, '')
 
-                        docker-compose -p airsphereconnect -f ${composeFile} ps
+                    if (branchName == 'main' || branchName == 'jenkins') {
+                        echo '=== Vérification de la santé des services ==='
+                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
 
-                        # Vérifier que les containers sont en cours d'exécution
-                        UNHEALTHY=\$(docker-compose -p airsphereconnect -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
+                        sh """
+                            echo "Attente du démarrage des services..."
+                            sleep 30
 
-                        if [ "\$UNHEALTHY" -gt 0 ]; then
-                            echo "⚠️ WARNING: \$UNHEALTHY container(s) unhealthy"
-                            docker-compose -p airsphereconnect -f ${composeFile} logs --tail=50
-                            exit 1
-                        else
-                            echo "✅ All containers are healthy"
-                        fi
-                    """
+                            docker-compose -p airsphereconnect -f ${composeFile} ps
+
+                            # Vérifier que les containers sont en cours d'exécution
+                            UNHEALTHY=\$(docker-compose -p airsphereconnect -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
+
+                            if [ "\$UNHEALTHY" -gt 0 ]; then
+                                echo "⚠️ WARNING: \$UNHEALTHY container(s) unhealthy"
+                                docker-compose -p airsphereconnect -f ${composeFile} logs --tail=50
+                                exit 1
+                            else
+                                echo "✅ All containers are healthy"
+                            fi
+                        """
+                    } else {
+                        echo "⏭️ Health check ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
+                    }
                 }
             }
         }
