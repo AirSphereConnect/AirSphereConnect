@@ -57,6 +57,62 @@ pipeline {
             }
         }
 
+        stage('Prepare Environment') {
+            steps {
+                echo '=== Préparation de l\'environnement ==='
+                sh '''
+                    if [ ! -f .env ]; then
+                        echo "Copie de .env.example vers .env"
+                        cp .env.example .env
+                    else
+                        echo ".env existe déjà"
+                    fi
+                '''
+            }
+        }
+
+        stage('Build Docker Images') {
+            steps {
+                echo '=== Construction des images Docker ==='
+                sh '''
+                    docker-compose -f docker-compose.dev.yml build --no-cache
+                '''
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                echo '=== Déploiement des containers ==='
+                sh '''
+                    docker-compose -f docker-compose.dev.yml down --remove-orphans || true
+                    docker-compose -f docker-compose.dev.yml up -d --force-recreate
+                '''
+            }
+        }
+
+        stage('Health Check') {
+            steps {
+                echo '=== Vérification de la santé des services ==='
+                sh '''
+                    echo "Attente du démarrage des services..."
+                    sleep 30
+
+                    docker-compose -f docker-compose.dev.yml ps
+
+                    # Vérifier que les containers sont en cours d'exécution
+                    UNHEALTHY=$(docker-compose -f docker-compose.dev.yml ps --filter "health=unhealthy" -q | wc -l)
+
+                    if [ "$UNHEALTHY" -gt 0 ]; then
+                        echo "⚠️ WARNING: $UNHEALTHY container(s) unhealthy"
+                        docker-compose -f docker-compose.dev.yml logs --tail=50
+                        exit 1
+                    else
+                        echo "✅ All containers are healthy"
+                    fi
+                '''
+            }
+        }
+
     }
 
     post {

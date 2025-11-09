@@ -6,10 +6,13 @@ USER root
 RUN apt-get update && apt-get install -y \
     curl \
     docker.io \
-    docker-compose-plugin \
     wget \
     gnupg \
     && apt-get clean
+
+# Install Docker Compose from GitHub
+RUN curl -L "https://github.com/docker/compose/releases/download/v2.24.5/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose \
+    && chmod +x /usr/local/bin/docker-compose
 
 # Install Node.js 20 from NodeSource
 RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
@@ -25,6 +28,6 @@ ENV MAVEN_HOME=/opt/maven
 ENV PATH="${MAVEN_HOME}/bin:${PATH}"
 
 # Verify installations
-RUN java -version && mvn -v && node -v && npm -v && docker --version && docker compose version
+RUN java -version && mvn -v && node -v && npm -v && docker --version && docker-compose --version
 
 USER jenkins
