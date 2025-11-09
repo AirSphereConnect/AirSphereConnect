@@ -28,7 +28,10 @@ ENV MAVEN_HOME=/opt/maven
 ENV PATH="${MAVEN_HOME}/bin:${PATH}"
 
 # Add jenkins user to docker group with GID 988 (matches host)
-RUN groupadd -f -g 988 docker && usermod -aG docker jenkins
+# Force delete existing docker group and recreate with correct GID
+RUN groupdel docker 2>/dev/null || true && \
+    groupadd -g 988 docker && \
+    usermod -aG docker jenkins
 
 # Verify installations
 RUN java -version && mvn -v && node -v && npm -v && docker --version && docker-compose --version
