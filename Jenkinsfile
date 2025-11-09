@@ -74,42 +74,68 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo '=== Construction des images Docker ==='
-                sh '''
-                    docker-compose -f docker-compose.dev.yml build --no-cache
-                '''
+                script {
+                    def composeFile = env.BRANCH_NAME == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
+                    sh """
+                        docker-compose -f ${composeFile} build --no-cache
+                    """
+                }
             }
         }
 
         stage('Deploy') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'jenkins'
+                }
+            }
             steps {
                 echo '=== Déploiement des containers ==='
-                sh '''
-                    docker-compose -f docker-compose.dev.yml down --remove-orphans || true
-                    docker-compose -f docker-compose.dev.yml up -d --force-recreate
-                '''
+                script {
+                    def composeFile = env.BRANCH_NAME == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
+                    def environment = env.BRANCH_NAME == 'main' ? 'PRODUCTION' : 'DEVELOPMENT'
+
+                    echo "Déploiement en ${environment}"
+
+                    sh """
+                        docker-compose -p airsphereconnect -f ${composeFile} down --remove-orphans || true
+                        docker-compose -p airsphereconnect -f ${composeFile} up -d --force-recreate
+                    """
+                }
             }
         }
 
         stage('Health Check') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'jenkins'
+                }
+            }
             steps {
                 echo '=== Vérification de la santé des services ==='
-                sh '''
-                    echo "Attente du démarrage des services..."
-                    sleep 30
+                script {
+                    def composeFile = env.BRANCH_NAME == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
 
-                    docker-compose -f docker-compose.dev.yml ps
+                    sh """
+                        echo "Attente du démarrage des services..."
+                        sleep 30
 
-                    # Vérifier que les containers sont en cours d'exécution
-                    UNHEALTHY=$(docker-compose -f docker-compose.dev.yml ps --filter "health=unhealthy" -q | wc -l)
+                        docker-compose -p airsphereconnect -f ${composeFile} ps
 
-                    if [ "$UNHEALTHY" -gt 0 ]; then
-                        echo "⚠️ WARNING: $UNHEALTHY container(s) unhealthy"
-                        docker-compose -f docker-compose.dev.yml logs --tail=50
-                        exit 1
-                    else
-                        echo "✅ All containers are healthy"
-                    fi
-                '''
+                        # Vérifier que les containers sont en cours d'exécution
+                        UNHEALTHY=\$(docker-compose -p airsphereconnect -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
+
+                        if [ "\$UNHEALTHY" -gt 0 ]; then
+                            echo "⚠️ WARNING: \$UNHEALTHY container(s) unhealthy"
+                            docker-compose -p airsphereconnect -f ${composeFile} logs --tail=50
+                            exit 1
+                        else
+                            echo "✅ All containers are healthy"
+                        fi
+                    """
+                }
             }
         }
 
