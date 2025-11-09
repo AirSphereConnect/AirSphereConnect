@@ -18,6 +18,8 @@ pipeline {
                 script {
                     env.GIT_COMMIT_SHORT = readFile('.git/commit-id').trim()
                     echo "Git commit: ${env.GIT_COMMIT_SHORT}"
+                    echo "Branch name: ${env.BRANCH_NAME}"
+                    echo "Git branch: ${env.GIT_BRANCH}"
                 }
             }
         }
