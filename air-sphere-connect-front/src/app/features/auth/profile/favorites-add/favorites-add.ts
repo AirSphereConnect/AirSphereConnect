@@ -2,7 +2,6 @@ import {Component, OnInit} from '@angular/core';
 import {FavoritesService} from '../../../../shared/services/favorites-service';
 import {FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {Router} from '@angular/router';
-import {InputField} from '../../../../shared/components/input-field/input-field';
 import {debounceTime, distinctUntilChanged, switchMap} from 'rxjs';
 import {CityService} from '../../../../shared/services/city-service';
 
@@ -10,7 +9,6 @@ import {CityService} from '../../../../shared/services/city-service';
   selector: 'app-favorites-add',
   imports: [
     ReactiveFormsModule,
-    InputField
   ],
   templateUrl: './favorites-add.html',
   styleUrl: './favorites-add.scss'
