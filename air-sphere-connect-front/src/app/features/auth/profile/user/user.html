@@ -6,7 +6,13 @@
           <label class="label font-bold">Nom utilisateur</label>
           <input type="text" class="input w-full" [value]="user.username" disabled/>
         </div>
-        <button class="btn btn-primary" (click)="editUser()">Modifier nom utilisateur</button>
+        <app-button
+          type="button"
+          (click)="editUser()"
+          class="btn-outline btn-primary"
+        >
+          Modifier nom utilisateur
+        </app-button>
       </div>
 
       <div class="divider divider-horizontal"></div>
@@ -16,7 +22,13 @@
           <label class="label font-bold">Email</label>
           <input type="text" class="input w-full" [value]="user.email" disabled/>
         </div>
-        <button class="btn btn-primary" (click)="editEmail()">Modifier email</button>
+        <app-button
+          type="button"
+          (click)="editEmail()"
+          class="btn-outline btn-primary"
+        >
+          Modifier email
+        </app-button>
       </div>
 
       <div class="divider divider-horizontal"></div>
@@ -29,7 +41,13 @@
       <div class="divider divider-horizontal"></div>
 
       <div class="flex flex-raw items-center">
-        <button class="btn btn-primary" (click)="editPassword()">Modifier mon mot de passe</button>
+        <app-button
+          type="button"
+          (click)="editPassword()"
+          class="btn-outline btn-primary"
+        >
+          Modifier mot de passe
+        </app-button>
       </div>
     </div>
     <div class="divider divider-vertical"></div>
@@ -50,7 +68,13 @@
           <label class="label font-bold">Code postal</label>
           <input type="text" class="input w-full" [value]="user.address.city.postalCode" disabled/>
         </div>
-        <button class="btn btn-secondary" (click)="editAddress()">Modifier mon adresse</button>
+        <app-button
+          type="button"
+          (click)="editAddress()"
+          class="btn-outline btn-primary"
+        >
+          Modifier adresse
+        </app-button>
       </div>
     }
 

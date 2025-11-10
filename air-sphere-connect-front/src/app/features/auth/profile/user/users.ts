@@ -5,11 +5,12 @@ import { UserForm } from '../../../../shared/components/ui/user-form/user-form';
 import {AddressForm} from '../../../../shared/components/ui/adress-form/address-form';
 import {EmailForm} from '../../../../shared/components/ui/email-form/email-form';
 import {PasswordForm} from '../../../../shared/components/ui/password-form/password-form';
+import {Button} from '../../../../shared/components/ui/button/button';
 
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [UserForm, AddressForm, EmailForm, PasswordForm],
+  imports: [UserForm, AddressForm, EmailForm, PasswordForm, Button],
   templateUrl: './user.html',
   styleUrls: ['./user.scss']
 })
