@@ -39,6 +39,7 @@ export class Profile implements OnInit, AfterViewInit {
   @ViewChild('favorites', { static: true }) favorites!: TemplateRef<unknown>;
   @ViewChild('alerts', { static: true }) alerts!: TemplateRef<unknown>;
 
+
   tabs: TabItem[] = [];
 
   ngOnInit() {
