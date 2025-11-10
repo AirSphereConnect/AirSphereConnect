@@ -17,11 +17,12 @@ import {Alerts} from '../alerts/alerts';
 import {UserDashboard} from '../user/users';
 import {Subject, takeUntil} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {ThreadList} from '../../../forum/components/thread-list/thread-list';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterOutlet, UserDashboard, Tab, Favorites, Alerts],
+  imports: [RouterOutlet, UserDashboard, Tab, Favorites, Alerts, ThreadList],
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss']
 })
@@ -34,6 +35,7 @@ export class Profile implements OnInit, AfterViewInit {
   user: User | null = null;
 
   @ViewChild('profilUser', { static: true }) profilUser!: TemplateRef<unknown>;
+  @ViewChild('thread', { static: true }) thread!: TemplateRef<unknown>;
   @ViewChild('favorites', { static: true }) favorites!: TemplateRef<unknown>;
   @ViewChild('alerts', { static: true }) alerts!: TemplateRef<unknown>;
 
@@ -52,6 +54,7 @@ export class Profile implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.tabs = [
       { label: "Mon profil", template: this.profilUser },
+      { label: "Mes rubriques", template: this.thread },
       { label: 'Mes favoris', template: this.favorites },
       { label: 'Mes alertes', template: this.alerts },
     ];

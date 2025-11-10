@@ -1,31 +1,42 @@
 import {
   Component,
   Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  forwardRef,
+  inject,
+  DestroyRef,
   computed,
   signal,
-  OnInit,
-  OnDestroy,
-  Output,
-  EventEmitter, input, inject, DestroyRef,
 } from '@angular/core';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  FormControl,
+  NG_VALUE_ACCESSOR,
+  ReactiveFormsModule,
+} from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { FormErrorService } from '../../../../features/auth/services/form-error.service';
 import { inputVariants, type InputVariants } from '../../../variants/input.variants';
 import { NgClass } from '@angular/common';
-import { Subject, takeUntil } from 'rxjs';
 import { type HeroIconName } from '../../../icons/heroicons.registry';
-import {IconComponent} from '../icon/icon';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import { FormErrorService } from '../../../../features/auth/services/form-error.service';
+import { IconComponent } from '../icon/icon';
 
 @Component({
   selector: 'app-input',
   templateUrl: './input.html',
+  styleUrls: ['./input.scss'],
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => InputComponent),
+      multi: true,
+    },
+  ],
   imports: [ReactiveFormsModule, IconComponent, NgClass],
-  styleUrl: './input.scss'
 })
-
-export class InputComponent implements OnInit {
-
+export class InputComponent implements ControlValueAccessor, OnInit {
   @Input() label!: string;
   @Input()
   set type(value: string) {
@@ -35,7 +46,10 @@ export class InputComponent implements OnInit {
     return this._typeSignal();
   }
   @Input() allowTypeToggle: boolean = false;
-  @Input() control!: FormControl;
+
+  // Rend le control optionnel pour ne pas casser l'utilisation avec formControlName
+  @Input() control?: FormControl;
+
   @Input() placeholder: string = '';
   @Input() size: InputVariants['size'] = 'md';
   @Input() fullWidth: boolean = true;
@@ -46,7 +60,7 @@ export class InputComponent implements OnInit {
   @Input() iconRight?: HeroIconName;
   @Input() autocomplete?: string;
   @Input() readonly: boolean = false;
-  @Input() fieldName?: string; // 🆕 Nom du champ pour les messages d'erreur personnalisés
+  @Input() fieldName?: string;
 
   @Output() iconRightClick = new EventEmitter<void>();
 
@@ -62,26 +76,69 @@ export class InputComponent implements OnInit {
 
   inputType = computed(() => this._typeSignal());
 
+  // ControlValueAccessor internal state
+  value: string = '';
+  disabled = false;
 
-  ngOnInit() {
-    if (!this.control) {
-      console.error('❌ FormControl non fourni');
-      return;
+  private onChange: (value: any) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  // ControlValueAccessor implementations
+  writeValue(value: any): void {
+    this.value = value ?? '';
+    if (this.control && this.control.value !== value) {
+      this.control.setValue(value, { emitEvent: false });
     }
-
-    this.control.statusChanges
-      ?.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.updateSignalsFromControl());
-
-    this.control.valueChanges
-      ?.pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.updateSignalsFromControl());
-
-    this.updateSignalsFromControl();
   }
 
+  registerOnChange(fn: any): void {
+    this.onChange = fn;
+  }
 
-  private updateSignalsFromControl() {
+  registerOnTouched(fn: any): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.disabled = isDisabled;
+  }
+
+  onInput(event: Event): void {
+    console.log("valeur html input element : " + (event.target as HTMLInputElement))
+    const inputValue = (event.target as HTMLInputElement).value;
+    this.value = inputValue;
+    this.onChange(inputValue);
+    if (this.control && this.control.value !== inputValue) {
+      this.control.setValue(inputValue, { emitEvent: false });
+    }
+  }
+
+  onBlur(): void {
+    this.onTouched();
+  }
+
+  ngOnInit(): void {
+    if (this.control) {
+      this.control.statusChanges
+        ?.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => this.updateSignalsFromControl());
+
+      this.control.valueChanges
+        ?.pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe(() => {
+          this.updateSignalsFromControl();
+          // Sync control value to internal value if it changed externally
+          if (this.control && this.control.value !== this.value) {
+            this.value = this.control.value ?? '';
+          }
+        });
+
+      this.updateSignalsFromControl();
+    }
+  }
+
+  private updateSignalsFromControl(): void {
+    if (!this.control) return;
     this.formValid.set(this.control.valid);
     this.formDisabled.set(this.control.disabled);
     this.formTouched.set(this.control.touched);
@@ -93,7 +150,6 @@ export class InputComponent implements OnInit {
   isInvalid = computed(() => this.shouldShowValidation() && !this.formValid());
   isSuccess = computed(() => this.shouldShowValidation() && this.formValid() && !!this.successMessage);
   isDisabled = computed(() => this.formDisabled());
-
 
   state = computed<InputVariants['state']>(() => {
     if (!this.shouldShowValidation()) return 'default';
@@ -108,8 +164,6 @@ export class InputComponent implements OnInit {
     return null;
   });
 
-
-
   private variantsConfig = computed(() => {
     return inputVariants({
       size: this.size,
@@ -117,7 +171,7 @@ export class InputComponent implements OnInit {
       fullWidth: this.fullWidth,
       disabled: this.isDisabled(),
       hasIconLeft: !!this.iconLeft,
-      hasIconRight: !!this.iconRight || !!this.stateIconName()
+      hasIconRight: !!this.iconRight || !!this.stateIconName(),
     });
   });
 
@@ -128,33 +182,27 @@ export class InputComponent implements OnInit {
   inputWrapperClass = computed(() => this.variantsConfig().inputWrapper());
   inputClass = computed(() => this.variantsConfig().input());
   iconLeftWrapperClass = computed(() => this.variantsConfig().iconLeft());
-  iconRightWrapperClass  = computed(() => this.variantsConfig().iconRight());
+  iconRightWrapperClass = computed(() => this.variantsConfig().iconRight());
   helperWrapperClass = computed(() => this.variantsConfig().helperWrapper());
   helperTextClass = computed(() => this.variantsConfig().helperText());
   errorTextClass = computed(() => this.variantsConfig().errorText());
   successTextClass = computed(() => this.variantsConfig().successText());
   characterCountClass = computed(() => this.variantsConfig().characterCount());
 
-
-  // 🔥 Utilisation du service centralisé pour les messages d'erreur
   errorMessage = computed<string | null>(() => {
     if (!this.isInvalid()) return null;
     return this.formErrorService.getErrorMessage(this.formErrors(), this.fieldName);
   });
 
-  // 📊 Compteur de caractères
   characterCount = computed(() => {
-    const value = this.control.value || '';
-    return value.length;
+    const val = this.control?.value ?? this.value;
+    return val.length;
   });
 
   maxLength = computed(() => {
     const errors = this.formErrors();
-    return errors?.['maxlength']?.requiredLength || null;
+    return errors?.['maxlength']?.requiredLength ?? null;
   });
 
-
-  showCharacterCount = computed(() => {
-    return this.maxLength() !== null;
-  });
+  showCharacterCount = computed(() => this.maxLength() !== null);
 }

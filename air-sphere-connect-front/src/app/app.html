@@ -6,8 +6,8 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<app-header [userRole]="userRole()" class="sticky top-0 z-50"></app-header>
-<main class="container mx-auto px-4 py-8">
+<app-header [userRole]="userRole()" [scrolled]="scrolled()" class="sticky top-0 z-50"></app-header>
+<main #mainContent class="container mx-auto px-4 py-8">
   <div class="content">
     <router-outlet></router-outlet>
 

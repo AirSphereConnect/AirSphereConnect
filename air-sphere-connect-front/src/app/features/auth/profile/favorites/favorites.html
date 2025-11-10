@@ -7,7 +7,7 @@
         <th class="p-2">Ville</th>
         <th class="p-2">Créé le</th>
         <th class="p-2">Modifié le</th>
-        <th class="p-2">Actions</th>
+        <th class="p-2 w-0">Actions</th>
       </tr>
       </thead>
       <tbody>
@@ -19,7 +19,7 @@
             <td class="p-2 text-center">{{ favorite.updatedAt }}</td>
             <td class="p-2 flex justify-center">
               <app-button
-                class="w-30 h-10 divider-horizontal divider-start"
+                class="w-20 h-7 divider-horizontal divider-start"
                 color="primary"
                 variant="solid"
                 (click)="editFavorites(favorite.id)"
@@ -28,7 +28,7 @@
               </app-button>
               <div class="divider divider-horizontal"> </div>
               <app-button
-                class="w-30 h-10 divider-horizontal divider-start"
+                class="w-20 h-7 divider-horizontal divider-start"
                 color="warning"
                 variant="solid"
                 (click)="deleteFavorites(favorite.id)"
