@@ -94,10 +94,13 @@ export class Register implements OnInit {
 
     this.registerFirstForm.statusChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.canSubmitStep1.set(this.registerFirstForm.valid));
+      .subscribe(() => {
+        this.canSubmitStep1.set(this.registerFirstForm.valid);
+      });
     this.registerForm.statusChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.canSubmitStep2.set(this.registerForm.valid));
+    this.registerFirstForm.updateValueAndValidity()
   }
 
   get usernameControl() { return this.registerFirstForm.get('username') as FormControl; }

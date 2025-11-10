@@ -1,6 +1,7 @@
-import {Component, Input, OnInit} from '@angular/core';
+import {Component, inject, Inject, Input, OnInit} from '@angular/core';
 import {NavigationService} from '../../../services/navigation-service';
 import {RouterLink, RouterLinkActive} from '@angular/router';
+import {UserService} from '../../../services/user-service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,7 +16,7 @@ export class Navbar {
   @Input() userRole!: string | null;
   activeTab: string = 'home';
 
-  constructor(private navigationService: NavigationService) {}
+  private readonly navigationService = inject(NavigationService);
 
   setActive(tab: string) {
     this.activeTab = tab;

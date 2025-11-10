@@ -103,8 +103,8 @@ export class UserService {
   }
 
 
-  deleteUser() {
-    return this.http.put(`${this.apiUrl}/users`, { withCredentials: true });
+  deleteUser(id: number) {
+    return this.http.delete(`${this.apiUrl}/users?id=${id}`, { withCredentials: true });
 
   }
 

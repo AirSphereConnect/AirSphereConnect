@@ -14,6 +14,7 @@ public class UserResponseDto {
     private String email;
     private UserRole role;
     private LocalDateTime createdAt;
+    private LocalDateTime delectedAt;
     private LocalDateTime updatedAt;
     private AddressResponseDto address;
     private List<FavoriteDto> favorites;
@@ -113,5 +114,9 @@ public class UserResponseDto {
 
     public void setAlerts(List<FavoritesAlertsDto> alerts) {
         this.alerts = alerts;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.delectedAt = deletedAt;
     }
 }

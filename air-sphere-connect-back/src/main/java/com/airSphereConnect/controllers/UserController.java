@@ -125,16 +125,8 @@ public class UserController {
     // Supprimer un utilisateur
     @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @DeleteMapping
-    public UserResponseDto deleteUser(@RequestParam Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        User user = userRepository.findByUsername(userDetails.getUsername())
-                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
-        User deletedUser = null;
-        if (user.getRole().equals("ADMIN")) {
-            deletedUser = userService.deleteUser(id);
-        } else {
-            deletedUser = userService.deleteUser(user.getId());
-        }
-
-        return UserMapper.toDto(deletedUser);
+    public ResponseEntity<?> deleteUser(@RequestParam Long id,HttpServletRequest request,
+                                      HttpServletResponse response) {
+        return authService.DeleteUser(id, request, response);
     }
 }

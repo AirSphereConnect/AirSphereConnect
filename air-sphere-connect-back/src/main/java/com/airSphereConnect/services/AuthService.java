@@ -3,6 +3,7 @@ package com.airSphereConnect.services;
 import com.airSphereConnect.controllers.HomeController;
 import com.airSphereConnect.dtos.request.LoginRequestDto;
 import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
@@ -31,6 +32,7 @@ public class AuthService {
 
     public ResponseEntity<?> EditUserLogin(UserRequestDto reqDto, User currentUser,
                                            HttpServletRequest request, HttpServletResponse response) {
+
         User userToUpdate = UserMapper.toEntity(reqDto);
         User updatedUser = userService.updateUser(currentUser.getId(), userToUpdate);
 
@@ -46,6 +48,21 @@ public class AuthService {
         return ResponseEntity.ok(UserMapper.toDto(updatedUser));
     }
 
+    public ResponseEntity<?> DeleteUser(Long id,
+                                        HttpServletRequest request, HttpServletResponse response) {
+
+        UserResponseDto delectedUser = userService.deleteUser(id);
+
+        boolean delectedUserChanged = delectedUser != null;
+
+        if (delectedUserChanged) {
+            // Invalide session + remplace token par "guest" (logout forcé)
+            return homeController.logout(request, response);
+        }
+
+        // Sinon, retourne utilisateur mis à jour normalement
+        return ResponseEntity.ok(null);
+    }
 }
 
 

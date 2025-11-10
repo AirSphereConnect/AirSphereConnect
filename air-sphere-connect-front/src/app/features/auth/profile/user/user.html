@@ -78,7 +78,16 @@
       </div>
     }
 
+    <div class="divider divider-vertical"></div>
 
+    <app-button
+      color="warning"
+      type="button"
+      (click)="deleteUser(user.id, user.username)"
+      class="btn-outline btn-primary"
+    >
+      Supprimer mon compte
+    </app-button>
   }
 </fieldset>
 

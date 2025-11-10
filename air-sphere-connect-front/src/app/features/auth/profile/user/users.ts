@@ -1,4 +1,4 @@
-import {Component, Input, signal} from '@angular/core';
+import {Component, DestroyRef, inject, Input, signal} from '@angular/core';
 import { UserService } from '../../../../shared/services/user-service';
 import { User } from '../../../../core/models/user.model';
 import { UserForm } from '../../../../shared/components/ui/user-form/user-form';
@@ -6,6 +6,9 @@ import {AddressForm} from '../../../../shared/components/ui/adress-form/address-
 import {EmailForm} from '../../../../shared/components/ui/email-form/email-form';
 import {PasswordForm} from '../../../../shared/components/ui/password-form/password-form';
 import {Button} from '../../../../shared/components/ui/button/button';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Router} from '@angular/router';
+import {NavigationService} from '../../../../shared/services/navigation-service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -16,6 +19,10 @@ import {Button} from '../../../../shared/components/ui/button/button';
 })
 export class UserDashboard {
   @Input() user: User | null = null;
+
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly navigationService = inject(NavigationService);
+
 
   // Modales séparées
   isUserModalOpen = signal(false);
@@ -87,5 +94,23 @@ export class UserDashboard {
   /** 🔒 Ferme la modale adresse */
   onAddressModalClose() {
     this.isAddressModalOpen.set(false);
+  }
+
+  deleteUser(id: number, username: string) {
+    if (confirm('Êtes-vous sûr de vouloir supprimer ce favori ?')) {
+      this.userService.deleteUser(id)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            // 🔁 rafraîchit le profil complet
+            this.navigationService.logout();
+            console.log(`${username} supprimé avec succès`);
+          },
+          error: (err) => {
+            console.error('Erreur lors de la suppression du favori :', err);
+          }
+        });
+    }
+    this.userService.deleteUser(id);
   }
 }
