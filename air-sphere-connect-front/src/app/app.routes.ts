@@ -1,4 +1,5 @@
-import {Routes} from '@angular/router';
+import { Routes } from '@angular/router';
+import {AuthGuard} from './core/guards/AuthGuard';
 
 export const routes: Routes = [
   { path: 'home', loadComponent: () => import('./features/home/home').then(m => m.Home) },
@@ -22,12 +23,7 @@ export const routes: Routes = [
       { path: 'section/:sectionId/:threadId', loadComponent: () => import('./features/forum/components/thread-detail/thread-detail').then(m => m.ThreadDetailComponent)},
     ]
   },
-/*
-  { path: 'dashboard', loadComponent: () => import('./features/dashboard/dashboard/dashboard').then(m => m.Dashboard), canActivate:[AuthGuard] },
-  { path: 'dashboard/air-quality', loadComponent: () => import('./features/dashboard/widgets/air-quality-widget/air-quality-widget').then(m => m.AirQualityWidget), canActivate:[AuthGuard] },
-  { path: 'dashboard/weather', loadComponent: () => import('./features/dashboard/widgets/weather-widget/weather-widget').then(m => m.WeatherWidget) },
-  { path: 'dashboard/pollution-trends', loadComponent: () => import('./features/dashboard/widgets/pollution-trend-widget/pollution-trend-widget').then(m => m.PollutionTrendWidget), canActivate:[AuthGuard] },
-*/
+
   { path: 'admin/users', loadComponent: () => import('./features/admin/user-management/user-management').then(m => m.UserManagement) },
   { path: 'admin/moderation', loadComponent: () => import('./features/admin/content-moderation/content-moderation').then(m => m.ContentModeration) },
 
