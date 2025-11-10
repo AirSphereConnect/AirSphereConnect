@@ -4,45 +4,66 @@
     <div class="breadcrumbs text-sm">
       <ul>
         <li><a [routerLink]="['/forum']" class="text-primary hover:text-primary-focus">Forum</a></li>
-        <li class="text-base-content/70">{{ section?.title }}</li>
+        @if (section(); as currentSection) {
+          <li class="text-base-content/70">{{ currentSection.title }}</li>
+        }
       </ul>
     </div>
 
     <div class="flex gap-2">
-      <button class="btn btn-primary btn-sm">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      <!-- Modale pour nouveau thread -->
+      <button class="btn btn-primary btn-sm" (click)="openModal()">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
+             stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
         </svg>
         Nouveau Thread
       </button>
       <div class="dropdown dropdown-end">
         <div tabindex="0" role="button" class="btn btn-outline btn-sm">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
           </svg>
         </div>
         <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
-          <li><a (click)="sortThreads('date')">Trier par date</a></li>
-          <li><a (click)="sortThreads('like')">Trier par popularité</a></li>
+          <li><a (click)="sortThreads('date')">
+            <span>Trier par date</span>
+            <span class="ml-auto">{{ getSortIndicator('date') }}</span>
+          </a></li>
+          <li><a (click)="sortThreads('popularite')">
+            <span>Trier par popularité</span>
+            <span class="ml-auto">{{ getSortIndicator('popularite') }}</span>
+          </a></li>
+          <li><a (click)="sortThreads('reponses')">
+            <span>Trier par réponses</span>
+            <span class="ml-auto">{{ getSortIndicator('reponses') }}</span>
+          </a></li>
+          <li><a (click)="sortThreads('titre')">
+            <span>Trier par titre</span>
+            <span class="ml-auto">{{ getSortIndicator('titre') }}</span>
+          </a></li>
         </ul>
       </div>
     </div>
   </div>
 
   <!-- Titre de section -->
-  @if (section) {
+  @if (section(); as currentSection) {
     <div class="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-6 border border-primary/20">
       <div class="flex items-center gap-4">
         <div class="avatar placeholder">
           <div class="bg-primary text-primary-content rounded-xl w-16 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+                 stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
             </svg>
           </div>
         </div>
         <div>
-          <h1 class="text-3xl font-bold text-base-content">{{ section.title }}</h1>
-          <p class="text-base-content/70 mt-1">{{ threads.length }} discussions disponibles</p>
+          <h1 class="text-3xl font-bold text-base-content">{{ currentSection.title }}</h1>
+          <p class="text-base-content/70 mt-1">{{ threads().length }} discussions disponibles</p>
         </div>
       </div>
     </div>
@@ -50,14 +71,15 @@
 
   <!-- Liste des threads -->
   <div class="space-y-4">
-    @for (thread of threads; track thread.id) {
-      <div class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-300 hover:border-primary/30">
+    @for (thread of sortedThreads(); track thread.id) {
+      <div
+        class="card bg-base-100 shadow-lg hover:shadow-xl transition-all duration-300 border border-base-300 hover:border-primary/30">
         <div class="card-body p-6">
           <div class="flex items-start gap-4">
             <!-- Avatar de l'auteur -->
             <div class="avatar placeholder flex-shrink-0">
               <div class="bg-secondary text-secondary-content rounded-full w-12 flex items-center justify-center">
-                <span class="text-xl font-bold">{{ thread.author.at(0) }}</span>
+                <span class="text-xl font-bold">{{ thread.username.charAt(0) || 'A' }}</span>
               </div>
             </div>
 
@@ -65,88 +87,202 @@
             <div class="flex-1 min-w-0">
               <div class="flex items-start justify-between gap-4 mb-3">
                 <h2 class="card-title text-lg font-semibold hover:text-primary transition-colors">
-                  <a [routerLink]="['/forum/section', section?.id, thread.id]" class="hover:no-underline">
-                    {{ thread.title }}
-                  </a>
+                  @if (section(); as currentSection) {
+                    <a [routerLink]="['/forum/section', currentSection.id, thread.id]" class="hover:no-underline">
+                      {{ thread.title }}
+                    </a>
+                  }
                 </h2>
 
                 <!-- Badge de statut -->
                 <div class="badge badge-outline badge-sm">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
                   </svg>
-                  {{ getPostCount(thread.id) || 0 }} réponses
+                  {{ thread.postCount }} réponses
                 </div>
               </div>
 
               <!-- Métadonnées -->
               <div class="flex items-center gap-4 text-sm text-base-content/60 mb-3">
                 <div class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                   </svg>
-                  <span class="font-medium">{{ thread.author }}</span>
+                  {{ thread.username }}
                 </div>
-
                 <div class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                   </svg>
-                  <span>{{ thread.createdAt | date:'short' }}</span>
+                  <span class="text-xs">{{ thread.createdAt }}</span>
                 </div>
-              </div>
-
-              <!-- Actions -->
-              <div class="flex items-center justify-between">
                 <div class="flex items-center gap-1">
-                  {{ getTotalLikesByThread(thread.id)}}
-                  @if (getTotalLikesByThread(thread.id) > 0) {
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  } @else {
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                    </svg>
-                  }
-
-                </div>
-
-                <a [routerLink]="['/forum/section', section?.id, thread.id]"
-                   class="btn btn-primary btn-sm">
-                  Lire la suite
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
                   </svg>
-                </a>
+                  {{ thread.likeCount }} likes
+                </div>
               </div>
             </div>
           </div>
         </div>
       </div>
     }
+  </div>
 
-    <!-- Message si aucun thread -->
-    @if (threads.length === 0) {
-      <div class="text-center py-16">
-        <div class="avatar placeholder mb-6">
-          <div class="bg-base-300 text-base-content rounded-full w-20">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
+  <!-- Modale pour nouveau thread -->
+  @if (showModal()) {
+    <dialog class="modal modal-open">
+      <div class="modal-box max-w-2xl">
+        <h3 class="font-bold text-2xl mb-6 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24"
+               stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+          </svg>
+          Créer une nouvelle discussion
+        </h3>
+
+        <!-- Info utilisateur -->
+        <div class="alert alert-info mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+               viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <div>
+            <h3 class="font-bold">Votre première contribution</h3>
+            <div class="text-xs">Le premier message de la discussion sera créé automatiquement avec votre contenu.
+            </div>
           </div>
         </div>
-        <h3 class="text-2xl font-semibold text-base-content mb-3">Aucune discussion pour le moment</h3>
-        <p class="text-base-content/70 mb-6 max-w-md mx-auto">
-          Soyez le premier à lancer une discussion dans cette section !
-        </p>
-        <button class="btn btn-primary">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-          </svg>
-          Créer le premier thread
-        </button>
+
+        <form class="space-y-4" (submit)="$event.preventDefault(); createThread()">
+          <!-- Titre -->
+          <div class="form-control">
+            <label class="label">
+            <span class="label-text font-semibold">
+              Titre de la discussion
+              <span class="text-error">*</span>
+            </span>
+              <span class="label-text-alt">{{ newThreadTitle().length }}/100</span>
+            </label>
+            <input
+              type="text"
+              class="input input-bordered w-full"
+              placeholder="Ex: Qu'est ce que l'AQI ?"
+              [value]="newThreadTitle()"
+              (input)="newThreadTitle.set($any($event.target).value)"
+              maxlength="100"
+              [disabled]="isSubmitting()"
+              required
+            >
+            <label class="label">
+            <span class="label-text-alt text-base-content/60">
+              Soyez clair et descriptif pour attirer les bonnes réponses
+            </span>
+            </label>
+          </div>
+
+          <!-- Contenu -->
+          <div class="form-control">
+            <label class="label">
+            <span class="label-text font-semibold">
+              Votre message
+              <span class="text-error">*</span>
+            </span>
+              <span class="label-text-alt">{{ newThreadContent().length }}/2000</span>
+            </label>
+            <textarea
+              class="textarea textarea-bordered h-40 resize-none"
+              placeholder="Décrivez votre question ou sujet en détail..."
+              [value]="newThreadContent()"
+              (input)="newThreadContent.set($any($event.target).value)"
+              maxlength="2000"
+              [disabled]="isSubmitting()"
+              required
+            ></textarea>
+            <label class="label">
+            <span class="label-text-alt text-base-content/60">
+              Plus vous donnez de détails, plus vous recevrez d'aide précise
+            </span>
+            </label>
+          </div>
+
+          <!-- Aperçu des infos -->
+          <div class="card bg-base-200">
+            <div class="card-body p-4">
+              <h4 class="font-semibold text-sm mb-2">Aperçu de votre publication</h4>
+              <div class="flex items-center gap-3 text-sm">
+                <div class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                  </svg>
+                  <span class="font-medium">{{ userService.getUsername() || 'Utilisateur' }}</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                       stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                  </svg>
+                  <span>Maintenant</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Actions -->
+          <div class="modal-action">
+            <button
+              type="button"
+              class="btn btn-ghost"
+              (click)="closeModal()"
+              [disabled]="isSubmitting()"
+            >
+              Annuler
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="isSubmitting() || !newThreadTitle().trim() || !newThreadContent().trim()"
+            >
+              @if (isSubmitting()) {
+                <span class="loading loading-spinner"></span>
+                Création...
+              } @else {
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
+                     stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Créer la discussion
+              }
+            </button>
+          </div>
+        </form>
       </div>
-    }
-  </div>
+
+      <!-- Backdrop pour fermer la modale -->
+      <form method="dialog" class="modal-backdrop">
+        <button
+          type="button"
+          (click)="closeModal()"
+          [disabled]="isSubmitting()"
+        >
+          Fermer
+        </button>
+      </form>
+    </dialog>
+
+  }
 </div>

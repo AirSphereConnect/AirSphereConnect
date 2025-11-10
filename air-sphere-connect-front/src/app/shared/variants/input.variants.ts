@@ -9,7 +9,7 @@ export const inputVariants = tv({
     inputWrapper: 'relative',
     input: 'input input-bordered w-full transition-all duration-200',
     iconLeft: 'absolute left-0 -translate-x-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10 h-9 w-12 flex items-center justify-center rounded-tl-lg rounded-bl-lg bg-base-300/90',
-    iconRight: 'absolute right-3 top-1/2 -translate-y-1/2 z-10',
+    iconRight: 'absolute right-3 top-1/2 -translate-y-1/2',
     helperWrapper: 'label',
     helperText: 'label-text-alt text-base-content/70 text-xs',
     errorText: 'label-text-alt text-error text-xs font-medium flex items-center gap-1.5',

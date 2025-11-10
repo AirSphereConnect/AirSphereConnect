@@ -19,6 +19,7 @@ import {IconComponent} from '../../ui/icon/icon';
 })
 export class Header {
   @Input() userRole: string | null = null;
+  @Input() scrolled = false; // Input pour le scroll
 
   readonly themeService = inject(ThemeService);
   readonly isDarkTheme = this.themeService.isDarkMode;

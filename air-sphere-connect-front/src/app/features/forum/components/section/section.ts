@@ -1,10 +1,10 @@
-import {Component, inject} from '@angular/core';
-import {Post} from '../../../../core/models/post.model';
+import {Component, computed, inject} from '@angular/core';
 import {Thread} from '../../../../core/models/thread.model';
 import {SectionService} from '../../../../core/services/section.service';
 import {ThreadService} from '../../../../core/services/thread.service';
 import {Section} from '../../../../core/models/section.model';
 import {RouterLink} from '@angular/router';
+import {toSignal} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-section',
@@ -13,14 +13,25 @@ import {RouterLink} from '@angular/router';
   styleUrl: './section.scss'
 })
 export class SectionComponent {
-
   private sectionService = inject(SectionService)
+  private threadService = inject(ThreadService)
 
-  sections: Section[] = this.sectionService.getAllSections();
+  readonly sections = toSignal(
+    this.sectionService.getSections(),
+    {initialValue: [] as Section[]}
+  )
 
-  getThreadCount(sectionId: number): number {
-    return this.sectionService.getThreadCountBySectionId(sectionId);
-  }
+  readonly threads = toSignal(
+    this.threadService.getAllThreads(),
+    {initialValue: [] as Thread[]}
+  )
+
+  readonly sectionsWithCount = computed(() => {
+    return this.sections().map(section => ({
+      ...section,
+      threadCount: this.threads().filter(thread => thread.rubricId === section.id).length
+    }))
+  })
 
 
 }

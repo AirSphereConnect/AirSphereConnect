@@ -14,15 +14,19 @@ import {AlertsService} from '../../../services/alerts-service';
 import {CityService} from '../../../../core/services/city';
 import {UserService} from '../../../services/user-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Button} from '../button/button';
+import {inputCitySearch} from '../../../utils/city-utils/city-utils';
+import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
+import {InputComponent} from '../input/input';
 
 @Component({
   selector: 'app-alerts-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, Button, ButtonCloseModal, InputComponent],
   templateUrl: './alerts-form.html',
   styleUrl: './alerts-form.scss'
 })
-export class AlertsForm implements OnInit, OnChanges {
+export class AlertsForm implements OnInit, OnChanges, OnDestroy {
 
   @Input() isOpen = signal(false);
   @Input() editingAlertsId: number | null = null;
@@ -37,10 +41,15 @@ export class AlertsForm implements OnInit, OnChanges {
   private readonly destroyRef = inject(DestroyRef);
 
   alertsForm!: FormGroup;
-  citySuggestions: any[] = [];
+  cityQuery = signal('');
+  citySuggestions = signal<any[]>([]);
   cityIdSelected: number | null = null;
   errorMessage: string | null = null;
   isDeleteMode = false;
+
+  private readonly destroy$ = new Subject<void>();
+
+  citySearchEffect = inputCitySearch(this.cityService, this.cityQuery, this.citySuggestions);
 
   ngOnInit() {
     this.alertsForm = this.fb.group({
@@ -55,6 +64,10 @@ export class AlertsForm implements OnInit, OnChanges {
     }
   }
 
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 
   private patchFormData() {
     this.alertsForm.patchValue({
@@ -66,24 +79,13 @@ export class AlertsForm implements OnInit, OnChanges {
   }
 
   onCityInput(event: any) {
-    const query = event.target.value;
-    if (query.length < 2) {
-      this.citySuggestions = [];
-      return;
-    }
-
-    this.cityService.searchCities(query)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-        next: (cities) => (this.citySuggestions = cities || []),
-        error: () => (this.citySuggestions = [])
-      });
+    this.cityQuery.set(event.target.value);
   }
 
   selectCity(city: any) {
     this.alertsForm.get('cityName')?.setValue(city.name);
     this.cityIdSelected = city.id;
-    this.citySuggestions = [];
+    this.citySuggestions.set([]);
   }
 
   submitForm() {
@@ -99,8 +101,11 @@ export class AlertsForm implements OnInit, OnChanges {
       return;
     }
 
-    if (!this.alertsForm.valid || !this.cityIdSelected) {
-      this.errorMessage = 'Veuillez remplir tous les champs et sélectionner une ville.';
+    const isNewEntry = !this.editingAlertsId;
+    const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
+
+    if (!this.alertsForm.valid || !this.alertsForm.dirty || (isNewEntry && !cityIdValid)) {
+      this.errorMessage = 'Veuillez modifier au moins un champ et sélectionner une ville.';
       return;
     }
 
@@ -119,12 +124,6 @@ export class AlertsForm implements OnInit, OnChanges {
         next: () => this.handleSuccess(),
         error: () => this.errorMessage = "Erreur lors de l'enregistrement de l'alerte."
       });
-  }
-
-
-  onDelete() {
-    this.isDeleteMode = true;
-    this.submitForm();
   }
 
   private handleSuccess() {

@@ -1,10 +1,15 @@
 
 export interface Post {
   id: number;
-  user: string;
   content: string;
-  createdAt: Date;
+  userId: number;
+  username: string;
   threadId: number;
-  likes: number;
-  isLiked: boolean;
+  threadTitle: string;
+  createdAt: Date | string;
+  updatedAt?: Date | string;
+  likeCount: number;
+  dislikeCount?: number;
+  currentUserReaction?: 'LIKE' | 'DISLIKE' | null;
+  isFlagged?: boolean;
 }

@@ -1,36 +1,26 @@
-import {inject, Injectable} from '@angular/core';
-import {Post} from '../models/post.model';
-import {ThreadService} from './thread.service';
-import {Section} from '../models/section.model';
+// section.service.ts
+import { inject, Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Section } from '../models/section.model';
+import { Observable } from 'rxjs';
 import {Thread} from '../models/thread.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SectionService {
+  private apiUrl = "http://localhost:8080/api/forum-rubrics";
+  private http = inject(HttpClient);
 
-  private threasService = inject(ThreadService);
-
-  private sections: Section[] = [
-    {id: 1, title: 'section météo', description: 'vive la planete', user: 'Cyril'},
-    {id: 2, title: 'section recensement', description: 'vive les gens', user: 'Sandrine'},
-    {id: 3, title: 'section qualité air', description: 'vive la pollution', user: 'Nuno'},
-  ]
-
-  getAllSections() {
-    return this.sections;
+  getSections(): Observable<Section[]> {
+    return this.http.get<Section[]>(this.apiUrl,
+      {withCredentials: true}
+    );
   }
 
-  getSectionById(id: number) {
-    return this.sections.find((section) => section.id === id);
-  }
-
-  getThreadsBySectionId(sectionId: number): Thread[] {
-    return this.threasService.getAllThreads().filter((thread) => thread.sectionId === sectionId);
-  }
-
-  getThreadCountBySectionId(sectionId: number): number {
-    return this.getThreadsBySectionId(sectionId).length;
-
+  getSectionById(id: number): Observable<Section> {
+    return this.http.get<Section>(`${this.apiUrl}/${id}`,
+      { withCredentials: true }
+      );
   }
 }

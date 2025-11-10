@@ -9,12 +9,17 @@ export const routes: Routes = [
   { path: 'auth/profile', loadComponent: () => import('./features/auth/profile/profile/profile').then(m => m.Profile)},
   { path: 'auth/settings', loadComponent: () => import('./features/auth/settings/settings').then(m => m.Settings) },
 
-  { path: 'dashboard', loadComponent: () => import('./features/dashboard/components/dashboard/dashboard').then(m => m.Dashboard), canActivate:[AuthGuard] },
+  { path: 'dashboard', loadComponent: () => import('./features/dashboard/components/dashboard/dashboard').then(m => m.Dashboard)},
 
-  { path: 'forum', loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.ForumComponent) },
-  { path: 'forum/thread-detail/:id', loadComponent: () => import('./features/forum/components/thread-detail/thread-detail').then(m => m.ThreadDetailComponent) },
-  { path: 'forum/thread-list/:id', loadComponent: () => import('./features/forum/components/thread-list/thread-list').then(m => m.ThreadListComponent) },
-  { path: 'forum/post/:id', loadComponent: () => import('./features/forum/components/post/post').then(m => m.PostComponent) },
+  {
+    path: 'forum',
+    loadComponent: () => import('./features/forum/components/forum/forum').then(m => m.Forum),
+    children: [
+      { path: '', pathMatch: 'full', loadComponent: () => import('./features/forum/components/section/section').then(m => m.SectionComponent)},
+      { path: 'section/:sectionId', loadComponent: () => import('./features/forum/components/thread-list/thread-list').then(m => m.ThreadListComponent)},
+      { path: 'section/:sectionId/:threadId', loadComponent: () => import('./features/forum/components/thread-detail/thread-detail').then(m => m.ThreadDetailComponent)},
+    ]
+  },
 
   { path: 'admin/users', loadComponent: () => import('./features/admin/user-management/user-management').then(m => m.UserManagement) },
   { path: 'admin/moderation', loadComponent: () => import('./features/admin/content-moderation/content-moderation').then(m => m.ContentModeration) },

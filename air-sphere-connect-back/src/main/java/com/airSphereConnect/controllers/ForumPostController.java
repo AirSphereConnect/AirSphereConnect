@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
-@RequestMapping("/forum-posts")
+@RequestMapping("/api/forum-posts")
 public class ForumPostController {
 
     private final ForumPostService forumPostService;

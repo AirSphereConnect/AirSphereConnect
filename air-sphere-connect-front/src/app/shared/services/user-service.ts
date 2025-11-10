@@ -50,7 +50,6 @@ export class UserService {
         .subscribe({
           next: profile => {
             this.setUserProfile(profile);
-            console.log(profile);
             // Re-synchronisation optionnelle pour garantir la cohérence cookie/vue
             this.fetchUserProfile();
             observer.next(profile);
@@ -110,5 +109,9 @@ export class UserService {
 
   editAddress(id: number | null, payload: any) {
     return this.http.put(`${this.apiUrl}/address/${id}`, payload, { withCredentials: true });
+  }
+
+  getUsername() {
+    return this._userProfileSubject.value ? this._userProfileSubject.value.user.username : null;
   }
 }

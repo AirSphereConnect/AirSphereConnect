@@ -28,7 +28,6 @@
         }"
       [type]="inputType()"
       [placeholder]="placeholder"
-      [formControl]="control"
       [class]="inputClass()"
       [attr.autocomplete]="autocomplete"
       [readonly]="readonly"
@@ -36,6 +35,11 @@
       [class.cursor-not-allowed]="readonly"
       [class.bg-base-200]="readonly"
       [class.select-none]="readonly"
+
+      [value]="value"
+      (input)="onInput($event)"
+      (blur)="onBlur()"
+      [disabled]="disabled"
 
     />
 

@@ -1,72 +1,202 @@
-import {Component, computed, inject, OnInit, signal} from '@angular/core';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
-import {ThreadService} from '../../../../core/services/thread.service';
-import {PostService} from '../../../../core/services/post.service';
-import {Thread} from '../../../../core/models/thread.model';
-import {Post} from '../../../../core/models/post.model';
-import {DatePipe} from '@angular/common';
-import {PostComponent} from '../post/post';
+import { Component, computed, inject, signal } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ThreadService } from '../../../../core/services/thread.service';
+import { PostService } from '../../../../core/services/post.service';
+import { DatePipe } from '@angular/common';
+import { PostComponent } from '../post/post';
+import { switchMap, tap } from 'rxjs';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { UserService } from '../../../../shared/services/user-service';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { Post } from '../../../../core/models/post.model';
 
 @Component({
   selector: 'app-thread-detail',
   standalone: true,
-  imports: [DatePipe, RouterLink, PostComponent],
+  imports: [DatePipe, RouterLink, PostComponent, ReactiveFormsModule],
   templateUrl: './thread-detail.html',
   styleUrls: ['./thread-detail.scss']
 })
-export class ThreadDetailComponent implements OnInit {
+export class ThreadDetailComponent {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private threadService = inject(ThreadService);
   private postService = inject(PostService);
+  private userService = inject(UserService);
+  private fb = inject(FormBuilder);
 
-  thread = signal<Thread | undefined>(undefined);
-  posts = signal<Post[]>([]);
-  sectionId = signal<string | null>(null);
+  // Forms & State
+  newPostForm = this.fb.group({
+    content: ['', [Validators.required, Validators.minLength(2)]]
+  });
 
+  isPublishing = signal(false);
+  isLoadingPosts = signal(false);
+  errorMessage = signal<string | null>(null);
 
-  ngOnInit(): void {
-    const sectionId = this.route.snapshot.paramMap.get('sectionId');
-    const threadId = Number(this.route.snapshot.paramMap.get('threadId'));
+  postsSignal = signal<Post[]>([]);
+  posts = computed(() => this.postsSignal());
 
-    this.sectionId.set(sectionId);
-    const sectionIdNumber = Number(sectionId)
+  private routeParams = toSignal(this.route.paramMap);
 
-    if (!sectionId || isNaN(sectionIdNumber) || isNaN(threadId) || sectionIdNumber <= 0 || threadId <= 0) {
-      this.router.navigate(['/forum']);
+  // Route params
+  sectionId = computed(() => {
+    const id = Number(this.routeParams()?.get('sectionId'));
+    return isNaN(id) ? null : id;
+  });
+
+  threadId = computed(() => {
+    const id = Number(this.routeParams()?.get('threadId'));
+    return isNaN(id) ? null : id;
+  });
+
+  // Thread data
+  thread = toSignal(
+    this.route.paramMap.pipe(
+      switchMap(params => {
+        const id = Number(params.get('threadId'));
+        if (isNaN(id)) {
+          this.router.navigate(['/forum']);
+          throw new Error('Invalid thread ID');
+        }
+        return this.threadService.getThreadById(id);
+      })
+    )
+  );
+
+  constructor() {
+    this.loadPosts();
+  }
+
+  private loadPosts(): void {
+    this.isLoadingPosts.set(true);
+
+    this.route.paramMap
+      .pipe(
+        takeUntilDestroyed(),
+        tap(() => this.isLoadingPosts.set(true)),
+        switchMap(params => {
+          const id = Number(params.get('threadId'));
+          if (isNaN(id)) {
+            this.router.navigate(['/forum']);
+            throw new Error('Invalid thread ID');
+          }
+          return this.postService.getPostByThreadId(id);
+        })
+      )
+      .subscribe({
+        next: posts => {
+          this.postsSignal.set(posts);
+          this.isLoadingPosts.set(false);
+        },
+        error: err => {
+          console.error('Erreur chargement posts:', err);
+          this.isLoadingPosts.set(false);
+          this.errorMessage.set('Erreur lors du chargement des posts');
+        }
+      });
+  }
+
+  private getUserId(): number | null {
+    const userId = this.userService.currentUserProfile?.user.id;
+    if (!userId) {
+      this.errorMessage.set('Vous devez être connecté');
+    }
+    return userId ?? null;
+  }
+
+  private updatePost(updated: Post): void {
+    this.postsSignal.update(posts =>
+      posts.map(p => (p.id === updated.id ? updated : p))
+    );
+  }
+
+  publishPost(): void {
+    if (this.newPostForm.invalid || this.isPublishing()) return;
+
+    const content = this.newPostForm.value.content!.trim();
+    const threadId = this.threadId();
+    const currentUser = this.userService.currentUserProfile?.user;
+    const userId = this.userService.currentUserProfile?.user.id;
+
+    if (!threadId) {
+      this.errorMessage.set('Thread introuvable');
       return;
     }
 
-    const foundThread = this.threadService.getThreadById(threadId);
-    if (foundThread && foundThread.sectionId === sectionIdNumber) {
-      this.thread.set(foundThread);
-      this.posts.set(this.postService.getPostByThreadId(threadId));
-    } else {
-      this.router.navigate(['/forum']);
+    if (!currentUser) {
+      this.errorMessage.set('Vous devez être connecté');
+      return;
     }
+
+    this.isPublishing.set(true);
+
+    this.postService.addPost(threadId, currentUser.username, content, userId).subscribe({
+      next: newPost => {
+        this.postsSignal.update(posts => [...posts, newPost]);
+        this.newPostForm.reset();
+        this.isPublishing.set(false);
+      },
+      error: err => {
+        console.error('Erreur publication:', err);
+        this.isPublishing.set(false);
+      }
+    });
   }
 
-  totalLikes = computed(() => {
-    return this.posts().reduce((total, post) => total + post.likes, 0);
-  })
+  onPostLike(postId: number): void {
+    const userId = this.getUserId();
+    if (!userId) return;
 
-  onPostLiked(postId: number): void {
-    const updatedPost = this.postService.toggleLike(postId);
-
-    if(updatedPost) {
-      const threadId = this.thread()?.id;
-
-      if (threadId) {
-        this.posts.set(this.postService.getPostByThreadId(threadId));
+    this.postService.toggleReaction(postId, userId, 'LIKE').subscribe({
+      next: updated => this.updatePost(updated),
+      error: err => {
+        console.error('Erreur like:', err);
+        this.errorMessage.set('Erreur lors du like');
       }
-      if (updatedPost.isLiked) {
-        console.log(`Post ${postId} a été aimé ! 👍 Total likes: ${updatedPost.likes}`);
-      } else {
-        console.log(`Post ${postId} n'est plus aimé. 👎 Total likes: ${updatedPost.likes}`);
+    });
+  }
+
+  onPostDislike(postId: number): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.postService.toggleReaction(postId, userId, 'DISLIKE').subscribe({
+      next: updated => this.updatePost(updated),
+      error: err => {
+        console.error('Erreur dislike:', err);
+        this.errorMessage.set('Erreur lors du dislike');
       }
-    }
+    });
+  }
 
+  onPostFlagged(postId: number): void {
 
+    const userId = this.getUserId();
+    if (!userId) return;
 
+    this.postService.toggleFlag(postId).subscribe({
+      next: updated => this.updatePost(updated),
+      error: err => {
+        console.error('Erreur flag:', err);
+        this.errorMessage.set('Erreur lors du signalement');
+      }
+    });
+  }
+
+  onPostDeleted(postId: number): void {
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.postService.deletePost(postId, userId).subscribe({
+      next: () => {
+        this.postsSignal.update(posts => posts.filter(p => p.id !== postId));
+      },
+      error: err => {
+        console.error('Erreur suppression:', err);
+        this.errorMessage.set('Erreur lors de la suppression');
+      }
+    });
   }
 }
