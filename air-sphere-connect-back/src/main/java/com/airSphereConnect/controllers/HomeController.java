@@ -11,16 +11,19 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
-
 @RestController
 @RequestMapping("/api")
 public class HomeController {
@@ -43,10 +46,15 @@ public class HomeController {
         this.cookieService = cookieService;
     }
 
+    private void writeAccessTokenCookie(HttpServletResponse response, String token) {
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", token));
+    }
+
+
     @NotNull
     private ResponseEntity<?> getGuestResponse(HttpServletResponse response) {
         String guestToken = jwtService.generateGuestToken();
-        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", guestToken));
+        writeAccessTokenCookie(response, guestToken);
 
         Map<String, Object> body = new HashMap<>();
         body.put("role", "GUEST");
@@ -55,31 +63,49 @@ public class HomeController {
         return ResponseEntity.ok(body);
     }
 
+
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginDto, HttpServletResponse response) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
 
-        User userEntity = (User) auth.getPrincipal();
+            User userEntity = (User) auth.getPrincipal();
 
-        String accessToken = jwtService.generateToken(userEntity);
-        String refreshToken = jwtService.generateRefreshToken(userEntity);
-        activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
+            if (userEntity.getDeletedAt() != null) {
+                throw new DisabledException("Compte utilisateur supprimé");
+            }
+            System.out.println("deletedAt user : " + userEntity.getDeletedAt());
 
-        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", accessToken));
-        Cookie refreshCookie = cookieService.createCookie("REFRESH_TOKEN", refreshToken);
-        refreshCookie.setPath("/api/token/refresh");
-        response.addCookie(refreshCookie);
+            String accessToken = jwtService.generateToken(userEntity);
+            String refreshToken = jwtService.generateRefreshToken(userEntity);
+            activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
 
-        UserResponseDto userResponse = userMapper.toDto(userEntity);
+            writeAccessTokenCookie(response, accessToken);
+            Cookie refreshCookie = cookieService.createCookie("REFRESH_TOKEN", refreshToken);
+            refreshCookie.setPath("/api/token/refresh");
+            response.addCookie(refreshCookie);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("message", "Connexion réussie");
-        body.put("role", userEntity.getRole().name());
-        body.put("user", userResponse);
+            UserResponseDto userResponse = userMapper.toDto(userEntity);
 
-        return ResponseEntity.ok(body);
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "Connexion réussie");
+            body.put("role", userEntity.getRole().name());
+            body.put("user", userResponse);
+
+            return ResponseEntity.ok(body);
+
+        } catch (DisabledException ex) {
+            // Compte désactivé ou supprimé : refuse la connexion
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", ex.getMessage()));
+        } catch (AuthenticationException ex) {
+            // Autres erreurs d'authentification
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Nom d'utilisateur ou mot de passe incorrect"));
+        }
     }
+
 
     @GetMapping("/profile")
     public ResponseEntity<?> getUserProfile(HttpServletRequest request, HttpServletResponse response) {
@@ -104,6 +130,10 @@ public class HomeController {
             }
 
             User userEntity = (User) userDetails;
+
+            String newToken = jwtService.generateToken(userEntity);
+            writeAccessTokenCookie(response, newToken);
+
             UserResponseDto userResponseDto = userMapper.toDto(userEntity);
 
             Map<String, Object> body = new HashMap<>();
@@ -118,13 +148,21 @@ public class HomeController {
 
     @GetMapping("/logout")
     public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
-        if (request.getSession(false) != null) {
+        if (request != null && request.getSession(false) != null) {
             request.getSession(false).invalidate();
         }
 
-        response.addCookie(cookieService.deleteCookie("ACCESS_TOKEN"));
+        // Remplacer le cookie ACCESS_TOKEN par un token guest
         response.addCookie(cookieService.createCookie("ACCESS_TOKEN", jwtService.generateGuestToken()));
+
+        // Supprimer le refresh token
+        response.addCookie(cookieService.deleteCookie("REFRESH_TOKEN"));
+
+        // Nettoyer le contexte pour éviter résidus
+        SecurityContextHolder.clearContext();
 
         return ResponseEntity.ok().build();
     }
+
+
 }
