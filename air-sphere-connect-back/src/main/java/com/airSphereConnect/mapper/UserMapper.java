@@ -49,7 +49,7 @@ public class UserMapper {
 
     // Backend -> Frontend
     public static UserResponseDto toDto(User user) {
-        if (user == null) return null;
+        if (user == null || user.getDeletedAt() != null) return null;
 
         UserResponseDto response = new UserResponseDto();
         response.setId(user.getId());

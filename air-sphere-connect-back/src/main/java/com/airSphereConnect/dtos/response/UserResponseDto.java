@@ -1,7 +1,8 @@
 package com.airSphereConnect.dtos.response;
 
+import com.airSphereConnect.dtos.AlertsDto;
 import com.airSphereConnect.dtos.FavoriteDto;
-import com.airSphereConnect.entities.Favorite;
+import com.airSphereConnect.dtos.FavoritesAlertsDto;
 import com.airSphereConnect.entities.enums.UserRole;
 
 import java.time.LocalDateTime;
@@ -13,15 +14,26 @@ public class UserResponseDto {
     private String email;
     private UserRole role;
     private LocalDateTime createdAt;
+    private LocalDateTime delectedAt;
     private LocalDateTime updatedAt;
     private AddressResponseDto address;
     private List<FavoriteDto> favorites;
 
 
+    private List<FavoritesAlertsDto> alerts;
+
+
     public UserResponseDto() {
     }
 
-    public UserResponseDto(Long id, String username, String email, UserRole role, LocalDateTime createdAt, AddressResponseDto address, List<FavoriteDto> favorites) {
+    public UserResponseDto(Long id,
+                           String username,
+                           String email,
+                           UserRole role,
+                           LocalDateTime createdAt,
+                           AddressResponseDto address,
+                           List<FavoriteDto> favorites,
+                           List<FavoritesAlertsDto> alerts) {
         this.id = id;
         this.username = username;
         this.email = email;
@@ -29,6 +41,7 @@ public class UserResponseDto {
         this.createdAt = createdAt;
         this.address = address;
         this.favorites = favorites;
+        this.alerts = alerts;
     }
 
     public Long getId() {
@@ -95,4 +108,15 @@ public class UserResponseDto {
         this.favorites = favorites;
     }
 
+    public List<FavoritesAlertsDto> getAlerts() {
+        return alerts;
+    }
+
+    public void setAlerts(List<FavoritesAlertsDto> alerts) {
+        this.alerts = alerts;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.delectedAt = deletedAt;
+    }
 }

@@ -11,10 +11,13 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.jetbrains.annotations.NotNull;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -63,29 +66,44 @@ public class HomeController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequestDto loginDto, HttpServletResponse response) {
-        Authentication auth = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+        try {
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
 
-        User userEntity = (User) auth.getPrincipal();
+            User userEntity = (User) auth.getPrincipal();
 
-        String accessToken = jwtService.generateToken(userEntity);
-        String refreshToken = jwtService.generateRefreshToken(userEntity);
-        activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
+            if (userEntity.getDeletedAt() != null) {
+                throw new DisabledException("Compte utilisateur supprimé");
+            }
+            System.out.println("deletedAt user : " + userEntity.getDeletedAt());
 
-        writeAccessTokenCookie(response, accessToken);
+            String accessToken = jwtService.generateToken(userEntity);
+            String refreshToken = jwtService.generateRefreshToken(userEntity);
+            activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
 
-        Cookie refreshCookie = cookieService.createCookie("REFRESH_TOKEN", refreshToken);
-        refreshCookie.setPath("/api/token/refresh");
-        response.addCookie(refreshCookie);
+            writeAccessTokenCookie(response, accessToken);
+            Cookie refreshCookie = cookieService.createCookie("REFRESH_TOKEN", refreshToken);
+            refreshCookie.setPath("/api/token/refresh");
+            response.addCookie(refreshCookie);
 
-        UserResponseDto userResponse = userMapper.toDto(userEntity);
+            UserResponseDto userResponse = userMapper.toDto(userEntity);
 
-        Map<String, Object> body = new HashMap<>();
-        body.put("message", "Connexion réussie");
-        body.put("role", userEntity.getRole().name());
-        body.put("user", userResponse);
+            Map<String, Object> body = new HashMap<>();
+            body.put("message", "Connexion réussie");
+            body.put("role", userEntity.getRole().name());
+            body.put("user", userResponse);
 
-        return ResponseEntity.ok(body);
+            return ResponseEntity.ok(body);
+
+        } catch (DisabledException ex) {
+            // Compte désactivé ou supprimé : refuse la connexion
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", ex.getMessage()));
+        } catch (AuthenticationException ex) {
+            // Autres erreurs d'authentification
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Map.of("error", "Nom d'utilisateur ou mot de passe incorrect"));
+        }
     }
 
 
