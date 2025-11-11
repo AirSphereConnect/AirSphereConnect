@@ -132,7 +132,8 @@ pipeline {
                         echo "Déploiement en ${environment} avec docker-compose.prod.yml"
 
                         sh """
-                            cd /var/www/projects/airsphereconnect
+                            # Re-copier .env.prod juste avant le déploiement pour être sûr
+                            cp -f .env.prod .env || echo "Pas de .env.prod à copier"
 
                             # Vérifier si la DB est déjà healthy
                             DB_HEALTHY=\$(docker inspect air_sphere_connect_db --format='{{.State.Health.Status}}' 2>/dev/null || echo "not_found")
