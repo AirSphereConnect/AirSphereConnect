@@ -55,6 +55,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - jenkins_agent_workdir:/home/jenkins/agent
+      - /var/www/projects/airsphereconnect:/var/www/projects/airsphereconnect:ro
 
     depends_on:
       jenkins:
