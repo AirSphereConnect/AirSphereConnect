@@ -98,17 +98,9 @@ pipeline {
         stage('Build Docker Images') {
             steps {
                 echo '=== Construction des images Docker ==='
-                script {
-                    // Détecter la branche
-                    def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
-                    def branchName = currentBranch.replaceAll(/^origin\//, '')
-
-                    // Utiliser dev.yml pour jenkins, prod.yml pour main
-                    def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
-                    sh """
-                        docker-compose -f ${composeFile} build
-                    """
-                }
+                sh """
+                    docker-compose -f docker-compose.prod.yml build
+                """
             }
         }
 
@@ -125,15 +117,13 @@ pipeline {
 
                     if (branchName == 'main' || branchName == 'jenkins') {
                         echo '=== Déploiement des containers ==='
-                        // Utiliser dev.yml pour jenkins, prod.yml pour main
-                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
-                        def environment = branchName == 'main' ? 'PRODUCTION' : 'DEVELOPMENT'
+                        def environment = branchName == 'main' ? 'PRODUCTION' : 'STAGING'
 
-                        echo "Déploiement en ${environment}"
+                        echo "Déploiement en ${environment} avec docker-compose.prod.yml"
 
                         sh """
-                            docker-compose -f ${composeFile} down --remove-orphans || true
-                            docker-compose -f ${composeFile} up -d --force-recreate
+                            docker-compose -f docker-compose.prod.yml down --remove-orphans || true
+                            docker-compose -f docker-compose.prod.yml up -d --force-recreate
                         """
                     } else {
                         echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
@@ -153,21 +143,19 @@ pipeline {
 
                     if (branchName == 'main' || branchName == 'jenkins') {
                         echo '=== Vérification de la santé des services ==='
-                        // Utiliser dev.yml pour jenkins, prod.yml pour main
-                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
 
                         sh """
                             echo "Attente du démarrage des services..."
                             sleep 30
 
-                            docker-compose -f ${composeFile} ps
+                            docker-compose -f docker-compose.prod.yml ps
 
                             # Vérifier que les containers sont en cours d'exécution
-                            UNHEALTHY=\$(docker-compose -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
+                            UNHEALTHY=\$(docker-compose -f docker-compose.prod.yml ps --filter "health=unhealthy" -q | wc -l)
 
                             if [ "\$UNHEALTHY" -gt 0 ]; then
                                 echo "⚠️ WARNING: \$UNHEALTHY container(s) unhealthy"
-                                docker-compose -f ${composeFile} logs --tail=50
+                                docker-compose -f docker-compose.prod.yml logs --tail=50
                                 exit 1
                             else
                                 echo "✅ All containers are healthy"

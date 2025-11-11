@@ -117,7 +117,7 @@ services:
 volumes:
   air_sphere_connect_db_data:
     name: ${DB_VOLUME_NAME}
-    driver: local
+    external: true
 
 # ==============================
 # NETWORKS
@@ -125,4 +125,4 @@ volumes:
 networks:
   air_sphere_connect_network:
     name: ${NETWORK_NAME}
-    driver: bridge
+    external: true
