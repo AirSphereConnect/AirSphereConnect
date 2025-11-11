@@ -62,16 +62,36 @@ pipeline {
         stage('Prepare Environment') {
             steps {
                 echo '=== Préparation de l\'environnement ==='
-                sh '''
-                    echo "Copie forcée de .env.example.prod vers .env pour CI/CD"
-                    cp -f .env.example.prod .env
+                script {
+                    // Détecter la branche
+                    def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                    def branchName = currentBranch.replaceAll(/^origin\//, '')
 
-                    echo "Vérification de la configuration:"
-                    echo "DB_PORT:"
-                    grep DB_PORT .env
-                    echo "DB_USER:"
-                    grep DB_USER .env
-                '''
+                    if (branchName == 'main') {
+                        sh '''
+                            echo "=== PRODUCTION: Copie de .env.example.prod vers .env ==="
+                            cp -f .env.example.prod .env
+                        '''
+                    } else {
+                        sh '''
+                            echo "=== DEVELOPMENT: Utilisation du .env existant ou copie de .env.example ==="
+                            if [ ! -f .env ]; then
+                                echo "Copie de .env.example vers .env"
+                                cp .env.example .env
+                            else
+                                echo ".env existe déjà, conservation"
+                            fi
+                        '''
+                    }
+
+                    sh '''
+                        echo "Vérification de la configuration:"
+                        echo "DB_PORT:"
+                        grep DB_PORT .env || echo "Non trouvé"
+                        echo "DB_USER:"
+                        grep DB_USER .env || echo "Non trouvé"
+                    '''
+                }
             }
         }
 
@@ -79,10 +99,14 @@ pipeline {
             steps {
                 echo '=== Construction des images Docker ==='
                 script {
-                    // Utiliser prod.yml pour main et jenkins (CI/CD), dev.yml pour les autres branches
-                    def composeFile = 'docker-compose.prod.yml'
+                    // Détecter la branche
+                    def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                    def branchName = currentBranch.replaceAll(/^origin\//, '')
+
+                    // Utiliser dev.yml pour jenkins, prod.yml pour main
+                    def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
                     sh """
-                        docker-compose -p airsphereconnect -f ${composeFile} build
+                        docker-compose -f ${composeFile} build
                     """
                 }
             }
@@ -101,14 +125,15 @@ pipeline {
 
                     if (branchName == 'main' || branchName == 'jenkins') {
                         echo '=== Déploiement des containers ==='
-                        // Toujours utiliser prod.yml pour CI/CD
-                        def composeFile = 'docker-compose.prod.yml'
-                        def environment = branchName == 'main' ? 'PRODUCTION' : 'STAGING (jenkins branch)'
+                        // Utiliser dev.yml pour jenkins, prod.yml pour main
+                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
+                        def environment = branchName == 'main' ? 'PRODUCTION' : 'DEVELOPMENT'
 
                         echo "Déploiement en ${environment}"
 
                         sh """
-                            docker-compose -p airsphereconnect -f ${composeFile} up -d --force-recreate --remove-orphans
+                            docker-compose -f ${composeFile} down --remove-orphans || true
+                            docker-compose -f ${composeFile} up -d --force-recreate
                         """
                     } else {
                         echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
@@ -128,21 +153,21 @@ pipeline {
 
                     if (branchName == 'main' || branchName == 'jenkins') {
                         echo '=== Vérification de la santé des services ==='
-                        // Toujours utiliser prod.yml pour CI/CD
-                        def composeFile = 'docker-compose.prod.yml'
+                        // Utiliser dev.yml pour jenkins, prod.yml pour main
+                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
 
                         sh """
                             echo "Attente du démarrage des services..."
                             sleep 30
 
-                            docker-compose -p airsphereconnect -f ${composeFile} ps
+                            docker-compose -f ${composeFile} ps
 
                             # Vérifier que les containers sont en cours d'exécution
-                            UNHEALTHY=\$(docker-compose -p airsphereconnect -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
+                            UNHEALTHY=\$(docker-compose -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
 
                             if [ "\$UNHEALTHY" -gt 0 ]; then
                                 echo "⚠️ WARNING: \$UNHEALTHY container(s) unhealthy"
-                                docker-compose -p airsphereconnect -f ${composeFile} logs --tail=50
+                                docker-compose -f ${composeFile} logs --tail=50
                                 exit 1
                             else
                                 echo "✅ All containers are healthy"
