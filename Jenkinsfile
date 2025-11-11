@@ -104,8 +104,7 @@ pipeline {
                         echo "Déploiement en ${environment}"
 
                         sh """
-                            docker-compose -f ${composeFile} down --remove-orphans || true
-                            docker-compose -f ${composeFile} up -d --force-recreate
+                            docker-compose -p airsphereconnect -f ${composeFile} up -d --force-recreate --remove-orphans
                         """
                     } else {
                         echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
@@ -131,14 +130,14 @@ pipeline {
                             echo "Attente du démarrage des services..."
                             sleep 30
 
-                            docker-compose -f ${composeFile} ps
+                            docker-compose -p airsphereconnect -f ${composeFile} ps
 
                             # Vérifier que les containers sont en cours d'exécution
-                            UNHEALTHY=\$(docker-compose -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
+                            UNHEALTHY=\$(docker-compose -p airsphereconnect -f ${composeFile} ps --filter "health=unhealthy" -q | wc -l)
 
                             if [ "\$UNHEALTHY" -gt 0 ]; then
                                 echo "⚠️ WARNING: \$UNHEALTHY container(s) unhealthy"
-                                docker-compose -f ${composeFile} logs --tail=50
+                                docker-compose -p airsphereconnect -f ${composeFile} logs --tail=50
                                 exit 1
                             else
                                 echo "✅ All containers are healthy"
