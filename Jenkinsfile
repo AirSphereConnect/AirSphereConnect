@@ -63,14 +63,14 @@ pipeline {
             steps {
                 echo '=== Préparation de l\'environnement ==='
                 sh '''
-                    echo "Copie forcée de .env.example vers .env"
-                    cp -f .env.example .env
+                    echo "Copie forcée de .env.example.prod vers .env pour CI/CD"
+                    cp -f .env.example.prod .env
 
-                    echo "Copie forcée de .env.example.prod vers .env.prod"
-                    cp -f .env.example.prod .env.prod
-
-                    echo "Vérification du DB_PORT configuré:"
+                    echo "Vérification de la configuration:"
+                    echo "DB_PORT:"
                     grep DB_PORT .env
+                    echo "DB_USER:"
+                    grep DB_USER .env
                 '''
             }
         }
