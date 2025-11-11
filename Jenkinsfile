@@ -67,10 +67,22 @@ pipeline {
                     def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
                     def branchName = currentBranch.replaceAll(/^origin\//, '')
 
+                    // Copier .env.prod depuis le serveur pour le déploiement
+                    sh '''
+                        echo "=== Copie de .env.prod depuis /var/www/projects/airsphereconnect ==="
+                        if [ -f /var/www/projects/airsphereconnect/.env.prod ]; then
+                            cp -f /var/www/projects/airsphereconnect/.env.prod .env.prod
+                            echo "✅ .env.prod copié avec succès"
+                        else
+                            echo "⚠️ .env.prod non trouvé sur le serveur, utilisation de .env.example.prod"
+                            cp -f .env.example.prod .env.prod
+                        fi
+                    '''
+
                     if (branchName == 'main') {
                         sh '''
-                            echo "=== PRODUCTION: Copie de .env.example.prod vers .env ==="
-                            cp -f .env.example.prod .env
+                            echo "=== PRODUCTION: Copie de .env.prod vers .env ==="
+                            cp -f .env.prod .env
                         '''
                     } else {
                         sh '''
@@ -85,11 +97,9 @@ pipeline {
                     }
 
                     sh '''
-                        echo "Vérification de la configuration:"
-                        echo "DB_PORT:"
-                        grep DB_PORT .env || echo "Non trouvé"
-                        echo "DB_USER:"
-                        grep DB_USER .env || echo "Non trouvé"
+                        echo "Vérification de la configuration .env.prod:"
+                        grep JWT_SECRET .env.prod || echo "⚠️ JWT_SECRET non trouvé"
+                        grep DB_ROOT_PASSWORD .env.prod || echo "⚠️ DB_ROOT_PASSWORD non trouvé"
                     '''
                 }
             }
