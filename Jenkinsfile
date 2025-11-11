@@ -122,7 +122,11 @@ pipeline {
                         echo "Déploiement en ${environment} avec docker-compose.prod.yml"
 
                         sh """
-                            docker-compose -f docker-compose.prod.yml down --remove-orphans || true
+                            # Arrêter les containers de l'application s'ils existent
+                            docker stop air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
+                            docker rm air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
+
+                            # Démarrer avec docker-compose
                             docker-compose -f docker-compose.prod.yml up -d --force-recreate
                         """
                     } else {
