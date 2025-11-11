@@ -137,9 +137,9 @@ pipeline {
 
                             if [ "\$DB_HEALTHY" = "healthy" ]; then
                                 echo "✅ DB déjà healthy, on garde la DB et recrée seulement backend/frontend"
-                                docker stop air_sphere_connect_back air_sphere_connect_front 2>/dev/null || true
-                                docker rm air_sphere_connect_back air_sphere_connect_front 2>/dev/null || true
-                                docker-compose -f docker-compose.prod.yml up -d backend frontend
+                                docker-compose -f docker-compose.prod.yml stop backend frontend
+                                docker-compose -f docker-compose.prod.yml rm -f backend frontend
+                                docker-compose -f docker-compose.prod.yml up -d --no-deps --force-recreate backend frontend
                             else
                                 echo "⚠️ DB not healthy, recréation complète de tous les containers"
                                 docker stop air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
