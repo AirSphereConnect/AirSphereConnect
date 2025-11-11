@@ -132,12 +132,20 @@ pipeline {
                         echo "Déploiement en ${environment} avec docker-compose.prod.yml"
 
                         sh """
-                            # Arrêter les containers de l'application s'ils existent
-                            docker stop air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
-                            docker rm air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
+                            # Vérifier si la DB est déjà healthy
+                            DB_HEALTHY=\$(docker inspect air_sphere_connect_db --format='{{.State.Health.Status}}' 2>/dev/null || echo "not_found")
 
-                            # Démarrer avec docker-compose
-                            docker-compose -f docker-compose.prod.yml up -d --force-recreate
+                            if [ "\$DB_HEALTHY" = "healthy" ]; then
+                                echo "✅ DB déjà healthy, on garde la DB et recrée seulement backend/frontend"
+                                docker stop air_sphere_connect_back air_sphere_connect_front 2>/dev/null || true
+                                docker rm air_sphere_connect_back air_sphere_connect_front 2>/dev/null || true
+                                docker-compose -f docker-compose.prod.yml up -d backend frontend
+                            else
+                                echo "⚠️ DB not healthy, recréation complète de tous les containers"
+                                docker stop air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
+                                docker rm air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
+                                docker-compose -f docker-compose.prod.yml up -d --force-recreate
+                            fi
                         """
                     } else {
                         echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
