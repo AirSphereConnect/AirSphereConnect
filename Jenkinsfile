@@ -86,11 +86,12 @@ pipeline {
                         echo "Déploiement en ${environment} avec docker-compose.prod.yml"
 
                         sh """
-                            # Vérifier que .env.prod existe et contient JWT_SECRET
-                            echo "=== Vérification du .env.prod ==="
-                            pwd
-                            ls -la .env.prod || echo "⚠️ .env.prod n'existe pas"
-                            grep JWT_SECRET .env.prod || echo "⚠️ JWT_SECRET manquant dans .env.prod"
+                            # Copier le .env.prod depuis le serveur (maintenant accessible via le volume mount)
+                            cp -f /var/www/projects/airsphereconnect/.env.prod .env.prod
+                            echo "✅ .env.prod copié depuis le serveur"
+
+                            # Vérifier que JWT_SECRET est présent
+                            grep JWT_SECRET .env.prod && echo "✅ JWT_SECRET trouvé" || echo "⚠️ JWT_SECRET manquant"
 
                             # Vérifier si la DB est déjà healthy
                             DB_HEALTHY=\$(docker inspect air_sphere_connect_db --format='{{.State.Health.Status}}' 2>/dev/null || echo "not_found")

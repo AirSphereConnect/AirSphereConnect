@@ -60,7 +60,7 @@ services:
     restart: always
 
     env_file:
-      - /var/www/projects/airsphereconnect/.env.prod
+      - .env.prod
 
     # Port bindé sur 127.0.0.1 uniquement (nginx sera le seul accès public)
     ports:
@@ -92,7 +92,7 @@ services:
     restart: always
 
     env_file:
-      - /var/www/projects/airsphereconnect/.env.prod
+      - .env.prod
 
     # Port bindé sur 127.0.0.1 uniquement (nginx sera le seul accès public)
     ports:
