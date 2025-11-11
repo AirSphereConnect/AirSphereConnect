@@ -132,8 +132,11 @@ pipeline {
                         echo "Déploiement en ${environment} avec docker-compose.prod.yml"
 
                         sh """
-                            # Re-copier .env.prod juste avant le déploiement pour être sûr
-                            cp -f .env.prod .env || echo "Pas de .env.prod à copier"
+                            # Vérifier que .env.prod existe et contient JWT_SECRET
+                            echo "=== Vérification du .env.prod ==="
+                            pwd
+                            ls -la .env.prod || echo "⚠️ .env.prod n'existe pas"
+                            grep JWT_SECRET .env.prod || echo "⚠️ JWT_SECRET manquant dans .env.prod"
 
                             # Vérifier si la DB est déjà healthy
                             DB_HEALTHY=\$(docker inspect air_sphere_connect_db --format='{{.State.Health.Status}}' 2>/dev/null || echo "not_found")
