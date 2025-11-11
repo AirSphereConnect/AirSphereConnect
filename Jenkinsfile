@@ -79,7 +79,8 @@ pipeline {
             steps {
                 echo '=== Construction des images Docker ==='
                 script {
-                    def composeFile = env.BRANCH_NAME == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
+                    // Utiliser prod.yml pour main et jenkins (CI/CD), dev.yml pour les autres branches
+                    def composeFile = 'docker-compose.prod.yml'
                     sh """
                         docker-compose -p airsphereconnect -f ${composeFile} build
                     """
@@ -100,8 +101,9 @@ pipeline {
 
                     if (branchName == 'main' || branchName == 'jenkins') {
                         echo '=== Déploiement des containers ==='
-                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
-                        def environment = branchName == 'main' ? 'PRODUCTION' : 'DEVELOPMENT'
+                        // Toujours utiliser prod.yml pour CI/CD
+                        def composeFile = 'docker-compose.prod.yml'
+                        def environment = branchName == 'main' ? 'PRODUCTION' : 'STAGING (jenkins branch)'
 
                         echo "Déploiement en ${environment}"
 
@@ -126,7 +128,8 @@ pipeline {
 
                     if (branchName == 'main' || branchName == 'jenkins') {
                         echo '=== Vérification de la santé des services ==='
-                        def composeFile = branchName == 'main' ? 'docker-compose.prod.yml' : 'docker-compose.dev.yml'
+                        // Toujours utiliser prod.yml pour CI/CD
+                        def composeFile = 'docker-compose.prod.yml'
 
                         sh """
                             echo "Attente du démarrage des services..."
