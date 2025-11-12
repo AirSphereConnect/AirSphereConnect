@@ -58,7 +58,7 @@ public class UserMapper {
         response.setRole(user.getRole());
         response.setCreatedAt(user.getCreatedAt());
         response.setUpdatedAt(user.getUpdatedAt());
-//        response.setDeletedAt(user.getDeletedAt());
+        response.setDeletedAt(user.getDeletedAt());
 
 
         if (user.getAddress() != null) {
