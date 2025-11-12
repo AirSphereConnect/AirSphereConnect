@@ -95,6 +95,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + id));
         user.softDelete();
         User saved = userRepository.save(user);
+        System.out.println("DEBUG-DELETE id USER : " +saved.getUsername());
         return UserMapper.toDto(saved);
     }
 

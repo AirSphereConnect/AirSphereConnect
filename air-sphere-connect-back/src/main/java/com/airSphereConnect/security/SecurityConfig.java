@@ -65,10 +65,10 @@ public class SecurityConfig {
                                 "/api/guest-token",
                                 "/api/login",
                                 "/api/profile",
+                                "api/logout",
                                 "/api/users/check",
                                 "/api/cities/search-name").permitAll()
                         .requestMatchers(HttpMethod.POST,
-                                "/api/logout",
                                 "/api/users/signup").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         .requestMatchers("/api/home",

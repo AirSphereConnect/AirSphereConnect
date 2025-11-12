@@ -14,6 +14,7 @@ import com.airSphereConnect.services.AddressService;
 import com.airSphereConnect.services.AuthService;
 import com.airSphereConnect.services.UserService;
 import com.airSphereConnect.services.security.ActiveTokenService;
+import com.airSphereConnect.services.security.CookieService;
 import com.airSphereConnect.services.security.JwtService;
 import com.airSphereConnect.services.security.implementations.JwtServiceImpl;
 import jakarta.validation.Valid;
@@ -23,6 +24,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,14 +45,16 @@ public class UserController {
 
     private final UserService userService;
     private final AuthService authService;
+    private final JwtService jwtService;
+    private final CookieService cookieService;
     private final UserRepository userRepository;
-    private final AddressService addressService;
 
-    public UserController(UserService userService, AuthService authService, UserRepository userRepository, AddressService addressService) {
+    public UserController(UserService userService, AuthService authService, JwtService jwtService, CookieService cookieService, UserRepository userRepository) {
         this.userService = userService;
         this.authService = authService;
+        this.jwtService = jwtService;
+        this.cookieService = cookieService;
         this.userRepository = userRepository;
-        this.addressService = addressService;
     }
 
     // Tous les utilisateurs
@@ -123,10 +127,23 @@ public class UserController {
 
 
     // Supprimer un utilisateur
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
-    @DeleteMapping
-    public ResponseEntity<?> deleteUser(@RequestParam Long id,HttpServletRequest request,
-                                      HttpServletResponse response) {
-        return authService.DeleteUser(id, request, response);
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    @DeleteMapping("/users")
+    public ResponseEntity<Void> deleteUser(@RequestParam Long id, HttpServletRequest request,
+                                           HttpServletResponse response) {
+        userService.deleteUser(id);
+
+        // Suppression des cookies côté réponse (directement)
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", jwtService.generateGuestToken()));
+        response.addCookie(cookieService.deleteCookie("REFRESH_TOKEN"));
+        // Invalider session et vider contexte
+        if (request.getSession(false) != null) {
+            request.getSession(false).invalidate();
+        }
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.noContent().build();
     }
+
+
 }

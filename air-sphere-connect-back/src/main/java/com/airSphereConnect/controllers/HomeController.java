@@ -4,6 +4,7 @@ import com.airSphereConnect.dtos.request.LoginRequestDto;
 import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
+import com.airSphereConnect.services.UserService;
 import com.airSphereConnect.services.security.ActiveTokenService;
 import com.airSphereConnect.services.security.CookieService;
 import com.airSphereConnect.services.security.JwtService;
@@ -28,17 +29,19 @@ import java.util.Map;
 @RequestMapping("/api")
 public class HomeController {
 
+    private final UserService userService;
     private final UserMapper userMapper;
-    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final ActiveTokenService activeTokenService;
+    private final JwtService jwtService;
     private final CookieService cookieService;
 
-    public HomeController(JwtService jwtService,
+    public HomeController(UserService userService, JwtService jwtService,
                           AuthenticationManager authenticationManager,
                           ActiveTokenService activeTokenService,
                           UserMapper userMapper,
                           CookieService cookieService) {
+        this.userService = userService;
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
         this.activeTokenService = activeTokenService;
@@ -164,5 +167,24 @@ public class HomeController {
         return ResponseEntity.ok().build();
     }
 
+    @DeleteMapping("/delete")
+    public ResponseEntity<Void> deleteUser(@RequestParam Long id, HttpServletRequest request, HttpServletResponse response) {
+        if (request != null && request.getSession(false) != null) {
+            request.getSession(false).invalidate();
+        }
+
+        // Remplacer le cookie ACCESS_TOKEN par un token guest
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", jwtService.generateGuestToken()));
+
+        // Supprimer le refresh token
+        response.addCookie(cookieService.deleteCookie("REFRESH_TOKEN"));
+
+        userService.deleteUser(id);
+
+        // Nettoyer le contexte pour éviter résidus
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.ok().build();
+    }
 
 }

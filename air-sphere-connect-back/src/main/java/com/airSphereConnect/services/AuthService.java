@@ -8,6 +8,8 @@ import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -48,21 +50,29 @@ public class AuthService {
         return ResponseEntity.ok(UserMapper.toDto(updatedUser));
     }
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthService.class);
+
     public ResponseEntity<?> DeleteUser(Long id,
                                         HttpServletRequest request, HttpServletResponse response) {
+        logger.info("DeleteUser appelé avec id={}", id);
 
         UserResponseDto delectedUser = userService.deleteUser(id);
 
         boolean delectedUserChanged = delectedUser != null;
 
         if (delectedUserChanged) {
-            // Invalide session + remplace token par "guest" (logout forcé)
-            return homeController.logout(request, response);
+            logger.info("Utilisateur supprimé, appel de getUserProfile");
+
+            ResponseEntity<?> profileResponse = homeController.getUserProfile(request, response);
+
+            logger.info("getUserProfile a répondu avec le status {}", profileResponse.getStatusCode());
+            return profileResponse;
         }
 
-        // Sinon, retourne utilisateur mis à jour normalement
+        logger.info("Pas de suppression utilisateur, retour OK sans contenu");
         return ResponseEntity.ok(null);
     }
+
 }
 
 
