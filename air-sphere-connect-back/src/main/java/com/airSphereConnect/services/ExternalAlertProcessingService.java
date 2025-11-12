@@ -26,7 +26,7 @@ public class ExternalAlertProcessingService {
         List<FavoritesAlerts> configs;
 
         if (alert.getCityId() != null) {
-            configs = favoritesAlertsRepository.findByCityIdAndIsEnabled(alert.getCityId(), true);
+            configs = favoritesAlertsRepository.findByCityIdAndEnabled(alert.getCityId(), true);
         } else {
             return; // Aucune zone valide, pas de traitement voir pour ajout
         }

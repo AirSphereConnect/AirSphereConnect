@@ -14,7 +14,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @RestController
-@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
+//@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/air-quality")
 public class AirQualityController {
 

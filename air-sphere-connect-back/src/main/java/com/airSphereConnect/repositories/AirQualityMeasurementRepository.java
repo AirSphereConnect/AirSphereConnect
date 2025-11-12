@@ -44,8 +44,5 @@ public interface AirQualityMeasurementRepository extends JpaRepository<AirQualit
             "ORDER BY m.station.id ASC, m.measuredAt DESC")
     List<AirQualityMeasurement> findByMeasuredAtAfterOrderByStationIdAscMeasuredAtDesc(@Param("since") LocalDateTime since);
 
-    List<AirQualityMeasurement> findByStationCityPostalCodeAndMeasuredAtAfterOrderByMeasuredAtDesc(
-            String postalCode,
-            LocalDateTime since
-    );
+
 }

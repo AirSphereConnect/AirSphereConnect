@@ -1,0 +1,66 @@
+<div role="tablist" class="tabs tabs-box min-w-[150px] flex gap-x-1">
+  <a
+    routerLink="/home"
+    routerLinkActive="tab-active tab-active-primary"
+    role="tab"
+    class="tab"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    Page d'accueil
+  </a>
+
+  <a
+    routerLink="/forum"
+    routerLinkActive="tab-active tab-active-primary"
+    role="tab"
+    class="tab"
+  >
+    Forum
+  </a>
+
+  @if (userRole === 'GUEST') {
+    <a
+      routerLink="/auth/login"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
+      Se connecter
+    </a>
+
+    <a
+      routerLink="/auth/register"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
+      Créer un compte
+    </a>
+  } @else if (userRole === 'USER') {
+    <a
+      routerLink="/dashboard"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
+      Données climatiques
+    </a>
+
+    <a
+      routerLink="/auth/profile"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
+      Mon compte
+    </a>
+
+    <a
+      (click)="logout()"
+      role="tab"
+      class="tab"
+    >
+      Déconnexion
+    </a>
+  }
+</div>

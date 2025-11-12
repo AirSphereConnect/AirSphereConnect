@@ -1,124 +1,151 @@
 package com.airSphereConnect.controllers;
 
-import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.request.LoginRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
+import com.airSphereConnect.entities.User;
+import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.security.ActiveTokenService;
+import com.airSphereConnect.services.security.CookieService;
 import com.airSphereConnect.services.security.JwtService;
-import com.airSphereConnect.services.security.implementations.JwtServiceImpl;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
 public class HomeController {
 
+    private final UserMapper userMapper;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
-    private final JwtServiceImpl jwtServiceImpl;
     private final ActiveTokenService activeTokenService;
+    private final CookieService cookieService;
 
-    public HomeController(JwtService jwtService, AuthenticationManager authenticationManager, JwtServiceImpl jwtServiceImpl, ActiveTokenService activeTokenService) {
+    public HomeController(JwtService jwtService,
+                          AuthenticationManager authenticationManager,
+                          ActiveTokenService activeTokenService,
+                          UserMapper userMapper,
+                          CookieService cookieService) {
         this.jwtService = jwtService;
         this.authenticationManager = authenticationManager;
-        this.jwtServiceImpl = jwtServiceImpl;
         this.activeTokenService = activeTokenService;
+        this.userMapper = userMapper;
+        this.cookieService = cookieService;
     }
-    @GetMapping("/guest-token")
-    public void generateGuestTokenAndRedirect(HttpServletResponse response) throws IOException {
 
+    private void writeAccessTokenCookie(HttpServletResponse response, String token) {
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", token));
+    }
+
+
+    @NotNull
+    private ResponseEntity<?> getGuestResponse(HttpServletResponse response) {
         String guestToken = jwtService.generateGuestToken();
+        writeAccessTokenCookie(response, guestToken);
 
-        Cookie cookie = new Cookie("ACCESS_TOKEN", guestToken);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true); // en production
-        cookie.setPath("/");
-        cookie.setMaxAge(jwtService.getAccessTokenExpirySeconds());
-        response.addCookie(cookie);
+        Map<String, Object> body = new HashMap<>();
+        body.put("role", "GUEST");
+        body.put("user", null);
 
-        // Rediriger vers /api/home
-        response.sendRedirect("/api/home");
+        return ResponseEntity.ok(body);
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
-    @GetMapping("/home")
-    public ResponseEntity<?> getHomePage() {
-        return ResponseEntity.ok("Bienvenue sur la meilleur application");
-    }
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
+
+
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody UserRequestDto loginDto, HttpServletResponse response) {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto loginDto, HttpServletResponse response) {
         Authentication auth = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
-        UserDetails userDetails = (UserDetails) auth.getPrincipal();
 
-        String accessToken = jwtServiceImpl.generateAccessToken(userDetails);
-        String refreshToken = jwtServiceImpl.generateRefreshToken(userDetails);
+        User userEntity = (User) auth.getPrincipal();
 
-        activeTokenService.saveRefreshToken(userDetails.getUsername(), refreshToken);
+        String accessToken = jwtService.generateToken(userEntity);
+        String refreshToken = jwtService.generateRefreshToken(userEntity);
+        activeTokenService.saveRefreshToken(userEntity.getUsername(), refreshToken);
 
-        Cookie accessCookie = new Cookie("ACCESS_TOKEN", accessToken);
-        accessCookie.setHttpOnly(true);
-        accessCookie.setSecure(true);
-        accessCookie.setPath("/");
-        accessCookie.setMaxAge(jwtServiceImpl.getAccessTokenExpirySeconds());
-        response.addCookie(accessCookie);
+        writeAccessTokenCookie(response, accessToken);
 
-        Cookie refreshCookie = new Cookie("REFRESH_TOKEN", refreshToken);
-        refreshCookie.setHttpOnly(true);
-        refreshCookie.setSecure(true);
-        refreshCookie.setPath("/api/users/refresh-token");
-        refreshCookie.setMaxAge(jwtServiceImpl.getRefreshTokenExpirySeconds());
+        Cookie refreshCookie = cookieService.createCookie("REFRESH_TOKEN", refreshToken);
+        refreshCookie.setPath("/api/token/refresh");
         response.addCookie(refreshCookie);
 
-        return ResponseEntity.ok(Map.of("message", "Connexion réussie"));
-    }
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
-    @PostMapping("/refresh-token")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = Arrays.stream(request.getCookies() != null ? request.getCookies() : new Cookie[0])
-                .filter(cookie -> "REFRESH_TOKEN".equals(cookie.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElse(null);
+        UserResponseDto userResponse = userMapper.toDto(userEntity);
 
-        if (refreshToken == null) {
-            return ResponseEntity.status(401).body("Refresh token manquant");
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "Connexion réussie");
+        body.put("role", userEntity.getRole().name());
+        body.put("user", userResponse);
+
+        return ResponseEntity.ok(body);
+    }
+
+
+    @GetMapping("/profile")
+    public ResponseEntity<?> getUserProfile(HttpServletRequest request, HttpServletResponse response) {
+        String jwt = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("ACCESS_TOKEN".equals(cookie.getName())) {
+                    jwt = cookie.getValue();
+                    break;
+                }
+            }
         }
 
-        UserDetails userDetails;
+        if (jwt == null || jwt.isEmpty()) {
+            return getGuestResponse(response);
+        }
+
         try {
-            userDetails = jwtServiceImpl.extractUserDetails(refreshToken);
+            UserDetails userDetails = jwtService.extractUserDetails(jwt);
+            if (!jwtService.validateToken(jwt, userDetails)) {
+                return getGuestResponse(response);
+            }
+
+            User userEntity = (User) userDetails;
+
+            String newToken = jwtService.generateToken(userEntity);
+            writeAccessTokenCookie(response, newToken);
+
+            UserResponseDto userResponseDto = userMapper.toDto(userEntity);
+
+            Map<String, Object> body = new HashMap<>();
+            body.put("role", userEntity.getRole() != null ? userEntity.getRole().name() : "GUEST");
+            body.put("user", userResponseDto);
+
+            return ResponseEntity.ok(body);
         } catch (Exception e) {
-            return ResponseEntity.status(403).body("Refresh token invalide");
+            return getGuestResponse(response);
         }
-
-        if (!activeTokenService.isTokenActive(userDetails.getUsername(), refreshToken)) {
-            return ResponseEntity.status(403).body("Refresh token non associé");
-        }
-
-        if (!jwtServiceImpl.validateToken(refreshToken, userDetails)) {
-            return ResponseEntity.status(403).body("Refresh token expiré");
-        }
-
-        String newAccessToken = jwtServiceImpl.generateAccessToken(userDetails);
-
-        Cookie accessTokenCookie = new Cookie("ACCESS_TOKEN", newAccessToken);
-        accessTokenCookie.setHttpOnly(true);
-        accessTokenCookie.setSecure(true);
-        accessTokenCookie.setPath("/");
-        accessTokenCookie.setMaxAge(jwtServiceImpl.getAccessTokenExpirySeconds());
-        response.addCookie(accessTokenCookie);
-
-        return ResponseEntity.ok(Map.of("message", "Token renouvelé"));
     }
+
+    @GetMapping("/logout")
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
+        if (request != null && request.getSession(false) != null) {
+            request.getSession(false).invalidate();
+        }
+
+        // Remplacer le cookie ACCESS_TOKEN par un token guest
+        response.addCookie(cookieService.createCookie("ACCESS_TOKEN", jwtService.generateGuestToken()));
+
+        // Supprimer le refresh token
+        response.addCookie(cookieService.deleteCookie("REFRESH_TOKEN"));
+
+        // Nettoyer le contexte pour éviter résidus
+        SecurityContextHolder.clearContext();
+
+        return ResponseEntity.ok().build();
+    }
+
+
 }

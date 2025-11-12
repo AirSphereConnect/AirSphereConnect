@@ -1,0 +1,58 @@
+<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4" style="width: 100%;">
+  @if (user && user.favorites && user.favorites.length > 0) {
+    <table class="w-full border border-gray-200 rounded-lg shadow-sm">
+      <thead>
+      <tr>
+        <th class="p-2">Catégorie</th>
+        <th class="p-2">Ville</th>
+        <th class="p-2">Créé le</th>
+        <th class="p-2">Modifié le</th>
+        <th class="p-2">Actions</th>
+      </tr>
+      </thead>
+      <tbody>
+        @for (favorite of user.favorites; track favorite.id) {
+          <tr class="border-t">
+            <td class="p-2 text-center">{{ favorite.favoriteCategory }}</td>
+            <td class="p-2 text-center">{{ favorite.cityName }}</td>
+            <td class="p-2 text-center">{{ favorite.createdAt }}</td>
+            <td class="p-2 text-center">{{ favorite.updatedAt }}</td>
+            <td class="p-2 flex justify-center">
+              <app-button
+                class="w-30 h-10 divider-horizontal divider-start"
+                color="primary"
+                variant="solid"
+                (click)="editFavorites(favorite.id)"
+              >
+                Modifier
+              </app-button>
+              <div class="divider divider-horizontal"> </div>
+              <app-button
+                class="w-30 h-10 divider-horizontal divider-start"
+                color="warning"
+                variant="solid"
+                (click)="deleteFavorites(favorite.id)"
+              >
+                Supprimer
+              </app-button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  } @else {
+    <p>Aucun favori trouvé.</p>
+  }
+</fieldset>
+  <br>
+  <app-button color="primary" size="md" variant="solid" (click)="addFavorites()">
+    Ajouter
+  </app-button>
+
+<!-- 🟣 Modal -->
+<app-favorites-form
+  [isOpen]="isModalOpen"
+  [editingFavoriteId]="editingFavoriteId"
+  [initialFavoriteData]="initialFavoriteData"
+  (close)="onModalClose()"
+></app-favorites-form>

@@ -17,6 +17,7 @@ public class ApiCityMapper {
             city.setLongitude(dto.centre().longitude());
         }
         city.setAreaCode(dto.zoneCode());
+        city.setPopulation(dto.population());
         city.setDepartment(department);
         return city;
     }

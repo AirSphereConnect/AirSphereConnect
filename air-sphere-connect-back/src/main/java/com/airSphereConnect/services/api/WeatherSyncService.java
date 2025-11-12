@@ -52,7 +52,7 @@ public class WeatherSyncService implements DataSyncService {
 
     @Override
     public String getServiceName() {
-        return "WeatherSyncService";
+        return "WEATHER";
     }
 
     @Override

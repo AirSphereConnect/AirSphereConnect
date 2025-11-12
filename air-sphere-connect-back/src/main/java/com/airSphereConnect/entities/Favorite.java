@@ -1,6 +1,7 @@
 package com.airSphereConnect.entities;
 
 import com.airSphereConnect.entities.enums.FavoriteCategory;
+import com.jayway.jsonpath.JsonPath;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 
@@ -88,4 +89,5 @@ public class Favorite extends Timestamp {
                 "favoriteCategory=" + favoriteCategory +
                 '}';
     }
+
 }

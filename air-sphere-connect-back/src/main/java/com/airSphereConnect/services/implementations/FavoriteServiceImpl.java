@@ -91,11 +91,14 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public FavoriteDto deleteFavorite(Long id) {
+        System.out.println("id : " + id);
         Favorite favorite = favoriteRepository.findById(id)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Favori non trouvé avec l'id : " + id));
 
         favorite.softDelete();
+        System.out.println("favorite : " + favorite);
         Favorite saved = favoriteRepository.save(favorite);
+        System.out.println("saved : " + saved);
         return favoriteMapper.toDto(saved);
     }
 }

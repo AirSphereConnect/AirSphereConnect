@@ -27,7 +27,6 @@ public class City {
     @Column(name = "name", nullable = false, length = 100)
     private String name;
 
-    @NotBlank(message = "{city.postalCode.required}")
     @Size(max = 10, message = "{city.postalCode.size}")
     @Column(name = "postal_code", length = 10, nullable = true)
     private String postalCode;
@@ -51,7 +50,13 @@ public class City {
     private Department department;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "area_code", referencedColumnName = "area_code", insertable = false, updatable = false)
+    @JoinColumn(
+        name = "area_code",
+        referencedColumnName = "area_code",
+        insertable = false,
+        updatable = false,
+        foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private AirQualityIndex airQualityIndex;
 
     @OneToMany(mappedBy = "city", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
@@ -78,7 +83,7 @@ public class City {
     public City() {}
 
     public City(String name, String inseeCode, String postalCode, Double latitude, Double longitude, String areaCode,
-                Department department, Integer population) {
+                Department department, Integer population, AirQualityIndex airQualityIndex) {
         this.inseeCode = inseeCode;
         this.name = name;
         this.postalCode = postalCode;
@@ -87,6 +92,7 @@ public class City {
         this.areaCode = areaCode;
         this.department = department;
         this.population = population;
+        this.airQualityIndex = airQualityIndex;
     }
 
     public Long getId() {
@@ -214,6 +220,14 @@ public class City {
 
     public void setFavoritesAlerts(List<FavoritesAlerts> favoritesAlerts) {
         this.favoritesAlerts = favoritesAlerts;
+    }
+
+    public AirQualityIndex getAirQualityIndex() {
+        return airQualityIndex;
+    }
+
+    public void setAirQualityIndex(AirQualityIndex airQualityIndex) {
+        this.airQualityIndex = airQualityIndex;
     }
 
     @Override

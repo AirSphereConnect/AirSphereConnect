@@ -63,27 +63,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User updateUser(Long id, User newUserData) {
-        //à vérifier l'utilité de CTRL pour l'existence d'un id avant de modifier, c'est l'utilisateur qui veut modifier (la base de données n'accepte pas les doublons)
-        if (userRepository.findById(id).isEmpty()) {
-            userRepository.findById(id).orElseThrow(() ->
-                    new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + id));
-        }
-        if (userRepository.findByUsername(newUserData.getUsername()).isPresent()) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + id));
+
+        if (newUserData.getUsername() != null && !newUserData.getUsername().equals(user.getUsername())
+                && userRepository.findByUsername(newUserData.getUsername()).isPresent()) {
             throw new GlobalException.BadRequestException("Le nom d'utilisateur existe déjà.");
         }
-        if (userRepository.findByEmail(newUserData.getEmail()).isPresent()) {
+
+        if (newUserData.getEmail() != null && !newUserData.getEmail().equals(user.getEmail())
+                && userRepository.findByEmail(newUserData.getEmail()).isPresent()) {
             throw new GlobalException.BadRequestException("L'email existe déjà.");
         }
 
-        User user = getUserById(id);
-        user.setUsername(newUserData.getUsername());
-        user.setEmail(newUserData.getEmail());
-        user.setPassword(encoder.encode(newUserData.getPassword()));
-        if (user.getAddress() != null) {
-            user.getAddress().setUser(user);
+        if (newUserData.getUsername() != null) user.setUsername(newUserData.getUsername());
+        if (newUserData.getEmail() != null) user.setEmail(newUserData.getEmail());
+        if (newUserData.getPassword() != null && !newUserData.getPassword().isEmpty()) {
+            user.setPassword(encoder.encode(newUserData.getPassword()));
         }
+
         return userRepository.save(user);
     }
+
 
     @Override
     public User deleteUser(Long id) {
@@ -98,4 +99,13 @@ public class UserServiceImpl implements UserService {
     public Optional<User> findByUsername(String username) throws UsernameNotFoundException {
         return Optional.empty();
     }
+
+    public boolean existsByUsername(String username) {
+        return userRepository.existsByUsername(username);
+    }
+
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
 }

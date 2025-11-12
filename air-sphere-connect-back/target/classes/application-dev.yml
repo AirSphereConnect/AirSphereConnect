@@ -15,8 +15,6 @@ spring:
       name: ${SPRING_SECURITY_USER_NAME:-admin}
       password: ${SPRING_SECURITY_USER_PASSWORD:-admin123}
       roles: ADMIN
-    filter:
-      dispatcher-types: REQUEST,ERROR
 
   jpa:
     hibernate:
@@ -46,22 +44,14 @@ cors:
 
 weather:
   api:
-    key: ${WEATHER_API_KEY:e935d0947600dd8f7247eefe1819751a}
+    key: e935d0947600dd8f7247eefe1819751a
 
 mailjet:
   api:
-    key: ${MAILJET_API_KEY:13f60c773c9d6b968a6415fa88e6affc}
-    secret: ${MAILJET_API_SECRET:361d897cbe85bd88f3ddfea48599a081}
+    key: 13f60c773c9d6b968a6415fa88e6affc
+    secret: 361d897cbe85bd88f3ddfea48599a081
 
 docker:
   compose:
     enabled: false
-    file: ../docker-compose.dev.yml
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-  endpoint:
-    health:
-      show-details: always
+    file: ../docker-compose.yml

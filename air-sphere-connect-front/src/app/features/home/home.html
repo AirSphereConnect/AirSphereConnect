@@ -1,1 +1,7 @@
-<p>home works!</p>
+<div>
+  @if (userRole === "GUEST"){
+    <span>Bienvenue invité</span>
+  } @else if (profile) {
+    <span>Bienvenue, {{ profile.user.username }}</span>
+  }
+</div>

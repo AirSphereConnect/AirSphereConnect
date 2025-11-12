@@ -6,9 +6,14 @@ import com.airSphereConnect.entities.Population;
 import com.airSphereConnect.repositories.CityRepository;
 import com.airSphereConnect.repositories.PopulationRepository;
 import jakarta.transaction.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.time.Year;
 import java.util.List;
 import java.util.Map;
@@ -19,17 +24,68 @@ import static com.airSphereConnect.configuration.WebClientConfig.POP_API_BASEURL
 
 @Service
 @Transactional
-public class PopulationSyncService {
+public class PopulationSyncService implements DataSyncService {
+
+    private static final Logger log = LoggerFactory.getLogger(PopulationSyncService.class);
 
     private final WebClient populationApiWebClient;
     private final CityRepository cityRepository;
     private final PopulationRepository populationRepository;
+
+    @Value("${app.api.population.enabled:true}")
+    private boolean enabled;
+
+    @Value("${app.api.population.sync-interval-hours:8760}")
+    private int syncIntervalHours; // 365 jours (1 an) par défaut
+
+    private LocalDateTime lastSync;
+    private int consecutiveErrors = 0;
 
     public PopulationSyncService(WebClient populationApiWebClient, CityRepository cityRepository,
                                  PopulationRepository populationRepository) {
         this.populationApiWebClient = populationApiWebClient;
         this.cityRepository = cityRepository;
         this.populationRepository = populationRepository;
+    }
+
+    @Override
+    public String getServiceName() {
+        return "POPULATION";
+    }
+
+    @Override
+    public void syncData() {
+        log.info("🔄 Début synchronisation des populations...");
+        try {
+            importPopulations();
+            lastSync = LocalDateTime.now();
+            consecutiveErrors = 0;
+            log.info("✅ [POPULATION] Sync terminée");
+        } catch (Exception e) {
+            consecutiveErrors++;
+            log.error("❌ [POPULATION] Erreur sync (tentative {}/3) : {}", consecutiveErrors, e.getMessage(), e);
+            throw new RuntimeException("Sync failed for POPULATION", e);
+        }
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return enabled && consecutiveErrors < 3;
+    }
+
+    @Override
+    public Duration getSyncInterval() {
+        return Duration.ofHours(syncIntervalHours);
+    }
+
+    @Override
+    public LocalDateTime getLastSync() {
+        return lastSync;
+    }
+
+    @Override
+    public int getConsecutiveErrors() {
+        return consecutiveErrors;
     }
 
 

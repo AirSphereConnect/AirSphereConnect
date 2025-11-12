@@ -25,7 +25,7 @@ public class AlertsController {
     }
 
     @GetMapping("/user/{userId}")
-    public List<AlertsDto> getUserAlertss(@PathVariable Long userId) {
+    public List<AlertsDto> getUserAlerts(@PathVariable Long userId) {
         return alertsService.getUserAlerts(userId);
     }
 }

@@ -1,1 +1,62 @@
-<p>post works!</p>
+@if (post()) {
+  <div class="card bg-base-200 shadow-xl hover:shadow-xl transition-all duration-300 mb-2">
+    <div class="card-body p-6">
+      <div class="flex items-start gap-4">
+        <!-- Contenu du post -->
+        <div class="flex-1 min-w-0">
+          <!-- En-tête du post -->
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <h4 class="font-semibold text-base-content">{{ post().user }}</h4>
+              <div class="badge badge-outline badge-sm ">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                {{ post().createdAt | date:'short' }}
+              </div>
+            </div>
+
+            <div class="dropdown dropdown-end">
+              <div tabindex="0" role="button" class="btn btn-ghost btn-xs">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
+                </svg>
+              </div>
+              <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-40">
+                <li><a>Citer</a></li>
+                <li><a>Répondre</a></li>
+                <li><a>Signaler</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Contenu du message -->
+          <div class="prose prose-sm max-w-none text-base-content mb-4">
+            <p class="whitespace-pre-wrap">{{ post().content }}</p>
+          </div>
+
+          <!-- Actions du post -->
+          <div class="flex items-center gap-4">
+            <app-button variant="ghost"
+                        shape="circle" (click)="onLikePost()" >
+              <app-icon
+                name="heart" [color]="onLike ? 'primary' : 'current'"
+                [filled]="post().isLiked" />
+            </app-button>
+
+              {{ post().isLiked ? 'Aimé' : 'J\'aime' }} ({{ post().likes }})
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="card bg-base-100 shadow-lg border border-base-300">
+    <div class="card-body p-6">
+      <div class="flex items-center gap-4">
+        <div class="loading loading-spinner loading-md"></div>
+        <p class="text-base-content/70 italic">Chargement du post...</p>
+      </div>
+    </div>
+  </div>
+}

@@ -17,7 +17,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+//@PreAuthorize("hasAnyRole('ADMIN', 'USER')")
 @RequestMapping("/api/weather")
 public class WeatherController {
 

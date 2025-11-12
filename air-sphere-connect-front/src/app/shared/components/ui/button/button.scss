@@ -1,0 +1,230 @@
+@import "tailwindcss";
+
+/* STRUCTURE */
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 font-medium transition-all duration-200 select-none;
+  border-radius: var(--radius-field);
+  cursor: pointer;
+  font-size: var(--fontsize);
+  padding: var(--btn-p);
+
+  line-height: 1;
+  @variant disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+/* COLOR */
+
+.btn-primary {
+  --btn-color: var(--color-primary-default);
+  --btn-hover: var(--color-primary-hover);
+  --btn-active: var(--color-primary-active);
+  --btn-content: var(--color-primary-content);
+}
+
+.btn-secondary {
+  --btn-color: var(--color-secondary-default);
+  --btn-hover: var(--color-secondary-hover);
+  --btn-active: var(--color-secondary-active);
+  --btn-content: var(--color-secondary-content);
+}
+
+.btn-accent {
+  --btn-color: var(--color-accent-default);
+  --btn-hover: var(--color-accent-hover);
+  --btn-active: var(--color-accent-active);
+  --btn-content: var(--color-accent-content);
+}
+
+.btn-info {
+  --btn-color: var(--color-info-default);
+  --btn-hover: var(--color-info-hover);
+  --btn-active: var(--color-info-active);
+  --btn-content: var(--color-info-content);
+}
+
+.btn-success {
+  --btn-color: var(--color-success-default);
+  --btn-hover: var(--color-success-hover);
+  --btn-active: var(--color-success-active);
+  --btn-content: var(--color-success-content);
+}
+
+.btn-warning {
+  --btn-color: var(--color-warning-default);
+  --btn-hover: var(--color-warning-hover);
+  --btn-active: var(--color-warning-active);
+  --btn-content: var(--color-warning-content);
+}
+
+.btn-error {
+  --btn-color: var(--color-error-default);
+  --btn-hover: var(--color-error-hover);
+  --btn-active: var(--color-error-active);
+  --btn-content: var(--color-error-content);
+}
+
+.btn-neutral {
+  --btn-color: var(--color-neutral-default);
+  --btn-hover: var(--color-neutral-hover);
+  --btn-active: var(--color-neutral-active);
+  --btn-content: var(--color-neutral-content);
+}
+
+
+/* VARIANTS*/
+
+/*  RAISED */
+.btn-raised {
+  background-color: var(--btn-color);
+  color: var(--btn-content);
+  border: none;
+  @apply shadow-md;
+
+  @variant hover {
+    background-color: var(--btn-hover);
+    @apply shadow-lg;
+  }
+
+  @variant active {
+    background-color: var(--btn-active);
+    @apply shadow-lg;
+  }
+
+  @variant disabled {
+    background-color: var(--btn-color);
+    opacity: 0.5;
+  }
+}
+
+/* BORDER */
+.btn-border {
+  background-color: transparent;
+  border: 1px solid var(--btn-color);
+  color: var(--btn-color);
+
+  @variant hover {
+    background-color: var(--btn-hover);
+    color: var(--btn-content);
+  }
+
+  @variant active {
+    background-color: var(--btn-active);
+    color: var(--btn-content);
+  }
+
+  @variant disabled {
+    opacity: 0.5;
+  }
+}
+
+/* Flat */
+.btn-ghost {
+  background-color: transparent;
+  color: var(--btn-color);
+  border-color: transparent;
+
+  @variant hover {
+    background-color: color-mix(in oklch, var(--btn-color) 10%, transparent);
+  }
+
+  @variant active {
+    background-color: color-mix(in oklch, var(--btn-color) 20%, transparent);
+  }
+
+  @variant disabled {
+    opacity: 0.5;
+  }
+}
+
+/* LINK */
+.btn-link {
+  background-color: transparent;
+  color: var(--btn-color);
+  text-decoration: underline;
+  border: none;
+  border-radius: 0;
+
+  @variant hover {
+    text-decoration: none;
+    color: var(--btn-hover);
+  }
+
+  @variant active {
+    color: var(--btn-active);
+  }
+
+  @variant disabled {
+    opacity: 0.5;
+  }
+}
+
+/* ACTIVE */
+.btn-active {
+  background-color: var(--btn-active);
+  color: var(--btn-content);
+}
+
+@layer components {
+  .btn-xs {
+    --size-field: 0.1875rem;
+    --btn-p: calc(var(--size-field) * 2) calc(var(--size-field) * 4);
+    font-size: 0.6875rem;
+    padding: var(--btn-p);
+    min-height: calc(var(--size-field) * 6); /* force la hauteur */
+  }
+
+  .btn-sm {
+    --size-field: 0.21875rem;
+    --btn-p: calc(var(--size-field) * 2.5) calc(var(--size-field) * 5);
+    font-size: 0.875rem;
+    padding: var(--btn-p);
+    min-height: calc(var(--size-field) * 6);
+  }
+
+  .btn-md {
+    --size-field: 0.25rem;
+    --btn-p: calc(var(--size-field) * 3) calc(var(--size-field) * 6);
+    font-size: 1rem;
+    padding: var(--btn-p);
+    min-height: calc(var(--size-field) * 6);
+  }
+
+  .btn-lg {
+    --size-field: 0.3125rem;
+    --btn-p: calc(var(--size-field) * 3.5) calc(var(--size-field) * 7);
+    font-size: 1.125rem;
+    padding: var(--btn-p);
+    min-height: calc(var(--size-field) * 6);
+  }
+
+  .btn-xl {
+    --size-field: 0.375rem;
+    --btn-p: calc(var(--size-field) * 4) calc(var(--size-field) * 8);
+    font-size: 1.25rem;
+    padding: var(--btn-p);
+    min-height: calc(var(--size-field) * 6);
+  }
+
+}
+
+@layer components {
+  .btn-wide {
+    @apply w-64 justify-center;
+  }
+
+  .btn-square {
+    @apply aspect-square p-0 justify-center;
+    width: 2rem;
+  }
+
+  .btn-circle {
+    @apply rounded-full aspect-square p-0 justify-center;
+    width: 2rem;
+  }
+}
+
+

@@ -1,1 +1,17 @@
-<p>header works!</p>
+<div class="flex justify-between items-center p-4">
+  <app-logo></app-logo>
+  <div class="flex flex-row gap-2 items-center">
+    <app-navbar [userRole]="userRole"></app-navbar>
+    <div class="tabs tabs-box">
+
+      <app-button variant="ghost" shape="circle" (click)="toggleTheme()">
+        <app-icon
+          [name]="isDarkTheme() ? 'sun' : 'darkMoon'"
+          color="current"
+          size="md"
+        />
+      </app-button>
+
+    </div>
+  </div>
+</div>

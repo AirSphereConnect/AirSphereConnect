@@ -17,7 +17,7 @@ services:
       - "${DB_PORT}:3306"
     volumes:
       - ${DB_VOLUME_NAME}:/var/lib/mysql
-      - ./config/database:/docker-entrypoint-initdb.d:ro
+      #- ./config/database:/docker-entrypoint-initdb.d:ro
     networks:
       - ${NETWORK_NAME}
     # ✅ Health check corrigé pour MariaDB
@@ -63,19 +63,19 @@ services:
       - .env
     environment:
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
-      SPRING_SCHEDULING_ENABLED: "false"
+      SPRING_SCHEDULING_ENABLED: "true"
     volumes:
       # ✅ Code source Java
-      - ./air-sphere-connect-back/src:/app/src:ro
+      - ./air-sphere-connect-back/src:/app/src
 
       # ✅ Configuration Maven
-      - ./air-sphere-connect-back/pom.xml:/app/pom.xml:ro
+      - ./air-sphere-connect-back/pom.xml:/app/pom.xml
 
       # ✅ Cache Maven
       - maven_cache:/root/.m2
     ports:
       - "${BACKEND_PORT}:8080"
-#      - "${DEBUG_PORT}:5005"
+    #      - "${DEBUG_PORT}:5005"
     depends_on:
       mariadb:
         condition: service_healthy
@@ -101,13 +101,13 @@ services:
       API_URL: ${API_URL}
       NODE_ENV: ${NODE_ENV:-development}
     ports:
-      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+      - "${FRONTEND_PORT}:4200"
     volumes:
       # ✅ Angular : uniquement src/ et config
-      - ./air-sphere-connect-front/src:/app/src:ro
-      - ./air-sphere-connect-front/angular.json:/app/angular.json:ro
-      - ./air-sphere-connect-front/package.json:/app/package.json:ro
-#      - node_modules:/app/node_modules
+      - ./air-sphere-connect-front/src:/app/src
+      - ./air-sphere-connect-front/angular.json:/app/angular.json
+      - ./air-sphere-connect-front/package.json:/app/package.json
+    #      - node_modules:/app/node_modules
     depends_on:
       backend:
         condition: service_healthy
@@ -125,7 +125,7 @@ services:
 # VOLUMES
 # ==============================
 volumes:
-  air-sphere-connect_db_data:
+  air_sphere_connect_db_data:
     name: ${DB_VOLUME_NAME}
     driver: local
   maven_cache:
@@ -135,6 +135,6 @@ volumes:
 # NETWORKS
 # ==============================
 networks:
-  air-sphere-connect-network:
+  air_sphere_connect_network:
     name: ${NETWORK_NAME}
     driver: bridge

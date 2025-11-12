@@ -42,7 +42,7 @@ public class AirQualityIndex {
     private String source;
 
     @NotNull(message = "{airquality.areaCode.required}")
-    @Column(name = "area_code", unique = true)
+    @Column(name = "area_code", nullable = false)
     private String areaCode;
 
     @NotBlank(message = "{airquality.areaName.required}")
@@ -61,7 +61,7 @@ public class AirQualityIndex {
     @Column(name = "measured_at", nullable = false)
     private LocalDateTime measuredAt;
 
-    @OneToMany(mappedBy = "airQualityIndex")
+    @OneToMany(mappedBy = "airQualityIndex", fetch = FetchType.LAZY)
     private List<City> cities = new ArrayList<>();
 
     public AirQualityIndex() {
@@ -159,6 +159,14 @@ public class AirQualityIndex {
         this.alert = alert;
     }
 
+    public List<City> getCities() {
+        return cities;
+    }
+
+    public void setCities(List<City> cities) {
+        this.cities = cities;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -170,5 +178,4 @@ public class AirQualityIndex {
     public int hashCode() {
         return Objects.hashCode(id);
     }
-
 }

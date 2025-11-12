@@ -1,0 +1,55 @@
+<!-- Modal backdrop -->
+@if (isOpen()) {
+  <div
+    class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
+    <!-- Contenu de la modal -->
+    <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md">
+      <h3 class="text-lg font-bold mb-4">
+        {{ editingFavoriteId ? 'Modifier le favori' : 'Ajouter un favori' }}
+      </h3>
+
+      <form [formGroup]="favoritesForm" (ngSubmit)="submitForm()">
+        <label class="block mb-2 font-semibold">Catégorie</label>
+        <input formControlName="favoriteCategory" class="border p-2 rounded-2xl" />
+        <!--
+        Il y a un problème pour l'affichage de la donnée pour une modification (récupérer les données depuis la ligne à modifier)
+        <app-input formControlName="favoriteCategory" placeholder="Catégorie" class="color-black"></app-input>
+        -->
+
+        <label class="block mt-4 mb-2 font-semibold">Ville</label>
+        <input formControlName="cityName" (input)="onCityInput($event)" class="border p-2 rounded-2xl" />
+
+        <!--
+        Il y a un problème pour l'affichage de la donnée pour une modification (récupérer les données depuis la ligne à modifier)
+        <app-input
+          formControlName="cityName"
+          placeholder="Nom de la ville"
+          (input)="onCityInput($event)"
+        ></app-input>
+-->
+        <div class="bg-white rounded mt-2 max-h-32 overflow-y-auto">
+          @if (citySuggestions) {
+            @for (city of citySuggestions; track city) {
+              <button
+                type="button"
+                class="block w-full text-left px-2 py-1 hover:bg-gray-200"
+                (click)="selectCity(city)"
+              >
+                {{ city.name }}
+              </button>
+            }
+          }
+        </div>
+
+        <p class="text-red-700 mt-2" [hidden]="!errorMessage">{{ errorMessage }}</p>
+
+        <div class="flex justify-end gap-2 mt-4">
+          <button type="button" class="btn btn-outline" (click)="closeModal()">Annuler</button>
+          <button type="submit" class="btn btn-primary">
+            {{ editingFavoriteId ? 'Modifier' : 'Ajouter' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

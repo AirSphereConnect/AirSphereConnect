@@ -2,19 +2,37 @@ package com.airSphereConnect.mapper;
 
 import com.airSphereConnect.dtos.FavoritesAlertsDto;
 import com.airSphereConnect.entities.*;
+import org.springframework.stereotype.Component;
 
+@Component
 public class FavoritesAlertsMapper {
-    // Frontend -> Backend
-    public static FavoritesAlerts toEntity(FavoritesAlertsDto dto) {
+
+    // Frontend → Backend
+    public static FavoritesAlerts toEntity(Long userId, FavoritesAlertsDto dto) {
         if (dto == null) return null;
 
         FavoritesAlerts entity = new FavoritesAlerts();
+
+        User user = new User();
+        user.setId(userId);
+        entity.setUser(user);
+
         entity.setId(dto.getId());
-        entity.setEnabled(dto.getIsEnabled());
+        entity.setEnabled(Boolean.TRUE.equals(dto.getEnabled()));
+
+
+        // City
+        if (dto.getCityId() != null) {
+            City city = new City();
+            city.setId(dto.getCityId());
+            entity.setCity(city);
+        }
+
 
         return entity;
     }
-    // Backend -> Frontend
+
+    // Backend → Frontend
     public static FavoritesAlertsDto toDto(FavoritesAlerts entity) {
         if (entity == null) return null;
 
@@ -22,11 +40,11 @@ public class FavoritesAlertsMapper {
         dto.setId(entity.getId());
 
         if (entity.getUser() != null) {
-            dto.setUserId(entity.getUser().getId());
+            dto.setUser(entity.getUser().getId());
         }
 
         if (entity.getCity() != null) {
-            dto.setCityId(entity.getCity().getId());
+            dto.setCityName(entity.getCity().getName());
         }
 
         if (entity.getDepartment() != null) {
@@ -36,11 +54,11 @@ public class FavoritesAlertsMapper {
         if (entity.getRegion() != null) {
             dto.setRegionId(entity.getRegion().getId());
         }
-        dto.setEnabled(entity.getIsEnabled());
+
+        dto.setEnabled(entity.isEnabled());
         dto.setCreatedAt(entity.getCreatedAt());
         dto.setUpdatedAt(entity.getUpdatedAt());
 
         return dto;
     }
-
 }
