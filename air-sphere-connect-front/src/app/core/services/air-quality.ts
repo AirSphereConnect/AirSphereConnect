@@ -2,11 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { AirQualityComplete, AirQualityIndex, AirQualityMeasurement } from '../models/data.model';
+import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class AirQualityService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/air-quality';
+  private api = inject(ApiConfigService);
+  private apiUrl = `${this.api.apiUrl}/air-quality`;
 
   getComplete(cityName: string): Observable<AirQualityComplete> {
     return this.http

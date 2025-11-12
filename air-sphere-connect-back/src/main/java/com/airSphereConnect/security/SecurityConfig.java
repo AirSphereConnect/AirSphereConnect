@@ -3,6 +3,7 @@ package com.airSphereConnect.security;
 import com.airSphereConnect.security.jwt.JwtRequestFilter;
 import com.airSphereConnect.services.CustomUserDetailsService;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -21,6 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.ForwardedHeaderFilter;
 
 import java.util.List;
 
@@ -30,6 +32,9 @@ public class SecurityConfig {
 
     private final CustomUserDetailsService userDetailsService;
     private final JwtRequestFilter jwtRequestFilter;
+
+    @Value("${cors.allowed-origins}")
+    private String corsAllowedOrigins;
 
     public SecurityConfig(CustomUserDetailsService userDetailsService, JwtRequestFilter jwtRequestFilter) {
         this.userDetailsService = userDetailsService;
@@ -54,7 +59,6 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // active CORS avec configuration source
-                //TODO activer csrf pour la production (sinon problème aux attaques XSRF → récupération du cookie dans le header)
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -65,11 +69,12 @@ public class SecurityConfig {
                                 "/api/guest-token",
                                 "/api/login",
                                 "/api/profile",
-                                "api/logout",
                                 "/api/users/check",
                                 "/api/cities/search-name").permitAll()
                         .requestMatchers(HttpMethod.POST,
-                                "/api/users/signup").permitAll()
+                                "/api/logout",
+                                "/api/users/signup",
+                                "/api/admin/historical-data/**").permitAll() // Chargement historique ATMO (usage ponctuel)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         .requestMatchers("/api/home",
                                 "/api/weather/**",
@@ -100,7 +105,8 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Origine frontend Angular explicitement déclarée (pas de wildcard avec credentials)
-        configuration.setAllowedOrigins(List.of("http://localhost:4200"));
+        // Lecture depuis application.yml via ${cors.allowed-origins}
+        configuration.setAllowedOrigins(List.of(corsAllowedOrigins));
 
         // Méthodes HTTP autorisées
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
@@ -119,6 +125,11 @@ public class SecurityConfig {
         // Appliquer la configuration pour les endpoints API
         source.registerCorsConfiguration("/api/**", configuration);
         return source;
+    }
+
+    @Bean
+    public ForwardedHeaderFilter forwardedHeaderFilter() {
+        return new ForwardedHeaderFilter();
     }
 
 }
