@@ -25,14 +25,18 @@ public class JwtServiceImpl implements JwtService {
     private final SecretKey secretKey;
     private final CustomUserDetailsService userDetailsService;
 
-    //TODO il faut mette les durée dans la variable d'environnement
-    // Durées en millisecondes
-    public static final long ACCESS_TOKEN_VALIDITY = 2 * 60 * 60 * 1000;   // 2 heures
-    private static final long REFRESH_TOKEN_VALIDITY = 7 * 24 * 60 * 60 * 1000; // 7 jours
+    // Durées des tokens en millisecondes (configurables via application.yml)
+    private final long accessTokenValidity;
+    private final long refreshTokenValidity;
 
-    public JwtServiceImpl(@Value("${jwt.secret:UneCleSecreteSuperLongueEtComplexePourTestUnique1234567890}") String secret,
-                          CustomUserDetailsService userDetailsService) {
+    public JwtServiceImpl(
+            @Value("${jwt.secret:UneCleSecreteSuperLongueEtComplexePourTestUnique1234567890}") String secret,
+            @Value("${jwt.access-token-validity:7200000}") long accessTokenValidity,  // 2h par défaut
+            @Value("${jwt.refresh-token-validity:604800000}") long refreshTokenValidity, // 7j par défaut
+            CustomUserDetailsService userDetailsService) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
+        this.accessTokenValidity = accessTokenValidity;
+        this.refreshTokenValidity = refreshTokenValidity;
         this.userDetailsService = userDetailsService;
     }
 
@@ -84,7 +88,7 @@ public class JwtServiceImpl implements JwtService {
                 .collect(Collectors.toList()));
 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY);
+        Date expiryDate = new Date(now.getTime() + accessTokenValidity);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -101,7 +105,7 @@ public class JwtServiceImpl implements JwtService {
         claims.put("roles", List.of("ROLE_GUEST"));
 
         Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + ACCESS_TOKEN_VALIDITY);
+        Date expiryDate = new Date(now.getTime() + accessTokenValidity);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -134,11 +138,11 @@ public class JwtServiceImpl implements JwtService {
     // Getter utilitaires pour configurer les cookies etc.
     @Override
     public int getAccessTokenExpirySeconds() {
-        return (int) (ACCESS_TOKEN_VALIDITY / 1000);
+        return (int) (accessTokenValidity / 1000);
     }
 
     @Override
     public int getRefreshTokenExpirySeconds() {
-        return (int) (REFRESH_TOKEN_VALIDITY / 1000);
+        return (int) (refreshTokenValidity / 1000);
     }
 }

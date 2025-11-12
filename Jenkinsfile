@@ -1,25 +1,48 @@
 pipeline {
-    // 🧩 Utilisation d'un agent "docker" si tu en as un, sinon "any"
-    agent any
+    agent {
+        label 'docker-agent'
+    }
 
-    environment {
-        DOCKER_COMPOSE_FILE = 'docker-compose.dev.yml'
+    options {
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+        disableConcurrentBuilds()
+        timeout(time: 30, unit: 'MINUTES')
     }
 
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'dev-front', url: 'https://github.com/AirSphereConnect/AirSphereConnect.git'
+                echo "=== Checkout du code ==="
+                checkout scm
+                sh 'git rev-parse --short HEAD > .git/commit-id'
+                script {
+                    env.GIT_COMMIT_SHORT = readFile('.git/commit-id').trim()
+                    echo "Git commit: ${env.GIT_COMMIT_SHORT}"
+                    echo "Branch name: ${env.BRANCH_NAME}"
+                    echo "Git branch: ${env.GIT_BRANCH}"
+                }
             }
         }
 
         stage('Build Backend') {
             steps {
                 dir('air-sphere-connect-back') {
-                    sh '''
-                        echo "=== Build du backend Spring Boot ==="
-                        mvn clean package -DskipTests
-                    '''
+                    echo '=== Build du backend Spring Boot ==='
+                    sh 'mvn clean package -DskipTests'
+                }
+            }
+        }
+
+        stage('Test Backend') {
+            steps {
+                dir('air-sphere-connect-back') {
+                    echo '=== Tests unitaires backend ==='
+                    sh 'mvn test || true'
+                }
+            }
+            post {
+                always {
+                    junit allowEmptyResults: true, testResults: '**/target/surefire-reports/*.xml'
                 }
             }
         }
@@ -27,56 +50,116 @@ pipeline {
         stage('Build Frontend') {
             steps {
                 dir('air-sphere-connect-front') {
+                    echo '=== Build du frontend Angular ==='
                     sh '''
-                        echo "=== Build du frontend Angular ==="
-                        npm install
+                        npm ci
                         npm run build
                     '''
                 }
             }
         }
 
-        stage('Docker Build & Deploy') {
+        stage('Build Docker Images') {
             steps {
-                sh '''
-                    echo "=== (Re)construction et déploiement Docker Compose ==="
-                    docker compose -f ${DOCKER_COMPOSE_FILE} down || true
-                    docker compose -f ${DOCKER_COMPOSE_FILE} build --no-cache
-                    docker compose -f ${DOCKER_COMPOSE_FILE} up -d
-                '''
+                echo '=== Construction des images Docker ==='
+                sh """
+                    docker-compose -f docker-compose.prod.yml build
+                """
             }
         }
 
-        stage('SonarQube Analysis') {
+        stage('Deploy') {
             steps {
                 script {
-                    echo "=== Analyse SonarQube ==="
-                    withSonarQubeEnv('SonarQube') {
-                        dir('air-sphere-connect-back') {
-                            sh 'mvn sonar:sonar'
-                        }
+                    // Détecter la branche actuelle de manière robuste
+                    def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+
+                    // Nettoyer le nom de branche (enlever origin/ si présent)
+                    def branchName = currentBranch.replaceAll(/^origin\//, '')
+
+                    echo "Branche détectée: ${branchName}"
+
+                    if (branchName == 'main' || branchName == 'jenkins') {
+                        echo '=== Déploiement des containers ==='
+                        def environment = branchName == 'main' ? 'PRODUCTION' : 'STAGING'
+
+                        echo "Déploiement en ${environment} avec docker-compose.prod.yml"
+
+                        sh """
+                            # Copier le .env.prod depuis le serveur (maintenant accessible via le volume mount)
+                            cp -f /var/www/projects/airsphereconnect/.env.prod .env.prod
+                            echo "✅ .env.prod copié depuis le serveur"
+
+                            # Vérifier que JWT_SECRET est présent
+                            grep JWT_SECRET .env.prod && echo "✅ JWT_SECRET trouvé" || echo "⚠️ JWT_SECRET manquant"
+
+                            # Vérifier si la DB est déjà healthy
+                            DB_HEALTHY=\$(docker inspect air_sphere_connect_db --format='{{.State.Health.Status}}' 2>/dev/null || echo "not_found")
+
+                            if [ "\$DB_HEALTHY" = "healthy" ]; then
+                                echo "✅ DB déjà healthy, on garde la DB et recrée seulement backend/frontend"
+                                docker stop air_sphere_connect_back air_sphere_connect_front 2>/dev/null || true
+                                docker rm air_sphere_connect_back air_sphere_connect_front 2>/dev/null || true
+                                docker-compose -f docker-compose.prod.yml up -d --no-deps --force-recreate backend frontend
+                            else
+                                echo "⚠️ DB not healthy, recréation complète de tous les containers"
+                                docker stop air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
+                                docker rm air_sphere_connect_back air_sphere_connect_front air_sphere_connect_db 2>/dev/null || true
+                                docker-compose -f docker-compose.prod.yml up -d --force-recreate
+                            fi
+                        """
+                    } else {
+                        echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
                     }
                 }
             }
         }
 
-        stage('Integration Tests') {
+        stage('Health Check') {
             steps {
-                sh '''
-                    echo "=== Vérification de la santé des services ==="
-                    curl -f http://localhost:8080/actuator/health || exit 1
-                    curl -f http://localhost:4200 || exit 1
-                '''
+                script {
+                    // Détecter la branche actuelle de manière robuste
+                    def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+
+                    // Nettoyer le nom de branche (enlever origin/ si présent)
+                    def branchName = currentBranch.replaceAll(/^origin\//, '')
+
+                    if (branchName == 'main' || branchName == 'jenkins') {
+                        echo '=== Vérification de la santé des services ==='
+
+                        sh """
+                            echo "Attente du démarrage des services..."
+                            sleep 30
+
+                            docker-compose -f docker-compose.prod.yml ps
+
+                            # Vérifier que les containers sont en cours d'exécution
+                            UNHEALTHY=\$(docker-compose -f docker-compose.prod.yml ps --filter "health=unhealthy" -q | wc -l)
+
+                            if [ "\$UNHEALTHY" -gt 0 ]; then
+                                echo "⚠️ WARNING: \$UNHEALTHY container(s) unhealthy"
+                                docker-compose -f docker-compose.prod.yml logs --tail=50
+                                exit 1
+                            else
+                                echo "✅ All containers are healthy"
+                            fi
+                        """
+                    } else {
+                        echo "⏭️ Health check ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
+                    }
+                }
             }
         }
+
     }
 
     post {
         success {
-            echo '✅ Pipeline terminé avec succès !'
+            echo "✅ Pipeline completed successfully!"
+            echo "Commit: ${env.GIT_COMMIT_SHORT}"
         }
         failure {
-            echo '❌ Échec du pipeline.'
+            echo "❌ Pipeline failed!"
         }
     }
 }

@@ -2,6 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {Post} from '../models/post.model';
 import {map, Observable, tap} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
+import { ApiConfigService } from './api';
 
 type ReactionType = 'LIKE' | 'DISLIKE';
 
@@ -9,8 +10,9 @@ type ReactionType = 'LIKE' | 'DISLIKE';
   providedIn: 'root'
 })
 export class PostService {
-  private apiUrlPosts = "http://localhost:8080/api/forum-posts";
   private http = inject(HttpClient);
+  private api = inject(ApiConfigService);
+  private apiUrlPosts = `${this.api.apiUrl}/forum-posts`;
 
 
   getPosts(currentUserId?: number): Observable<Post[]> {

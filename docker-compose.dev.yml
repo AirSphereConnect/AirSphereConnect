@@ -125,7 +125,7 @@ services:
 # VOLUMES
 # ==============================
 volumes:
-  air-sphere-connect_db_data:
+  air_sphere_connect_db_data:
     name: ${DB_VOLUME_NAME}
     driver: local
   maven_cache:
@@ -135,6 +135,6 @@ volumes:
 # NETWORKS
 # ==============================
 networks:
-  air-sphere-connect-network:
+  air_sphere_connect_network:
     name: ${NETWORK_NAME}
     driver: bridge

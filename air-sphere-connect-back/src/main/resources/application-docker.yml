@@ -1,9 +1,9 @@
 # Profil Docker
 spring:
   datasource:
-    url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${DB_NAME:air-sphere-connect}
-    username: ${DB_USER:air-sphere-connect_user}
-    password: ${DB_PASSWORD:userpass123}
+    url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${DB_NAME:air_sphere_connect}
+    username: ${DB_USER:air_sphere_connect_user}
+    password: ${DB_PASSWORD:PassASC@34Diginamic!}
     driver-class-name: org.mariadb.jdbc.Driver
 
   docker:

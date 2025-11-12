@@ -2,11 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { PopulationData } from '../models/data.model';
+import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class PopulationService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/history';
+  private api = inject(ApiConfigService);
+  private apiUrl = `${this.api.apiUrl}/history`;
 
   getHistory(cityName: string): Observable<PopulationData[]> {
     return this.http
