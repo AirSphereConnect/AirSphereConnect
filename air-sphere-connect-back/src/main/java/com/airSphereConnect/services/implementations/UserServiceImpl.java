@@ -6,6 +6,7 @@ import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.repositories.UserRepository;
 import com.airSphereConnect.services.UserService;
+import jakarta.transaction.Transactional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByUsername(String username) {
-        return userRepository.findByUsername(username)
+        return userRepository.findByUsernameAndDeletedAtIsNull(username)
                 .orElseThrow(() ->
                         new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec le username : " + username));
     }
@@ -49,10 +50,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public User createUser(User user) {
         //à vérifier l'utilité de ctrl l'existance d'un id avant de créer (la base de donnée n'accepte pas les doublons
-        if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+
+        if (userRepository.existsByUsernameAndDeletedAtIsNull(user.getUsername())) {
             throw new GlobalException.BadRequestException("Le nom d'utilisateur existe déjà.");
         }
-        if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        if (userRepository.existsByEmailAndDeletedAtIsNull(user.getEmail())) {
             throw new GlobalException.BadRequestException("L'email existe déjà.");
         }
 
@@ -70,12 +72,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + id));
 
         if (newUserData.getUsername() != null && !newUserData.getUsername().equals(user.getUsername())
-                && userRepository.findByUsername(newUserData.getUsername()).isPresent()) {
+                && userRepository.findByUsernameAndDeletedAtIsNull(newUserData.getUsername()).isPresent()) {
             throw new GlobalException.BadRequestException("Le nom d'utilisateur existe déjà.");
         }
 
         if (newUserData.getEmail() != null && !newUserData.getEmail().equals(user.getEmail())
-                && userRepository.findByEmail(newUserData.getEmail()).isPresent()) {
+                && userRepository.findByEmailAndDeletedAtIsNull(newUserData.getEmail()).isPresent()) {
             throw new GlobalException.BadRequestException("L'email existe déjà.");
         }
 
@@ -88,14 +90,15 @@ public class UserServiceImpl implements UserService {
         return userRepository.save(user);
     }
 
-
+    @Transactional
     @Override
     public UserResponseDto deleteUser(Long id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + id));
         user.softDelete();
+        System.out.println("DEBUG before save deletedAt : " + user.getDeletedAt());
         User saved = userRepository.save(user);
-        System.out.println("DEBUG-DELETE id USER : " +saved.getUsername());
+        System.out.println("DEBUG after save deletedAt : " + saved.getDeletedAt());
         return UserMapper.toDto(saved);
     }
 

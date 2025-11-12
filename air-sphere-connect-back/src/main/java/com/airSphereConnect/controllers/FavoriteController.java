@@ -47,7 +47,7 @@ public class FavoriteController {
             @RequestBody FavoriteDto favoriteDto,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
+        User user = userRepository.findByUsernameAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
 
         FavoriteDto created = favoriteService.createFavorite(user.getId(), favoriteDto);

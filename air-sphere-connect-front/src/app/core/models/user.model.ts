@@ -21,6 +21,7 @@ export interface User {
   email: string;
   role: string;
   address: {
+    id: number;
     street: string;
     city: {
       name: string;

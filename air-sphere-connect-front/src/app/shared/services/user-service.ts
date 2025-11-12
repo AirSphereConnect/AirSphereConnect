@@ -118,13 +118,10 @@ export class UserService {
 
 
   deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/delete?id=${id}`, { withCredentials: true }).pipe(
-      tap(() => setTimeout(() => window.location.reload(), 5))
+    return this.http.delete<void>(`${this.apiUrl}/users?id=${id}`, { withCredentials: true }).pipe(
+      tap(()  => this.fetchUserProfile())
     );
   }
-
-
-
 
   editAddress(id: number | null, payload: any) {
     return this.http.put(`${this.apiUrl}/address/${id}`, payload, { withCredentials: true });

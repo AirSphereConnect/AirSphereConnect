@@ -70,11 +70,16 @@ export class UserDashboard {
 
   /** ✏️ Ouvre la modale adresse */
   editAddress() {
-    if (!this.user || !this.user.address) return;
+    console.log('editAddress called with user:', this.user);
+    if (!this.user || !this.user.address) {
+      console.warn('editAddress aborted: user or address missing');
+      return;
+    }
     this.editingUserId = this.user.id;
     this.initialAddressData = this.user.address;
     this.isAddressModalOpen.set(true);
   }
+
 
   /** 🔒 Ferme la modale user */
   onUserModalClose() {
@@ -96,10 +101,13 @@ export class UserDashboard {
     this.isAddressModalOpen.set(false);
   }
 
-  deleteUser(userId: number, username: string) {
-    this.userService.deleteUser(userId).subscribe({
+  deleteUser(userId: number) {
+    console.log('deleteUser called with id:', userId);
+    this.userService.deleteUser(userId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => {
-        console.log('User deleted' + username);
+        console.log('User deleted');
         this.router.navigate(['/home']);
       },
       error: err => {

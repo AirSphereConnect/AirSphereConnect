@@ -1,10 +1,22 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
+import {
+  Component, DestroyRef,
+  EventEmitter,
+  inject,
+  Input,
+  numberAttribute,
+  OnChanges,
+  OnInit,
+  Output,
+  signal
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { UserService } from '../../../services/user-service';
 import { CityService } from '../../../../core/services/city';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import {Button} from '../button/button';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
+import {User} from '../../../../core/models/user.model';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
   selector: 'app-address-form',
@@ -14,7 +26,7 @@ import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 })
 export class AddressForm implements OnChanges {
   @Input() isOpen = signal(false);
-  @Input() editingUserId!: number | null;
+  @Input({transform: numberAttribute}) editingUserId!: number | undefined;
   @Input() addressData: any = null;
   @Output() close = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
@@ -23,14 +35,15 @@ export class AddressForm implements OnChanges {
   citySuggestions: any[] = [];
   selectedCityId: number | null = null;
 
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
+  private readonly cityService = inject(CityService);
+
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
-  constructor(
-    private fb: FormBuilder,
-    private userService: UserService,
-    private cityService: CityService
-  ) {
+  constructor() {
     this.addressForm = this.fb.group({
       street: ['', Validators.required],
       cityName: ['', Validators.required],
@@ -78,9 +91,11 @@ export class AddressForm implements OnChanges {
       street: this.addressForm.get('street')?.value,
       city: { id: this.selectedCityId }
     };
-    console.log("user" + this.editingUserId)
+    console.log("user id adresse" + this.addressData.id);
 
-    this.userService.editAddress(this.editingUserId, payload).subscribe({
+    this.userService.editAddress(this.addressData.id, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => {
         this.isLoading.set(false);
         this.updated.emit();

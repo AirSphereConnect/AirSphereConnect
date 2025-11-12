@@ -3,7 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  inject,
+  inject, Input,
   OnInit,
   TemplateRef,
   ViewChild
@@ -16,11 +16,12 @@ import {UserDashboard} from '../user/users';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ThreadListComponent} from '../../../forum/components/thread-list/thread-list';
 import {Favorites} from '../favorites/favorites';
+import {Alerts} from '../alerts/alerts';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterOutlet, UserDashboard, Tab, ThreadListComponent, Favorites],
+  imports: [RouterOutlet, UserDashboard, Tab, ThreadListComponent, Favorites, Alerts],
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss']
 })
@@ -28,8 +29,8 @@ import {Favorites} from '../favorites/favorites';
 export class Profile implements OnInit, AfterViewInit {
   private readonly userService = inject(UserService);
   private readonly cdr = inject(ChangeDetectorRef);
-
   private readonly destroyRef = inject(DestroyRef);
+
   user: User | null = null;
 
   @ViewChild('profilUser', { static: true }) profilUser!: TemplateRef<unknown>;

@@ -24,11 +24,11 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé : " + username));
+        User user = userRepository.findByUsernameAndDeletedAtIsNull(username)
+                .orElseThrow(() -> new UsernameNotFoundException("Utilisateur non trouvé"));
 
-        if (!user.isEnabled()) {
-            throw new DisabledException("Compte utilisateur désactivé ou supprimé.");
+        if (user.getDeletedAt() != null) {
+            throw new DisabledException("Compte utilisateur supprimé");
         }
         // Log utilisateur chargé
         System.out.println("User loaded for authentication: " + user.getUsername());

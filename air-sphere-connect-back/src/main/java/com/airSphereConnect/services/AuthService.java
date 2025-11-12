@@ -54,22 +54,9 @@ public class AuthService {
 
     public ResponseEntity<?> DeleteUser(Long id,
                                         HttpServletRequest request, HttpServletResponse response) {
-        logger.info("DeleteUser appelé avec id={}", id);
 
-        UserResponseDto delectedUser = userService.deleteUser(id);
+        userService.deleteUser(id);
 
-        boolean delectedUserChanged = delectedUser != null;
-
-        if (delectedUserChanged) {
-            logger.info("Utilisateur supprimé, appel de getUserProfile");
-
-            ResponseEntity<?> profileResponse = homeController.getUserProfile(request, response);
-
-            logger.info("getUserProfile a répondu avec le status {}", profileResponse.getStatusCode());
-            return profileResponse;
-        }
-
-        logger.info("Pas de suppression utilisateur, retour OK sans contenu");
         return ResponseEntity.ok(null);
     }
 

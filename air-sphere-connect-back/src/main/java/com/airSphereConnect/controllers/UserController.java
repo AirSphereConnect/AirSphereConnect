@@ -112,7 +112,7 @@ public class UserController {
                                         HttpServletRequest request,
                                         HttpServletResponse response) {
 
-        User currentUser = userRepository.findByUsername(userDetails.getUsername())
+        User currentUser = userRepository.findByUsernameAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
 
         if (!currentUser.getId().equals(id)) {
@@ -128,14 +128,38 @@ public class UserController {
 
     // Supprimer un utilisateur
     @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @DeleteMapping("/users")
+    @DeleteMapping
     public ResponseEntity<Void> deleteUser(@RequestParam Long id, HttpServletRequest request,
                                            HttpServletResponse response) {
+
+        // Récupérer token JWT depuis cookie
+        String jwtToken = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("ACCESS_TOKEN".equals(cookie.getName())) {
+                    jwtToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
+        System.out.println("JWT Token reçu : " + jwtToken);
+
+        // Récupérer username depuis contexte sécurité Spring
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null && auth.isAuthenticated()) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof UserDetails) {
+                String username = ((UserDetails) principal).getUsername();
+                System.out.println("Utilisateur authentifié : " + username);
+            }
+        }
+
         userService.deleteUser(id);
 
         // Suppression des cookies côté réponse (directement)
         response.addCookie(cookieService.createCookie("ACCESS_TOKEN", jwtService.generateGuestToken()));
         response.addCookie(cookieService.deleteCookie("REFRESH_TOKEN"));
+
         // Invalider session et vider contexte
         if (request.getSession(false) != null) {
             request.getSession(false).invalidate();
@@ -144,6 +168,7 @@ public class UserController {
 
         return ResponseEntity.noContent().build();
     }
+
 
 
 }

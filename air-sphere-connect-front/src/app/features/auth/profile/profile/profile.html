@@ -13,8 +13,13 @@
   </ng-template>
 
   <ng-template #favorites>
-    <app-favorites></app-favorites>
+    <app-favorites [user]="user"></app-favorites>
   </ng-template>
+
+  <ng-template #alerts>
+    <app-alerts [user]="user"></app-alerts>
+  </ng-template>
+
   <router-outlet></router-outlet>
 
 </div>
