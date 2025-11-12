@@ -68,7 +68,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         if (city.getInseeCode() != null) {
             measurement = measurementRepository
-                    .findTopByInseeCodeOrderByMeasuredAtDesc(city.getInseeCode())
+                    .findTopByStation_City_InseeCodeOrderByMeasuredAtDesc(city.getInseeCode())
                     .orElse(null);
 
             if (measurement != null) {
@@ -78,7 +78,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         if (measurement == null && city.getAreaCode() != null) {
             measurement = measurementRepository
-                    .findTopByAreaCodeOrderByMeasuredAtDesc(city.getAreaCode())
+                    .findTopByStation_City_AreaCodeOrderByMeasuredAtDesc(city.getAreaCode())
                     .orElse(null);
 
             if (measurement != null) {
@@ -127,7 +127,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         if (city.getInseeCode() != null) {
             measurements = measurementRepository
-                    .findByInseeCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+                    .findByStation_City_InseeCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
                             city.getInseeCode(), period[0], period[1]);
 
             if (!measurements.isEmpty()) {
@@ -138,7 +138,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         if ((measurements == null || measurements.isEmpty()) && city.getAreaCode() != null) {
             measurements = measurementRepository
-                    .findByAreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+                    .findByStation_City_AreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
                             city.getAreaCode(), period[0], period[1]);
 
             if (!measurements.isEmpty()) {
@@ -221,14 +221,14 @@ public class AirQualityServiceImpl implements AirQualityService {
         List<AirQualityMeasurement> measurements = null;
 
         if (city.getInseeCode() != null) {
-            measurements = measurementRepository.findByInseeCodeOrderByMeasuredAtDesc(city.getInseeCode());
+            measurements = measurementRepository.findByStation_City_InseeCodeOrderByMeasuredAtDesc(city.getInseeCode());
             if (!measurements.isEmpty()) {
                 log.info("📊 {} mesures trouvées pour {} via inseeCode", measurements.size(), cityName);
             }
         }
 
         if ((measurements == null || measurements.isEmpty()) && city.getAreaCode() != null) {
-            measurements = measurementRepository.findByAreaCodeOrderByMeasuredAtDesc(city.getAreaCode());
+            measurements = measurementRepository.findByStation_City_AreaCodeOrderByMeasuredAtDesc(city.getAreaCode());
             if (!measurements.isEmpty()) {
                 log.info("📊 {} mesures trouvées pour {} via areaCode (fallback)", measurements.size(), cityName);
             }
