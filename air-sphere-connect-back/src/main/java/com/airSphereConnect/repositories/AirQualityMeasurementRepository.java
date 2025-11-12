@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.lang.ScopedValue;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -32,4 +33,6 @@ public interface AirQualityMeasurementRepository extends JpaRepository<AirQualit
     boolean existsByStationAndMeasuredAt(AirQualityStation station, LocalDateTime measuredAt);
 
     List<AirQualityMeasurement> findByMeasuredAtAfterOrderByStation_IdAscMeasuredAtDesc(LocalDateTime since);
+
+    ScopedValue<Object> findTopByInseeCodeOrderByMeasuredAtDesc(String inseeCode);
 }
