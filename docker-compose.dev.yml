@@ -68,6 +68,9 @@ services:
       # ✅ Code source Java
       - ./air-sphere-connect-back/src:/app/src
 
+      # ✅ Classes compilées pour hot-reload
+      - ./air-sphere-connect-back/target:/app/target
+
       # ✅ Configuration Maven
       - ./air-sphere-connect-back/pom.xml:/app/pom.xml
 
