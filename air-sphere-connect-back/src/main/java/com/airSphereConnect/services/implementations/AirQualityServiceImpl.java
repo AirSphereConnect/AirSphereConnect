@@ -132,7 +132,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
             if (!measurements.isEmpty()) {
                 log.debug("✅ Historique mesures pour {} via inseeCode: {} entrées",
-                         cityName, measurements.size());
+                        cityName, measurements.size());
             }
         }
 
@@ -143,7 +143,7 @@ public class AirQualityServiceImpl implements AirQualityService {
 
             if (!measurements.isEmpty()) {
                 log.debug("✅ Historique mesures pour {} via areaCode (fallback): {} entrées",
-                         cityName, measurements.size());
+                        cityName, measurements.size());
             }
         }
 
@@ -252,10 +252,10 @@ public class AirQualityServiceImpl implements AirQualityService {
         }
 
         dto.setMeasurementHistory(
-            getMeasurementsHistoryForCity(cityName, null, null)
+                getMeasurementsHistoryForCity(cityName, null, null)
         );
         dto.setIndexHistory(
-            getIndicesHistoryForCity(cityName, null, null)
+                getIndicesHistoryForCity(cityName, null, null)
         );
 
         return dto;

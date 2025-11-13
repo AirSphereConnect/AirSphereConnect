@@ -19,7 +19,7 @@
             <td class="p-2 text-center">{{ alert.enabled }}</td>
             <td class="p-2 flex justify-center">
               <app-button
-                class="w-20 h-7 divider-horizontal divider-start"
+                class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
                 color="primary"
                 variant="solid"
                 (click)="editAlerts(alert.id)"
@@ -28,7 +28,7 @@
               </app-button>
               <div class="divider divider-horizontal"> </div>
               <app-button
-                class="w-20 h-7 divider-horizontal divider-start"
+                class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
                 color="warning"
                 variant="solid"
                 (click)="deleteAlerts(alert.id)"
@@ -45,7 +45,7 @@
   }
 </fieldset>
   <br>
-<app-button color="primary" size="md" variant="solid" (click)="addAlerts()">
+<app-button color="primary" size="md" variant="solid" (click)="addAlerts()" class="btn-outline btn-primary">
   Ajouter
 </app-button>
 

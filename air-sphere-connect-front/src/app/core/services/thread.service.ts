@@ -4,14 +4,16 @@ import {Thread} from '../models/thread.model';
 import {PostService} from './post.service';
 import {UserService} from '../../shared/services/user-service';
 import {map, Observable} from 'rxjs';
+import { ApiConfigService } from './api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class ThreadService {
-  private apiUrl = "http://localhost:8080/api/forum-threads";
   private http = inject(HttpClient);
+  private api = inject(ApiConfigService);
   private userService = inject(UserService);
+  private apiUrl = `${this.api.apiUrl}/forum-threads`;
 
   getAllThreads(): Observable<Thread[]> {
     return this.http.get<Thread[]>(`${this.apiUrl}`,

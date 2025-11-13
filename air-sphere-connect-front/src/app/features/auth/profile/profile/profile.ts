@@ -15,11 +15,12 @@ import {Tab, TabItem} from '../../../../shared/components/ui/tab/tab';
 import {UserDashboard} from '../user/users';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ThreadListComponent} from '../../../forum/components/thread-list/thread-list';
+import {Favorites} from '../favorites/favorites';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterOutlet, UserDashboard, Tab, ThreadListComponent],
+  imports: [RouterOutlet, UserDashboard, Tab, ThreadListComponent, Favorites],
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss']
 })

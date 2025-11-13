@@ -11,7 +11,7 @@
             <app-input
               label="Nom d'utilisateur"
               type="text"
-              [control]="usernameControl"
+              formControlName="username"
               [required]="true"
               iconLeft="user"
               placeholder="Entrez votre nom d'utilisateur"
@@ -22,7 +22,7 @@
             <app-input
               label="Email"
               type="email"
-              [control]="emailControl"
+              formControlName="email"
               [required]="true"
               iconLeft="envelope"
               placeholder="exemple@exemple.com"
@@ -33,7 +33,7 @@
             <app-input
               label="Mot de passe"
               [type]="passwordType()"
-              [control]="passwordControl"
+              formControlName="password"
               [required]="true"
               iconLeft="lockClosed"
               [iconRight]="passwordIcon()"

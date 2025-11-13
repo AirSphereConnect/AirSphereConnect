@@ -210,6 +210,12 @@ public class User extends Timestamp implements UserDetails {
                 '}';
     }
 
+    @Override
+    public boolean isEnabled() {
+        // Un utilisateur est considéré "désactivé" si deletedAt est non null (pour garder un historique).
+        return this.getDeletedAt() == null;
+    }
+
 //    //Besoin pour la gestion des rôles dans spring sécurity
 //    @Override
 //    public Collection<? extends GrantedAuthority> getAuthorities() {

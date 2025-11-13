@@ -2,11 +2,13 @@ import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
 import { WeatherMeasurement } from '../models/data.model';
+import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class WeatherService {
   private http = inject(HttpClient);
-  private apiUrl = 'http://localhost:8080/api/weather';
+  private api = inject(ApiConfigService);
+  private apiUrl = `${this.api.apiUrl}/weather`;
 
   getHistory(cityId: number): Observable<WeatherMeasurement[]> {
     return this.http

@@ -18,13 +18,13 @@ import {
 } from '@angular/forms';
 import { UserService } from '../../../shared/services/user-service';
 import { Router, RouterLink } from '@angular/router';
-import { CityService } from '../../../shared/services/city-service';
 import { InputComponent } from '../../../shared/components/ui/input/input';
 import { Button } from '../../../shared/components/ui/button/button';
 import { IconComponent } from '../../../shared/components/ui/icon/icon';
 import { HeroIconName } from '../../../shared/icons/heroicons.registry';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {inputCitySearch} from '../../../shared/utils/city-utils/city-utils';
+import {CityService} from '../../../core/services/city';
 
 @Component({
   selector: 'app-register',
@@ -94,10 +94,13 @@ export class Register implements OnInit {
 
     this.registerFirstForm.statusChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => this.canSubmitStep1.set(this.registerFirstForm.valid));
+      .subscribe(() => {
+        this.canSubmitStep1.set(this.registerFirstForm.valid);
+      });
     this.registerForm.statusChanges
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => this.canSubmitStep2.set(this.registerForm.valid));
+    this.registerFirstForm.updateValueAndValidity()
   }
 
   get usernameControl() { return this.registerFirstForm.get('username') as FormControl; }

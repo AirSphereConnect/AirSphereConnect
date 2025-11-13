@@ -1,22 +1,24 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { UserProfileResponse } from '../../core/models/user.model';
+import { ApiConfigService } from '../../core/services/api';
 
 
 @Injectable({
   providedIn: 'root'
 })
 export class UserService {
-
-  private readonly apiUrl = 'http://localhost:8080/api';
+  private http = inject(HttpClient);
+  private api = inject(ApiConfigService);
+  private readonly apiUrl = this.api.apiUrl;
 
   private readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
 
   public readonly userProfile$ = this._userProfileSubject.asObservable();
 
-  constructor(private http: HttpClient) {
+  constructor() {
     const storedProfile = localStorage.getItem('userProfile');
     if (storedProfile) {
       this._userProfileSubject.next(JSON.parse(storedProfile));
@@ -102,8 +104,8 @@ export class UserService {
   }
 
 
-  deleteUser() {
-    return this.http.put(`${this.apiUrl}/users`, { withCredentials: true });
+  deleteUser(id: number) {
+    return this.http.delete(`${this.apiUrl}/users?id=${id}`, { withCredentials: true });
 
   }
 

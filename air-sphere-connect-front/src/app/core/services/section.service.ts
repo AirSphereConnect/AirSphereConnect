@@ -4,13 +4,15 @@ import { HttpClient } from '@angular/common/http';
 import { Section } from '../models/section.model';
 import { Observable } from 'rxjs';
 import {Thread} from '../models/thread.model';
+import { ApiConfigService } from './api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class SectionService {
-  private apiUrl = "http://localhost:8080/api/forum-rubrics";
   private http = inject(HttpClient);
+  private api = inject(ApiConfigService);
+  private apiUrl = `${this.api.apiUrl}/forum-rubrics`;
 
   getSections(): Observable<Section[]> {
     return this.http.get<Section[]>(this.apiUrl,
