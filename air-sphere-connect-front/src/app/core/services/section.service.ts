@@ -25,4 +25,17 @@ export class SectionService {
       { withCredentials: true }
       );
   }
+
+  createSection(title: string, description: string, forumId: number, userId: number): Observable<Section> {
+    const newSection = {title, description, forumId};
+    return this.http.post<Section>(`${this.apiUrl}/new/${userId}`, newSection,
+      {withCredentials: true}
+    );
+  }
+
+    deleteSection(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`,
+      { withCredentials: true }
+    );
+  }
 }

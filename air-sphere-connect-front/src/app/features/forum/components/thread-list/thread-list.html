@@ -192,31 +192,6 @@
             </label>
           </div>
 
-          <!-- Contenu -->
-          <div class="form-control">
-            <label class="label">
-            <span class="label-text font-semibold">
-              Votre message
-              <span class="text-error">*</span>
-            </span>
-              <span class="label-text-alt">{{ newThreadContent().length }}/2000</span>
-            </label>
-            <textarea
-              class="textarea textarea-bordered h-40 resize-none"
-              placeholder="Décrivez votre question ou sujet en détail..."
-              [value]="newThreadContent()"
-              (input)="newThreadContent.set($any($event.target).value)"
-              maxlength="2000"
-              [disabled]="isSubmitting()"
-              required
-            ></textarea>
-            <label class="label">
-            <span class="label-text-alt text-base-content/60">
-              Plus vous donnez de détails, plus vous recevrez d'aide précise
-            </span>
-            </label>
-          </div>
-
           <!-- Aperçu des infos -->
           <div class="card bg-base-200">
             <div class="card-body p-4">
@@ -255,7 +230,7 @@
             <button
               type="submit"
               class="btn btn-primary"
-              [disabled]="isSubmitting() || !newThreadTitle().trim() || !newThreadContent().trim()"
+              [disabled]="isSubmitting() || !newThreadTitle().trim()"
             >
               @if (isSubmitting()) {
                 <span class="loading loading-spinner"></span>

@@ -142,7 +142,6 @@ export class ThreadListComponent {
 
   createThread() {
     const title = this.newThreadTitle().trim();
-    const content = this.newThreadContent().trim();
     const sectionId = this.sectionId();
     const userId = this.userService.currentUserProfile?.user?.id;
 
@@ -155,15 +154,11 @@ export class ThreadListComponent {
       alert('le titre est obligatoire');
       return;
     }
-    if (!content) {
-      alert('le contenu est obligatoire');
-      return;
-    }
 
     // appel du service pour créer le thread et le post initial
     this.isSubmitting.set(true);
 
-    this.threadService.addThread(title, content, sectionId, userId).subscribe({
+    this.threadService.addThread(title, sectionId, userId).subscribe({
       next: (newPost) => {
         console.log('Nouveau thread créé avec le post initial:', newPost);
 
@@ -181,5 +176,15 @@ export class ThreadListComponent {
         this.isSubmitting.set(false);
       }
     });
+  }
+
+  deleteThread(thread: any): boolean {
+    const currentUser = this.userService.currentUserProfile;
+    if(!currentUser) return false;
+
+
+    if(currentUser.user.role === 'ADMIN') return true;
+
+    return currentUser.user.id === thread.userId;
   }
 }

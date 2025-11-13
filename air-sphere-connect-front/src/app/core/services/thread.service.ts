@@ -32,10 +32,9 @@ export class ThreadService {
     );
   }
 
-  addThread(title: string, content: string, sectionId: number, userId: number): Observable<Thread> {
+  addThread(title: string, sectionId: number, userId: number): Observable<Thread> {
     const newThread = {
       title: title,
-      content: content,
       author: this.userService.getUsername(),
       createdAt: new Date(),
       rubricId: sectionId,
@@ -43,6 +42,12 @@ export class ThreadService {
 
     return this.http.post<Thread>(`${this.apiUrl}/new/${userId}`, newThread,
       { withCredentials: true}
+    );
+  }
+
+  deleteThread(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/${id}`,
+      { withCredentials: true }
     );
   }
 }

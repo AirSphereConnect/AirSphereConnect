@@ -92,6 +92,7 @@ export class PostComponent {
   closeDeleteModal(): void {
     this.showDeleteModal.set(false);
   }
+
   confirmDelete(): void {
     this.onDelete.emit(this.post().id);
     this.closeDeleteModal();

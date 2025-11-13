@@ -1,10 +1,25 @@
 <div class="space-y-6">
   <!-- Header avec breadcrumb -->
-  <div class="breadcrumbs text-sm">
-    <ul>
-      <li><a class="text-primary hover:text-primary-focus">Forum</a></li>
-      <li class="text-base-content/70">Sections</li>
-    </ul>
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+    <div class="breadcrumbs text-sm">
+      <ul>
+        <li><a class="text-primary hover:text-primary-focus">Forum</a></li>
+        <li class="text-base-content/70">Sections</li>
+      </ul>
+    </div>
+
+    <!-- Bouton Créer (visible uniquement pour les admins) -->
+    @if (isAdmin()) {
+      <button
+        class="btn btn-primary btn-sm"
+        (click)="openCreateSectionModal()"
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        Nouvelle Section
+      </button>
+    }
   </div>
 
   <!-- Titre principal -->
@@ -18,16 +33,14 @@
   <!-- Grille des sections -->
   <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
     @for (section of sectionsWithCount(); track section.id) {
-      <div
-        class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-300 duration-300 hover:-translate-y-2 group">
+      <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-300 duration-300 hover:-translate-y-2 group">
         <div class="card-body p-6">
           <!-- Icône de section -->
           <div class="flex items-center justify-between mb-4">
             <div class="avatar placeholder">
               <div class="bg-primary text-primary-content rounded-xl w-12 flex items-center justify-center">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
                 </svg>
               </div>
             </div>
@@ -50,20 +63,29 @@
 
           <!-- Actions -->
           <div class="card-actions justify-between items-center">
-            <a [routerLink]="['/forum/section', section.id]"
-               class="btn btn-primary btn-sm group-hover:btn-primary-focus transition-all">
+            <a
+              [routerLink]="['/forum/section', section.id]"
+              class="btn btn-primary btn-sm group-hover:btn-primary-focus transition-all"
+            >
               <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7l5 5m0 0l-5 5m5-5H6"/>
               </svg>
               Explorer
             </a>
 
-            <!-- Stats supplémentaires -->
+            <div class="flex items-center gap-4">
+
+              <!-- supprimer section (visible uniquement pour les admins) -->
+              @if (isAdmin()) {
+
+
+              }
+            </div>
+
+            <!-- Stats -->
             <div class="flex items-center gap-2 text-xs text-base-content/50">
-              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24"
-                   stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                      d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
               </svg>
               <span>Actif</span>
             </div>
@@ -78,10 +100,8 @@
     <div class="text-center py-12">
       <div class="avatar placeholder mb-4">
         <div class="bg-base-300 text-base-content rounded-full w-16">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
           </svg>
         </div>
       </div>
@@ -90,3 +110,149 @@
     </div>
   }
 </div>
+
+<!-- ✅ Modale de création de section (visible uniquement pour les admins) -->
+@if (showCreateSectionModale()) {
+  <dialog class="modal modal-open">
+    <div class="modal-box max-w-2xl">
+      <h3 class="font-bold text-2xl mb-6 flex items-center gap-2">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+        </svg>
+        Créer une nouvelle section
+      </h3>
+
+      <!-- Info admin -->
+      <div class="alert alert-info mb-4">
+        <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <div>
+          <h3 class="font-bold">Création d'une section</h3>
+          <div class="text-xs">Une nouvelle section sera visible par tous les utilisateurs du forum.</div>
+        </div>
+      </div>
+
+      <!-- Message d'erreur -->
+      @if (errorMessage()) {
+        <div class="alert alert-error mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <form class="space-y-4" (submit)="$event.preventDefault(); createSection()">
+        <!-- Titre -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">
+              Titre de la section
+              <span class="text-error">*</span>
+            </span>
+            <span class="label-text-alt">{{ newSectionTitle().length }}/100</span>
+          </label>
+          <input
+            type="text"
+            class="input input-bordered w-full"
+            placeholder="Ex: Développement Ecologique"
+            [value]="newSectionTitle()"
+            (input)="newSectionTitle.set($any($event.target).value)"
+            maxlength="100"
+            [disabled]="isCreating()"
+            required
+          >
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">
+              Un titre clair et descriptif pour la section
+            </span>
+          </label>
+        </div>
+
+        <!-- Description -->
+        <div class="form-control">
+          <label class="label">
+            <span class="label-text font-semibold">
+              Description
+              <span class="text-error">*</span>
+            </span>
+            <span class="label-text-alt">{{ newSectionDescription().length }}/500</span>
+          </label>
+          <textarea
+            class="textarea textarea-bordered h-32 resize-none"
+            placeholder="Décrivez le thème et le contenu de cette section..."
+            [value]="newSectionDescription()"
+            (input)="newSectionDescription.set($any($event.target).value)"
+            maxlength="500"
+            [disabled]="isCreating()"
+            required
+          ></textarea>
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">
+              Expliquez ce que les utilisateurs trouveront dans cette section
+            </span>
+          </label>
+        </div>
+
+        <!-- Aperçu -->
+        <div class="card bg-base-200">
+          <div class="card-body p-4">
+            <h4 class="font-semibold text-sm mb-2">Aperçu</h4>
+            <div class="flex items-start gap-3">
+              <div class="avatar placeholder">
+                <div class="bg-primary text-primary-content rounded-xl w-10">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                  </svg>
+                </div>
+              </div>
+              <div class="flex-1">
+                <h3 class="font-bold">{{ newSectionTitle() || 'Titre de la section' }}</h3>
+                <p class="text-sm text-base-content/70">{{ newSectionDescription() || 'Description de la section' }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="modal-action">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            (click)="closeCreateSectionModal()"
+            [disabled]="isCreating()"
+          >
+            Annuler
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="isCreating() || !newSectionTitle().trim() || !newSectionDescription().trim()"
+          >
+            @if (isCreating()) {
+              <span class="loading loading-spinner"></span>
+              Création...
+            } @else {
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              Créer la section
+            }
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Backdrop -->
+    <form method="dialog" class="modal-backdrop">
+      <button
+        type="button"
+        (click)="closeCreateSectionModal()"
+        [disabled]="isCreating()"
+      >
+        Fermer
+      </button>
+    </form>
+  </dialog>
+}
