@@ -27,7 +27,10 @@
 
       <!-- 🗺️ Carte (pleine largeur) -->
       <section class="col-span-12">
-        <app-map (citySelected)="onCitySelected($event)"></app-map>
+        <app-map
+          [userCityName]="selectedCity()"
+          (citySelected)="onCitySelected($event)">
+        </app-map>
       </section>
 
       <!-- 📊 CityPopulation et Pollutants côte à côte -->

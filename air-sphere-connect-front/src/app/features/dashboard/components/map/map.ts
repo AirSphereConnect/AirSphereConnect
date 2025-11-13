@@ -1,4 +1,4 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, signal, inject, output } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, signal, inject, output, input, effect, computed } from '@angular/core';
 import * as L from 'leaflet';
 import { CityService } from '../../../../core/services/city';
 import { AirQualityService } from '../../../../core/services/air-quality';
@@ -209,8 +209,31 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   selectedCity = signal<CityMapPoint | null>(null);
   tooltipPosition = signal<{ x: number; y: number } | null>(null);
 
+  // Input moderne pour recevoir le nom de la ville de l'utilisateur
+  userCityName = input<string>('');
+
+  // Computed pour trouver la ville de l'utilisateur dans les données
+  userCity = computed(() => {
+    const cityName = this.userCityName();
+    if (!cityName) return null;
+    return this.mapData().find(city =>
+      city.name.toLowerCase() === cityName.toLowerCase()
+    ) || null;
+  });
+
   // Output pour notifier le parent du changement de ville
   citySelected = output<string>();
+
+  constructor() {
+    // Effect pour recentrer la carte quand la ville de l'utilisateur est trouvée
+    effect(() => {
+      const city = this.userCity();
+      if (city && this.map) {
+        console.log('🎯 Centrage de la carte sur la ville de l\'utilisateur:', city.name);
+        this.map.setView([city.latitude, city.longitude], 10);
+      }
+    });
+  }
 
   ngOnInit() {
     this.loadMapData();
@@ -338,13 +361,37 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
 
     console.log('🗺️ Initialisation de la carte avec', this.mapData().length, 'villes');
 
-    // Créer la carte centrée sur l'Occitanie
-    this.map = L.map('map').setView([43.6, 1.45], 7);
+    // Déterminer le centre et le zoom initial
+    const userCity = this.userCity();
+    let center: [number, number];
+    let zoom: number;
+
+    if (userCity) {
+      // Centrer sur la ville de l'utilisateur
+      center = [userCity.latitude, userCity.longitude];
+      zoom = 10;
+      console.log('🎯 Carte centrée sur la ville de l\'utilisateur:', userCity.name);
+    } else {
+      // Par défaut, centrer sur l'Occitanie
+      center = [43.6, 1.45];
+      zoom = 7;
+      console.log('🗺️ Carte centrée sur l\'Occitanie (par défaut)');
+    }
+
+    // Créer la carte
+    this.map = L.map('map').setView(center, zoom);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
       maxZoom: 19
     }).addTo(this.map);
+
+    // Forcer la carte à recalculer ses dimensions
+    setTimeout(() => {
+      if (this.map) {
+        this.map.invalidateSize();
+      }
+    }, 100);
 
     // Ajouter les marqueurs pour chaque ville
     this.addCityMarkers();
