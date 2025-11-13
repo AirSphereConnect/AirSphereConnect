@@ -55,7 +55,7 @@ import {User} from '../../../../core/models/user.model';
 
         <vis-bullet-legend [items]="pollutantLegend()"></vis-bullet-legend>
 
-        <vis-xy-container [data]="chartData()" [height]="400">
+        <vis-xy-container [data]="chartData()" [height]="400" [margin]="{ top: 20, right: 20, bottom: 20, left: 20 }">
           <vis-grouped-bar
             [x]="x"
             [y]="y"
@@ -68,7 +68,7 @@ import {User} from '../../../../core/models/user.model';
             type="x"
             label="Date"
             [tickFormat]="dateFormat"
-            [tickTextAngle]="45"
+            [tickTextAngle]="-45"
             [tickValues]="xTickValues()"></vis-axis>
           <vis-axis
             type="y"
