@@ -1,0 +1,63 @@
+@if (show()) {
+  <!-- Modal Backdrop et Container DaisyUI -->
+  <div class="modal modal-open" (click)="onBackdropClick($event)">
+    <div [class]="classes().container()">
+
+      <!-- Header -->
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="font-bold text-lg">{{ title() }}</h3>
+        <button
+          type="button"
+          class="btn btn-sm btn-circle btn-ghost"
+          (click)="onClose()"
+          [disabled]="isSubmitting()"
+        >
+          ✕
+        </button>
+      </div>
+
+      <!-- Error Alert -->
+      @if (errorMessage()) {
+        <div class="alert alert-error mb-4">
+          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>{{ errorMessage() }}</span>
+        </div>
+      }
+
+      <!-- Body Content (ng-content projection) -->
+      <div class="py-4">
+        <ng-content></ng-content>
+      </div>
+
+      <!-- Footer Actions -->
+      <div class="modal-action">
+        @if (showCancelButton()) {
+          <button
+            type="button"
+            [class]="classes().cancelButton()"
+            (click)="onClose()"
+            [disabled]="isSubmitting()"
+          >
+            {{ cancelButtonText() }}
+          </button>
+        }
+
+        @if (showSubmitButton()) {
+          <button
+            type="button"
+            [class]="classes().submitButton()"
+            (click)="onSubmit()"
+            [disabled]="isSubmitting()"
+          >
+            @if (isSubmitting()) {
+              <span class="loading loading-spinner loading-sm"></span>
+            }
+            {{ submitButtonText() }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}
