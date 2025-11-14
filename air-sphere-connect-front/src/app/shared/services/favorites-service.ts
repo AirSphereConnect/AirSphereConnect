@@ -49,7 +49,7 @@ export class FavoritesService {
     if (!id) {
       throw new Error('User id n\'est pas reconnus');
     }
-    return this.http.post(`${this.apiUrl}/favorites/new/${id}`, userData, { withCredentials: true });
+    return this.http.post(`${this.apiUrl}/favorites/new`, userData, { withCredentials: true });
   }
 
   //Mettre à jour les infos de l'user

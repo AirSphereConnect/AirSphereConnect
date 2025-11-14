@@ -32,4 +32,5 @@ public interface AirQualityMeasurementRepository extends JpaRepository<AirQualit
     boolean existsByStationAndMeasuredAt(AirQualityStation station, LocalDateTime measuredAt);
 
     List<AirQualityMeasurement> findByMeasuredAtAfterOrderByStation_IdAscMeasuredAtDesc(LocalDateTime since);
+
 }

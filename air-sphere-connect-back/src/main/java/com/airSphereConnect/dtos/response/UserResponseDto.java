@@ -1,6 +1,5 @@
 package com.airSphereConnect.dtos.response;
 
-import com.airSphereConnect.dtos.AlertsDto;
 import com.airSphereConnect.dtos.FavoriteDto;
 import com.airSphereConnect.dtos.FavoritesAlertsDto;
 import com.airSphereConnect.entities.enums.UserRole;
@@ -8,13 +7,18 @@ import com.airSphereConnect.entities.enums.UserRole;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * DTO complet représentant un utilisateur avec ses informations personnelles,
+ * adresses, favoris et alertes.
+ */
 public class UserResponseDto {
     private Long id;
     private String username;
     private String email;
     private UserRole role;
     private LocalDateTime createdAt;
-    private LocalDateTime delectedAt;
+    private LocalDateTime deletedAt;
+
     private LocalDateTime updatedAt;
     private AddressResponseDto address;
     private List<FavoriteDto> favorites;
@@ -116,7 +120,7 @@ public class UserResponseDto {
         this.alerts = alerts;
     }
 
-    public void setDeletedAt(LocalDateTime deletedAt) {
-        this.delectedAt = deletedAt;
-    }
+    public LocalDateTime getDeletedAt() { return deletedAt; }
+    public void setDeletedAt(LocalDateTime deletedAt) { this.deletedAt = deletedAt; }
+
 }

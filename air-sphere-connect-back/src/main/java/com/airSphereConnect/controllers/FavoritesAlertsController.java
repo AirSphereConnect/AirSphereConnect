@@ -31,7 +31,7 @@ public class FavoritesAlertsController {
     @PostMapping
     public FavoritesAlertsDto create(@RequestBody FavoritesAlertsDto dto, @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
+        User user = userRepository.findByUsernameAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
 
         return favoritesAlertsService.createAlertConfig(user.getId(),dto);
@@ -51,7 +51,7 @@ public class FavoritesAlertsController {
     @PutMapping("/{id}")
     public FavoritesAlertsDto update(@PathVariable Long id,@RequestBody FavoritesAlertsDto dto, @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
+        User user = userRepository.findByUsernameAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
 
         return favoritesAlertsService.updateAlertConfig(dto, user.getId(), id);

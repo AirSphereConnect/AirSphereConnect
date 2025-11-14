@@ -1,5 +1,5 @@
-import { Injectable, inject } from '@angular/core';
-import {BehaviorSubject, Observable, of, tap} from 'rxjs';
+import {inject, Injectable} from '@angular/core';
+import {BehaviorSubject, concatMap, Observable, of, tap} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
 import { UserProfileResponse } from '../../core/models/user.model';
@@ -31,8 +31,23 @@ export class UserService {
 
   fetchUserProfile(): void {
     this.http.get<UserProfileResponse>(`${this.apiUrl}/profile`, { withCredentials: true }).subscribe({
-      next: profile => this.setUserProfile(profile),
-      error: () => this.setUserProfile(null)
+      next: profile => {
+        // Accepte que profile.user null (profil guest)
+        if (profile && profile.user) {
+          this.setUserProfile(profile);
+        } else {
+          this.setUserProfile(null);
+        }
+      },
+      error: err => {
+        // En cas d'erreur 401, considérer profil guest (null)
+        if (err.status === 401) {
+          this.setUserProfile(null);
+        } else {
+          console.error('Erreur fetching profile:', err);
+          this.setUserProfile(null);
+        }
+      }
     });
   }
 
@@ -104,9 +119,10 @@ export class UserService {
   }
 
 
-  deleteUser(id: number) {
-    return this.http.delete(`${this.apiUrl}/users?id=${id}`, { withCredentials: true });
-
+  deleteUser(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.apiUrl}/users?id=${id}`, { withCredentials: true }).pipe(
+      tap(()  => this.fetchUserProfile())
+    );
   }
 
   editAddress(id: number | null, payload: any) {
