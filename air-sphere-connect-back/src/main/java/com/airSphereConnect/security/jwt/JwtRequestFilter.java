@@ -7,6 +7,8 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -26,6 +28,9 @@ public class JwtRequestFilter extends OncePerRequestFilter {
     private final JwtServiceImpl jwtServiceImpl;
     private final CustomUserDetailsService userDetailsService;
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtRequestFilter.class);
+    private static final String ACCESS_TOKEN = "ACCESS_TOKEN";
+
     public JwtRequestFilter(JwtServiceImpl jwtServiceImpl,
                             CustomUserDetailsService userDetailsService) {
         this.jwtServiceImpl = jwtServiceImpl;
@@ -38,20 +43,11 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
-        logger.debug("Filtrage JWT pour l'URL : " + request.getRequestURI());
+        logger.debug("Filtrage JWT pour l'URL : {}", request.getRequestURI());
 
-        String jwt = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if ("ACCESS_TOKEN".equals(cookie.getName())) {
-                    jwt = cookie.getValue();
-                    logger.debug("Token JWT trouvé dans cookie");
-                    break;
-                }
-            }
-        }
+        String jwt = extractJwtFromCookies(request);
 
-        if (jwt == null || jwt.trim().isEmpty()) {
+        if (jwt == null || jwt.isBlank()) {
             logger.debug("Aucun token JWT trouvé ou token vide - requête non authentifiée");
             filterChain.doFilter(request, response);
             return;
@@ -61,33 +57,54 @@ public class JwtRequestFilter extends OncePerRequestFilter {
             String username = jwtServiceImpl.extractUsername(jwt);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                UserDetails userDetails;
-                if ("guest".equals(username)) {
-                    List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority("ROLE_GUEST"));
-                    userDetails = new User("guest", "", authorities);
-                    logger.debug("Utilisateur invité créé sans base : guest");
-                } else {
-                    userDetails = userDetailsService.loadUserByUsername(username);
-                }
+                UserDetails userDetails = "guest".equals(username)
+                        ? createGuestUserDetails()
+                        : userDetailsService.loadUserByUsername(username);
 
                 if (jwtServiceImpl.validateToken(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken auth =
                             new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    logger.debug("Utilisateur authentifié avec succès : " + username);
+                    logger.debug("Utilisateur authentifié avec succès : {}", username);
                 } else {
-                    logger.debug("Token JWT invalide pour " + username);
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    logger.warn("Token JWT invalide pour {}", username);
+                    sendUnauthorizedResponse(response, "Token JWT invalide ou expiré");
                     return;
                 }
             }
         } catch (Exception e) {
             logger.error("Erreur lors de la validation JWT : ", e);
-            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            sendUnauthorizedResponse(response, "Erreur de validation du token JWT");
             return;
         }
 
         filterChain.doFilter(request, response);
     }
+
+    private String extractJwtFromCookies(HttpServletRequest request) {
+        if (request.getCookies() == null) return null;
+        for (var cookie : request.getCookies()) {
+            if (ACCESS_TOKEN.equals(cookie.getName())) {
+                logger.debug("Token JWT trouvé dans cookie");
+                return cookie.getValue();
+            }
+        }
+        return null;
+    }
+
+    private UserDetails createGuestUserDetails() {
+        var authorities = List.of(new SimpleGrantedAuthority("ROLE_GUEST"));
+        logger.debug("Utilisateur invité créé sans base : guest");
+        return new User("guest", "", authorities);
+    }
+
+    private void sendUnauthorizedResponse(HttpServletResponse response, String message) throws IOException {
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+        response.setContentType("application/json");
+        String json = String.format("{\"error\": \"%s\"}", message);
+        response.getWriter().write(json);
+        response.getWriter().flush();
+    }
 }
+
