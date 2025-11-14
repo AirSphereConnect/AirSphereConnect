@@ -12,36 +12,28 @@ import java.time.LocalDateTime;
 public class FavoriteDto {
 
     private Long id;
-
-    private FavoriteCategory favoriteCategory;
+    private boolean selectWeather;
+    private boolean selectAirQuality;
+    private boolean selectPopulation;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime updatedAt;
 
     private Long userId;
-
     private Long cityId;
-
-    public String getCityName() {
-        return cityName;
-    }
-
-    public void setCityName(String cityName) {
-        this.cityName = cityName;
-    }
-
     private String cityName;
 
     public FavoriteDto() {
     }
 
-    public FavoriteDto(Long id, FavoriteCategory favoriteCategory, LocalDateTime createdAt,
+    public FavoriteDto(Long id, boolean selectPopulation, boolean selectAirQuality, boolean selectWeather, LocalDateTime createdAt,
                        LocalDateTime updatedAt, Long userId, Long cityId, String cityName) {
         this.id = id;
-        this.favoriteCategory = favoriteCategory;
+        this.selectPopulation = selectPopulation;
+        this.selectAirQuality = selectAirQuality;
+        this.selectWeather = selectWeather;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.userId = userId;
@@ -58,13 +50,6 @@ public class FavoriteDto {
         this.id = id;
     }
 
-    public FavoriteCategory getFavoriteCategory() {
-        return favoriteCategory;
-    }
-
-    public void setFavoriteCategory(FavoriteCategory favoriteCategory) {
-        this.favoriteCategory = favoriteCategory;
-    }
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
@@ -97,4 +82,38 @@ public class FavoriteDto {
     public void setCityId(Long cityId) {
         this.cityId = cityId;
     }
+
+
+    public String getCityName() {
+        return cityName;
+    }
+
+    public void setCityName(String cityName) {
+        this.cityName = cityName;
+    }
+
+    public boolean getSelectWeather() {
+        return selectWeather;
+    }
+
+    public void setSelectWeather(Boolean selectWeather) {
+        this.selectWeather = selectWeather;
+    }
+
+    public boolean getSelectAirQuality() {
+        return selectAirQuality;
+    }
+
+    public void setSelectAirQuality(Boolean selectAirQuality) {
+        this.selectAirQuality = selectAirQuality;
+    }
+
+    public boolean getSelectPopulation() {
+        return selectPopulation;
+    }
+
+    public void setSelectPopulation(Boolean selectPopulation) {
+        this.selectPopulation = selectPopulation;
+    }
+
 }

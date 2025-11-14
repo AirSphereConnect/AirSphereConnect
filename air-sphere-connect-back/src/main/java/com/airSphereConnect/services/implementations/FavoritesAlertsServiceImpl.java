@@ -14,11 +14,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
-
+    private final FavoritesAlertsMapper  favoritesAlertsMapper;
     private final FavoritesAlertsRepository favoritesAlertsRepository;
     private final UserRepository userRepository;
 
-    public FavoritesAlertsServiceImpl(FavoritesAlertsRepository favoritesAlertsRepository, UserRepository userRepository) {
+    public FavoritesAlertsServiceImpl(FavoritesAlertsMapper favoritesAlertsMapper, FavoritesAlertsRepository favoritesAlertsRepository, UserRepository userRepository) {
+        this.favoritesAlertsMapper = favoritesAlertsMapper;
         this.favoritesAlertsRepository = favoritesAlertsRepository;
         this.userRepository = userRepository;
     }
@@ -27,7 +28,7 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
     public List<FavoritesAlertsDto> getAllFavoritesAlerts() {
         return favoritesAlertsRepository.findAll()
                 .stream()
-                .map(FavoritesAlertsMapper::toDto)
+                .map(favoritesAlertsMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -35,7 +36,7 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
     @Override
     public List<FavoritesAlertsDto> getUserAlerts(Long userId) {
         return favoritesAlertsRepository.findById(userId).stream()
-                .map(FavoritesAlertsMapper::toDto)
+                .map(favoritesAlertsMapper::toDto)
                 .collect(Collectors.toList());
     }
 
@@ -51,7 +52,7 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
 
         FavoritesAlerts entity = FavoritesAlertsMapper.toEntity(user.getId(), dto);
         entity = favoritesAlertsRepository.save(entity);
-        return FavoritesAlertsMapper.toDto(entity);
+        return favoritesAlertsMapper.toDto(entity);
     }
 
     @Override
@@ -77,7 +78,7 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
         entity.setEnabled(Boolean.TRUE.equals(dto.getEnabled()));
 
         entity = favoritesAlertsRepository.save(entity);
-        return FavoritesAlertsMapper.toDto(entity);
+        return favoritesAlertsMapper.toDto(entity);
     }
 
 

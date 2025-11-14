@@ -83,7 +83,9 @@ public class FavoriteServiceImpl implements FavoriteService {
             existing.setCity(city);
         }
 
-        existing.setFavoriteCategory(favoriteDto.getFavoriteCategory());
+        existing.setSelectAirQuality(favoriteDto.getSelectAirQuality());
+        existing.setSelectPopulation(favoriteDto.getSelectPopulation());
+        existing.setSelectWeather(favoriteDto.getSelectWeather());
 
         Favorite updated = favoriteRepository.save(existing);
         return favoriteMapper.toDto(updated);

@@ -36,7 +36,7 @@
     >
       Créer un compte
     </a>
-  } @else if (userRole === 'USER') {
+  } @else if (userRole === 'USER' || 'ADMIN') {
     <a
       routerLink="/dashboard"
       routerLinkActive="tab-active tab-active-primary"

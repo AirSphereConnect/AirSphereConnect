@@ -16,10 +16,22 @@ public class Favorite extends Timestamp {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "{favorite.category.required}")
-    @Enumerated(EnumType.STRING)
-    @Column(name = "favorite_category", nullable = false)
-    private FavoriteCategory favoriteCategory;
+//    @NotNull(message = "{favorite.category.required}")
+//    @Enumerated(EnumType.STRING)
+//    @Column(name = "favorite_category", nullable = false)
+//    private FavoriteCategory favoriteCategory;
+
+    @NotNull(message = "{alert.enabled.required}")
+    @Column(name = "weather", nullable = false)
+    private boolean selectWeather;
+
+    @NotNull(message = "{alert.enabled.required}")
+    @Column(name = "air_quality", nullable = false)
+    private boolean selectAirQuality;
+
+    @NotNull(message = "{alert.enabled.required}")
+    @Column(name = "population", nullable = false)
+    private boolean selectPopulation;
 
     @NotNull(message = "{favorite.user.required}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -33,8 +45,7 @@ public class Favorite extends Timestamp {
 
     public Favorite() {}
 
-    public Favorite(FavoriteCategory favoriteCategory, User user, City city) {
-        this.favoriteCategory = favoriteCategory;
+    public Favorite(User user, City city) {
         this.user = user;
         this.city = city;
     }
@@ -47,13 +58,13 @@ public class Favorite extends Timestamp {
         this.id = id;
     }
 
-    public FavoriteCategory getFavoriteCategory() {
-        return favoriteCategory;
-    }
-
-    public void setFavoriteCategory(FavoriteCategory favoriteCategory) {
-        this.favoriteCategory = favoriteCategory;
-    }
+//    public FavoriteCategory getFavoriteCategory() {
+//        return favoriteCategory;
+//    }
+//
+//    public void setFavoriteCategory(FavoriteCategory favoriteCategory) {
+//        this.favoriteCategory = favoriteCategory;
+//    }
 
     public User getUser() {
         return user;
@@ -71,6 +82,31 @@ public class Favorite extends Timestamp {
         this.city = city;
     }
 
+    public boolean getSelectPopulation() {
+        return selectPopulation;
+    }
+
+    public void setSelectPopulation(boolean selectPopulation) {
+        this.selectPopulation = selectPopulation;
+    }
+
+
+    public boolean getSelectAirQuality() {
+        return this.selectAirQuality;
+    }
+
+    public void setSelectAirQuality(boolean selectAirQuality) {
+        this.selectAirQuality = selectAirQuality;
+    }
+
+    public boolean getSelectWeather() {
+        return selectWeather;
+    }
+
+    public void setSelectWeather(boolean selectWeather) {
+        this.selectWeather = selectWeather;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o == null || getClass() != o.getClass()) return false;
@@ -86,7 +122,7 @@ public class Favorite extends Timestamp {
     @Override
     public String toString() {
         return "Favorite{" +
-                "favoriteCategory=" + favoriteCategory +
+                "favoriteCategory=" + selectAirQuality + selectPopulation + selectWeather +
                 '}';
     }
 

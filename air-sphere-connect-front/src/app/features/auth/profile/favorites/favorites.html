@@ -3,7 +3,9 @@
     <table class="w-full border border-gray-200 rounded-lg shadow-sm">
       <thead>
       <tr>
-        <th class="p-2">Catégorie</th>
+        <th class="p-2">Export Météo</th>
+        <th class="p-2">Export Qualité de l'air</th>
+        <th class="p-2">Export Population</th>
         <th class="p-2">Ville</th>
         <th class="p-2">Créé le</th>
         <th class="p-2">Modifié le</th>
@@ -13,7 +15,72 @@
       <tbody>
         @for (favorite of user.favorites; track favorite.id) {
           <tr class="border-t">
-            <td class="p-2 text-center">{{ favorite.favoriteCategory }}</td>
+            @if (favorite?.weather) {
+              <td class="p-2 text-center">
+                <app-button
+                  class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
+                  color="primary"
+                  variant="solid"
+                >
+                  PDF
+                </app-button>
+                <div class="divider divider-horizontal">
+                  <app-button
+                    class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
+                    color="primary"
+                    variant="solid"
+                  >
+                    CSV
+                  </app-button>
+                </div>
+              </td>
+            } @else {
+              <td class="p-2 text-center">Non sélectionner</td>
+            }
+            @if (favorite?.airQuality) {
+              <td class="p-2 text-center">
+                <app-button
+                  class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
+                  color="primary"
+                  variant="solid"
+                >
+                  PDF
+                </app-button>
+                <div class="divider divider-horizontal">
+                  <app-button
+                    class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
+                    color="primary"
+                    variant="solid"
+                  >
+                    CSV
+                  </app-button>
+                </div>
+              </td>
+            } @else {
+              <td class="p-2 text-center">Non sélectionner</td>
+            }
+            @if (favorite?.population) {
+              <td class="p-2 text-center">
+                <app-button
+                  class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
+                  color="primary"
+                  variant="solid"
+                >
+                  PDF
+                </app-button>
+                <div class="divider divider-horizontal">
+                  <app-button
+                    class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
+                    color="primary"
+                    variant="solid"
+                  >
+                    CSV
+                  </app-button>
+                </div>
+              </td>
+            } @else {
+              <td class="p-2 text-center">Non sélectionner</td>
+            }
             <td class="p-2 text-center">{{ favorite.cityName }}</td>
             <td class="p-2 text-center">{{ favorite.createdAt }}</td>
             <td class="p-2 text-center">{{ favorite.updatedAt }}</td>
@@ -26,7 +93,7 @@
               >
                 Modifier
               </app-button>
-              <div class="divider divider-horizontal"> </div>
+              <div class="divider divider-horizontal"></div>
               <app-button
                 class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
                 color="warning"
@@ -44,10 +111,10 @@
     <p>Aucun favori trouvé.</p>
   }
 </fieldset>
-  <br>
-  <app-button color="primary" size="md" variant="solid" (click)="addFavorites()" class="btn-outline btn-primary">
-    Ajouter
-  </app-button>
+<br>
+<app-button color="primary" size="md" variant="solid" (click)="addFavorites()" class="btn-outline btn-primary">
+  Ajouter
+</app-button>
 
 <!-- 🟣 Modal -->
 <app-favorites-form

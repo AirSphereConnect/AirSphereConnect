@@ -35,7 +35,69 @@ public class AlertsDto {
         this.sentAt = sentAt;
     }
 
-    // Getters/Setters omis pour concision, à documenter si besoin
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public City getCity() {
+        return city;
+    }
+
+    public void setCity(City city) {
+        this.city = city;
+    }
+
+    public AlertType getAlertType() {
+        return alertType;
+    }
+
+    public void setAlertType(AlertType alertType) {
+        this.alertType = alertType;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public LocalDateTime getSentAt() {
+        return sentAt;
+    }
+
+    public void setSentAt(LocalDateTime sentAt) {
+        this.sentAt = sentAt;
+    }
+
+    public Region getRegion() {
+        return region;
+    }
+
+    public void setRegion(Region region) {
+        this.region = region;
+    }
+
+    public Department getDepartment() {
+        return department;
+    }
+
+    public void setDepartmentId(Department department) {
+        this.department = department;
+    }
 
     /**
      * Tente de parser le champ message JSON en objet WeatherAlertDto.

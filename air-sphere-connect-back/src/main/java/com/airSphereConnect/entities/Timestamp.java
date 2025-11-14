@@ -48,4 +48,5 @@ public abstract class Timestamp {
     public void setDeletedAt(LocalDateTime deletedAt) {
         this.deletedAt = deletedAt;
     }
+
 }

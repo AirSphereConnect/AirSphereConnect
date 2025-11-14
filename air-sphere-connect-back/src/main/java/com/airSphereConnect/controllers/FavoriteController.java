@@ -61,9 +61,7 @@ public class FavoriteController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<FavoriteDto> deleteFavorite(@PathVariable Long id) {
-        System.out.println("id entrée delete : " + id);
         FavoriteDto deletedFavorite = favoriteService.deleteFavorite(id);
-        System.out.println("delete : " + deletedFavorite);
         return ResponseEntity.ok(deletedFavorite);
     }
 }

@@ -9,7 +9,24 @@
       </h3>
 
       <form [formGroup]="favoritesForm" (ngSubmit)="submitForm()">
-        <app-input formControlName="favoriteCategory" label="Catégorie" class="color-black"></app-input>
+
+        <label class="block mb-2 font-semibold">Météo</label>
+        <label class="flex items-center gap-2 mb-4">
+          <input type="checkbox" formControlName="activeWeather" class="checkbox checkbox-primary"/>
+          <span>Activer</span>
+        </label>
+
+        <label class="block mb-2 font-semibold">Qualité de l'air</label>
+        <label class="flex items-center gap-2 mb-4">
+          <input type="checkbox" formControlName="activeAirQuality" class="checkbox checkbox-primary"/>
+          <span>Activer</span>
+        </label>
+
+        <label class="block mb-2 font-semibold">Population</label>
+        <label class="flex items-center gap-2 mb-4">
+          <input type="checkbox" formControlName="activePopulation" class="checkbox checkbox-primary"/>
+          <span>Activer</span>
+        </label>
 
         <app-input
           formControlName="cityName"
@@ -17,14 +34,6 @@
           label="Ville"
         ></app-input>
 
-        <!--
-        Il y a un problème pour l'affichage de la donnée pour une modification (récupérer les données depuis la ligne à modifier)
-        <app-input
-          formControlName="cityName"
-          placeholder="Nom de la ville"
-          (input)="onCityInput($event)"
-        ></app-input>
--->
         <div class="bg-white rounded mt-2 max-h-32 overflow-y-auto">
           @if (citySuggestions().length) {
             @for (city of citySuggestions(); track city.id) {

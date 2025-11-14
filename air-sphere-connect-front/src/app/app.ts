@@ -18,10 +18,11 @@ import {AuthInterceptor} from './core/interceptors/auth-interceptor';
 import {Footer} from './shared/components/layout/footer/footer/footer';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {fromEvent, Subscription} from 'rxjs';
+import {Forum} from './features/forum/components/forum/forum';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer],
+  imports: [RouterOutlet, Header, Footer, Forum],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
   providers: [
