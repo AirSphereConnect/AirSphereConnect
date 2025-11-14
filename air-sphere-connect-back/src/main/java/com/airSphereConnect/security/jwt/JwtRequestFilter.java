@@ -43,6 +43,7 @@ public class JwtRequestFilter extends OncePerRequestFilter {
                                     FilterChain filterChain)
             throws ServletException, IOException {
 
+
         logger.debug("Filtrage JWT pour l'URL : {}", request.getRequestURI());
 
         String jwt = extractJwtFromCookies(request);
