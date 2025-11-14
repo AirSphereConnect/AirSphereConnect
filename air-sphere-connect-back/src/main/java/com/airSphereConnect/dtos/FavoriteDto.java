@@ -5,15 +5,24 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO représentant un favori utilisateur lié à une ville,
+ * avec ses catégories, dates et nom de ville.
+ */
 public class FavoriteDto {
 
     private Long id;
+
     private FavoriteCategory favoriteCategory;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime updatedAt;
+
     private Long userId;
+
     private Long cityId;
 
     public String getCityName() {
@@ -26,7 +35,8 @@ public class FavoriteDto {
 
     private String cityName;
 
-    public FavoriteDto() {}
+    public FavoriteDto() {
+    }
 
     public FavoriteDto(Long id, FavoriteCategory favoriteCategory, LocalDateTime createdAt,
                        LocalDateTime updatedAt, Long userId, Long cityId, String cityName) {

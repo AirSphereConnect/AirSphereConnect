@@ -1,10 +1,12 @@
 package com.airSphereConnect.dtos;
 
-import com.airSphereConnect.entities.User;
 import com.fasterxml.jackson.annotation.JsonFormat;
-
 import java.time.LocalDateTime;
 
+/**
+ * DTO représentant l’état d’abonnement aux alertes météo favoris,
+ * avec détails sur la ville, département, région et statut.
+ */
 public class FavoritesAlertsDto {
     private Long id;
     private Long user;

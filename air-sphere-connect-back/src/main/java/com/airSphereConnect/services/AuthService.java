@@ -2,6 +2,7 @@ package com.airSphereConnect.services;
 
 import com.airSphereConnect.dtos.request.LoginRequestDto;
 import com.airSphereConnect.dtos.request.UserRequestDto;
+import com.airSphereConnect.dtos.response.UserResponseDto;
 import com.airSphereConnect.entities.User;
 import com.airSphereConnect.mapper.UserMapper;
 import com.airSphereConnect.services.security.ActiveTokenService;
@@ -189,7 +190,7 @@ public class AuthService {
             String jwt = jwtOpt.get();
             UserDetails userDetails = jwtService.extractUserDetails(jwt);
 
-            if (!jwtService.validateToken(jwt, userDetails)) {
+            if (jwtService.validateToken(jwt, userDetails)) {
                 return getGuestResponse(response);
             }
 

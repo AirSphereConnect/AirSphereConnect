@@ -33,7 +33,7 @@ public class FavoritesAlertsMapper {
     }
 
     // Backend → Frontend
-    public static FavoritesAlertsDto toDto(FavoritesAlerts entity) {
+    public FavoritesAlertsDto toDto(FavoritesAlerts entity) {
         if (entity == null) return null;
 
         FavoritesAlertsDto dto = new FavoritesAlertsDto();
