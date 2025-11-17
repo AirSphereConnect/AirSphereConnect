@@ -1,9 +1,9 @@
-<div class="max-w-[1600px] mx-auto p-5">
-  <header class="flex justify-between items-center mb-8 pb-5 border-b-2 border-gray-200">
-    <h1 class="text-3xl font-bold text-gray-800"> Tableau de bord des indicateurs de la ville de
-      <span class="">{{ cityName() }}</span>
-      <span class="ml-2">({{ cityPostalCode() }})</span></h1>
-  </header>
+<div class="max-w-[1600px] mx-auto p-6">
+    <header class="mb-8 pb-5 border-b-2 border-base-300">
+      <h1 class="text-3xl font-bold text-base-content">Tableau de bord des indicateurs de la ville de
+        <span class="">{{ cityName() }}</span>
+        <span class="ml-2">({{ cityPostalCode() }})</span></h1>
+    </header>
 
   @if (isLoading()) {
     <div class="loading-overlay">
