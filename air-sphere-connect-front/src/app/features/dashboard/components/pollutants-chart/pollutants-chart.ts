@@ -77,7 +77,7 @@ import {User} from '../../../../core/models/user.model';
           <vis-tooltip [triggers]="tooltipTriggers"></vis-tooltip>
         </vis-xy-container>
       } @else {
-        <p class="text-gray-400 italic text-center mt-5">
+        <p class="text-base-content opacity-60 italic text-center py-8">
           Aucune donnée de pollution disponible
         </p>
       }
@@ -215,15 +215,15 @@ export class PollutantsChart {
       const dateStr = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}`;
 
       return `
-        <div style="padding: 10px; background: white; border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.2); min-width: 180px;">
-          <div style="font-weight: 600; margin-bottom: 8px; font-size: 13px; border-bottom: 1px solid #e0e0e0; padding-bottom: 6px;">
+        <div class="bg-base-100 rounded-lg p-3 shadow-lg border border-base-300" style="min-width: 180px;">
+          <div class="font-semibold mb-2 text-sm border-b border-base-300 pb-1 text-base-content">
             ${dateStr}
           </div>
-          ${d.pm25 ? `<div style="margin: 4px 0; font-size: 12px;"><span style="color: ${this.pollutantLegend()[0].color};">●</span> PM2.5 : <strong>${d.pm25.toFixed(1)} µg/m³</strong></div>` : ''}
-          ${d.pm10 ? `<div style="margin: 4px 0; font-size: 12px;"><span style="color: ${this.pollutantLegend()[1].color};">●</span> PM10 : <strong>${d.pm10.toFixed(1)} µg/m³</strong></div>` : ''}
-          ${d.no2 ? `<div style="margin: 4px 0; font-size: 12px;"><span style="color: ${this.pollutantLegend()[2].color};">●</span> NO₂ : <strong>${d.no2.toFixed(1)} µg/m³</strong></div>` : ''}
-          ${d.o3 ? `<div style="margin: 4px 0; font-size: 12px;"><span style="color: ${this.pollutantLegend()[3].color};">●</span> O₃ : <strong>${d.o3.toFixed(1)} µg/m³</strong></div>` : ''}
-          ${d.so2 ? `<div style="margin: 4px 0; font-size: 12px;"><span style="color: ${this.pollutantLegend()[4].color};">●</span> SO₂ : <strong>${d.so2.toFixed(1)} µg/m³</strong></div>` : ''}
+          ${d.pm25 ? `<div class="my-1 text-xs text-base-content"><span style="color: ${this.pollutantLegend()[0].color};">●</span> PM2.5 : <strong>${d.pm25.toFixed(1)} µg/m³</strong></div>` : ''}
+          ${d.pm10 ? `<div class="my-1 text-xs text-base-content"><span style="color: ${this.pollutantLegend()[1].color};">●</span> PM10 : <strong>${d.pm10.toFixed(1)} µg/m³</strong></div>` : ''}
+          ${d.no2 ? `<div class="my-1 text-xs text-base-content"><span style="color: ${this.pollutantLegend()[2].color};">●</span> NO₂ : <strong>${d.no2.toFixed(1)} µg/m³</strong></div>` : ''}
+          ${d.o3 ? `<div class="my-1 text-xs text-base-content"><span style="color: ${this.pollutantLegend()[3].color};">●</span> O₃ : <strong>${d.o3.toFixed(1)} µg/m³</strong></div>` : ''}
+          ${d.so2 ? `<div class="my-1 text-xs text-base-content"><span style="color: ${this.pollutantLegend()[4].color};">●</span> SO₂ : <strong>${d.so2.toFixed(1)} µg/m³</strong></div>` : ''}
         </div>
       `;
     }

@@ -57,7 +57,7 @@ import {City} from '../../../../core/models/city.model';
           </vis-xy-container>
         </div>
       } @else {
-        <p class="text-gray-400 italic text-center py-8">
+        <p class="text-base-content opacity-60 italic text-center py-8">
           Chargement des données...
         </p>
       }
@@ -115,9 +115,9 @@ export class CityPopulationChart {
 
   tooltipTriggers = {
     [GroupedBar.selectors.bar]: (d: City) => `
-      <div style="padding: 10px; background: white; border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.2);">
-        <div style="font-weight: 600; margin-bottom: 6px; font-size: 14px;">${d.name}</div>
-        <div style="color: #666; font-size: 13px;">Population :
+      <div class="bg-base-100 rounded-lg p-3 shadow-lg border border-base-300">
+        <div class="font-semibold mb-2 text-sm text-base-content">${d.name}</div>
+        <div class="text-sm text-base-content opacity-70">Population :
           <strong style="color: ${this.color()};">${(d.population || 0).toLocaleString('fr-FR')}</strong> habitants
         </div>
       </div>

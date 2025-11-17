@@ -46,7 +46,7 @@ import { WeatherMeasurement } from '../../../../core/models/data.model';
           <vis-crosshair [template]="crosshairTemplate" [color]="color"></vis-crosshair>
         </vis-xy-container>
       } @else {
-        <p class="text-gray-400 italic text-center py-8">Aucune donnée de température disponible</p>
+        <p class="text-base-content opacity-60 italic text-center py-8">Aucune donnée de température disponible</p>
       }
     </div>
   `,
@@ -154,9 +154,9 @@ export class TemperatureChart {
     const dateStr = `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
 
     return `
-      <div style="padding: 10px; background: white; border-radius: 6px; box-shadow: 0 2px 12px rgba(0,0,0,0.2);">
-        <div style="font-weight: 600; margin-bottom: 6px; font-size: 13px; border-bottom: 1px solid #e0e0e0; padding-bottom: 4px;">${dateStr}</div>
-        <div style="font-size: 14px; margin-top: 6px;">
+      <div class="bg-base-100 rounded-lg p-3 shadow-lg border border-base-300">
+        <div class="font-semibold mb-2 text-sm border-b border-base-300 pb-1 text-base-content">${dateStr}</div>
+        <div class="text-sm mt-2 text-base-content">
           Température : <strong style="color: ${this.color()};">${d.y.toFixed(1)}°C</strong>
         </div>
       </div>
