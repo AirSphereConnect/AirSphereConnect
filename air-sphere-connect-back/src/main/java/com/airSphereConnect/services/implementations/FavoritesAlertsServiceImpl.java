@@ -45,7 +45,6 @@ public class FavoritesAlertsServiceImpl implements FavoritesAlertsService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé avec l'id : " + userId));
 
-        // Convertir null en false pour enabled
         if (dto.getEnabled() == null) {
             dto.setEnabled(false);
         }

@@ -23,15 +23,15 @@ public class Favorite extends Timestamp {
 
     @NotNull(message = "{alert.enabled.required}")
     @Column(name = "weather", nullable = false)
-    private boolean selectWeather;
+    private Boolean selectWeather;
 
     @NotNull(message = "{alert.enabled.required}")
     @Column(name = "air_quality", nullable = false)
-    private boolean selectAirQuality;
+    private Boolean selectAirQuality;
 
     @NotNull(message = "{alert.enabled.required}")
     @Column(name = "population", nullable = false)
-    private boolean selectPopulation;
+    private Boolean selectPopulation;
 
     @NotNull(message = "{favorite.user.required}")
     @ManyToOne(fetch = FetchType.LAZY)
@@ -82,28 +82,27 @@ public class Favorite extends Timestamp {
         this.city = city;
     }
 
-    public boolean getSelectPopulation() {
+    public Boolean getSelectPopulation() {
         return selectPopulation;
     }
 
-    public void setSelectPopulation(boolean selectPopulation) {
+    public void setSelectPopulation(Boolean selectPopulation) {
         this.selectPopulation = selectPopulation;
     }
 
-
-    public boolean getSelectAirQuality() {
+    public Boolean getSelectAirQuality() {
         return this.selectAirQuality;
     }
 
-    public void setSelectAirQuality(boolean selectAirQuality) {
+    public void setSelectAirQuality(Boolean selectAirQuality) {
         this.selectAirQuality = selectAirQuality;
     }
 
-    public boolean getSelectWeather() {
+    public Boolean getSelectWeather() {
         return selectWeather;
     }
 
-    public void setSelectWeather(boolean selectWeather) {
+    public void setSelectWeather(Boolean selectWeather) {
         this.selectWeather = selectWeather;
     }
 

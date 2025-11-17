@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 public class FavoriteDto {
 
     private Long id;
-    private boolean selectWeather;
-    private boolean selectAirQuality;
-    private boolean selectPopulation;
+    private Boolean selectWeather;
+    private Boolean selectAirQuality;
+    private Boolean selectPopulation;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime createdAt;
@@ -92,7 +92,7 @@ public class FavoriteDto {
         this.cityName = cityName;
     }
 
-    public boolean getSelectWeather() {
+    public Boolean getSelectWeather() {
         return selectWeather;
     }
 
@@ -100,7 +100,7 @@ public class FavoriteDto {
         this.selectWeather = selectWeather;
     }
 
-    public boolean getSelectAirQuality() {
+    public Boolean getSelectAirQuality() {
         return selectAirQuality;
     }
 
@@ -108,7 +108,7 @@ public class FavoriteDto {
         this.selectAirQuality = selectAirQuality;
     }
 
-    public boolean getSelectPopulation() {
+    public Boolean getSelectPopulation() {
         return selectPopulation;
     }
 

@@ -15,67 +15,34 @@
       <tbody>
         @for (favorite of user.favorites; track favorite.id) {
           <tr class="border-t">
-            @if (favorite?.weather) {
-              <td class="p-2 text-center">
-                <app-button
-                  class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                  color="primary"
-                  variant="solid"
-                >
-                  PDF
-                </app-button>
-                <div class="divider divider-horizontal">
-                  <app-button
-                    class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                    color="primary"
-                    variant="solid"
-                  >
-                    CSV
-                  </app-button>
+            @if (favorite?.selectWeather) {
+              <td class="p-2">
+                <div class="flex justify-center">
+                  <a href="#" class="link link-primary">PDF</a>
+                  <div class="divider divider-horizontal mx-"></div>
+                  <a href="#" class="link link-primary">CSV</a>
                 </div>
               </td>
             } @else {
               <td class="p-2 text-center">Non sélectionner</td>
             }
-            @if (favorite?.airQuality) {
-              <td class="p-2 text-center">
-                <app-button
-                  class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                  color="primary"
-                  variant="solid"
-                >
-                  PDF
-                </app-button>
-                <div class="divider divider-horizontal">
-                  <app-button
-                    class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                    color="primary"
-                    variant="solid"
-                  >
-                    CSV
-                  </app-button>
+            @if (favorite?.selectAirQuality) {
+              <td class="p-2">
+                <div class="flex justify-center">
+                  <a href="#" class="link link-primary">PDF</a>
+                  <div class="divider divider-horizontal mx-"></div>
+                  <a href="#" class="link link-primary">CSV</a>
                 </div>
               </td>
             } @else {
               <td class="p-2 text-center">Non sélectionner</td>
             }
-            @if (favorite?.population) {
-              <td class="p-2 text-center">
-                <app-button
-                  class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                  color="primary"
-                  variant="solid"
-                >
-                  PDF
-                </app-button>
-                <div class="divider divider-horizontal">
-                  <app-button
-                    class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                    color="primary"
-                    variant="solid"
-                  >
-                    CSV
-                  </app-button>
+            @if (favorite?.selectPopulation) {
+              <td class="p-2">
+                <div class="flex justify-center">
+                  <a href="#" class="link link-primary">PDF</a>
+                  <div class="divider divider-horizontal mx-"></div>
+                  <a href="#" class="link link-primary">CSV</a>
                 </div>
               </td>
             } @else {

@@ -4,9 +4,9 @@ export interface Favorite {
   cityName: string;
   createdAt: string;
   updatedAt: string;
-  weather: boolean;
-  airQuality: boolean;
-  population: boolean;
+  selectWeather: boolean;
+  selectAirQuality: boolean;
+  selectPopulation: boolean;
 }
 
 export interface Alerts {

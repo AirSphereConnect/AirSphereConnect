@@ -109,11 +109,12 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
     }
 
     const payload = {
-      enabledWeather: !!this.favoritesForm.value.activeWeather,
-      enabledAirQuality: !!this.favoritesForm.value.activeAirQuality,
-      enabledPopulation: !!this.favoritesForm.value.activePopulation,
+      selectWeather: !!this.favoritesForm.value.activeWeather,
+      selectAirQuality: !!this.favoritesForm.value.activeAirQuality,
+      selectPopulation: !!this.favoritesForm.value.activePopulation,
       cityId: this.cityIdSelected
     };
+
 
     const request$ = this.editingFavoriteId
       ? this.favoritesService.editFavorites(payload, this.editingFavoriteId)
