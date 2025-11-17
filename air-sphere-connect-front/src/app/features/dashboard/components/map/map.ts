@@ -1,4 +1,5 @@
-import { Component, OnInit, AfterViewInit, OnDestroy, signal, inject, output, input, effect, computed } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy, signal, inject, output, input, effect, computed, DestroyRef } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import * as L from 'leaflet';
 import { CityService } from '../../../../core/services/city';
 import { AirQualityService } from '../../../../core/services/air-quality';
@@ -23,9 +24,9 @@ interface CityMapPoint extends City {
   standalone: true,
   imports: [],
   template: `
-    <div class="relative bg-white rounded-xl p-5 shadow-md">
+    <div class="relative bg-base-100 rounded-lg p-5 shadow-md">
       <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold text-gray-800 m-0">
+        <h3 class="text-xl font-semibold text-base-content m-0">
           🗺️ Carte des villes d'Occitanie
         </h3>
 
@@ -46,36 +47,46 @@ interface CityMapPoint extends City {
 
       <!-- Tooltip personnalisé -->
       @if (selectedCity()) {
-        <div class="absolute bg-white rounded-xl shadow-2xl border border-gray-200 p-5 z-[2000]"
+        <div class="absolute bg-base-100 rounded-lg shadow-2xl border border-base-300 p-5 z-[2000]"
              [style.left.px]="tooltipPosition()?.x"
              [style.top.px]="tooltipPosition()?.y"
              style="max-width: 350px; min-width: 300px;">
           <div class="flex justify-between items-start mb-3">
-            <h3 class="text-lg font-bold text-gray-900 m-0">
+            <h3 class="text-lg font-bold text-base-content m-0">
               {{ selectedCity()!.name }}
             </h3>
             <button (click)="closeTooltip()"
-                    class="text-gray-400 hover:text-gray-600 text-xl leading-none">
+                    class="text-base-content opacity-60 hover:opacity-100 text-xl leading-none">
               ×
             </button>
           </div>
 
           <div class="space-y-2 text-sm">
             <div class="flex items-center">
-              <span class="text-gray-600 font-medium w-32">📍 Département :</span>
-              <span class="text-gray-900">{{ selectedCity()!.departmentName || 'N/A' }} ({{ selectedCity()!.postalCode || 'N/A' }})</span>
+              <span class="text-base-content opacity-70 font-medium w-32">📍 Département :</span>
+              <span class="text-base-content">{{ selectedCity()!.departmentName || 'Non mesuré' }} ({{ selectedCity()!.postalCode || 'Non mesuré' }})</span>
             </div>
 
             <div class="flex items-center">
-              <span class="text-gray-600 font-medium w-32">👥 Population :</span>
-              <span class="text-gray-900 font-semibold">{{ selectedCity()!.population.toLocaleString('fr-FR') }} hab.</span>
+              <span class="text-base-content opacity-70 font-medium w-32">👥 Population :</span>
+              <span class="text-base-content font-semibold">{{ selectedCity()!.population.toLocaleString('fr-FR') }} hab.</span>
             </div>
+
+            <!-- Loading indicator -->
+            @if (isLoadingCityDetails()) {
+              <div class="mt-3 p-3 bg-base-200 rounded-lg">
+                <div class="flex items-center gap-2">
+                  <span class="loading loading-spinner loading-sm"></span>
+                  <span class="text-sm">Chargement des données...</span>
+                </div>
+              </div>
+            }
 
             <!-- Indice de qualité de l'air -->
             @if (selectedCity()!.airQualityLabel) {
-              <div class="mt-3 p-3 bg-gray-50 rounded-lg">
+              <div class="mt-3 p-3 bg-base-200 rounded-lg">
                 <div class="flex items-center justify-between mb-2">
-                  <span class="text-gray-700 font-semibold text-sm">🏭 Qualité de l'air</span>
+                  <span class="text-base-content font-semibold text-sm">🏭 Qualité de l'air</span>
                   <span class="inline-block px-3 py-1 rounded-full text-white text-xs font-semibold"
                         [style.background-color]="selectedCity()!.airQualityColor">
                     {{ selectedCity()!.airQualityLabel }} ({{ selectedCity()!.airQualityIndex }})
@@ -92,32 +103,32 @@ interface CityMapPoint extends City {
 
             <!-- Polluants du jour -->
             @if (selectedCity()!.latestMeasurement) {
-              <div class="mt-3 p-3 bg-blue-50 rounded-lg">
-                <h4 class="text-gray-800 font-semibold text-sm mb-2">🧪 Polluants ({{ selectedCity()!.latestMeasurement!.unit }})</h4>
+              <div class="mt-3 p-3 bg-base-200 rounded-lg">
+                <h4 class="text-base-content font-semibold text-sm mb-2">🧪 Polluants ({{ selectedCity()!.latestMeasurement!.unit }})</h4>
                 <div class="grid grid-cols-3 gap-2 text-xs">
                   <div class="flex flex-col">
-                    <span class="text-gray-600">PM2.5</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestMeasurement!.pm25 != null ? selectedCity()!.latestMeasurement!.pm25.toFixed(1) : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70">PM2.5</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestMeasurement!.pm25 != null ? selectedCity()!.latestMeasurement!.pm25.toFixed(1) : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-gray-600">PM10</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestMeasurement!.pm10 != null ? selectedCity()!.latestMeasurement!.pm10.toFixed(1) : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70">PM10</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestMeasurement!.pm10 != null ? selectedCity()!.latestMeasurement!.pm10.toFixed(1) : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-gray-600">NO₂</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestMeasurement!.no2 != null ? selectedCity()!.latestMeasurement!.no2.toFixed(1) : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70">NO₂</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestMeasurement!.no2 != null ? selectedCity()!.latestMeasurement!.no2.toFixed(1) : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-gray-600">O₃</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestMeasurement!.o3 != null ? selectedCity()!.latestMeasurement!.o3.toFixed(1) : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70">O₃</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestMeasurement!.o3 != null ? selectedCity()!.latestMeasurement!.o3.toFixed(1) : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-gray-600">SO₂</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestMeasurement!.so2 != null ? selectedCity()!.latestMeasurement!.so2.toFixed(1) : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70">SO₂</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestMeasurement!.so2 != null ? selectedCity()!.latestMeasurement!.so2.toFixed(1) : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex flex-col">
-                    <span class="text-gray-600">CO</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestMeasurement!.co != null ? selectedCity()!.latestMeasurement!.co.toFixed(1) : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70">CO</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestMeasurement!.co != null ? selectedCity()!.latestMeasurement!.co.toFixed(1) : 'Non mesuré' }}</span>
                   </div>
 
 
@@ -127,24 +138,24 @@ interface CityMapPoint extends City {
 
             <!-- Météo du jour -->
             @if (selectedCity()!.latestWeather) {
-              <div class="mt-3 p-3 bg-sky-50 rounded-lg">
-                <h4 class="text-gray-800 font-semibold text-sm mb-2">🌤️ Météo</h4>
+              <div class="mt-3 p-3 bg-base-200 rounded-lg">
+                <h4 class="text-base-content font-semibold text-sm mb-2">🌤️ Météo</h4>
                 <div class="grid grid-cols-2 gap-2 text-xs">
                   <div class="flex items-center">
-                    <span class="text-gray-600 mr-1">🌡️</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestWeather!.temperature != null ? selectedCity()!.latestWeather!.temperature.toFixed(1) + '°C' : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70 mr-1">🌡️</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.temperature != null ? selectedCity()!.latestWeather!.temperature.toFixed(1) + '°C' : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex items-center">
-                    <span class="text-gray-600 mr-1">💧</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestWeather!.humidity != null ? selectedCity()!.latestWeather!.humidity.toFixed(0) + '%' : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70 mr-1">💧</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.humidity != null ? selectedCity()!.latestWeather!.humidity.toFixed(0) + '%' : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex items-center">
-                    <span class="text-gray-600 mr-1">🌬️</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestWeather!.windSpeed != null ? selectedCity()!.latestWeather!.windSpeed.toFixed(1) + ' km/h' : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70 mr-1">🌬️</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.windSpeed != null ? selectedCity()!.latestWeather!.windSpeed.toFixed(1) + ' km/h' : 'Non mesuré' }}</span>
                   </div>
                   <div class="flex items-center">
-                    <span class="text-gray-600 mr-1">🔽</span>
-                    <span class="font-bold text-gray-900">{{ selectedCity()!.latestWeather!.pressure != null ? selectedCity()!.latestWeather!.pressure.toFixed(0) + ' hPa' : 'N/A' }}</span>
+                    <span class="text-base-content opacity-70 mr-1">🔽</span>
+                    <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.pressure != null ? selectedCity()!.latestWeather!.pressure.toFixed(0) + ' hPa' : 'Non mesuré' }}</span>
                   </div>
                 </div>
               </div>
@@ -159,26 +170,26 @@ interface CityMapPoint extends City {
       }
 
       <div
-        class="absolute bottom-10 right-10 bg-white p-4 rounded-lg shadow-lg z-[1000]">
-        <h4 class="m-0 mb-2 text-sm font-semibold text-gray-800">Légende</h4>
+        class="absolute bottom-10 right-10 bg-base-100 p-4 rounded-lg shadow-lg border border-base-300 z-[1000]">
+        <h4 class="m-0 mb-2 text-sm font-semibold text-base-content">Légende</h4>
 
-        <div class="flex items-center mb-2 text-xs text-gray-600">
+        <div class="flex items-center mb-2 text-xs text-base-content opacity-70">
       <span
-        class="w-4 h-4 rounded-full mr-2 border-2 border-white shadow-sm"
+        class="w-4 h-4 rounded-full mr-2 border-2 border-base-300 shadow-sm"
         style="background-color: #4CAF50"></span>
           <span>Petite ville (&lt; 10k hab.)</span>
         </div>
 
-        <div class="flex items-center mb-2 text-xs text-gray-600">
+        <div class="flex items-center mb-2 text-xs text-base-content opacity-70">
       <span
-        class="w-4 h-4 rounded-full mr-2 border-2 border-white shadow-sm"
+        class="w-4 h-4 rounded-full mr-2 border-2 border-base-300 shadow-sm"
         style="background-color: #2196F3"></span>
           <span>Ville moyenne (10k-100k hab.)</span>
         </div>
 
-        <div class="flex items-center text-xs text-gray-600">
+        <div class="flex items-center text-xs text-base-content opacity-70">
       <span
-        class="w-4 h-4 rounded-full mr-2 border-2 border-white shadow-sm"
+        class="w-4 h-4 rounded-full mr-2 border-2 border-base-300 shadow-sm"
         style="background-color: #E91E63"></span>
           <span>Grande ville (&gt; 100k hab.)</span>
         </div>
@@ -199,6 +210,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   private cityService = inject(CityService);
   private airQualityService = inject(AirQualityService);
   private weatherService = inject(WeatherService);
+  private destroyRef = inject(DestroyRef);
 
   private map: L.Map | null = null;
   private cityMarkers: Array<{ marker: L.CircleMarker; city: CityMapPoint; popupBound: boolean }> = [];
@@ -208,6 +220,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   error = signal<string | null>(null);
   selectedCity = signal<CityMapPoint | null>(null);
   tooltipPosition = signal<{ x: number; y: number } | null>(null);
+  isLoadingCityDetails = signal(false);
 
   // Input moderne pour recevoir le nom de la ville de l'utilisateur
   userCityName = input<string>('');
@@ -266,91 +279,90 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   }
 
   /**
-   * 📍 Charger toutes les villes d'Occitanie
+   * 📍 Charger toutes les villes d'Occitanie (sans données air/météo)
    */
   loadMapData() {
     this.isLoading.set(true);
     this.error.set(null);
 
-    this.cityService.getAll().subscribe({
-      next: (cities) => {
-        console.log(`✅ ${cities.length} villes chargées`);
+    this.cityService.getAll()
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (cities) => {
+          console.log(`✅ ${cities.length} villes chargées`);
 
-        // Filtrer les villes avec coordonnées valides
-        const validCities = cities.filter(c =>
-          c.latitude &&
-          c.longitude &&
-          c.latitude >= 42 && c.latitude <= 45 && // Occitanie
-          c.longitude >= -1 && c.longitude <= 4.5
-        );
+          // Filtrer les villes avec coordonnées valides
+          const validCities = cities.filter(c =>
+            c.latitude &&
+            c.longitude &&
+            c.latitude >= 42 && c.latitude <= 45 && // Occitanie
+            c.longitude >= -1 && c.longitude <= 4.5
+          );
 
-        console.log(`✅ ${validCities.length} villes avec coordonnées valides`);
+          console.log(`✅ ${validCities.length} villes avec coordonnées valides`);
 
-        // Charger la qualité de l'air pour les grandes villes (optionnel)
-        this.enrichWithAirQuality(validCities);
-      },
-      error: (err) => {
-        console.error('❌ Erreur chargement villes:', err);
-        this.error.set('Impossible de charger les villes');
-        this.isLoading.set(false);
-      }
-    });
+          // Convertir en CityMapPoint sans charger les données (lazy loading)
+          const cityMapPoints: CityMapPoint[] = validCities.map(city => ({
+            ...city
+          }));
+
+          this.mapData.set(cityMapPoints);
+          this.isLoading.set(false);
+
+          setTimeout(() => this.initMap(), 0);
+        },
+        error: (err) => {
+          console.error('❌ Erreur chargement villes:', err);
+          this.error.set('Impossible de charger les villes');
+          this.isLoading.set(false);
+        }
+      });
   }
 
   /**
-   * 🏭 Enrichir avec la qualité de l'air et la météo (pour les grandes villes)
+   * 🔍 Charger les données d'une ville spécifique au clic (lazy loading)
    */
-  private enrichWithAirQuality(cities: City[]) {
-    // Enrichir les 30 plus grandes villes avec les données complètes
-    const topCities = cities
-      .sort((a, b) => b.population - a.population)
-      .slice(0, 30);
+  private loadCityDetails(city: CityMapPoint) {
+    console.log(`🔄 Chargement lazy des données pour ${city.name}...`);
 
-    const dataRequests = topCities.map(city =>
-      forkJoin({
-        airQuality: this.airQualityService.getComplete(city.name).pipe(catchError(() => of(null))),
-        weather: this.weatherService.getLatest(city.id).pipe(catchError(() => of(null)))
-      })
-    );
+    // Afficher immédiatement le tooltip avec les infos de base + loading
+    this.selectedCity.set(city);
+    this.isLoadingCityDetails.set(true);
 
-    forkJoin(dataRequests).subscribe({
-      next: (enrichedData) => {
-        console.log('🔍 Enriched data received:', enrichedData);
+    forkJoin({
+      airQuality: this.airQualityService.getComplete(city.name).pipe(catchError(() => of(null))),
+      weather: this.weatherService.getLatest(city.id).pipe(catchError(() => of(null)))
+    })
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+        next: (data) => {
+          const aq = data.airQuality?.latestIndex;
+          const measurement = data.airQuality?.latestMeasurement;
+          const weather = data.weather;
 
-        const enrichedCities: CityMapPoint[] = cities.map(city => {
-          const topCityIndex = topCities.findIndex(tc => tc.id === city.id);
-          if (topCityIndex >= 0) {
-            const data = enrichedData[topCityIndex];
-            const aq = data.airQuality?.latestIndex;
-            const measurement = data.airQuality?.latestMeasurement;
-            const weather = data.weather;
+          console.log(`✅ Données chargées pour ${city.name}:`, { aq, measurement, weather });
 
-            console.log(`📊 ${city.name}:`, {
-              airQuality: aq,
-              measurement: measurement,
-              weather: weather
-            });
+          // Mettre à jour la ville avec les données enrichies
+          const enrichedCity: CityMapPoint = {
+            ...city,
+            airQualityIndex: aq?.qualityIndex,
+            airQualityLabel: aq?.qualityLabel,
+            airQualityColor: aq?.qualityColor,
+            airQualityAlert: aq?.alert,
+            airQualityAlertMessage: aq?.alertMessage,
+            latestMeasurement: measurement,
+            latestWeather: weather || undefined
+          };
 
-            return {
-              ...city,
-              airQualityIndex: aq?.qualityIndex,
-              airQualityLabel: aq?.qualityLabel,
-              airQualityColor: aq?.qualityColor,
-              airQualityAlert: aq?.alert,
-              airQualityAlertMessage: aq?.alertMessage,
-              latestMeasurement: measurement,
-              latestWeather: weather || undefined
-            };
-          }
-          return city;
-        });
-
-        this.mapData.set(enrichedCities);
-        this.isLoading.set(false);
-
-        setTimeout(() => this.initMap(), 0);
-      }
-    });
+          // Mettre à jour le tooltip avec les données enrichies
+          this.selectedCity.set(enrichedCity);
+          this.isLoadingCityDetails.set(false);
+        },
+        error: (err) => {
+          console.error(`❌ Erreur chargement données ${city.name}:`, err);
+          this.isLoadingCityDetails.set(false);
+        }
+      });
   }
 
   /**
@@ -455,7 +467,18 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
                   y: e.originalEvent.clientY - rect.top + 10
                 });
               }
-              this.selectedCity.set(city);
+
+              // Lazy loading : charger les données au clic
+              this.loadCityDetails(city);
+
+              // Zoomer sur la ville avec une animation fluide
+              if (this.map) {
+                this.map.flyTo([city.latitude, city.longitude], 12, {
+                  duration: 1.5,
+                  easeLinearity: 0.25
+                });
+              }
+
               console.log(`🖱️ Clic sur ${city.name}:`, city);
             });
 
