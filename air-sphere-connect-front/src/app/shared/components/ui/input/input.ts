@@ -104,7 +104,6 @@ export class InputComponent implements ControlValueAccessor, OnInit {
   }
 
   onInput(event: Event): void {
-    console.log("valeur html input element : " + (event.target as HTMLInputElement))
     const inputValue = (event.target as HTMLInputElement).value;
     this.value = inputValue;
     this.onChange(inputValue);
@@ -119,6 +118,9 @@ export class InputComponent implements ControlValueAccessor, OnInit {
 
   ngOnInit(): void {
     if (this.control) {
+      // Initialiser la valeur immédiatement depuis le control
+      this.value = this.control.value ?? '';
+
       this.control.statusChanges
         ?.pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => this.updateSignalsFromControl());
@@ -127,7 +129,7 @@ export class InputComponent implements ControlValueAccessor, OnInit {
         ?.pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe(() => {
           this.updateSignalsFromControl();
-          // Sync control value to internal value if it changed externally
+
           if (this.control && this.control.value !== this.value) {
             this.value = this.control.value ?? '';
           }

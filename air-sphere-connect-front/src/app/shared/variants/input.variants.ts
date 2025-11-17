@@ -9,7 +9,7 @@ export const inputVariants = tv({
     inputWrapper: 'relative',
     input: 'input input-bordered w-full transition-all duration-200',
     iconLeft: 'absolute left-0 -translate-x-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10 h-9 w-12 flex items-center justify-center rounded-tl-lg rounded-bl-lg bg-base-300/90',
-    iconRight: 'absolute right-3 top-1/2 -translate-y-1/2',
+    iconRight: 'absolute right-3 top-1/2 -translate-y-1/2 z-10',
     helperWrapper: 'label',
     helperText: 'label-text-alt text-base-content/70 text-xs',
     errorText: 'label-text-alt text-error text-xs font-medium flex items-center gap-1.5',
@@ -52,15 +52,15 @@ export const inputVariants = tv({
     },
     state: {
       default: {
-        input: 'border-base-300 focus:border-primary focus:outline-primary',
+        input: 'border-base-300 shadow-sm hover:shadow-md focus:border-primary focus:outline-primary focus:shadow-lg transition-shadow',
         labelText: 'text-base-content',
       },
       error: {
-        input: 'border-2 !border-error focus:!border-error focus:!outline-none focus:ring-2 focus:ring-error/20 !bg-error/5',
+        input: 'border-2 !border-error focus:!border-error focus:!outline-none focus:ring-2 focus:ring-error/20 !bg-error/5 shadow-sm hover:shadow-md focus:shadow-lg transition-shadow',
         labelText: 'text-base-content',
       },
       success: {
-        input: 'border-2 !border-success focus:!border-success focus:!outline-none focus:ring-2 focus:ring-success/20',
+        input: 'border-2 !border-success focus:!border-success focus:!outline-none focus:ring-2 focus:ring-success/20 shadow-sm hover:shadow-md focus:shadow-lg transition-shadow',
         labelText: 'text-base-content',
       },
     },
