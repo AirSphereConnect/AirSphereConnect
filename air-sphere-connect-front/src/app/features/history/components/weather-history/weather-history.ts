@@ -2,11 +2,12 @@ import { Component, computed, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { CityHistoryData } from '../../../../core/models/city.model';
 import { translateWeatherMessage } from '../../../../shared/utils/weather-translator.util';
+import {Button} from '../../../../shared/components/ui/button/button';
 
 @Component({
   selector: 'app-weather-history',
   standalone: true,
-  imports: [DatePipe],
+  imports: [DatePipe, Button],
   templateUrl: './weather-history.html',
   styleUrls: ['./weather-history.scss']
 })

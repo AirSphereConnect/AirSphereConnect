@@ -89,7 +89,6 @@
     </div>
   }
 
-  <!-- Templates pour les labels des onglets avec icônes -->
   <ng-template #airQualityLabel>
     <span class="flex items-center justify-center gap-2">
       <app-icon [name]="'leaf'" [size]="'md'" />
@@ -104,7 +103,6 @@
     </span>
   </ng-template>
 
-  <!-- Templates pour le contenu des onglets -->
   <ng-template #airQualityTab>
     <app-air-quality-history
       [historyData]="historyData()!"

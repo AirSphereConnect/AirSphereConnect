@@ -117,27 +117,38 @@
     </tbody>
   </table>
 
-  <!-- Pagination -->
   @if (totalPages() > 1) {
-    <div class="flex justify-center items-center gap-2 mt-4">
-      <button
-        class="btn btn-sm"
-        [disabled]="currentPage() === 1"
-        (click)="prevPage()">
-        Précédent
-      </button>
+    <div class="flex justify-center items-center gap-3 m-4">
+
+      @if (currentPage() > 1) {
+        <app-button
+          size="sm"
+          variant="outline"
+          (click)="prevPage()"
+        >
+          Précédent
+        </app-button>
+      } @else {
+        <div class="w-[88px]"></div>
+      }
 
       <span class="text-sm">
         Page {{ currentPage() }} / {{ totalPages() }}
         ({{ allFilteredData().length }} résultats)
       </span>
 
-      <button
-        class="btn btn-sm"
-        [disabled]="currentPage() === totalPages()"
-        (click)="nextPage()">
-        Suivant
-      </button>
+      @if (currentPage() < totalPages()) {
+          <app-button
+            size="sm"
+            variant="outline"
+            padding="lg"
+            (click)="nextPage()"
+          >
+            Suivant
+          </app-button>
+      } @else {
+        <div class="w-[88px]"></div>
+      }
     </div>
   }
 </div>

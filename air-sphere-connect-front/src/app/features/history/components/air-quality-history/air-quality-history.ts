@@ -1,11 +1,12 @@
 import {Component, computed, input, signal} from '@angular/core';
 import {DatePipe, NgClass} from '@angular/common';
 import {CityHistoryData} from '../../../../core/models/city.model';
+import {Button} from '../../../../shared/components/ui/button/button';
 
 @Component({
   selector: 'app-air-quality-history',
   standalone: true,
-  imports: [DatePipe, NgClass],
+  imports: [DatePipe, NgClass, Button],
   templateUrl: './air-quality-history.html',
   styleUrls: ['./air-quality-history.scss']
 })
