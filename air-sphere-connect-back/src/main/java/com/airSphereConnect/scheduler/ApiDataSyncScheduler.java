@@ -22,11 +22,13 @@ public class ApiDataSyncScheduler {
 
     private final List<DataSyncService> syncServices;
     private final SyncMetrics syncMetrics;
+    private final com.airSphereConnect.services.api.HistoricalDataLoaderService historicalDataLoader;
 
-
-    public ApiDataSyncScheduler(List<DataSyncService> syncServices, SyncMetrics syncMetrics) {
+    public ApiDataSyncScheduler(List<DataSyncService> syncServices, SyncMetrics syncMetrics,
+                                com.airSphereConnect.services.api.HistoricalDataLoaderService historicalDataLoader) {
         this.syncServices = syncServices;
         this.syncMetrics = syncMetrics;
+        this.historicalDataLoader = historicalDataLoader;
         log.info("🚀 Scheduler initialisé avec {} service(s)", syncServices.size());
     }
 
@@ -89,44 +91,15 @@ public class ApiDataSyncScheduler {
         log.info("✅ Données de base synchronisées");
     }
 
-    /**
-     * ❌ DÉSACTIVÉ - Cycle de synchronisation global toutes les 12 heures
-     * Remplacé par des synchros à heures fixes : 10h (matin) et 18h (soir)
-     *
-     * Raison : fixedRate créait des doublons aléatoires selon l'heure de démarrage
-     */
-    // @Scheduled(fixedRate = 43200000, initialDelay = 180000)
-    public void globalSynchronization() {
-        log.info("🔄 [{}] Début cycle de synchronisation (12h)", LocalDateTime.now());
-
-        AtomicInteger successCount = new AtomicInteger(0);
-        AtomicInteger errorCount = new AtomicInteger(0);
-
-        syncServices.stream()
-                .filter(DataSyncService::isEnabled)
-                .forEach(service -> {
-                    log.info("✅ Synchronisation du service: {}", service.getServiceName());
-                    try {
-                        syncService(service);
-                        successCount.incrementAndGet();
-                    } catch (Exception e) {
-                        errorCount.incrementAndGet();
-                        log.error("❌ Erreur synchronisation {}: {}", service.getServiceName(), e.getMessage());
-                    }
-                });
-
-        log.info("✅ Cycle 12h terminé - Succès: {}, Erreurs: {}", successCount.get(), errorCount.get());
-        syncMetrics.recordGlobalSync(successCount, errorCount);
-    }
-
 
     /**
-     * 🌅 Synchronisation des bulletins du matin à 10h00
+     * 🌅 Synchronisation des bulletins du matin à 12h00
      * Seuls les services AirQuality et Weather sont synchronisés
+     * Horaire décalé à 12h car ATMO publie ses données vers 10h30-11h
      */
-    @Scheduled(cron = "0 0 10 * * *")
+    @Scheduled(cron = "0 0 12 * * *")
     public void morningBulletinSync() {
-        log.info("🌅 [{}] Synchronisation bulletin du matin (10h)", LocalDateTime.now());
+        log.info("🌅 [{}] Synchronisation bulletin du matin (12h)", LocalDateTime.now());
 
         List<String> morningServices = Arrays.asList("AIR_QUALITY", "WEATHER");
 
@@ -162,9 +135,6 @@ public class ApiDataSyncScheduler {
         log.info("✅ Synchronisation soirée terminée");
     }
 
-    /*
-     * 🎯 Synchronisation annuelle des données de recensement le 27 décembre
-     */
     @Scheduled(cron = "0 0 2 27 12 *")
     public void annualRecensementSync() {
         log.info("📊 [{}] Synchronisation annuelle recensement", LocalDateTime.now());
@@ -179,6 +149,22 @@ public class ApiDataSyncScheduler {
                 });
 
         log.info("✅ Synchronisation annuelle terminée");
+    }
+
+    /**
+     * Détecte et comble les jours manquants dans l'historique (serveur éteint)
+     * Chaque nuit à 2h00
+     */
+    @Scheduled(cron = "0 0 2 * * *")
+    public void nightlyMissingDataCheck() {
+        log.info("🌙 [{}] Vérification données manquantes", LocalDateTime.now());
+
+        try {
+            int missingDays = historicalDataLoader.detectAndFillMissingDays();
+            log.info("✅ Vérification terminée - {} jours traités", missingDays);
+        } catch (Exception e) {
+            log.error("❌ Erreur vérification nocturne: {}", e.getMessage());
+        }
     }
 
     /**
