@@ -27,6 +27,7 @@ public class JwtServiceImpl implements JwtService {
 
     private final SecretKey secretKey;
     private final CustomUserDetailsService userDetailsService;
+
     private final long accessTokenValidity;
     private final long refreshTokenValidity;
 
@@ -40,7 +41,7 @@ public class JwtServiceImpl implements JwtService {
      */
     public JwtServiceImpl(
             @Value("${jwt.secret:UneCleSecreteSuperLongueEtComplexePourTestUnique1234567890}") String secret,
-            @Value("${jwt.access-token-validity:7200000}") long accessTokenValidity,
+            @Value("${jwt.access-token-validity:900000}") long accessTokenValidity,
             @Value("${jwt.refresh-token-validity:604800000}") long refreshTokenValidity,
             CustomUserDetailsService userDetailsService) {
         this.secretKey = Keys.hmacShaKeyFor(secret.getBytes());
@@ -48,7 +49,6 @@ public class JwtServiceImpl implements JwtService {
         this.refreshTokenValidity = refreshTokenValidity;
         this.userDetailsService = userDetailsService;
     }
-
     /**
      * Extrait le username (subject) depuis un token JWT.
      *
@@ -59,7 +59,6 @@ public class JwtServiceImpl implements JwtService {
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
     }
-
     /**
      * Extrait la date d'expiration d'un token JWT.
      *
@@ -70,7 +69,6 @@ public class JwtServiceImpl implements JwtService {
     public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
-
     /**
      * Extrait une information spécifique (claim) via une fonction.
      *
@@ -84,7 +82,6 @@ public class JwtServiceImpl implements JwtService {
         Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
-
     /**
      * Récupère toutes les claims dans un token JWT.
      *
@@ -99,7 +96,6 @@ public class JwtServiceImpl implements JwtService {
                 .parseClaimsJws(token)
                 .getBody();
     }
-
     /**
      * Vérifie si un token JWT est expiré.
      *
@@ -111,7 +107,6 @@ public class JwtServiceImpl implements JwtService {
         Date expiration = extractExpiration(token);
         return expiration.before(new Date());
     }
-
     /**
      * Valide un token JWT pour un utilisateur donné.
      *
@@ -126,10 +121,10 @@ public class JwtServiceImpl implements JwtService {
     }
 
     /**
-     * Génère un token JWT avec durée de validité spécifiée.
+     * Génère un token JWT avec la durée spécifiée.
      *
      * @param userDetails données utilisateur
-     * @param validity    durée en millisecondes
+     * @param validity    durée de validité en millisecondes
      * @return token JWT signé
      */
     private String generateTokenWithValidity(UserDetails userDetails, long validity) {
@@ -149,7 +144,6 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
-
     /**
      * Génère un access token JWT selon la durée configurée.
      *
@@ -160,7 +154,6 @@ public class JwtServiceImpl implements JwtService {
     public String generateToken(UserDetails userDetails) {
         return generateTokenWithValidity(userDetails, accessTokenValidity);
     }
-
     /**
      * Génère un token invité JWT.
      *
@@ -182,7 +175,6 @@ public class JwtServiceImpl implements JwtService {
                 .signWith(secretKey, SignatureAlgorithm.HS256)
                 .compact();
     }
-
     /**
      * Génère un refresh token avec la durée configurée.
      *
@@ -193,7 +185,6 @@ public class JwtServiceImpl implements JwtService {
     public String generateRefreshToken(UserDetails userDetails) {
         return generateTokenWithValidity(userDetails, refreshTokenValidity);
     }
-
     /**
      * Extrait la liste des rôles depuis un token JWT.
      *
@@ -206,7 +197,6 @@ public class JwtServiceImpl implements JwtService {
         Claims claims = extractAllClaims(token);
         return claims.get("roles", List.class);
     }
-
     /**
      * Charge l'objet UserDetails depuis un token JWT.
      *
@@ -218,7 +208,6 @@ public class JwtServiceImpl implements JwtService {
         String username = extractUsername(token);
         return userDetailsService.loadUserByUsername(username);
     }
-
     /**
      * Durée d'expiration des access tokens en secondes.
      *
@@ -228,7 +217,6 @@ public class JwtServiceImpl implements JwtService {
     public int getAccessTokenExpirySeconds() {
         return (int) (accessTokenValidity / 1000);
     }
-
     /**
      * Durée d'expiration des refresh tokens en secondes.
      *

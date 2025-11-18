@@ -190,7 +190,7 @@ public class AuthService {
             String jwt = jwtOpt.get();
             UserDetails userDetails = jwtService.extractUserDetails(jwt);
 
-            if (jwtService.validateToken(jwt, userDetails)) {
+            if (!jwtService.validateToken(jwt, userDetails)) {
                 return getGuestResponse(response);
             }
 

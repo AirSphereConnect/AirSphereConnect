@@ -61,6 +61,16 @@ public class FavoriteServiceImpl implements FavoriteService {
                     .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Ville non trouvée avec l'id : " + favoriteDto.getCityId()));
         }
 
+        if (favoriteDto.getSelectAirQuality() == null) {
+            favoriteDto.setSelectAirQuality(false);
+        }
+        if (favoriteDto.getSelectWeather() == null) {
+            favoriteDto.setSelectWeather(false);
+        }
+        if (favoriteDto.getSelectPopulation() == null) {
+            favoriteDto.setSelectPopulation(false);
+        }
+
         Favorite favorite = favoriteMapper.toEntity(favoriteDto);
         favorite.setUser(user);
         favorite.setCity(city);
@@ -83,7 +93,9 @@ public class FavoriteServiceImpl implements FavoriteService {
             existing.setCity(city);
         }
 
-        existing.setFavoriteCategory(favoriteDto.getFavoriteCategory());
+        existing.setSelectAirQuality(favoriteDto.getSelectAirQuality());
+        existing.setSelectPopulation(favoriteDto.getSelectPopulation());
+        existing.setSelectWeather(favoriteDto.getSelectWeather());
 
         Favorite updated = favoriteRepository.save(existing);
         return favoriteMapper.toDto(updated);
