@@ -47,6 +47,15 @@ export const buttonVariants = tv({
       square: 'btn-square'
     },
 
+    padding: {
+      none: '',
+      sm: 'px-2',
+      md: 'px-4',
+      lg: 'px-5',
+      xl: 'px-6',
+      xxl: 'px-8'
+    },
+
   },
 
   compoundVariants: [
@@ -60,7 +69,6 @@ export const buttonVariants = tv({
     shape: 'default',
     fullWidth: false,
     loading: false,
-    //disabled: false,
     wide: false
   }
 });
