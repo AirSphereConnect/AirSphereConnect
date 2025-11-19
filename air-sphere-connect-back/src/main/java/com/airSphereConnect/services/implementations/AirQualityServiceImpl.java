@@ -66,32 +66,48 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         AirQualityMeasurement measurement = null;
 
+        // Chercher avec le code INSEE exact
         if (city.getInseeCode() != null) {
             measurement = measurementRepository
                     .findTopByStation_City_InseeCodeOrderByMeasuredAtDesc(city.getInseeCode())
                     .orElse(null);
 
             if (measurement != null) {
-                log.debug("✅ Mesures trouvées pour {} via inseeCode", cityName);
+                return mapper.toDto(measurement);
             }
         }
 
-        if (measurement == null && city.getAreaCode() != null) {
+        // Chercher dans le même areaCode (intercommunalité)
+        if (city.getAreaCode() != null) {
             measurement = measurementRepository
                     .findTopByStation_City_AreaCodeOrderByMeasuredAtDesc(city.getAreaCode())
                     .orElse(null);
 
             if (measurement != null) {
-                log.debug("✅ Mesures trouvées pour {} via areaCode (fallback)", cityName);
+                return mapper.toDto(measurement);
             }
         }
 
-        if (measurement == null) {
-            throw new GlobalException.ResourceNotFoundException(
-                    "Aucune mesure trouvée pour: " + cityName);
+        // Fallback: Chercher dans le même département (2 premiers chiffres INSEE)
+        if (city.getInseeCode() != null && city.getInseeCode().length() >= 2) {
+            String departmentCode = city.getInseeCode().substring(0, 2);
+            List<AirQualityMeasurement> deptMeasurements = measurementRepository
+                    .findLatestByDepartmentCode(departmentCode);
+
+            if (!deptMeasurements.isEmpty()) {
+                String sourceCities = deptMeasurements.stream()
+                    .map(m -> m.getStation().getCity().getName())
+                    .distinct()
+                    .limit(5)
+                    .reduce((a, b) -> a + ", " + b)
+                    .orElse("");
+
+                return mapper.toDto(deptMeasurements.get(0), "department", sourceCities);
+            }
         }
 
-        return mapper.toDto(measurement);
+        throw new GlobalException.ResourceNotFoundException(
+                "Aucune mesure trouvée pour: " + cityName);
     }
 
     @Override
@@ -125,35 +141,41 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         List<AirQualityMeasurement> measurements = null;
 
+        // Chercher avec code INSEE exact
         if (city.getInseeCode() != null) {
             measurements = measurementRepository
                     .findByStation_City_InseeCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
                             city.getInseeCode(), period[0], period[1]);
 
             if (!measurements.isEmpty()) {
-                log.debug("✅ Historique mesures pour {} via inseeCode: {} entrées",
-                        cityName, measurements.size());
+                return measurements.stream().map(mapper::toDto).toList();
             }
         }
 
-        if ((measurements == null || measurements.isEmpty()) && city.getAreaCode() != null) {
+        // Chercher avec areaCode
+        if (city.getAreaCode() != null) {
             measurements = measurementRepository
                     .findByStation_City_AreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
                             city.getAreaCode(), period[0], period[1]);
 
             if (!measurements.isEmpty()) {
-                log.debug("✅ Historique mesures pour {} via areaCode (fallback): {} entrées",
-                        cityName, measurements.size());
+                return measurements.stream().map(mapper::toDto).toList();
             }
         }
 
-        if (measurements == null) {
-            measurements = List.of();
+        // Fallback: Chercher dans le même département
+        if (city.getInseeCode() != null && city.getInseeCode().length() >= 2) {
+            String departmentCode = city.getInseeCode().substring(0, 2);
+            measurements = measurementRepository
+                    .findByDepartmentCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+                            departmentCode, period[0], period[1]);
+
+            if (!measurements.isEmpty()) {
+                return measurements.stream().map(mapper::toDto).toList();
+            }
         }
 
-        return measurements.stream()
-                .map(mapper::toDto)
-                .toList();
+        return List.of();
     }
 
     @Override
@@ -188,15 +210,13 @@ public class AirQualityServiceImpl implements AirQualityService {
     public AirQualityDataResponseDto getCompleteDataForCity(String cityName) {
         City city = findCityByName(cityName);
 
-        log.info("🔍 getCompleteDataForCity pour: {}, areaCode: {}", cityName, city.getAreaCode());
-
         AirQualityDataResponseDto dto = new AirQualityDataResponseDto();
         dto.setCityId(city.getId());
         dto.setCityName(city.getName());
         dto.setPostalCode(city.getPostalCode());
         dto.setAreaCode(city.getAreaCode());
 
-        // 📊 Indice ATMO
+        // Indice ATMO
         if (city.getAreaCode() != null) {
             try {
                 indexRepository
@@ -220,18 +240,21 @@ public class AirQualityServiceImpl implements AirQualityService {
 
         List<AirQualityMeasurement> measurements = null;
 
+        // Chercher avec code INSEE exact
         if (city.getInseeCode() != null) {
             measurements = measurementRepository.findByStation_City_InseeCodeOrderByMeasuredAtDesc(city.getInseeCode());
-            if (!measurements.isEmpty()) {
-                log.info("📊 {} mesures trouvées pour {} via inseeCode", measurements.size(), cityName);
-            }
         }
 
+        // Chercher avec areaCode
         if ((measurements == null || measurements.isEmpty()) && city.getAreaCode() != null) {
             measurements = measurementRepository.findByStation_City_AreaCodeOrderByMeasuredAtDesc(city.getAreaCode());
-            if (!measurements.isEmpty()) {
-                log.info("📊 {} mesures trouvées pour {} via areaCode (fallback)", measurements.size(), cityName);
-            }
+        }
+
+        // Fallback: Chercher dans le même département
+        if ((measurements == null || measurements.isEmpty()) &&
+            city.getInseeCode() != null && city.getInseeCode().length() >= 2) {
+            String departmentCode = city.getInseeCode().substring(0, 2);
+            measurements = measurementRepository.findByDepartmentCodeOrderByMeasuredAtDesc(departmentCode);
         }
 
         if (measurements != null && !measurements.isEmpty()) {
@@ -295,5 +318,36 @@ public class AirQualityServiceImpl implements AirQualityService {
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null);
+    }
+
+    @Override
+    public List<AirQualityDataResponseDto> getTopCitiesWithDataInDepartment(String departmentCode, int limit) {
+        List<City> citiesWithData = cityRepository.findAll().stream()
+                .filter(city -> city.getInseeCode() != null
+                        && city.getInseeCode().startsWith(departmentCode))
+                .filter(city -> {
+                    boolean hasMeasurements = measurementRepository
+                            .findTopByStation_City_InseeCodeOrderByMeasuredAtDesc(city.getInseeCode())
+                            .isPresent();
+
+                    if (!hasMeasurements && city.getAreaCode() != null) {
+                        hasMeasurements = measurementRepository
+                                .findTopByStation_City_AreaCodeOrderByMeasuredAtDesc(city.getAreaCode())
+                                .isPresent();
+                    }
+
+                    return hasMeasurements;
+                })
+                .sorted((c1, c2) -> {
+                    int pop1 = c1.getPopulation() != null ? c1.getPopulation() : 0;
+                    int pop2 = c2.getPopulation() != null ? c2.getPopulation() : 0;
+                    return Integer.compare(pop2, pop1);
+                })
+                .limit(limit)
+                .toList();
+
+        return citiesWithData.stream()
+                .map(city -> getCompleteDataForCity(city.getName()))
+                .toList();
     }
 }

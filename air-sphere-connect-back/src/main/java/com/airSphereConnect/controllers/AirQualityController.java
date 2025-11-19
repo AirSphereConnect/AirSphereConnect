@@ -24,9 +24,6 @@ public class AirQualityController {
         this.airQualityService = airQualityService;
     }
 
-    /**
-     * 📍 Récupérer toutes les stations pour la carte Leaflet
-     */
     @GetMapping("/stations")
     public ResponseEntity<List<AirQualityStationResponseDto>> getAllStations() {
         List<AirQualityStationResponseDto> stations = airQualityService.getAllStations();
@@ -65,7 +62,7 @@ public class AirQualityController {
     }
 
     /**
-     * 🎯 Récupère les données complètes (mesures + indice) pour une ville
+     * Récupère les données complètes (mesures + indice) pour une ville
      *
      * @param cityName Nom de la ville
      * @return Données complètes de qualité de l'air
@@ -78,11 +75,6 @@ public class AirQualityController {
         return ResponseEntity.ok(data);
     }
 
-
-
-    /**
-     * 📊 Récupère uniquement l'historique des mesures (pour graphiques détaillés)
-     */
     @GetMapping("/city/{cityName}/history/measurements")
     public ResponseEntity<List<AirQualityMeasurementResponseDto>> getMeasurementsHistory(
             @PathVariable String cityName,
@@ -96,9 +88,6 @@ public class AirQualityController {
         );
     }
 
-    /**
-     * 📊 Récupère uniquement l'historique des indices ATMO (pour timeline)
-     */
     @GetMapping("/city/{cityName}/history/indices")
     public ResponseEntity<List<AirQualityIndexResponseDto>> getIndicesHistory(
             @PathVariable String cityName,
@@ -109,6 +98,22 @@ public class AirQualityController {
 
         return ResponseEntity.ok(
                 airQualityService.getIndicesHistoryForCity(cityName, startDate, endDate)
+        );
+    }
+
+    /**
+     * Récupère les N plus grandes villes du département avec leurs données air quality
+     *
+     * @param departmentCode Code département
+     * @param limit Nombre de villes à retourner (par défaut 2)
+     */
+    @GetMapping("/department/{departmentCode}/top-cities")
+    public ResponseEntity<List<AirQualityDataResponseDto>> getTopCitiesInDepartment(
+            @PathVariable String departmentCode,
+            @RequestParam(defaultValue = "2") int limit) {
+
+        return ResponseEntity.ok(
+                airQualityService.getTopCitiesWithDataInDepartment(departmentCode, limit)
         );
     }
 
