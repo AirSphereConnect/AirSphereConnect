@@ -5,13 +5,15 @@ import {Router} from '@angular/router';
 import {Button} from '../button/button';
 import {InputComponent} from '../input/input';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
+import {Modal} from '../../modal/modal';
 
 @Component({
   selector: 'app-password-form',
   imports: [
     ReactiveFormsModule,
     InputComponent,
-    ButtonCloseModal
+    ButtonCloseModal,
+    Modal
   ],
   templateUrl: './password-form.html',
   styleUrl: './password-form.scss'

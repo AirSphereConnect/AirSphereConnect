@@ -5,11 +5,12 @@ import {Router} from '@angular/router';
 import {Button} from '../button/button';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
+import {Modal} from '../../modal/modal';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonCloseModal, InputComponent],
+  imports: [ReactiveFormsModule, ButtonCloseModal, InputComponent, Modal],
   templateUrl: './user-form.html',
 })
 export class UserForm implements OnChanges, OnInit {

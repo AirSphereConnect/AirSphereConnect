@@ -92,10 +92,10 @@
     <div>
 
       <app-button
-        color="warning"
+        color="error"
         type="button"
         (click)="deleteUser(user.id)"
-        class="btn-outline btn-primary"
+        class="btn-outline"
       >
         Supprimer mon compte
       </app-button>
@@ -136,4 +136,10 @@
   (updated)="userService.fetchUserProfile()">
 </app-address-form>
 
+<app-warning-message
+  [isOpen]="isWarningOpen"
+  [message]="warningMessage()"
+  (close)="isWarningOpen.set(false)"
+  (confirm)="confirmDelete()"
+></app-warning-message>
 

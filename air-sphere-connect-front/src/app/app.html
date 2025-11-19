@@ -6,13 +6,20 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<app-header [userRole]="userRole()" [scrolled]="scrolled()" class="sticky top-0 z-50"></app-header>
-<main #mainContent class="container mx-auto px-4 py-8">
-  <div class="content">
-    <router-outlet></router-outlet>
-  </div>
-</main>
-<app-footer [userRole]="userRole()"></app-footer>
+<div class="grid grid-template-rows: 80px 1fr 30px;">
+
+  <app-header [userRole]="userRole()" [scrolled]="scrolled()" class="sticky top-0 z-50"></app-header>
+  <main #mainContent class="container mx-auto px-4 py-8">
+    <div class="content">
+      <router-outlet></router-outlet>
+    </div>
+    <app-error-message class="fixed bottom-0 left-0 right-0 flex justify-center items-center z-50"></app-error-message>
+  </main>
+  @if (scrolled()) {
+    <app-back-to-top (click)="top()" class="fixed bottom-0 right-0 z-50"></app-back-to-top>
+  }
+  <app-footer [userRole]="userRole()"></app-footer>
+</div>
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * is only a placeholder * * * * * * * * * * * -->

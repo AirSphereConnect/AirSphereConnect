@@ -55,9 +55,9 @@ const modalVariants = tv({
   selector: 'app-modal',
   standalone: true,
   imports: [],
-  templateUrl: './modal.component.html'
+  templateUrl: './forum-modal.html'
 })
-export class ModalComponent {
+export class ForumModal {
   // 🔹 Inputs (signaux)
   title = input<string>('');
   show = input<boolean>(false);

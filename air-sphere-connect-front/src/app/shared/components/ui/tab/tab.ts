@@ -25,4 +25,23 @@ export class Tab {
   setActive(index: number): void {
     this.activeIndex.set(index);
   }
+
+  getBorderClass(label: string, index: number): string {
+    if (this.activeIndex() !== index) {
+      return '';
+    }
+    switch(label.toLowerCase()) {
+      case 'mon profil':
+        return 'mon-profil';
+      case 'mes rubriques':
+        return 'mes-rubriques';
+      case 'mes favoris':
+        return 'mes-favoris';
+      case 'mes alertes':
+        return 'mes-alertes';
+      default:
+        return '';
+    }
+  }
+
 }

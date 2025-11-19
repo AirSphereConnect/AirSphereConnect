@@ -17,11 +17,12 @@ import {Button} from '../button/button';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {User} from '../../../../core/models/user.model';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Modal} from '../../modal/modal';
 
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonCloseModal],
+  imports: [ReactiveFormsModule, ButtonCloseModal, Modal],
   templateUrl: './address-form.html',
 })
 export class AddressForm implements OnChanges {

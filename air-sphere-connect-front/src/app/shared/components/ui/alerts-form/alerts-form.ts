@@ -19,11 +19,12 @@ import {inputCitySearch} from '../../../utils/city-utils/city-utils';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
 import {Subject} from 'rxjs';
+import {Modal} from '../../modal/modal';
 
 @Component({
   selector: 'app-alerts-form',
   standalone: true,
-  imports: [ReactiveFormsModule, Button, ButtonCloseModal, InputComponent],
+  imports: [ReactiveFormsModule, Button, ButtonCloseModal, InputComponent, Modal],
   templateUrl: './alerts-form.html',
   styleUrl: './alerts-form.scss'
 })
@@ -41,6 +42,8 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
 
+  private readonly destroy$ = new Subject<void>();
+
   alertsForm!: FormGroup;
   cityQuery = signal('');
   citySuggestions = signal<any[]>([]);
@@ -48,7 +51,6 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   errorMessage: string | null = null;
   isDeleteMode = false;
 
-  private readonly destroy$ = new Subject<void>();
 
   citySearchEffect = inputCitySearch(this.cityService, this.cityQuery, this.citySuggestions);
 

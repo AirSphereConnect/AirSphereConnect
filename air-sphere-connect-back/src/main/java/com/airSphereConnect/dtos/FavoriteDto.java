@@ -28,7 +28,7 @@ public class FavoriteDto {
     public FavoriteDto() {
     }
 
-    public FavoriteDto(Long id, boolean selectPopulation, boolean selectAirQuality, boolean selectWeather, LocalDateTime createdAt,
+    public FavoriteDto(Long id,  boolean selectAirQuality, boolean selectPopulation, boolean selectWeather, LocalDateTime createdAt,
                        LocalDateTime updatedAt, Long userId, Long cityId, String cityName) {
         this.id = id;
         this.selectPopulation = selectPopulation;

@@ -5,6 +5,7 @@
         role="tab"
         class="tab flex-1 text-center"
         [class.tab-active]="activeIndex() === i"
+        [class]="getBorderClass(tab.label, i)"
         (click)="setActive(i)">
         {{ tab.label }}
       </a>

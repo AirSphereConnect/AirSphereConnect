@@ -10,7 +10,7 @@ import {
   effect,
   ViewChild,
   ElementRef,
-  AfterViewInit, OnDestroy
+  AfterViewInit, OnDestroy, Output, EventEmitter
 } from '@angular/core';
 import {Header} from './shared/components/layout/header/header';
 import {HTTP_INTERCEPTORS} from '@angular/common/http';
@@ -18,10 +18,12 @@ import {AuthInterceptor} from './core/interceptors/auth-interceptor';
 import {Footer} from './shared/components/layout/footer/footer/footer';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {fromEvent, Subscription} from 'rxjs';
+import {BackToTop} from './shared/components/ui/back-to-top/back-to-top';
+import {ErrorMessage} from './shared/components/ui/error-message/error-message';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer],
+  imports: [RouterOutlet, Header, Footer, BackToTop, ErrorMessage],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
   providers: [
@@ -38,8 +40,8 @@ export class App implements AfterViewInit, OnDestroy {
 
   protected readonly title = signal('AirSphereConnect');
 
-
   private scrollSub!: Subscription;
+  private scrollSubTop!: Subscription;
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(UserService);
 
@@ -65,10 +67,20 @@ export class App implements AfterViewInit, OnDestroy {
       .subscribe(() => {
         this.scrolled.set(window.scrollY > 0);
       });
+
+    this.scrollSubTop = fromEvent(window, 'scroll')
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
+        this.scrolled.set(window.scrollY > 50);
+      });
   }
 
   ngOnDestroy() {
     this.scrollSub?.unsubscribe();
+    this.scrollSubTop?.unsubscribe();
   }
 
+  top() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }

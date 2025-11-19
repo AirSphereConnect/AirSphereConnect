@@ -3,9 +3,9 @@
     <table class="w-full border border-gray-200 rounded-lg shadow-sm">
       <thead>
       <tr>
-        <th class="p-2">Export Météo</th>
         <th class="p-2">Export Qualité de l'air</th>
         <th class="p-2">Export Population</th>
+        <th class="p-2">Export Météo</th>
         <th class="p-2">Ville</th>
         <th class="p-2">Créé le</th>
         <th class="p-2">Modifié le</th>
@@ -15,17 +15,6 @@
       <tbody>
         @for (favorite of user.favorites; track favorite.id) {
           <tr class="border-t">
-            @if (favorite?.selectWeather) {
-              <td class="p-2">
-                <div class="flex justify-center">
-                  <a href="#" class="link link-primary">PDF</a>
-                  <div class="divider divider-horizontal mx-"></div>
-                  <a href="#" class="link link-primary">CSV</a>
-                </div>
-              </td>
-            } @else {
-              <td class="p-2 text-center">Non sélectionner</td>
-            }
             @if (favorite?.selectAirQuality) {
               <td class="p-2">
                 <div class="flex justify-center">
@@ -38,6 +27,17 @@
               <td class="p-2 text-center">Non sélectionner</td>
             }
             @if (favorite?.selectPopulation) {
+              <td class="p-2">
+                <div class="flex justify-center">
+                  <a href="#" class="link link-primary">PDF</a>
+                  <div class="divider divider-horizontal mx-"></div>
+                  <a href="#" class="link link-primary">CSV</a>
+                </div>
+              </td>
+            } @else {
+              <td class="p-2 text-center">Non sélectionner</td>
+            }
+            @if (favorite?.selectWeather) {
               <td class="p-2">
                 <div class="flex justify-center">
                   <a href="#" class="link link-primary">PDF</a>
@@ -62,8 +62,8 @@
               </app-button>
               <div class="divider divider-horizontal"></div>
               <app-button
-                class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                color="warning"
+                class="w-20 h-7 divider-horizontal divider-start btn-outline"
+                color="error"
                 variant="solid"
                 (click)="deleteFavorites(favorite.id)"
               >
@@ -90,3 +90,10 @@
   [initialFavoriteData]="initialFavoriteData"
   (close)="onModalClose()"
 ></app-favorites-form>
+
+<app-warning-message
+  [isOpen]="isWarningOpen"
+  [message]="warningMessage()"
+  (close)="isWarningOpen.set(false)"
+  (confirm)="confirmDelete()"
+></app-warning-message>
