@@ -43,6 +43,29 @@ export interface AirQualityComplete {
   indexHistory: AirQualityIndex[];
 }
 
+export interface AirQualityData {
+  cityId: number;
+  cityName: string;
+  postalCode?: string;
+  areaCode?: string;
+  population?: number;
+  qualityIndex?: number;
+  qualityLabel?: string;
+  qualityColor?: string;
+  indexMeasuredAt?: string;
+  alertMessage?: string;
+  pm10?: number;
+  pm25?: number;
+  no2?: number;
+  o3?: number;
+  so2?: number;
+  pollutantsMeasuredAt?: string;
+  latestMeasurement?: AirQualityMeasurement;
+  latestIndex?: AirQualityIndex;
+  measurementHistory?: AirQualityMeasurement[];
+  indexHistory?: AirQualityIndex[];
+}
+
 export interface PopulationData {
   id?: number;
   cityName?: string;

@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { AirQualityComplete, AirQualityIndex, AirQualityMeasurement } from '../models/data.model';
+import { AirQualityComplete, AirQualityIndex, AirQualityMeasurement, AirQualityData } from '../models/data.model';
 import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
@@ -24,6 +24,19 @@ export class AirQualityService {
 
   getLatestMeasurement(cityName: string): Observable<AirQualityMeasurement | null> {
     return this.getComplete(cityName).pipe(map(data => data.latestMeasurement));
+  }
+
+  /**
+   * Récupère les N plus grandes villes du département avec des données air quality
+   * @param departmentCode Code du département (2 chiffres, ex: "34")
+   * @param limit Nombre de villes à retourner (par défaut 2)
+   */
+  getTopCitiesInDepartment(departmentCode: string, limit: number = 2): Observable<AirQualityData[]> {
+    const params = new HttpParams().set('limit', limit.toString());
+    return this.http.get<AirQualityData[]>(
+      `${this.apiUrl}/department/${departmentCode}/top-cities`,
+      { params, withCredentials: true }
+    );
   }
 
   private mapToComplete(data: any): AirQualityComplete {
