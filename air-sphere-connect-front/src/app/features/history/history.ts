@@ -55,6 +55,7 @@ export class History implements OnInit, AfterViewInit {
   citySearchInput = signal<string>('');
   startDate = signal<string>('');
   endDate = signal<string>('');
+  activeTab = signal<'air-quality' | 'weather'>('air-quality');
 
   cities = signal<City[]>([]);
   filteredCities = signal<City[]>([]);
@@ -62,7 +63,8 @@ export class History implements OnInit, AfterViewInit {
   historyData = signal<CityHistoryData | null>(null);
   isLoading = signal(false);
   error = signal<string | null>(null);
-  private isInitializing = true; // Flag pour éviter les événements lors de l'init
+  private isInitializing = true;
+
 
   @ViewChild('airQualityLabel', { static: false }) airQualityLabelTemplate!: TemplateRef<unknown>;
   @ViewChild('weatherLabel', { static: false }) weatherLabelTemplate!: TemplateRef<unknown>;
@@ -245,6 +247,10 @@ export class History implements OnInit, AfterViewInit {
     this.loadHistory();
   }
 
+  onTabChange(index: number) {
+    this.activeTab.set(index === 0 ? 'air-quality' : 'weather');
+  }
+
   loadHistory() {
     const city = this.selectedCityName();
     if (!city) {
@@ -272,11 +278,13 @@ export class History implements OnInit, AfterViewInit {
     const inseeCode = this.selectedInseeCode();
     const dateDebut = this.startDate();
     const dateFin = this.endDate();
+    const type = this.activeTab();
 
     const params = new URLSearchParams();
     if (inseeCode) params.append('inseeCode', inseeCode);
     if (dateDebut) params.append('dateDebut', dateDebut);
     if (dateFin) params.append('dateFin', dateFin);
+    params.append('type', type);
 
     const url = `${this.apiConfig.apiUrl}/export/csv?${params.toString()}`;
     window.open(url, '_blank');
@@ -286,11 +294,13 @@ export class History implements OnInit, AfterViewInit {
     const inseeCode = this.selectedInseeCode();
     const dateDebut = this.startDate();
     const dateFin = this.endDate();
+    const type = this.activeTab();
 
     const params = new URLSearchParams();
     if (inseeCode) params.append('inseeCode', inseeCode);
     if (dateDebut) params.append('dateDebut', dateDebut);
     if (dateFin) params.append('dateFin', dateFin);
+    params.append('type', type);
 
     const url = `${this.apiConfig.apiUrl}/export/pdf?${params.toString()}`;
     window.open(url, '_blank');
