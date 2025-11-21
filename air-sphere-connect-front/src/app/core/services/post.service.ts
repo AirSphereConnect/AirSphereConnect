@@ -2,7 +2,8 @@ import {inject, Injectable} from '@angular/core';
 import {Post} from '../models/post.model';
 import {map, Observable, tap} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import { ApiConfigService } from './api';
+import {ApiConfigService} from './api';
+import {PostReportReason} from '../models/post-report.model';
 
 type ReactionType = 'LIKE' | 'DISLIKE';
 
@@ -82,13 +83,13 @@ export class PostService {
     return this.http.post<Post>(
       `${this.apiUrlPosts}/${postId}/reaction`,
       {},
-      {params, withCredentials: true}
+      {params, withCredentials: true }
     ).pipe(
       tap(updatedPost => console.log('Post mis à jour après réaction :', updatedPost))
     );
   }
 
-  toggleFlag(postId: number): Observable<Post> {
+  /*toggleFlag(postId: { postId: number; reason: PostReportReason; description: string }): Observable<Post> {
 
     return this.getPosts().pipe(
       map(posts => {
@@ -100,6 +101,11 @@ export class PostService {
         };
       })
     );
-  }
+  }*/
 }
+
+
+
+
+
 

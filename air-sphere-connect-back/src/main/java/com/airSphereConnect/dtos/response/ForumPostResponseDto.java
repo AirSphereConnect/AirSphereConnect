@@ -1,6 +1,7 @@
 package com.airSphereConnect.dtos.response;
 
 import com.airSphereConnect.entities.enums.ReactionType;
+import com.airSphereConnect.entities.enums.UserRole;
 
 import java.time.LocalDateTime;
 
@@ -8,7 +9,8 @@ public class ForumPostResponseDto {
     private Long id;
     private String content;
     private Long userId;
-    private  String username;
+    private String username;
+    private UserRole userRole;
     private Long threadId;
     private String threadTitle;
     private LocalDateTime createdAt;
@@ -16,21 +18,26 @@ public class ForumPostResponseDto {
     private long likeCount;
     private long dislikeCount;
     private ReactionType currentUserReaction;
+    private Boolean isReported;
 
     public ForumPostResponseDto() {
+
     }
 
-    public ForumPostResponseDto(Long id, String content, Long userId, String username, Long threadId, String threadTitle, LocalDateTime createdAt, long likeCount, long dislikeCount, ReactionType currentUserReaction) {
+    public ForumPostResponseDto(Long id, String content, Long userId, String username, UserRole userRole, Long threadId,
+                                String threadTitle, LocalDateTime createdAt, long likeCount, long dislikeCount, ReactionType currentUserReaction, Boolean isReported) {
         this.id = id;
         this.content = content;
         this.userId = userId;
         this.username = username;
+        this.userRole = userRole;
         this.threadId = threadId;
         this.threadTitle = threadTitle;
         this.createdAt = createdAt;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.currentUserReaction = currentUserReaction;
+        this.isReported = isReported;
     }
 
     public Long getId() {
@@ -119,5 +126,17 @@ public class ForumPostResponseDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public Boolean getReported() {
+        return isReported;
+    }
+
+    public void setReported(Boolean reported) {
+        isReported = reported;
     }
 }

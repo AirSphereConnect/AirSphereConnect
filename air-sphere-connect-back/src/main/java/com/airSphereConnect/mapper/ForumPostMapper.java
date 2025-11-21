@@ -4,7 +4,6 @@ import com.airSphereConnect.dtos.request.ForumPostRequestDto;
 import com.airSphereConnect.dtos.response.ForumPostResponseDto;
 import com.airSphereConnect.entities.ForumPost;
 import com.airSphereConnect.entities.ForumThread;
-import com.airSphereConnect.entities.PostReaction;
 import com.airSphereConnect.entities.User;
 import org.springframework.stereotype.Component;
 
@@ -34,6 +33,7 @@ public class ForumPostMapper {
         response.setContent(post.getContent());
         response.setUserId(post.getUser().getId());
         response.setUsername(post.getUser().getUsername());
+        response.setUserRole(post.getUser().getRole());
         response.setThreadId(post.getThread().getId());
         response.setThreadTitle(post.getThread().getTitle());
         response.setCreatedAt(post.getCreatedAt());

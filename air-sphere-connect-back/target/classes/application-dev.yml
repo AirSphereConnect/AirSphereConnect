@@ -1,9 +1,9 @@
 # Profil développement local
 spring:
   datasource:
-    url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${DB_NAME:air-sphere-connect}
-    username: ${DB_USER:air-sphere-connect_user}
-    password: ${DB_PASSWORD:userpass123}
+    url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${DB_NAME:air_sphere_connect}
+    username: ${DB_USER:air_sphere_connect_user}
+    password: ${DB_PASSWORD:PassASC@34Diginamic!}
     driver-class-name: org.mariadb.jdbc.Driver
 
   messages:
@@ -44,12 +44,22 @@ cors:
 
 weather:
   api:
-    key: e935d0947600dd8f7247eefe1819751a
+    key: ${WEATHER_API_KEY:e935d0947600dd8f7247eefe1819751a}
 
 mailjet:
   api:
-    key: 13f60c773c9d6b968a6415fa88e6affc
-    secret: 361d897cbe85bd88f3ddfea48599a081
+    key: ${MAILJET_API_KEY:13f60c773c9d6b968a6415fa88e6affc}
+    secret: ${MAILJET_API_SECRET:361d897cbe85bd88f3ddfea48599a081}
+
+# JWT Configuration
+jwt:
+  secret: ${JWT_SECRET:UneCleSecreteSuperLongueEtComplexePourTestUnique1234567890}
+  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:7200000}   # 2 heures en ms
+  refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000} # 7 jours en ms
+
+# Cookie Configuration
+cookie:
+  secure: ${COOKIE_SECURE:false}  # false en dev (HTTP), true en prod (HTTPS)
 
 docker:
   compose:

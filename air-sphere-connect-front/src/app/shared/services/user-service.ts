@@ -2,7 +2,7 @@ import { Injectable, inject } from '@angular/core';
 import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { UserProfileResponse } from '../../core/models/user.model';
+import {User, UserProfileResponse} from '../../core/models/user.model';
 import { ApiConfigService } from '../../core/services/api';
 
 
@@ -115,5 +115,9 @@ export class UserService {
 
   getUsername() {
     return this._userProfileSubject.value ? this._userProfileSubject.value.user.username : null;
+  }
+
+  getUserRoleById(userId: number): Observable<User> {
+    return this.http.get<User>(`${this.apiUrl}/users/public-profile/${userId}`, { withCredentials: true });
   }
 }

@@ -14,40 +14,41 @@ import {UserService} from '../../../../shared/services/user-service';
   styleUrl: './section.scss'
 })
 export class SectionComponent {
-  private sectionService = inject(SectionService)
-  private threadService = inject(ThreadService)
-  private userService = inject(UserService);
+  private readonly sectionService = inject(SectionService);
+  private readonly threadService = inject(ThreadService);
+  protected readonly userService = inject(UserService);
 
-  readonly sections = toSignal(
-    this.sectionService.getSections(),
-    {initialValue: [] as Section[]}
-  )
+  readonly sections = signal<Section[]>([]);
 
   readonly threads = toSignal(
     this.threadService.getAllThreads(),
     {initialValue: [] as Thread[]}
-  )
+  );
+
+  constructor() {
+    this.sectionService.getSections().subscribe(
+      sections => this.sections.set(sections)
+    );
+  }
 
   readonly sectionsWithCount = computed(() => {
     return this.sections().map(section => ({
       ...section,
       threadCount: this.threads().filter(thread => thread.rubricId === section.id).length
-    }))
-  })
-
-  // Vérifie si l'utilisateur actuel est un administrateur
-  readonly isAdmin = computed(() => {
-    const admin = this.userService.currentUserProfile;
-    return admin?.user.role === 'ADMIN';
+    }));
   });
 
-  // etat modale
-  showCreateSectionModale = signal(false);
-  newSectionForumId = signal<number>(1);
-  newSectionTitle = signal('');
-  newSectionDescription = signal('');
-  isCreating = signal(false);
-  errorMessage = signal<string | null>(null);
+  // État modale et création
+  readonly showCreateSectionModale = signal(false);
+  readonly newSectionForumId = signal<number>(1);
+  readonly newSectionTitle = signal('');
+  readonly newSectionDescription = signal('');
+  readonly isCreating = signal(false);
+  readonly errorMessage = signal<string | null>(null);
+  readonly isDeletingPerSection = signal<Record<number, boolean>>({});
+
+  // Vérifie si l'utilisateur actuel est un administrateur
+  readonly isAdmin = computed(() => this.userService.currentUserProfile?.user.role === 'ADMIN');
 
   openCreateSectionModal() {
     this.showCreateSectionModale.set(true);
@@ -57,8 +58,8 @@ export class SectionComponent {
   closeCreateSectionModal() {
     this.showCreateSectionModale.set(false);
     this.newSectionForumId.set(1);
-    this.newSectionTitle.set('')
-    this.newSectionDescription.set('')
+    this.newSectionTitle.set('');
+    this.newSectionDescription.set('');
   }
 
   createSection() {
@@ -72,11 +73,12 @@ export class SectionComponent {
       return;
     }
 
-    if(!title) {
+    if (!title) {
       this.errorMessage.set('Le titre de la section ne peut pas être vide.');
       return;
     }
-    if(!description) {
+
+    if (!description) {
       this.errorMessage.set('La description de la section ne peut pas être vide.');
       return;
     }
@@ -84,50 +86,48 @@ export class SectionComponent {
     this.isCreating.set(true);
 
     this.sectionService.createSection(title, description, forumId, userId).subscribe({
-      next: (section) => {
-        console.log('Section créée avec succès :', section);
+      next: () => {
         this.closeCreateSectionModal();
         this.isCreating.set(false);
-
-         window.location.reload();
-      },
-      error: (error) => {
-        console.error('Erreur lors de la création de la section :', error);
-        if (error.status === 403) {
-          this.errorMessage.set('Vous n\'avez pas les droits pour créer une section');
-        } else if (error.status === 401) {
-          this.errorMessage.set('Vous devez être connecté pour créer une section');
-        } else if (error.status === 409) {
-          this.errorMessage.set('Une section avec ce titre existe déjà');
-        } else {
-          this.errorMessage.set('Erreur lors de la création de la section');
-        }
-
-        this.isCreating.set(false);
-      }
-    })
-  }
-
-  deleteSection(sectionId: number) {
-    if (!confirm('Êtes-vous sûr de vouloir supprimer cette section ?')) {
-      return;
-    }
-
-    this.sectionService.deleteSection(sectionId).subscribe({
-      next: () => {
-        console.log('Section supprimée avec succès');
-        // Actualiser la liste des sections après la suppression
         window.location.reload();
       },
       error: (error) => {
-        console.error('Erreur lors de la suppression de la section :', error);
-        if (error.status === 403) {
-          alert('Vous n\'avez pas les droits pour supprimer cette section');
-        } else if (error.status === 401) {
-          alert('Vous devez être connecté pour supprimer une section');
-        } else {
-          alert('Erreur lors de la suppression de la section');
-        }
+        this.isCreating.set(false);
+        const statusCode = error.status;
+        const messages: Record<number, string> = {
+          403: 'Vous n\'avez pas les droits pour créer une section',
+          401: 'Vous devez être connecté pour créer une section',
+          409: 'Une section avec ce titre existe déjà'
+        };
+        this.errorMessage.set(messages[statusCode] || 'Erreur lors de la création de la section');
+      }
+    });
+  }
+
+  deleteSection(section: Section) {
+    if (!confirm(`Êtes-vous sûr de vouloir supprimer "${section.title}" ?`)) return;
+
+    const userId = this.userService.currentUserProfile?.user?.id;
+    if (!userId) {
+      alert('Vous devez être connecté pour supprimer une section');
+      return;
+    }
+
+    this.isDeletingPerSection.update(state => ({ ...state, [section.id]: true }));
+
+    this.sectionService.deleteSection(section.id, userId).subscribe({
+      next: () => {
+        this.sections.update(sections => sections.filter(s => s.id !== section.id));
+        this.isDeletingPerSection.update(state => ({ ...state, [section.id]: false }));
+      },
+      error: (error) => {
+        this.isDeletingPerSection.update(state => ({ ...state, [section.id]: false }));
+        const statusCode = error.status;
+        const messages: Record<number, string> = {
+          403: 'Vous n\'avez pas les droits pour supprimer cette section',
+          401: 'Vous devez être connecté'
+        };
+        alert(messages[statusCode] || 'Erreur lors de la suppression');
       }
     });
   }

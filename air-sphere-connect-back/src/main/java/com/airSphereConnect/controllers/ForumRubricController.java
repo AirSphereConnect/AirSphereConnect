@@ -40,7 +40,7 @@ public class ForumRubricController {
         return ResponseEntity.ok(responses);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("/new/{userId}")
     public ResponseEntity<ForumRubricResponseDto> createRubric(
             @Valid @RequestBody ForumRubricRequestDto request,

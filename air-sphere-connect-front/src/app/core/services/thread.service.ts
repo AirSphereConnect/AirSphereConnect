@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Thread} from '../models/thread.model';
 import {PostService} from './post.service';
 import {UserService} from '../../shared/services/user-service';
@@ -45,9 +45,10 @@ export class ThreadService {
     );
   }
 
-  deleteThread(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`,
-      { withCredentials: true }
+  deleteThread(threadId: number, userId: number): Observable<void> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.delete<void>(`${this.apiUrl}/${threadId}`,
+      { params, withCredentials: true }
     );
   }
 }

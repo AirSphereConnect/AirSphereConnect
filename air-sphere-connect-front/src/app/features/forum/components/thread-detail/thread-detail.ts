@@ -1,15 +1,15 @@
-import { Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { ThreadService } from '../../../../core/services/thread.service';
-import { PostService } from '../../../../core/services/post.service';
-import { DatePipe } from '@angular/common';
-import { PostComponent } from '../post/post';
-import { switchMap, tap } from 'rxjs';
-import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { UserService } from '../../../../shared/services/user-service';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { Post } from '../../../../core/models/post.model';
+import {Component, computed, inject, signal} from '@angular/core';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {takeUntilDestroyed, toSignal} from '@angular/core/rxjs-interop';
+import {ThreadService} from '../../../../core/services/thread.service';
+import {PostService} from '../../../../core/services/post.service';
+import {DatePipe} from '@angular/common';
+import {PostComponent} from '../post/post';
+import {switchMap, tap} from 'rxjs';
+import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
+import {UserService} from '../../../../shared/services/user-service';
+import {Post} from '../../../../core/models/post.model';
+import {PostReportReason} from '../../../../core/models/post-report.model';
 
 @Component({
   selector: 'app-thread-detail',
@@ -87,7 +87,10 @@ export class ThreadDetailComponent {
       )
       .subscribe({
         next: posts => {
-          this.postsSignal.set(posts);
+          // Ajouter threadOwnerId à chaque post
+          const threadOwnerId = this.thread()?.userId;
+          const enrichedPosts = posts.map(p => ({...p, threadOwnerId}));
+          this.postsSignal.set(enrichedPosts);
           this.isLoadingPosts.set(false);
         },
         error: err => {
@@ -134,6 +137,15 @@ export class ThreadDetailComponent {
 
     this.postService.addPost(threadId, currentUser.username, content, userId).subscribe({
       next: newPost => {
+        // Si l'API ne renvoie pas userRole, on l'ajoute localement depuis le profil courant
+        if (!newPost.userRole && currentUser) {
+          newPost.userRole = currentUser.role ?? currentUser.role ?? undefined;
+        }
+        // Ajouter threadOwnerId si absent
+        if (!newPost.threadOwnerId) {
+          newPost.threadOwnerId = this.thread()?.userId;
+        }
+
         this.postsSignal.update(posts => [...posts, newPost]);
         this.newPostForm.reset();
         this.isPublishing.set(false);
@@ -171,7 +183,7 @@ export class ThreadDetailComponent {
     });
   }
 
-  onPostFlagged(postId: number): void {
+/* onPostFlagged(postId: { postId: number; reason: PostReportReason; description: string }): void {
 
     const userId = this.getUserId();
     if (!userId) return;
@@ -183,7 +195,7 @@ export class ThreadDetailComponent {
         this.errorMessage.set('Erreur lors du signalement');
       }
     });
-  }
+  }*/
 
   onPostDeleted(postId: number): void {
     const userId = this.getUserId();
@@ -198,5 +210,20 @@ export class ThreadDetailComponent {
         this.errorMessage.set('Erreur lors de la suppression');
       }
     });
+  }
+
+  isRoleAdmin() {
+    return this.userService.currentUserProfile?.user.role === 'ADMIN';
+  }
+
+  isThreadOwner(): boolean {
+    const currentUserId = this.userService.currentUserProfile?.user.id;
+    const threadOwnerId = this.thread()?.userId;
+    return currentUserId !== undefined && threadOwnerId !== undefined && currentUserId === threadOwnerId;
+  }
+
+  isAuthorThreadOwner(postAuthorId: number): boolean {
+    const threadOwnerId = this.thread()?.userId;
+    return threadOwnerId !== undefined && postAuthorId === threadOwnerId;
   }
 }
