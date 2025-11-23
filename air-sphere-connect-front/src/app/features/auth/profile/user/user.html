@@ -6,13 +6,16 @@
           <label class="label font-bold">Nom utilisateur</label>
           <input type="text" class="input w-full" [value]="user.username" disabled/>
         </div>
-        <app-button
-          type="button"
-          (click)="editUser()"
-          class="btn-outline btn-primary"
-        >
-          Modifier nom utilisateur
-        </app-button>
+        <div>
+          <app-button
+            type="button"
+            (click)="editUser()"
+            class="btn-outline btn-primary"
+          >
+            Modifier nom utilisateur
+          </app-button>
+
+        </div>
       </div>
 
       <div class="divider divider-horizontal"></div>
@@ -22,13 +25,16 @@
           <label class="label font-bold">Email</label>
           <input type="text" class="input w-full" [value]="user.email" disabled/>
         </div>
-        <app-button
-          type="button"
-          (click)="editEmail()"
-          class="btn-outline btn-primary"
-        >
-          Modifier email
-        </app-button>
+        <div>
+
+          <app-button
+            type="button"
+            (click)="editEmail()"
+            class="btn-outline btn-primary"
+          >
+            Modifier email
+          </app-button>
+        </div>
       </div>
 
       <div class="divider divider-horizontal"></div>
@@ -68,26 +74,32 @@
           <label class="label font-bold">Code postal</label>
           <input type="text" class="input w-full" [value]="user.address.city.postalCode" disabled/>
         </div>
-        <app-button
-          type="button"
-          (click)="editAddress()"
-          class="btn-outline btn-primary"
-        >
-          Modifier adresse
-        </app-button>
+        <div>
+          <app-button
+            type="button"
+            (click)="editAddress()"
+            class="btn-outline btn-primary"
+          >
+            Modifier adresse
+          </app-button>
+
+        </div>
       </div>
     }
 
     <div class="divider divider-vertical"></div>
 
-    <app-button
-      color="warning"
-      type="button"
-      (click)="deleteUser(user.id, user.username)"
-      class="btn-outline btn-primary"
-    >
-      Supprimer mon compte
-    </app-button>
+    <div>
+
+      <app-button
+        color="warning"
+        type="button"
+        (click)="deleteUser(user.id)"
+        class="btn-outline btn-primary"
+      >
+        Supprimer mon compte
+      </app-button>
+    </div>
   }
 </fieldset>
 

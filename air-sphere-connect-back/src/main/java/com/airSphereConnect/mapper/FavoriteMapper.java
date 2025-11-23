@@ -10,7 +10,9 @@ public class FavoriteMapper {
     public FavoriteDto toDto(Favorite favorite) {
         return new FavoriteDto(
                 favorite.getId(),
-                favorite.getFavoriteCategory(),
+                favorite.getSelectAirQuality(),
+                favorite.getSelectPopulation(),
+                favorite.getSelectWeather(),
                 favorite.getCreatedAt(),
                 favorite.getUpdatedAt(),
                 favorite.getUser() != null ? favorite.getUser().getId() : null,
@@ -22,8 +24,9 @@ public class FavoriteMapper {
     public Favorite toEntity(FavoriteDto dto) {
         Favorite favorite = new Favorite();
         favorite.setId(dto.getId());
-        favorite.setFavoriteCategory(dto.getFavoriteCategory());
-
+        favorite.setSelectAirQuality(dto.getSelectAirQuality());
+        favorite.setSelectPopulation(dto.getSelectPopulation());
+        favorite.setSelectWeather(dto.getSelectWeather());
 
         return favorite;
     }

@@ -21,7 +21,7 @@ export class UserDashboard {
   @Input() user: User | null = null;
 
   private readonly destroyRef = inject(DestroyRef);
-  private readonly navigationService = inject(NavigationService);
+  private readonly router = inject(Router);
 
 
   // Modales séparées
@@ -70,11 +70,16 @@ export class UserDashboard {
 
   /** ✏️ Ouvre la modale adresse */
   editAddress() {
-    if (!this.user || !this.user.address) return;
+    console.log('editAddress called with user:', this.user);
+    if (!this.user || !this.user.address) {
+      console.warn('editAddress aborted: user or address missing');
+      return;
+    }
     this.editingUserId = this.user.id;
     this.initialAddressData = this.user.address;
     this.isAddressModalOpen.set(true);
   }
+
 
   /** 🔒 Ferme la modale user */
   onUserModalClose() {
@@ -96,21 +101,19 @@ export class UserDashboard {
     this.isAddressModalOpen.set(false);
   }
 
-  deleteUser(id: number, username: string) {
-    if (confirm('Êtes-vous sûr de vouloir supprimer ce favori ?')) {
-      this.userService.deleteUser(id)
-        .pipe(takeUntilDestroyed(this.destroyRef))
-        .subscribe({
-          next: () => {
-            // 🔁 rafraîchit le profil complet
-            this.navigationService.logout();
-            console.log(`${username} supprimé avec succès`);
-          },
-          error: (err) => {
-            console.error('Erreur lors de la suppression du favori :', err);
-          }
-        });
-    }
-    this.userService.deleteUser(id);
+  deleteUser(userId: number) {
+    console.log('deleteUser called with id:', userId);
+    this.userService.deleteUser(userId)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
+      next: () => {
+        console.log('User deleted');
+        this.router.navigate(['/home']);
+      },
+      error: err => {
+        console.error('Erreur suppression :', err);
+      }
+    });
   }
+
 }

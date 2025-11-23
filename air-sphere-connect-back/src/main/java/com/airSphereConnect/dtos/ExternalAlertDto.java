@@ -2,7 +2,10 @@ package com.airSphereConnect.dtos;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-
+/**
+ * DTO représentant une alerte externe reçue pour une ville,
+ * avec validation des champs requis.
+ */
 public class ExternalAlertDto {
 
 

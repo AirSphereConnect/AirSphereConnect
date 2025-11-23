@@ -47,7 +47,7 @@ public class FavoriteController {
             @RequestBody FavoriteDto favoriteDto,
             @AuthenticationPrincipal UserDetails userDetails) {
 
-        User user = userRepository.findByUsername(userDetails.getUsername())
+        User user = userRepository.findByUsernameAndDeletedAtIsNull(userDetails.getUsername())
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Utilisateur non trouvé"));
 
         FavoriteDto created = favoriteService.createFavorite(user.getId(), favoriteDto);
@@ -61,9 +61,7 @@ public class FavoriteController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<FavoriteDto> deleteFavorite(@PathVariable Long id) {
-        System.out.println("id entrée delete : " + id);
         FavoriteDto deletedFavorite = favoriteService.deleteFavorite(id);
-        System.out.println("delete : " + deletedFavorite);
         return ResponseEntity.ok(deletedFavorite);
     }
 }
