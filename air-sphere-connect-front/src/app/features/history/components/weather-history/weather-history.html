@@ -39,9 +39,9 @@
           </td>
 
           <td class="text-center">
-            @if (snapshot.weather?.temperature !== undefined) {
+            @if (snapshot.weather.temperature !== undefined) {
               <span class="badge badge-info">
-                {{ formatTemperature(snapshot.weather!.temperature) }}
+                {{ formatTemperature(snapshot.weather.temperature) }}
               </span>
             } @else {
               <span class="opacity-60">Non mesuré</span>
@@ -49,9 +49,9 @@
           </td>
 
           <td class="text-center">
-            @if (snapshot.weather?.humidity !== undefined) {
+            @if (snapshot.weather.humidity !== undefined) {
               <span class="text-sm">
-                {{ formatHumidity(snapshot.weather!.humidity) }}
+                {{ formatHumidity(snapshot.weather.humidity) }}
               </span>
             } @else {
               <span class="opacity-60">Non mesuré</span>
@@ -59,9 +59,9 @@
           </td>
 
           <td class="text-center">
-            @if (snapshot.weather?.pressure !== undefined) {
+            @if (snapshot.weather.pressure !== undefined) {
               <span class="text-sm">
-                {{ formatPressure(snapshot.weather!.pressure) }}
+                {{ formatPressure(snapshot.weather.pressure) }}
               </span>
             } @else {
               <span class="opacity-60">Non mesuré</span>
@@ -69,9 +69,9 @@
           </td>
 
           <td class="text-center">
-            @if (snapshot.weather?.windSpeed !== undefined) {
+            @if (snapshot.weather.windSpeed !== undefined) {
               <span class="text-sm">
-                {{ formatWindSpeed(snapshot.weather!.windSpeed) }}
+                {{ formatWindSpeed(snapshot.weather.windSpeed) }}
               </span>
             } @else {
               <span class="opacity-60">Non mesuré</span>
@@ -79,13 +79,13 @@
           </td>
 
           <td class="text-center">
-            @if (snapshot.weather?.windDirection !== undefined) {
+            @if (snapshot.weather.windDirection !== undefined) {
               <div class="flex items-center justify-center gap-2">
                 <span class="badge badge-outline">
-                  {{ getWindDirection(snapshot.weather!.windDirection) }}
+                  {{ getWindDirection(snapshot.weather.windDirection) }}
                 </span>
                 <span class="text-xs opacity-60">
-                  ({{ snapshot.weather!.windDirection }}°)
+                  ({{ snapshot.weather.windDirection }}°)
                 </span>
               </div>
             } @else {
@@ -94,17 +94,17 @@
           </td>
 
           <td class="text-center">
-            @if (snapshot.weather?.message) {
+            @if (snapshot.weather.message) {
               <div class="flex items-center justify-center gap-2">
-                @if (getWeatherIcon(snapshot.weather!.message); as icon) {
+                @if (getWeatherIcon(snapshot.weather.message); as icon) {
                   <img
                     [src]="getWeatherIconUrl(icon)"
-                    [alt]="translateWeatherMessage(snapshot.weather!.message)"
+                    [alt]="translateWeatherMessage(snapshot.weather.message)"
                     class="w-10 h-10"
                   />
                 }
                 <span class="text-sm">
-                  {{ translateWeatherMessage(snapshot.weather!.message) }}
+                  {{ translateWeatherMessage(snapshot.weather.message) }}
                 </span>
               </div>
             } @else {
