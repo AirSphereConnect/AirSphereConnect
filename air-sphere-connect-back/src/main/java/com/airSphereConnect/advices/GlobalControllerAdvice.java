@@ -2,12 +2,11 @@ package com.airSphereConnect.advices;
 
 import com.airSphereConnect.exceptions.GlobalException;
 import com.airSphereConnect.utils.ErrorResponseBuilder;
-
 import jakarta.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.AuthenticationException;
@@ -31,51 +30,63 @@ public class GlobalControllerAdvice {
     private static final Logger logger = LoggerFactory.getLogger(GlobalControllerAdvice.class);
 
     /**
-     * Gestion de l’exception ResourceNotFoundException (404).
-     * Retourne un message simple avec status 404 NOT FOUND.
+     * Gère l'exception ResourceNotFoundException (404 Not Found).
+     * Convertit l'exception en réponse HTTP 404 avec ProblemDetail selon RFC 7807.
      *
-     * @param ex exception métier ResourceNotFoundException
-     * @return réponse HTTP 404 avec message d’erreur
+     * @param ex l'exception ResourceNotFoundException levée
+     * @return ResponseEntity avec statut 404 et détails structurés
      */
     @ExceptionHandler(GlobalException.ResourceNotFoundException.class)
-    public ResponseEntity<String> handleNotFound(GlobalException.ResourceNotFoundException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(ex.getMessage());
+    public ResponseEntity<ProblemDetail> handleNotFound(GlobalException.ResourceNotFoundException ex) {
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+        detail.setTitle("Ressource non trouvée");
+        detail.setProperty("timestamp", System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(detail);
     }
 
     /**
-     * Gestion de l’exception BadRequestException (400).
-     * Retourne un message simple avec status 400 BAD REQUEST.
+     * Gère l'exception BadRequestException (400 Bad Request).
+     * Convertit l'exception en réponse HTTP 400 avec ProblemDetail selon RFC 7807.
      *
-     * @param ex exception métier BadRequestException
-     * @return réponse HTTP 400 avec message d’erreur
+     * @param ex l'exception BadRequestException levée
+     * @return ResponseEntity avec statut 400 et détails structurés
      */
     @ExceptionHandler(GlobalException.BadRequestException.class)
-    public ResponseEntity<String> handleBadRequestException(GlobalException.BadRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    public ResponseEntity<ProblemDetail> handleBadRequestException(GlobalException.BadRequestException ex) {
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+        detail.setTitle("Requête invalide");
+        detail.setProperty("timestamp", System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(detail);
     }
 
     /**
-     * Gestion de l’exception UnauthorizedException (401).
-     * Retourne un message simple avec status 401 UNAUTHORIZED.
+     * Gère l'exception UnauthorizedException (401 Unauthorized).
+     * Convertit l'exception en réponse HTTP 401 avec ProblemDetail selon RFC 7807.
      *
-     * @param ex exception métier UnauthorizedException
-     * @return réponse HTTP 401 avec message d’erreur
+     * @param ex l'exception UnauthorizedException levée
+     * @return ResponseEntity avec statut 401 et détails structurés
      */
     @ExceptionHandler(GlobalException.UnauthorizedException.class)
-    public ResponseEntity<String> handleUnauthorizedException(GlobalException.UnauthorizedException ex) {
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(ex.getMessage());
+    public ResponseEntity<ProblemDetail> handleUnauthorizedException(GlobalException.UnauthorizedException ex) {
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.UNAUTHORIZED, ex.getMessage());
+        detail.setTitle("Authentification requise");
+        detail.setProperty("timestamp", System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(detail);
     }
 
     /**
-     * Gestion de l’exception ForbiddenException (403).
-     * Retourne un message simple avec status 403 FORBIDDEN.
+     * Gère l'exception ForbiddenException (403 Forbidden).
+     * Convertit l'exception en réponse HTTP 403 avec ProblemDetail selon RFC 7807.
      *
-     * @param ex exception métier ForbiddenException
-     * @return réponse HTTP 403 avec message d’erreur
+     * @param ex l'exception ForbiddenException levée
+     * @return ResponseEntity avec statut 403 et détails structurés
      */
     @ExceptionHandler(GlobalException.ForbiddenException.class)
-    public ResponseEntity<String> handleForbiddenException(GlobalException.ForbiddenException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.getMessage());
+    public ResponseEntity<ProblemDetail> handleForbiddenException(GlobalException.ForbiddenException ex) {
+        ProblemDetail detail = ProblemDetail.forStatusAndDetail(HttpStatus.FORBIDDEN, ex.getMessage());
+        detail.setTitle("Accès refusé");
+        detail.setProperty("timestamp", System.currentTimeMillis());
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(detail);
     }
 
     /**
