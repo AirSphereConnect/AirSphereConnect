@@ -5,6 +5,13 @@ import com.airSphereConnect.dtos.response.AirQualityMeasurementResponseDto;
 import com.airSphereConnect.dtos.response.AirQualityStationResponseDto;
 import com.airSphereConnect.dtos.response.AirQualityDataResponseDto;
 import com.airSphereConnect.services.implementations.AirQualityServiceImpl;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -13,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
 import java.util.List;
 
+@Tag(name = "Qualité de l'air", description = "API de surveillance de la qualité de l'air - Indices ATMO, polluants (PM2.5, PM10, NO2, O3, SO2) et historiques")
 @RestController
 //@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/air-quality")
@@ -24,6 +32,14 @@ public class AirQualityController {
         this.airQualityService = airQualityService;
     }
 
+    @Operation(
+            summary = "Récupérer toutes les stations de mesure",
+            description = "Retourne la liste de toutes les stations de mesure de la qualité de l'air avec leurs coordonnées"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des stations récupérée",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = AirQualityStationResponseDto.class)))
+    })
     @GetMapping("/stations")
     public ResponseEntity<List<AirQualityStationResponseDto>> getAllStations() {
         List<AirQualityStationResponseDto> stations = airQualityService.getAllStations();
