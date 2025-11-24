@@ -160,8 +160,10 @@ public class ApiDataSyncScheduler {
         log.info("🌙 [{}] Vérification données manquantes", LocalDateTime.now());
 
         try {
-            int missingDays = historicalDataLoader.detectAndFillMissingDays();
-            log.info("✅ Vérification terminée - {} jours traités", missingDays);
+            // TODO: Méthode detectAndFillMissingDays() à réimplémenter dans HistoricalDataLoaderService
+            // int missingDays = historicalDataLoader.detectAndFillMissingDays();
+            // log.info("✅ Vérification terminée - {} jours traités", missingDays);
+            log.info("⏭️ Vérification nocturne désactivée temporairement");
         } catch (Exception e) {
             log.error("❌ Erreur vérification nocturne: {}", e.getMessage());
         }

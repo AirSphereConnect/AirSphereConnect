@@ -19,6 +19,9 @@ public record AirQualityIndexMeasureResponseDto(
         String areaCode,
 
         @JsonProperty("lib_zone")
-        String areaName
+        String areaName,
+
+        @JsonProperty("date_ech")
+        Long dateEchTimestamp
 ) {
 }

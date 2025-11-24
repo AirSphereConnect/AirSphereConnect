@@ -23,6 +23,9 @@ public record AirQualityDailyMeasureResponseDto(
         @JsonProperty("unite")
         String polluantUnit,
 
+        @JsonProperty("date_debut")
+        Long dateDebutTimestamp,
+
         LocalDateTime measuredAt
 ) {
 }
