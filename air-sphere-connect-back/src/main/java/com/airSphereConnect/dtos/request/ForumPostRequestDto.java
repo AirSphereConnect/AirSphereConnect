@@ -1,13 +1,18 @@
 package com.airSphereConnect.dtos.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "Donnée reçues d'un post du forum")
 public class ForumPostRequestDto {
 
+    @Schema(description = "Contenu d'un post", example = "Bonjour tout le monde")
     @Size(min = 2, max = 255, message = "{post.content.size}")
     private String content;
+    @Schema(description = "Identifiant de l'utilisateur qui écrit le post", example = "1")
     private Long userId;
+    @Schema(description = "Identifiant du thread parent du post", example = "2")
     private Long threadId;
 
 

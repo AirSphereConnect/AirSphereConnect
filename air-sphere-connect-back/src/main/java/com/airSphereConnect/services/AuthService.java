@@ -142,7 +142,7 @@ public class AuthService {
     public ResponseEntity<?> login(LoginRequestDto loginDto, HttpServletResponse response) {
         try {
             Authentication auth = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword()));
+                    new UsernamePasswordAuthenticationToken(loginDto.username(), loginDto.password()));
 
             User userEntity = (User) auth.getPrincipal();
 

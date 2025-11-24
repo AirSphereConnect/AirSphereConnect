@@ -1,7 +1,5 @@
 package com.airSphereConnect.dtos.response;
 
-import java.time.LocalDateTime;
-
 public class ForumRubricResponseDto {
 
     private Long id;

@@ -1,29 +1,35 @@
 package com.airSphereConnect.dtos.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "Données reçues lors d'une inscription utilisateur")
 public class UserRequestDto {
 
+    @Schema(description = "Nom d'utilisateur saisi lors d'une inscription", example = "Cyril")
     @NotBlank(message = "{user.username.required}")
     @Size(min = 1, message = "{user.username.min}")
     @Size(max = 50, message = "{user.username.max}")
     @Column(name = "username", unique = true, nullable = false, length = 50)
     private String username;
 
+    @Schema(description = "Email de l'utilisateur", example = "cyril@gmail.com")
     @NotBlank(message = "{user.email.required}")
     @Email(message = "{user.email.invalid}")
     @Column(name = "email", unique = true, nullable = false, length = 150)
     private String email;
 
+    @Schema(description = "Mot de passe de connexion de l'utilisateur")
     @NotBlank(message = "{user.password.required}")
     @Size(min = 8, message = "{user.password.min}")
     @Column(name = "password", nullable = false)
     private String password;
 
+    @Schema(description = "Adresse de l'utilisateur")
     @NotBlank(message = "{user.address.required}")
     @Valid
     private AddressRequestDto address;

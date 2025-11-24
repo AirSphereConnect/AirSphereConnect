@@ -1,10 +1,17 @@
 package com.airSphereConnect.dtos.response;
 
-import java.util.Objects;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Données envoyées d'un département")
 public class DepartmentResponseDto {
+
+    @Schema(description = "Identifiant du Département", example = "1")
     private Long id;
+
+    @Schema(description = "Nom du Département", example = "Hérault")
     private String name;
+
+    @Schema(description = "Code du Département", example = "34")
     private String code;
 
     public DepartmentResponseDto() {

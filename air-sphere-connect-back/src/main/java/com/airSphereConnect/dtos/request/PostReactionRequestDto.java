@@ -1,14 +1,19 @@
 package com.airSphereConnect.dtos.request;
 
 import com.airSphereConnect.entities.enums.ReactionType;
-import jakarta.validation.constraints.NotNull;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Données reçues lors d'une interaction sur un post")
 public class PostReactionRequestDto {
 
+    @Schema(description = "Identifiant de l'utilisateur")
     private Long user_id;
-    private Long post_id;
-    private ReactionType reaction;
 
+    @Schema(description = "Identifiant du post")
+    private Long post_id;
+
+    @Schema(description = "Le type de réaction du post", example = "Like / Dislike")
+    private ReactionType reaction;
 
     public PostReactionRequestDto() {
     }
