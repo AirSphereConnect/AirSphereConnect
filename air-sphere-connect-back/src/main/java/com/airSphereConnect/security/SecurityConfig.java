@@ -62,6 +62,11 @@ public class SecurityConfig {
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        // Documentation Swagger (accès public)
+                        .requestMatchers("/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**").permitAll()
+                        // Endpoints publics
                         .requestMatchers("/actuator/health",
                                 "/actuator/info",
                                 "/api/refresh-token",
