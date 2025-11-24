@@ -47,16 +47,13 @@ public class OpenApiConfig {
                                 """)
                         .contact(new Contact()
                                 .name("Équipe AirSphere Connect")
-                                .email("contact@airsphereconnect.fr"))
-                        .license(new License()
-                                .name("Propriétaire")
-                                .url("https://www.airsphereconnect.fr/license")))
+                                .email("support@airsphereconnect.com"))
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:" + serverPort)
                                 .description("Serveur de développement"),
                         new Server()
-                                .url("https://api.airsphereconnect.fr")
+                                .url("https://airsphereconnect.sandrinealcazar.ovh")
                                 .description("Serveur de production")))
                 .addSecurityItem(new SecurityRequirement().addList("Bearer Authentication"))
                 .components(new io.swagger.v3.oas.models.Components()

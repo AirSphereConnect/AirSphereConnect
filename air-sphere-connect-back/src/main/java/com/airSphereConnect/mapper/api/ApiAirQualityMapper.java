@@ -1,11 +1,10 @@
 package com.airSphereConnect.mapper.api;
 
-import com.airSphereConnect.dtos.response.api.AirQualityDailyMeasureResponseDto;
-import com.airSphereConnect.dtos.response.api.AirQualityIndexMeasureResponseDto;
+import com.airSphereConnect.dtos.response.AirQualityDailyMeasureResponseDto;
+import com.airSphereConnect.dtos.response.AirQualityIndexMeasureResponseDto;
 import com.airSphereConnect.entities.AirQualityIndex;
 import com.airSphereConnect.entities.AirQualityMeasurement;
 import com.airSphereConnect.entities.AirQualityStation;
-import com.airSphereConnect.entities.Department;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
