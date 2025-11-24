@@ -4,7 +4,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 
 /**
- * DTO Données complètes d'une ville envoyée à l'utilisateur
+ * DTO Données complètes d'une ville envoyées à l'utilisateur
+ *
  * @param id identifiant de la ville
  * @param inseeCode Code insee de la ville
  * @param name Nom de la ville

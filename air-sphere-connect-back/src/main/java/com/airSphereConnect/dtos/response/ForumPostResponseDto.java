@@ -14,10 +14,10 @@ public class ForumPostResponseDto {
     @Schema(description = "Contenu d'un post", example = "Bonjour tout le monde")
     private String content;
 
-    @Schema(description = "Identifiant de l'utilisateur du post", example = "55")
+    @Schema(description = "Identifiant de l'auteur du post", example = "55")
     private Long userId;
 
-    @Schema(description = "Pseudo de l'utilisateur du post", example = "Cyril")
+    @Schema(description = "Pseudo de l'auteur du post", example = "Cyril")
     private  String username;
 
     @Schema(description = "Identifiant du thread parent du post", example = "2")
