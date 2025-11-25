@@ -58,14 +58,6 @@ public class Favorite extends Timestamp {
         this.id = id;
     }
 
-//    public FavoriteCategory getFavoriteCategory() {
-//        return favoriteCategory;
-//    }
-//
-//    public void setFavoriteCategory(FavoriteCategory favoriteCategory) {
-//        this.favoriteCategory = favoriteCategory;
-//    }
-
     public User getUser() {
         return user;
     }
