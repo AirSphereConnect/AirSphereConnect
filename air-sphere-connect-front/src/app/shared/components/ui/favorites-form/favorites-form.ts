@@ -6,7 +6,7 @@ import {InputComponent} from '../input/input';
 import {UserService} from '../../../services/user-service';
 import {Subject, takeUntil} from 'rxjs';
 import {Button} from '../button/button';
-import {inputCitySearch} from '../../../utils/city-utils/city-utils';
+import {citySearch} from '../../../utils/city-search.util';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {MatSelectModule} from '@angular/material/select';
 
@@ -43,7 +43,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   errorMessage: string | null = null;
   isDeleteMode = false;
 
-  citySearchEffect = inputCitySearch(this.cityService, this.cityQuery, this.citySuggestions);
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
 
   ngOnInit() {
     this.favoritesForm = this.fb.group({

@@ -23,7 +23,7 @@ import { Button } from '../../../shared/components/ui/button/button';
 import { IconComponent } from '../../../shared/components/ui/icon/icon';
 import { HeroIconName } from '../../../shared/icons/heroicons.registry';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import {inputCitySearch} from '../../../shared/utils/city-utils/city-utils';
+import {citySearch} from '../../../shared/utils/city-search.util';
 import {CityService} from '../../../core/services/city';
 
 @Component({
@@ -64,7 +64,7 @@ export class Register implements OnInit {
   canSubmitStep2 = signal<boolean>(false);
 
   // Effet Angular 20 pour recherche villes
-  citySearchEffect = inputCitySearch(this.cityService, this.cityQuery, this.citySuggestions);
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
 
   ngOnInit() {
     this.registerFirstForm = this.fb.group({

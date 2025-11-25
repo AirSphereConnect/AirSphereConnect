@@ -12,7 +12,7 @@ import {RouterOutlet} from '@angular/router';
 import {UserService} from '../../../../shared/services/user-service';
 import {User} from '../../../../core/models/user.model';
 import {Tab, TabItem} from '../../../../shared/components/ui/tab/tab';
-import {UserDashboard} from '../user/users';
+import {UserDashboard} from '../user/user';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ThreadListComponent} from '../../../forum/components/thread-list/thread-list';
 import {Favorites} from '../favorites/favorites';

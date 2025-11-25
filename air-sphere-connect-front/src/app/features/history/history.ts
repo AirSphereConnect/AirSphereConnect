@@ -75,7 +75,7 @@ export class History implements OnInit, AfterViewInit {
 
   // Getters pour les FormControls (comme dans login)
   get citySearchControl(): FormControl {
-    return this.filterForm.get('citySearch') as FormControl;
+    return this.filterForm.get('citySearchUtils') as FormControl;
   }
 
   get startDateControl(): FormControl {
