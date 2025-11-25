@@ -6,6 +6,11 @@
 
 set -e  # Arrêt en cas d'erreur
 
+# Charger les variables d'environnement depuis .env
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | grep -v '^$' | xargs)
+fi
+
 echo "========================================="
 echo "🔍 Analyse Frontend (Angular)"
 echo "========================================="

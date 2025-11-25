@@ -6,15 +6,19 @@
 
 set -e  # Arrêt en cas d'erreur
 
+# Charger les variables d'environnement depuis .env
+if [ -f .env ]; then
+    export $(cat .env | grep -v '^#' | grep -v '^$' | xargs)
+fi
+
 echo "========================================="
 echo "🔍 Analyse Backend (Spring Boot)"
 echo "========================================="
 echo ""
 
 # Variables
-SONAR_HOST="${SONAR_HOST:-http://localhost:9000}"
+SONAR_HOST="${SONAR_HOST_URL:-http://localhost:9000}"
 SONAR_TOKEN="${SONAR_TOKEN:-YOUR_SONARQUBE_TOKEN_HERE}"
-PROJECT_KEY="${PROJECT_KEY:-air-sphere-connect}"
 
 cd air-sphere-connect-back
 
@@ -25,12 +29,12 @@ echo "✅ Exécution des tests + coverage JaCoCo..."
 ./mvnw verify
 
 echo "📊 Envoi des résultats vers SonarQube..."
+# Note: projectKey est défini dans sonar-project.properties
 ./mvnw sonar:sonar \
-  -Dsonar.projectKey="$PROJECT_KEY" \
   -Dsonar.host.url="$SONAR_HOST" \
   -Dsonar.token="$SONAR_TOKEN"
 
 echo ""
 echo "✅ Analyse backend terminée!"
-echo "🌐 Résultats: $SONAR_HOST/dashboard?id=$PROJECT_KEY"
+echo "🌐 Résultats: $SONAR_HOST/dashboard?id=air-sphere-connect-backend"
 echo ""
