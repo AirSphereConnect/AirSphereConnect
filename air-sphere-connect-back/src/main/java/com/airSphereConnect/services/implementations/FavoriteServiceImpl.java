@@ -74,7 +74,6 @@ public class FavoriteServiceImpl implements FavoriteService {
         Favorite favorite = favoriteMapper.toEntity(favoriteDto);
         favorite.setUser(user);
         favorite.setCity(city);
-//        favorite.setCreatedAt(LocalDateTime.now());
 
         Favorite saved = favoriteRepository.save(favorite);
         return favoriteMapper.toDto(saved);
@@ -103,7 +102,6 @@ public class FavoriteServiceImpl implements FavoriteService {
 
     @Override
     public FavoriteDto deleteFavorite(Long id) {
-        System.out.println("id : " + id);
         Favorite favorite = favoriteRepository.findById(id)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException("Favori non trouvé avec l'id : " + id));
 

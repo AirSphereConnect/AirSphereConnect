@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Optional<User> findByUsername(String username) throws UsernameNotFoundException {
-        return Optional.empty();
+        return userRepository.findByUsernameAndDeletedAtIsNull(username);
     }
 
     public boolean existsByUsername(String username) {
