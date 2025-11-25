@@ -47,7 +47,7 @@ public class OpenApiConfig {
                                 """)
                         .contact(new Contact()
                                 .name("Équipe AirSphere Connect")
-                                .email("support@airsphereconnect.com"))
+                                .email("support@airsphereconnect.com")))
                 .servers(List.of(
                         new Server()
                                 .url("http://localhost:" + serverPort)

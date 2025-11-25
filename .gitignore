@@ -22,3 +22,20 @@ target/
 dist/
 build/
 
+
+# ==============================
+# SonarQube & Coverage Reports
+# ==============================
+# Backend
+air-sphere-connect-back/target/jacoco.exec
+air-sphere-connect-back/target/site/jacoco/
+air-sphere-connect-back/.scannerwork/
+
+# Frontend
+air-sphere-connect-front/coverage/
+air-sphere-connect-front/.scannerwork/
+air-sphere-connect-front/.nyc_output/
+
+# SonarQube
+.sonarqube/
+.sonar/
