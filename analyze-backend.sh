@@ -29,12 +29,14 @@ echo "✅ Exécution des tests + coverage JaCoCo..."
 ./mvnw verify
 
 echo "📊 Envoi des résultats vers SonarQube..."
-# Note: projectKey est défini dans sonar-project.properties
+# Note: Override du projectKey Maven avec celui défini dans sonar-project.properties
 ./mvnw sonar:sonar \
+  -Dsonar.projectKey=air-sphere-connect \
+  -Dsonar.projectName="AirSphere Connect - Backend" \
   -Dsonar.host.url="$SONAR_HOST" \
   -Dsonar.token="$SONAR_TOKEN"
 
 echo ""
 echo "✅ Analyse backend terminée!"
-echo "🌐 Résultats: $SONAR_HOST/dashboard?id=air-sphere-connect-backend"
+echo "🌐 Résultats: $SONAR_HOST/dashboard?id=air-sphere-connect"
 echo ""
