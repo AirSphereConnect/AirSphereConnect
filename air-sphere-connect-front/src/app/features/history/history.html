@@ -10,7 +10,7 @@
           <app-input
             label="Commune"
             type="text"
-            formControlName="citySearchUtils"
+            formControlName="citySearch"
             placeholder="Tapez au moins 3 lettres..."
             [fullWidth]="true"
             size="md"
@@ -55,7 +55,8 @@
           variant="outline"
           size="md"
           [heroIcon]="'download'"
-          (click)="exportCSV()"
+          (buttonClick)="exportCSV()"
+          (buttonKeydown)="undefined"
         >
           Export CSV
         </app-button>
@@ -63,7 +64,8 @@
           variant="outline"
           size="md"
           [heroIcon]="'download'"
-          (click)="exportPDF()"
+          (buttonClick)="exportPDF()"
+          (buttonKeydown)="undefined"
         >
           Export PDF
         </app-button>

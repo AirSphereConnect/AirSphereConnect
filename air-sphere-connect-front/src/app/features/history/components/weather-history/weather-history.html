@@ -124,7 +124,8 @@
         <app-button
           size="sm"
           variant="outline"
-          (click)="prevPage()"
+          (buttonClick)="prevPage()"
+          (buttonKeydown)="undefined"
         >
           Précédent
         </app-button>
@@ -142,7 +143,8 @@
             size="sm"
             variant="outline"
             padding="lg"
-            (click)="nextPage()"
+            (buttonClick)="nextPage()"
+            (buttonKeydown)="undefined"
           >
             Suivant
           </app-button>

@@ -39,12 +39,12 @@ import { Tab, type TabItem } from '../../shared/components/ui/tab/tab';
   styleUrls: ['./history.scss']
 })
 export class History implements OnInit, AfterViewInit {
-  private userService = inject(UserService);
-  private cityService = inject(CityService);
-  private orchestrator = inject(DataOrchestratorService);
-  private apiConfig = inject(ApiConfigService);
-  private destroyRef = inject(DestroyRef);
-  private fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
+  private readonly cityService = inject(CityService);
+  private readonly orchestrator = inject(DataOrchestratorService);
+  private readonly apiConfig = inject(ApiConfigService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
 
   // FormGroup pour les filtres
   filterForm!: FormGroup;
@@ -75,7 +75,7 @@ export class History implements OnInit, AfterViewInit {
 
   // Getters pour les FormControls (comme dans login)
   get citySearchControl(): FormControl {
-    return this.filterForm.get('citySearchUtils') as FormControl;
+    return this.filterForm.get('citySearch') as FormControl;
   }
 
   get startDateControl(): FormControl {
@@ -145,8 +145,7 @@ export class History implements OnInit, AfterViewInit {
                 this.initializeWithUserCity(cities, newProfile.user.address.city.name);
               }
             });
-        },
-        error: (err) => console.error('Erreur chargement villes:', err)
+        }
       });
   }
 
@@ -192,17 +191,9 @@ export class History implements OnInit, AfterViewInit {
       this.startDateControl.setValue(startDateStr);
       this.endDateControl.setValue(endDateStr);
 
-      // Debug: vérifier que les valeurs sont bien dans les controls
-      console.log('🔍 FormControl values:', {
-        city: this.citySearchControl.value,
-        start: this.startDateControl.value,
-        end: this.endDateControl.value
-      });
-
       // Activer les événements après l'initialisation
       setTimeout(() => {
         this.isInitializing = false;
-        console.log('✅ Initialization complete, loading history...');
         // Charger les données automatiquement au démarrage
         this.loadHistory();
       }, 100);
