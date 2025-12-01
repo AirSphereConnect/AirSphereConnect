@@ -10,9 +10,9 @@ import {Button} from '../button/button';
   styleUrls: ['./button-close-modal.scss']
 })
 export class ButtonCloseModal {
-  @Output() close = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
 
   onClick() {
-    this.close.emit();
+    this.closeModal.emit();
   }
 }

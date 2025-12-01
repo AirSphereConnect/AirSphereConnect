@@ -50,6 +50,9 @@ export class InputComponent implements ControlValueAccessor, OnInit {
   // Rend le control optionnel pour ne pas casser l'utilisation avec formControlName
   @Input() control?: FormControl;
 
+  // Generate unique ID for input-label association
+  inputId: string = `input-${Math.random().toString(36).substring(2, 11)}`;
+
   @Input() placeholder: string = '';
   @Input() size: InputVariants['size'] = 'md';
   @Input() fullWidth: boolean = true;
@@ -64,13 +67,13 @@ export class InputComponent implements ControlValueAccessor, OnInit {
 
   @Output() iconRightClick = new EventEmitter<void>();
 
-  private _typeSignal = signal<string>('text');
+  private readonly _typeSignal = signal<string>('text');
 
-  private formTouched = signal(false);
-  private formDirty = signal(false);
-  private formValid = signal(false);
-  private formDisabled = signal(false);
-  private formErrors = signal<any>(null);
+  private readonly formTouched = signal(false);
+  private readonly formDirty = signal(false);
+  private readonly formValid = signal(false);
+  private readonly formDisabled = signal(false);
+  private readonly formErrors = signal<any>(null);
   private readonly destroyRef = inject(DestroyRef);
   private readonly formErrorService = inject(FormErrorService);
 
@@ -166,7 +169,7 @@ export class InputComponent implements ControlValueAccessor, OnInit {
     return null;
   });
 
-  private variantsConfig = computed(() => {
+  private readonly variantsConfig = computed(() => {
     return inputVariants({
       size: this.size,
       state: this.state(),

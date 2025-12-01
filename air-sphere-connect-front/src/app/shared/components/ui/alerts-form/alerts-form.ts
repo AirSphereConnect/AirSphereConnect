@@ -19,6 +19,13 @@ import {citySearch} from '../../../utils/city-search.util';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
 import {Subject} from 'rxjs';
+import {City} from '../../../../core/models/city.model';
+
+interface AlertFormData {
+  cityId: number;
+  cityName: string;
+  enabled: boolean;
+}
 
 @Component({
   selector: 'app-alerts-form',
@@ -31,8 +38,8 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
 
   @Input() isOpen = signal(false);
   @Input() editingAlertsId: number | null = null;
-  @Input() initialAlertsData: any = null;
-  @Output() close = new EventEmitter<void>();
+  @Input() initialAlertsData: AlertFormData | null = null;
+  @Output() closeModal = new EventEmitter<void>();
   @Output() submitSuccess = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
@@ -43,7 +50,7 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
 
   alertsForm!: FormGroup;
   cityQuery = signal('');
-  citySuggestions = signal<any[]>([]);
+  citySuggestions = signal<City[]>([]);
   cityIdSelected: number | null = null;
   errorMessage: string | null = null;
   isDeleteMode = false;
@@ -72,18 +79,19 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
 
   private patchFormData() {
     this.alertsForm.patchValue({
-      activeAlert: this.initialAlertsData.enabled === true,
-      cityName: this.initialAlertsData.cityName || ''
+      activeAlert: this.initialAlertsData?.enabled,
+      cityName: this.initialAlertsData?.cityName || ''
     });
-    this.cityIdSelected = this.initialAlertsData.cityId || null;
+    this.cityIdSelected = this.initialAlertsData?.cityId || null;
     this.isDeleteMode = false;
   }
 
-  onCityInput(event: any) {
-    this.cityQuery.set(event.target.value);
+  onCityInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.cityQuery.set(target.value);
   }
 
-  selectCity(city: any) {
+  selectCity(city: City) {
     this.alertsForm.get('cityName')?.setValue(city.name);
     this.cityIdSelected = city.id;
     this.citySuggestions.set([]);
@@ -134,10 +142,10 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
     this.isDeleteMode = false;
     this.userService.fetchUserProfile();
     this.submitSuccess.emit();
-    this.closeModal();
+    this.onClose();
   }
 
-  closeModal() {
+  onClose() {
     this.alertsForm.reset({
       activeAlert: false,
       cityName: ''
@@ -145,6 +153,6 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
     this.cityIdSelected = null;
     this.isDeleteMode = false;
     this.isOpen.set(false);
-    this.close.emit();
+    this.closeModal.emit();
   }
 }

@@ -1,4 +1,4 @@
-import {Component, Input, computed, inject, Output, EventEmitter, input, ChangeDetectorRef} from '@angular/core';
+import {Component, Input, computed, inject, Output, EventEmitter} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {buttonVariants, type ButtonVariants} from '../../../variants/button.variants';
 import {type HeroIconName} from '../../../icons/heroicons.registry';
@@ -18,6 +18,7 @@ import {DomSanitizer} from '@angular/platform-browser';
       [type]="type"
       [attr.aria-label]="ariaLabel"
       (click)="handleClick($event)"
+      (keydown)="handleKeyDown($event)"
     >
       @if (loading) {
         <span class="loading loading-spinner"></span>
@@ -47,8 +48,8 @@ import {DomSanitizer} from '@angular/platform-browser';
   `]
 })
 export class Button {
-  private iconService = inject(IconService);
-  private sanitizer = inject(DomSanitizer);
+  private readonly iconService = inject(IconService);
+  private readonly sanitizer = inject(DomSanitizer);
 
   @Input() color: ButtonVariants['color'] = 'primary';
   @Input() size: ButtonVariants['size'] = 'md';
@@ -68,7 +69,8 @@ export class Button {
   @Input() iconColor?: IconVariants['color'];
 
   @Input() ariaLabel?: string;
-  @Output() click = new EventEmitter<MouseEvent>();
+  @Output() buttonClick = new EventEmitter<MouseEvent>();
+  @Output() buttonKeydown = new EventEmitter<KeyboardEvent>();
 
 
   buttonClasses = computed(() => {
@@ -108,7 +110,25 @@ export class Button {
   handleClick(event: MouseEvent): void {
     event.stopPropagation();
     if (!this.disabled && !this.loading) {
-      this.click.emit(event);
+      this.buttonClick.emit(event);
+    }
+  }
+
+  handleKeyDown(event: KeyboardEvent): void {
+    // Émettre l'événement keydown pour permettre au parent de le capturer si nécessaire
+    this.buttonKeydown.emit(event);
+
+    // Gérer Enter et Space comme des clics (accessibilité)
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!this.disabled && !this.loading) {
+        const mouseEvent = new MouseEvent('click', {
+          bubbles: event.bubbles,
+          cancelable: event.cancelable
+        });
+        this.buttonClick.emit(mouseEvent);
+      }
     }
   }
 

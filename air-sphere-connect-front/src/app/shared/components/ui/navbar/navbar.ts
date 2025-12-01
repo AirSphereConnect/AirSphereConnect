@@ -1,7 +1,6 @@
-import {Component, inject, Inject, Input, OnInit} from '@angular/core';
+import {Component, inject, Input} from '@angular/core';
 import {NavigationService} from '../../../services/navigation-service';
 import {RouterLink, RouterLinkActive} from '@angular/router';
-import {UserService} from '../../../services/user-service';
 
 @Component({
   selector: 'app-navbar',

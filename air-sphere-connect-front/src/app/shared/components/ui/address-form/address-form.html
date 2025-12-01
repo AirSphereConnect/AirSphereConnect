@@ -2,16 +2,20 @@
   <div class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
     <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md relative">
       <app-button-close-modal
-        (close)="close.emit()">
+        (closeModal)="closeModal.emit()">
       </app-button-close-modal>
       <h2 class="text-xl font-bold mb-4">Modifier mon adresse</h2>
       <form [formGroup]="addressForm" (ngSubmit)="submit()">
-        <input formControlName="street" placeholder="Adresse" class="text-black input mb-2 w-full" />
+        <label for="street-address-input" class="sr-only">Adresse</label>
+        <input id="street-address-input" formControlName="street" placeholder="Adresse" class="text-black input mb-2 w-full" autocomplete="street-address" />
 
+        <label for="city-name-input" class="sr-only">Ville</label>
         <input
+          id="city-name-input"
           formControlName="cityName"
           placeholder="Ville"
           class="text-black input mb-2 w-full"
+          autocomplete="address-level2"
         />
 
         @if(citySuggestions.length) {
@@ -22,7 +26,7 @@
         </ul>
         }
 
-        <input formControlName="cityId" type="hidden" />
+        <input formControlName="cityId" type="hidden" autocomplete="off" />
 
         @if(errorMessage()) { <div class="alert alert-error">{{ errorMessage() }}</div> }
 

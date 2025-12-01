@@ -9,10 +9,12 @@ import {Button} from '../button/button';
 import {citySearch} from '../../../utils/city-search.util';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {MatSelectModule} from '@angular/material/select';
+import {City} from '../../../../core/models/city.model';
 
-interface catData {
-  value: string;
-  label: string;
+interface FavoriteFormData {
+  cityId: number;
+  cityName: string;
+  enabled: boolean;
 }
 
 
@@ -26,8 +28,8 @@ interface catData {
 export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   @Input() isOpen = signal(false);
   @Input() editingFavoriteId: number | null = null;
-  @Input() initialFavoriteData: any = null;
-  @Output() close = new EventEmitter<void>();
+  @Input() initialFavoriteData: FavoriteFormData | null = null;
+  @Output() closeModal = new EventEmitter<void>();
   @Output() submitSuccess = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
@@ -38,7 +40,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
 
   favoritesForm!: FormGroup;
   cityQuery = signal<string>('');
-  citySuggestions = signal<any[]>([]);
+  citySuggestions = signal<City[]>([]);
   cityIdSelected: number | null = null;
   errorMessage: string | null = null;
   isDeleteMode = false;
@@ -68,21 +70,22 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
 
   private patchFormData() {
     this.favoritesForm.patchValue({
-      activeWeather: this.initialFavoriteData?.enabled === true,
-      activeAirQuality: this.initialFavoriteData?.enabled === true,
-      activePopulation: this.initialFavoriteData?.enabled === true,
+      activeWeather: this.initialFavoriteData?.enabled,
+      activeAirQuality: this.initialFavoriteData?.enabled,
+      activePopulation: this.initialFavoriteData?.enabled,
       cityName: this.initialFavoriteData?.cityName ?? ''
     });
     this.cityIdSelected = this.initialFavoriteData?.cityId ?? null;
     this.isDeleteMode = false;
   }
 
-  onCityInput(event: any) {
-    this.cityQuery.set(event.target.value);
+  onCityInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.cityQuery.set(target.value);
   }
 
 
-  selectCity(city: any) {
+  selectCity(city: City) {
     this.favoritesForm.get('cityName')?.setValue(city.name);
     this.cityIdSelected = city.id;
     this.citySuggestions.set([]);
@@ -128,7 +131,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  closeModal() {
+  onClose() {
     this.favoritesForm.reset({
       activeWeather: false,
       activeAirQuality: false,
@@ -138,7 +141,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
     this.cityIdSelected = null;
     this.isDeleteMode = false;
     this.isOpen.set(false);
-    this.close.emit();
+    this.closeModal.emit();
   }
 
   private handleSuccess() {
@@ -148,6 +151,6 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
     this.isDeleteMode = false;
     this.userService.fetchUserProfile();
     this.submitSuccess.emit();
-    this.closeModal();
+    this.onClose();
   }
 }

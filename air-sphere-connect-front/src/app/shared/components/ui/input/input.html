@@ -1,5 +1,5 @@
 <div [class]="wrapperClass()">
-  <label [class]="labelClass()">
+  <label [for]="inputId" [class]="labelClass()">
     <span [class]="labelTextClass()">
       {{ label }}
       @if (required) {
@@ -20,6 +20,7 @@
     }
 
     <input
+      [id]="inputId"
       [ngClass]="{
           'pl-16': iconLeft,
           'pr-8': iconRight,
@@ -29,7 +30,7 @@
       [type]="inputType()"
       [placeholder]="placeholder"
       [class]="inputClass()"
-      [attr.autocomplete]="autocomplete"
+      [attr.autocomplete]="autocomplete || null"
       [readonly]="readonly"
       [class.pointer-events-none]="readonly"
       [class.cursor-not-allowed]="readonly"

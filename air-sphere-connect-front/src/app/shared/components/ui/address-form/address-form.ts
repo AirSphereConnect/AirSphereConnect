@@ -5,7 +5,6 @@ import {
   Input,
   numberAttribute,
   OnChanges,
-  OnInit,
   Output,
   signal
 } from '@angular/core';
@@ -13,9 +12,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { UserService } from '../../../services/user-service';
 import { CityService } from '../../../../core/services/city';
 import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import {Button} from '../button/button';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
-import {User} from '../../../../core/models/user.model';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 @Component({
@@ -28,7 +25,7 @@ export class AddressForm implements OnChanges {
   @Input() isOpen = signal(false);
   @Input({transform: numberAttribute}) editingUserId!: number | undefined;
   @Input() addressData: any = null;
-  @Output() close = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
   addressForm: FormGroup;
@@ -87,11 +84,15 @@ export class AddressForm implements OnChanges {
     if (this.addressForm.invalid) return;
     this.isLoading.set(true);
 
+    if (!this.selectedCityId) {
+      this.isLoading.set(false);
+      return;
+    }
+
     const payload = {
       street: this.addressForm.get('street')?.value,
       city: { id: this.selectedCityId }
     };
-    console.log("user id adresse" + this.addressData.id);
 
     this.userService.editAddress(this.addressData.id, payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
@@ -99,7 +100,7 @@ export class AddressForm implements OnChanges {
       next: () => {
         this.isLoading.set(false);
         this.updated.emit();
-        this.close.emit();
+        this.closeModal.emit();
       },
       error: () => {
         this.isLoading.set(false);

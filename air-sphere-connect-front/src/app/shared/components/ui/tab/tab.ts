@@ -26,7 +26,7 @@ export class Tab {
 
   activeIndex = signal(0);
 
-  private variantsConfig = computed(() => tabVariants({ variant: this.variant }));
+  private readonly variantsConfig = computed(() => tabVariants({ variant: this.variant }));
 
   navClasses = computed(() => this.variantsConfig().nav());
   panelClasses = computed(() => this.variantsConfig().panel());

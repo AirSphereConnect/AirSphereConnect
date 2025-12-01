@@ -1,4 +1,4 @@
-import {Component, Input, computed, input} from '@angular/core';
+import {Component, computed, input} from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {IconService} from '../../../services/icon';
 import { type HeroIconName } from '../../../icons/heroicons.registry';
@@ -21,8 +21,8 @@ export class IconComponent {
 
 
   constructor(
-    private iconService: IconService,
-    private sanitizer: DomSanitizer
+    private readonly iconService: IconService,
+    private readonly sanitizer: DomSanitizer
   ) {}
 
   iconClasses = computed(() => {
@@ -33,7 +33,7 @@ export class IconComponent {
 
     const filledValue = this.filled();
 
-    if (filledValue === true) {
+    if (filledValue) {
       return `${baseClasses} [&_svg_path]:fill-current [&_svg_path]:stroke-current transition-all duration-200`;
     } else if (filledValue === false) {
       return `${baseClasses} [&_svg_path]:fill-none transition-all duration-200`;

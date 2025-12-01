@@ -1,6 +1,5 @@
 import {Component, computed, input, output} from '@angular/core';
 import {tv} from 'tailwind-variants';
-import {Button} from '../button/button';
 
 // 🎨 Définition des variantes avec tailwind-variants
 const modalVariants = tv({
@@ -54,9 +53,7 @@ const modalVariants = tv({
 @Component({
   selector: 'app-modal',
   standalone: true,
-  imports: [
-    Button
-  ],
+  imports: [],
   templateUrl: './modal.html'
 })
 export class ModalComponent {

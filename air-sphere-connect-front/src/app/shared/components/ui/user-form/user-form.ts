@@ -1,8 +1,7 @@
 import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
-import {FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
+import {FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
-import {Button} from '../button/button';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
 
@@ -17,7 +16,7 @@ export class UserForm implements OnChanges, OnInit {
   @Input() isOpen = signal(false);
   @Input() editingUserId!: number | null;
   @Input() initialUserData: any = null;
-  @Output() close = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
   userForm: FormGroup;
@@ -25,7 +24,7 @@ export class UserForm implements OnChanges, OnInit {
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
-  constructor(private fb: FormBuilder, private userService: UserService, private router: Router) {
+  constructor(private readonly fb: FormBuilder, private readonly userService: UserService, private readonly router: Router) {
     this.userForm = this.fb.group({
       username: ['', Validators.required]
     });
@@ -34,7 +33,7 @@ export class UserForm implements OnChanges, OnInit {
   ngOnInit() {
     // 🔁 Synchronisation automatique avec le profil utilisateur
     this.userService.userProfile$.subscribe(profile => {
-      if (profile && profile.user) {
+      if (profile?.user) {
         this.user = profile.user;
       }
     });
@@ -50,41 +49,38 @@ export class UserForm implements OnChanges, OnInit {
 
   submit() {
     if (this.userForm.invalid) {
-      console.log("[UserForm] Formulaire invalide");
       return;
     }
 
     this.isLoading.set(true);
     const payload = { ...this.userForm.value };
 
-    console.log("[UserForm] Soumission des données:", payload);
-
     this.userService.editUser(this.editingUserId, payload).subscribe({
       next: (res) => {
-        console.log("[UserForm] Réponse backend:", res);
-
         if (!res || Object.keys(res).length === 0) {
-          console.log("[UserForm] Session invalidée côté backend, déconnexion forcée");
-
           this.userService.setUserProfile(null);
           this.userService.fetchUserProfile();
           this.router.navigate(['/home']);
         } else {
-          console.log("[UserForm] Mise à jour normale, rafraîchissement du profil");
-
           this.userService.fetchUserProfile();
           this.updated.emit();
-          this.close.emit();
+          this.closeModal.emit();
         }
         this.isLoading.set(false);
       },
       error: (err) => {
-        console.error("[UserForm] Erreur lors de la mise à jour:", err);
+        this.logError('Erreur lors de la mise à jour utilisateur', err);
         this.isLoading.set(false);
         this.errorMessage.set('Erreur lors de la mise à jour.');
       }
     });
   }
 
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
+  }
 
 }
