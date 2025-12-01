@@ -8,7 +8,7 @@
     <app-navbar [userRole]="userRole"></app-navbar>
     <div class="tabs tabs-box">
 
-      <app-button variant="ghost" shape="circle" (click)="toggleTheme()">
+      <app-button variant="ghost" shape="circle" (buttonClick)="toggleTheme()" (buttonKeydown)="undefined">
         <app-icon
           [name]="isDarkTheme() ? 'sun' : 'darkMoon'"
           color="current"

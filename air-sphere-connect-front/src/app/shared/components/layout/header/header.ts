@@ -1,4 +1,4 @@
-import {Component, inject, Input, OnInit, signal} from '@angular/core';
+import {Component, inject, Input} from '@angular/core';
 import { Navbar } from '../../ui/navbar/navbar';
 import {Logo} from '../../ui/logo/logo';
 import {ThemeService} from '../../../../core/services/theme';

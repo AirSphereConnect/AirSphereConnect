@@ -13,7 +13,7 @@ import {RouterLink} from '@angular/router';
 export class FooterLinks {
   @Input() userRole!: string | null;
 
-  constructor(private navigationService: NavigationService) {}
+  constructor(private readonly navigationService: NavigationService) {}
 
   logout() {
     this.navigationService.logout();
