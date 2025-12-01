@@ -99,24 +99,9 @@ export class PollutantsChart {
   ]
 
   constructor() {
-    // Debug: afficher les données reçues
     effect(() => {
       const rawData = this.data();
-      const aggregated = this.chartData();
-
-      console.log('🔍 PollutantsChart - données brutes:', rawData.length, 'mesures');
-      console.log('📊 PollutantsChart - après agrégation:', aggregated.length, 'jours');
-
-      if (aggregated.length > 0) {
-        console.log('📈 Exemple jour 1:', {
-          date: aggregated[0].date,
-          pm25: aggregated[0].pm25?.toFixed(1),
-          pm10: aggregated[0].pm10?.toFixed(1),
-          no2: aggregated[0].no2?.toFixed(1),
-          o3: aggregated[0].o3?.toFixed(1),
-          so2: aggregated[0].so2?.toFixed(1)
-        });
-      }
+      this.chartData();
 
       this.checkAlerts(rawData);
     });
@@ -150,7 +135,7 @@ export class PollutantsChart {
     // 🔄 Grouper par jour (ignorer l'heure) et calculer la moyenne
     const groupedByDay = new Map<string, AirQualityMeasurement[]>();
 
-    filtered.forEach(d => {
+    for (const d of filtered) {
       const date = new Date(d.measuredAt);
       // ✅ Créer une clé unique pour chaque jour (YYYY-MM-DD)
       const dayKey = date.toISOString().split('T')[0];
@@ -159,7 +144,7 @@ export class PollutantsChart {
         groupedByDay.set(dayKey, []);
       }
       groupedByDay.get(dayKey)!.push(d);
-    });
+    }
 
     // 📈 Calculer la moyenne pour chaque jour
     return Array.from(groupedByDay.entries()).map(([dayKey, measurements]) => {

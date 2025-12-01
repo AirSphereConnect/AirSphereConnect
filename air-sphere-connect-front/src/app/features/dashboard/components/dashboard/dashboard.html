@@ -16,7 +16,7 @@
     <div class="error-banner">
       <strong>⚠️ Erreur</strong>
       <p>{{ error() }}</p>
-      <app-button (click)="loadDashboard()">🔄 Réessayer</app-button>
+      <app-button (buttonClick)="loadDashboard()" (buttonKeydown)="undefined">🔄 Réessayer</app-button>
     </div>
   }
 

@@ -1,10 +1,9 @@
-import {Component, computed, DestroyRef, Input, OnInit, signal} from '@angular/core';
+import {Component, computed, DestroyRef, inject, Input, OnInit, signal} from '@angular/core';
 import { TemperatureChart } from '../temperature-chart/temperature-chart';
 import { CityPopulationChart } from '../city-population-chart/city-population-chart';
 import { PollutantsChart } from '../pollutants-chart/pollutants-chart';
 import { Map } from '../map/map';
 import {FormsModule} from '@angular/forms';
-import { inject } from '@angular/core';
 import { DataOrchestratorService } from '../../../../core/services/data-orchestrator';
 import { DashboardData } from '../../../../core/models/data.model';
 import {UserService} from '../../../../shared/services/user-service';
@@ -29,9 +28,9 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 })
 
 export class Dashboard implements OnInit {
-  private orchestrator = inject(DataOrchestratorService);
-  private userService = inject(UserService);
-  private destroyRef = inject(DestroyRef);
+  private readonly orchestrator = inject(DataOrchestratorService);
+  private readonly userService = inject(UserService);
+  private readonly destroyRef = inject(DestroyRef);
 
   selectedCity = signal('');
   selectedPostalCode = signal<string | null>(null);
@@ -46,12 +45,7 @@ export class Dashboard implements OnInit {
     this.dashboardData()?.city?.postalCode ?? this.selectedPostalCode()
   );
   weatherHistory = computed(() => this.dashboardData()?.weatherHistory || []);
-  airQuality = computed(() => {
-    const aq = this.dashboardData()?.airQuality;
-    console.log('🏭 Dashboard - airQuality computed:', aq);
-    console.log('📈 Dashboard - measurementHistory:', aq?.measurementHistory);
-    return aq;
-  });
+  airQuality = computed(() => this.dashboardData()?.airQuality);
   populationHistory = computed(() => this.dashboardData()?.populationHistory || []);
   @Input() user: User | null = null;
 
@@ -77,12 +71,10 @@ export class Dashboard implements OnInit {
 
     this.orchestrator.loadDashboardData(this.selectedCity()).subscribe({
       next: (data) => {
-        console.log('✅ Dashboard data loaded:', data);
         this.dashboardData.set(data);
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error('❌ Error loading dashboard:', err);
+      error: () => {
         this.error.set('Impossible de charger les données. Vérifiez que le backend est lancé.');
         this.isLoading.set(false);
       }
@@ -90,7 +82,6 @@ export class Dashboard implements OnInit {
   }
 
   onCitySelected(cityName: string) {
-    console.log('🏙️ Ville sélectionnée:', cityName);
     this.selectedCity.set(cityName);
     this.loadDashboard();
 

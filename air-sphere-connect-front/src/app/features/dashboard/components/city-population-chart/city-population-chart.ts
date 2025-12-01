@@ -66,7 +66,7 @@ import {City} from '../../../../core/models/city.model';
 })
 
 export class CityPopulationChart {
-  private cityService = inject(CityService);
+  private readonly cityService = inject(CityService);
 
   selectedCity = input.required<City>();
   chartData = signal<City[]>([]);
@@ -86,8 +86,15 @@ export class CityPopulationChart {
   private loadTopCities(areaCode: string) {
     this.cityService.getTopCitiesByArea(areaCode, 10).subscribe({
       next: (data) => this.chartData.set(data),
-      error: (err) => console.error('Error loading top cities:', err),
+      error: (err) => this.logError('Error loading top cities', err),
     });
+  }
+
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
   }
 
   // ✅ Correction ici : x doit renvoyer un number

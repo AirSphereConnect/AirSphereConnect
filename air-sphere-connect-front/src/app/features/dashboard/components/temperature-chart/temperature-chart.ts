@@ -6,7 +6,7 @@ import {
   VisTooltipModule,
   VisCrosshairModule,
 } from '@unovis/angular';
-import { CurveType, Line } from '@unovis/ts';
+import { CurveType } from '@unovis/ts';
 import { WeatherMeasurement } from '../../../../core/models/data.model';
 
 @Component({
@@ -51,6 +51,7 @@ import { WeatherMeasurement } from '../../../../core/models/data.model';
     </div>
   `,
 })
+
 export class TemperatureChart {
   // === Inputs ===
   data = input.required<WeatherMeasurement[]>();
@@ -62,11 +63,11 @@ export class TemperatureChart {
     const grouped: Record<string, number[]> = {};
 
     // Grouper les températures par jour
-    this.data().forEach(d => {
-      const day = new Date(d.measuredAt).toISOString().split('T')[0];
+    for (const measurement of this.data()) {
+      const day = new Date(measurement.measuredAt).toISOString().split('T')[0];
       if (!grouped[day]) grouped[day] = [];
-      grouped[day].push(d.temperature);
-    });
+      grouped[day].push(measurement.temperature);
+    }
 
     // Moyenne par jour
     const dailyAvg = Object.entries(grouped).map(([day, temps]) => ({

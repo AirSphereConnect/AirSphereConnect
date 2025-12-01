@@ -28,13 +28,13 @@ interface CityMapPoint extends City {
 })
 
 export class Map implements OnInit, AfterViewInit, OnDestroy {
-  private cityService = inject(CityService);
-  private airQualityService = inject(AirQualityService);
-  private weatherService = inject(WeatherService);
-  private destroyRef = inject(DestroyRef);
+  private readonly cityService = inject(CityService);
+  private readonly airQualityService = inject(AirQualityService);
+  private readonly weatherService = inject(WeatherService);
+  private readonly destroyRef = inject(DestroyRef);
 
   private map: L.Map | null = null;
-  private cityMarkers: Array<{ marker: L.CircleMarker; city: CityMapPoint; popupBound: boolean }> = [];
+  private readonly cityMarkers: Array<{ marker: L.CircleMarker; city: CityMapPoint; popupBound: boolean }> = [];
 
   mapData = signal<CityMapPoint[]>([]);
   isLoading = signal(true);
@@ -140,7 +140,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (data) => {
-          const aq = data.airQuality?.latestIndex;
+          const aq: AirQualityIndex | undefined = data.airQuality?.latestIndex;
           const measurement = data.airQuality?.latestMeasurement;
           const weather = data.weather;
 
@@ -215,7 +215,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
   private addCityMarkers() {
     if (!this.map) return;
 
-    this.mapData().forEach(city => {
+    for (const city of this.mapData()) {
       const color = this.getCityColor(city);
       const radius = this.getCityRadius(city);
 
@@ -230,7 +230,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       });
 
       this.cityMarkers.push({ marker, city, popupBound: false });
-    });
+    }
 
     this.updateMarkersVisibility();
   }
@@ -241,7 +241,7 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
     const zoom = this.map.getZoom();
     let shownCount = 0;
 
-    this.cityMarkers.forEach((item) => {
+    for (const item of this.cityMarkers) {
       const { marker, city } = item;
       const shouldShow = this.shouldShowCity(city, zoom);
 
@@ -276,12 +276,10 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
 
           shownCount++;
         }
-      } else {
-        if (this.map!.hasLayer(marker)) {
-          this.map!.removeLayer(marker);
-        }
+      } else if (this.map!.hasLayer(marker)) {
+        this.map!.removeLayer(marker);
       }
-    });
+    }
   }
 
   private shouldShowCity(city: CityMapPoint, zoom: number): boolean {
