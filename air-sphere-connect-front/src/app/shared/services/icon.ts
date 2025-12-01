@@ -17,7 +17,7 @@ export class IconService {
     if (!icon) return '';
 
     return icon
-      .replace(/class="[^"]*"/g, '')
+      .replaceAll(/class="[^"]*"/g, '')
       .replace('<svg', `<svg class="${classes}"`);
   }
 

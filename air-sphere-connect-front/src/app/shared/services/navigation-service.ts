@@ -1,11 +1,12 @@
-import {Injectable} from '@angular/core';
+import {inject, Injectable} from '@angular/core';
 import {Router} from '@angular/router';
 import {UserService} from './user-service';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({providedIn: 'root'})
 export class NavigationService {
 
-  constructor(private userService: UserService, private router: Router) {}
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
 
   logout() {
     this.userService.logout().subscribe(() => {

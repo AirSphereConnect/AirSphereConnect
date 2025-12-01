@@ -1,16 +1,15 @@
 import {Injectable, inject} from '@angular/core';
-import {BehaviorSubject, Observable, of, tap} from 'rxjs';
-import {UserProfileResponse} from '../../core/models/user.model';
+import {BehaviorSubject, Observable} from 'rxjs';
+import {UserProfileResponse, AddFavoritePayload} from '../../core/models/user.model';
 import {HttpClient} from '@angular/common/http';
-import {catchError} from 'rxjs/operators';
 import { ApiConfigService } from '../../core/services/api';
 
 @Injectable({
   providedIn: 'root'
 })
 export class FavoritesService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
   private readonly apiUrl = this.api.apiUrl;
   private readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
   public readonly userProfile$ = this._userProfileSubject.asObservable();
@@ -30,7 +29,6 @@ export class FavoritesService {
   }
 
   getUserId(): number | null {
-    console.log(this._userProfileSubject.value ? this._userProfileSubject.value.user.id : null)
     return this._userProfileSubject.value ? this._userProfileSubject.value.user.id : null
   }
 
@@ -44,17 +42,17 @@ export class FavoritesService {
   }
 
   //Ajout nouveau favoris
-  addFavorites(userData: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/favorites/new`, userData, { withCredentials: true });
+  addFavorites(userData: AddFavoritePayload): Observable<void> {
+    return this.http.post<void>(`${this.apiUrl}/favorites/new`, userData, { withCredentials: true });
   }
 
   //Mettre à jour les infos de l'user
-  editFavorites(userData: any, id: number) {
-    return this.http.put(`${this.apiUrl}/favorites/${id}`, userData, { withCredentials: true });
+  editFavorites(userData: AddFavoritePayload, id: number) {
+    return this.http.put<void>(`${this.apiUrl}/favorites/${id}`, userData, { withCredentials: true });
   }
 
   deleteFavorites(id :number) {
-    return this.http.delete(`${this.apiUrl}/favorites/${id}`, { withCredentials: true });
+    return this.http.delete<void>(`${this.apiUrl}/favorites/${id}`, { withCredentials: true });
 
   }
 }

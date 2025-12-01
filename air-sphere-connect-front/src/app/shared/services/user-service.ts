@@ -1,8 +1,8 @@
 import {inject, Injectable} from '@angular/core';
-import {BehaviorSubject, concatMap, Observable, of, tap} from 'rxjs';
+import {BehaviorSubject, Observable, of, tap} from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { catchError } from 'rxjs/operators';
-import { UserProfileResponse } from '../../core/models/user.model';
+import { UserProfileResponse, RegisterPayload, UpdateUserPayload, UpdateAddressPayload } from '../../core/models/user.model';
 import { ApiConfigService } from '../../core/services/api';
 
 
@@ -10,8 +10,8 @@ import { ApiConfigService } from '../../core/services/api';
   providedIn: 'root'
 })
 export class UserService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
   private readonly apiUrl = this.api.apiUrl;
 
   private readonly _userProfileSubject = new BehaviorSubject<UserProfileResponse | null>(null);
@@ -33,7 +33,7 @@ export class UserService {
     this.http.get<UserProfileResponse>(`${this.apiUrl}/profile`, { withCredentials: true }).subscribe({
       next: profile => {
         // Accepte que profile.user null (profil guest)
-        if (profile && profile.user) {
+        if (profile?.user) {
           this.setUserProfile(profile);
         } else {
           this.setUserProfile(null);
@@ -44,7 +44,7 @@ export class UserService {
         if (err.status === 401) {
           this.setUserProfile(null);
         } else {
-          console.error('Erreur fetching profile:', err);
+          this.logError('Erreur fetching profile', err);
           this.setUserProfile(null);
         }
       }
@@ -103,12 +103,12 @@ export class UserService {
   }
 
   //Ajout nouveau user
-  register(userData: any) {
-    return this.http.post(`${this.apiUrl}/users/signup`, userData, { withCredentials: true });
+  register(userData: RegisterPayload) {
+    return this.http.post<UserProfileResponse>(`${this.apiUrl}/users/signup`, userData, { withCredentials: true });
   }
 
   //Mettre à jour les infos de l'user
-  editUser(userId: number | null, payload: any) {
+  editUser(userId: number | null, payload: UpdateUserPayload) {
     return this.http.put<UserProfileResponse>(
       `${this.apiUrl}/users/${userId}`,
       payload,
@@ -125,11 +125,18 @@ export class UserService {
     );
   }
 
-  editAddress(id: number | null, payload: any) {
+  editAddress(id: number | null, payload: UpdateAddressPayload) {
     return this.http.put(`${this.apiUrl}/address/${id}`, payload, { withCredentials: true });
   }
 
   getUsername() {
     return this._userProfileSubject.value ? this._userProfileSubject.value.user.username : null;
+  }
+
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
   }
 }

@@ -1,26 +1,27 @@
 import {Injectable, inject} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import { ApiConfigService } from '../../core/services/api';
+import { AddAlertPayload } from '../../core/models/user.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AlertsService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
   private readonly apiUrl = `${this.api.apiUrl}/alert/configurations`;
 
 
-  editAlerts(payload: { enabled: boolean; cityId: number | null }, editingAlertsId: number) {
-    return this.http.put(`${this.apiUrl}/${editingAlertsId}`, payload, { withCredentials: true });
+  editAlerts(payload: AddAlertPayload, editingAlertsId: number) {
+    return this.http.put<void>(`${this.apiUrl}/${editingAlertsId}`, payload, { withCredentials: true });
 
   }
 
-  addAlerts(payload: { enabled: boolean; cityId: number | null }) {
-    return this.http.post(`${this.apiUrl}`, payload, { withCredentials: true });
+  addAlerts(payload: AddAlertPayload) {
+    return this.http.post<void>(`${this.apiUrl}`, payload, { withCredentials: true });
   }
 
   deleteAlerts(editingAlertsId: number) {
-    return this.http.delete(`${this.apiUrl}/${editingAlertsId}`, { withCredentials: true });
+    return this.http.delete<void>(`${this.apiUrl}/${editingAlertsId}`, { withCredentials: true });
   }
 }
