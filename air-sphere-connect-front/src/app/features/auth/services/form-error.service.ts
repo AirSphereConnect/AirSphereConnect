@@ -13,7 +13,7 @@ export class FormErrorService {
   /**
    * Messages d'erreur génériques
    */
-  private genericErrorMessages: ErrorMessageConfig = {
+  private readonly genericErrorMessages: ErrorMessageConfig = {
     required: () => 'Ce champ est requis',
     email: () => 'Veuillez entrer une adresse email valide',
     minlength: (error) => {

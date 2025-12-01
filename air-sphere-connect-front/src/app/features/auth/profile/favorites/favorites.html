@@ -56,7 +56,8 @@
                 class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
                 color="primary"
                 variant="solid"
-                (click)="editFavorites(favorite.id)"
+                (buttonClick)="editFavorites(favorite.id)"
+                (buttonKeydown)="undefined"
               >
                 Modifier
               </app-button>
@@ -65,7 +66,8 @@
                 class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
                 color="warning"
                 variant="solid"
-                (click)="deleteFavorites(favorite.id)"
+                (buttonClick)="deleteFavorites(favorite.id)"
+                (buttonKeydown)="undefined"
               >
                 Supprimer
               </app-button>
@@ -79,7 +81,7 @@
   }
 </fieldset>
 <br>
-<app-button color="primary" size="md" variant="solid" (click)="addFavorites()" class="btn-outline btn-primary">
+<app-button color="primary" size="md" variant="solid" (buttonClick)="addFavorites()" (buttonKeydown)="undefined" class="btn-outline btn-primary">
   Ajouter
 </app-button>
 
@@ -88,5 +90,5 @@
   [isOpen]="isModalOpen"
   [editingFavoriteId]="editingFavoriteId"
   [initialFavoriteData]="initialFavoriteData"
-  (close)="onModalClose()"
+  (closeModal)="onModalClose()"
 ></app-favorites-form>

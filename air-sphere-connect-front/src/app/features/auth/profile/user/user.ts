@@ -8,7 +8,6 @@ import {PasswordForm} from '../../../../shared/components/ui/password-form/passw
 import {Button} from '../../../../shared/components/ui/button/button';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
-import {NavigationService} from '../../../../shared/services/navigation-service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -70,9 +69,7 @@ export class UserDashboard {
 
   /** ✏️ Ouvre la modale adresse */
   editAddress() {
-    console.log('editAddress called with user:', this.user);
-    if (!this.user || !this.user.address) {
-      console.warn('editAddress aborted: user or address missing');
+    if (!this.user?.address) {
       return;
     }
     this.editingUserId = this.user.id;
@@ -102,18 +99,23 @@ export class UserDashboard {
   }
 
   deleteUser(userId: number) {
-    console.log('deleteUser called with id:', userId);
     this.userService.deleteUser(userId)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
       next: () => {
-        console.log('User deleted');
         this.router.navigate(['/home']);
       },
       error: err => {
-        console.error('Erreur suppression :', err);
+        this.logError('Erreur suppression utilisateur', err);
       }
     });
+  }
+
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
   }
 
 }

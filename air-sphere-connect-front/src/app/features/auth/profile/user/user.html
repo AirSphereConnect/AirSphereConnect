@@ -3,13 +3,14 @@
     <div class="flex flex-wrap gap-4 mb-4">
       <div class="flex flex-col flex-1">
         <div class="flex flex-raw flex-1 items-center">
-          <label class="label font-bold">Nom utilisateur</label>
-          <input type="text" class="input w-full" [value]="user.username" disabled/>
+          <label for="username-input" class="label font-bold">Nom utilisateur</label>
+          <input id="username-input" type="text" class="input w-full" [value]="user.username" disabled autocomplete="username"/>
         </div>
         <div>
           <app-button
             type="button"
-            (click)="editUser()"
+            (buttonClick)="editUser()"
+            (buttonKeydown)="undefined"
             class="btn-outline btn-primary"
           >
             Modifier nom utilisateur
@@ -22,14 +23,15 @@
 
       <div class="flex flex-col flex-1">
         <div class="flex flex-raw flex-1 items-center">
-          <label class="label font-bold">Email</label>
-          <input type="text" class="input w-full" [value]="user.email" disabled/>
+          <label for="email-input" class="label font-bold">Email</label>
+          <input id="email-input" type="text" class="input w-full" [value]="user.email" disabled autocomplete="email"/>
         </div>
         <div>
 
           <app-button
             type="button"
-            (click)="editEmail()"
+            (buttonClick)="editEmail()"
+            (buttonKeydown)="undefined"
             class="btn-outline btn-primary"
           >
             Modifier email
@@ -40,8 +42,8 @@
       <div class="divider divider-horizontal"></div>
 
       <div class="flex flex-col flex-1 justify-between items-center">
-        <label class="label font-bold">Rôle</label>
-        <input type="text" class="input w-full  text-center " [value]="user.role" disabled/>
+        <label for="role-input" class="label font-bold">Rôle</label>
+        <input id="role-input" type="text" class="input w-full  text-center " [value]="user.role" disabled autocomplete="off"/>
       </div>
 
       <div class="divider divider-horizontal"></div>
@@ -49,7 +51,8 @@
       <div class="flex flex-raw items-center">
         <app-button
           type="button"
-          (click)="editPassword()"
+          (buttonClick)="editPassword()"
+          (buttonKeydown)="undefined"
           class="btn-outline btn-primary"
         >
           Modifier mot de passe
@@ -61,23 +64,24 @@
     @if (user.address) {
       <div class="flex flex-wrap gap-4 mb-4">
         <div class="flex flex-col flex-1">
-          <label class="label font-bold">Adresse</label>
-          <input type="text" class="input w-full" [value]="user.address.street" disabled/>
+          <label for="street-input" class="label font-bold">Adresse</label>
+          <input id="street-input" type="text" class="input w-full" [value]="user.address.street" disabled autocomplete="street-address"/>
         </div>
 
         <div class="flex flex-col flex-1">
-          <label class="label font-bold">Ville</label>
-          <input type="text" class="input w-full" [value]="user.address.city.name" disabled/>
+          <label for="city-input" class="label font-bold">Ville</label>
+          <input id="city-input" type="text" class="input w-full" [value]="user.address.city.name" disabled autocomplete="address-level2"/>
         </div>
 
         <div class="flex flex-col flex-1">
-          <label class="label font-bold">Code postal</label>
-          <input type="text" class="input w-full" [value]="user.address.city.postalCode" disabled/>
+          <label for="postal-code-input" class="label font-bold">Code postal</label>
+          <input id="postal-code-input" type="text" class="input w-full" [value]="user.address.city.postalCode" disabled autocomplete="postal-code"/>
         </div>
         <div>
           <app-button
             type="button"
-            (click)="editAddress()"
+            (buttonClick)="editAddress()"
+            (buttonKeydown)="undefined"
             class="btn-outline btn-primary"
           >
             Modifier adresse
@@ -94,7 +98,8 @@
       <app-button
         color="warning"
         type="button"
-        (click)="deleteUser(user.id)"
+        (buttonClick)="deleteUser(user.id)"
+        (buttonKeydown)="undefined"
         class="btn-outline btn-primary"
       >
         Supprimer mon compte
@@ -108,7 +113,7 @@
   [isOpen]="isUserModalOpen"
   [editingUserId]="editingUserId"
   [initialUserData]="initialUserData"
-  (close)="onUserModalClose()"
+  (closeModal)="onUserModalClose()"
   (updated)="userService.fetchUserProfile()">
 </app-user-form>
 
@@ -116,7 +121,7 @@
   [isOpen]="isEmailModalOpen"
   [editingUserId]="editingUserId"
   [initialEmailData]="initialEmailData"
-  (close)="onEmailModalClose()"
+  (closeModal)="onEmailModalClose()"
   (updated)="userService.fetchUserProfile()">
 </app-email-form>
 
@@ -124,7 +129,7 @@
   [isOpen]="isPasswordModalOpen"
   [editingUserId]="editingUserId"
   [initialPasswordData]="initialPasswordData"
-  (close)="onPasswordModalClose()"
+  (closeModal)="onPasswordModalClose()"
   (updated)="userService.fetchUserProfile()">
 </app-password-form>
 
@@ -132,7 +137,7 @@
   [isOpen]="isAddressModalOpen"
   [editingUserId]="editingUserId"
   [addressData]="initialAddressData"
-  (close)="onAddressModalClose()"
+  (closeModal)="onAddressModalClose()"
   (updated)="userService.fetchUserProfile()">
 </app-address-form>
 

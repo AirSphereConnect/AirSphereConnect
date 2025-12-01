@@ -3,7 +3,7 @@ import {
   ChangeDetectorRef,
   Component,
   DestroyRef,
-  inject, Input,
+  inject,
   OnInit,
   TemplateRef,
   ViewChild

@@ -22,7 +22,8 @@
                 class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
                 color="primary"
                 variant="solid"
-                (click)="editAlerts(alert.id)"
+                (buttonClick)="editAlerts(alert.id)"
+                (buttonKeydown)="undefined"
               >
                 Modifier
               </app-button>
@@ -31,7 +32,8 @@
                 class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
                 color="warning"
                 variant="solid"
-                (click)="deleteAlerts(alert.id)"
+                (buttonClick)="deleteAlerts(alert.id)"
+                (buttonKeydown)="undefined"
               >
                 Supprimer
               </app-button>
@@ -45,7 +47,7 @@
   }
 </fieldset>
   <br>
-<app-button color="primary" size="md" variant="solid" (click)="addAlerts()" class="btn-outline btn-primary">
+<app-button color="primary" size="md" variant="solid" (buttonClick)="addAlerts()" (buttonKeydown)="undefined" class="btn-outline btn-primary">
   Ajouter
 </app-button>
 
@@ -53,5 +55,5 @@
   [isOpen]="isModalOpen"
   [editingAlertsId]="editingAlertsId"
   [initialAlertsData]="initialAlertData"
-  (close)="onModalClose()"
+  (closeModal)="onModalClose()"
 ></app-alerts-form>

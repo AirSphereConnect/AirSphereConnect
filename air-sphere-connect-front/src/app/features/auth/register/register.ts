@@ -25,6 +25,8 @@ import { HeroIconName } from '../../../shared/icons/heroicons.registry';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {citySearch} from '../../../shared/utils/city-search.util';
 import {CityService} from '../../../core/services/city';
+import {City} from '../../../core/models/city.model';
+import {UserProfileResponse} from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-register',
@@ -110,11 +112,12 @@ export class Register implements OnInit {
   get cityNameControl() { return this.registerForm.get('cityName') as FormControl; }
   get cityCodeControl() { return this.registerForm.get('cityCode') as FormControl; }
 
-  onCityInput(event: any) {
-    this.cityQuery.set(event.target.value);
+  onCityInput(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.cityQuery.set(target.value);
   }
 
-  selectCity(city: any) {
+  selectCity(city: City) {
     this.cityNameControl.setValue(city.name);
     this.cityCodeControl.setValue(city.postalCode);
     this.cityIdSelected = city.id;
@@ -184,7 +187,7 @@ export class Register implements OnInit {
     this.userService.register(payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: (res: any) => {
+        next: (res: UserProfileResponse) => {
           this.isLoadingStep2.set(false);
           this.userService.setUserProfile(res);
           this.router.navigate(['/home']).then();

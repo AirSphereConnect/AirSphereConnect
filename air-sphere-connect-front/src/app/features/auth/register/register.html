@@ -47,7 +47,7 @@
               <div class="alert alert-error">
                 <app-icon name="exclamationTriangle" size="md" color="current" />
                 <span>{{ errorMessage() }}</span>
-                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (click)="clearError()" heroIcon="xMark"></app-button>
+                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (buttonClick)="clearError()" (buttonKeydown)="undefined" heroIcon="xMark"></app-button>
               </div>
             }
 
@@ -55,6 +55,7 @@
               type="submit"
               [fullWidth]="true"
               [disabled]="!canSubmitStep1() || isLoadingStep1()"
+              (buttonKeydown)="undefined"
             >
               @if (isLoadingStep1()) {
                 <span class="loading loading-spinner"></span>
@@ -123,7 +124,7 @@
               <div class="alert alert-error">
                 <app-icon name="exclamationTriangle" size="md" color="current" />
                 <span>{{ errorMessage() }}</span>
-                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (click)="clearError()" heroIcon="xMark"></app-button>
+                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (buttonClick)="clearError()" (buttonKeydown)="undefined" heroIcon="xMark"></app-button>
               </div>
             }
 
@@ -134,7 +135,8 @@
                 variant="outline"
                 [wide]="true"
                 color="info"
-                (click)="goBackToStep1()"
+                (buttonClick)="goBackToStep1()"
+                (buttonKeydown)="undefined"
                 class="flex-1"
                 [disabled]="isLoadingStep2()"
               >
@@ -146,6 +148,7 @@
                 [wide]="true"
                 color="primary"
                 [disabled]="!canSubmitStep2() || isLoadingStep2()"
+                (buttonKeydown)="undefined"
                 class="flex-1"
               >
                 @if (isLoadingStep2()) {

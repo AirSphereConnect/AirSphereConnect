@@ -1,10 +1,10 @@
-import {Component, DestroyRef, inject, Input, OnDestroy, OnInit, signal} from '@angular/core';
+import {Component, DestroyRef, inject, Input, OnInit, signal} from '@angular/core';
 import {FavoritesForm} from '../../../../shared/components/ui/favorites-form/favorites-form';
 import {Button} from '../../../../shared/components/ui/button/button';
 import {UserService} from '../../../../shared/services/user-service';
 import {FavoritesService} from '../../../../shared/services/favorites-service';
-import {Subject, takeUntil} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Favorite, User} from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-favorites',
@@ -13,7 +13,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
   imports: [FavoritesForm, Button],
 })
 export class Favorites implements OnInit {
-  @Input() user: any = null;
+  @Input() user: User | null = null;
   private readonly favoritesService = inject(FavoritesService);
   private readonly userService = inject(UserService);
 
@@ -29,7 +29,7 @@ export class Favorites implements OnInit {
     this.userService.userProfile$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(profile => {
-        if (profile && profile.user) {
+        if (profile?.user) {
           this.user = profile.user;
         }
       });
@@ -43,9 +43,9 @@ export class Favorites implements OnInit {
     this.isModalOpen.set(true);
   }
 
-  /** ✏️ Modification d’un favori existant */
+  /** ✏️ Modification d'un favori existant */
   editFavorites(id: number) {
-    const favorite = this.user?.favorites.find((f: any) => f.id === id);
+    const favorite = this.user?.favorites.find((f: Favorite) => f.id === id);
     if (favorite) {
       this.editingFavoriteId = id;
       this.initialFavoriteData = favorite;
@@ -53,9 +53,9 @@ export class Favorites implements OnInit {
     }
   }
 
-  /** 🗑️ Suppression d’un favori */
+  /** 🗑️ Suppression d'un favori */
   deleteFavorites(id: number) {
-    const favorite = this.user?.favorites.find((f: any) => f.id === id);
+    const favorite = this.user?.favorites.find((f: Favorite) => f.id === id);
     if (favorite && confirm('Êtes-vous sûr de vouloir supprimer ce favori ?')) {
       this.favoritesService.deleteFavorites(id)
         .pipe(takeUntilDestroyed(this.destroyRef))
@@ -63,12 +63,18 @@ export class Favorites implements OnInit {
           next: () => {
             // 🔁 rafraîchit le profil complet
             this.userService.fetchUserProfile();
-            console.log(`Favori ${id} supprimé avec succès`);
           },
           error: (err) => {
-            console.error('Erreur lors de la suppression du favori :', err);
+            this.logError('Erreur lors de la suppression du favori', err);
           }
         });
+    }
+  }
+
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
     }
   }
 

@@ -14,6 +14,7 @@
             iconLeft="user"
             placeholder="Entrez votre nom d'utilisateur"
             autocomplete="username"
+            fieldName="username"
           ></app-input>
 
           <app-input
@@ -32,7 +33,7 @@
             <div class="alert alert-error flex items-center gap-2">
               <app-icon name="exclamationTriangle" size="md" color="current" />
               <span>{{ errorMessage() }}</span>
-              <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (click)="clearError()" heroIcon="xMark"></app-button>
+              <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (buttonClick)="clearError()" (buttonKeydown)="undefined" heroIcon="xMark"></app-button>
             </div>
           }
 
@@ -42,6 +43,7 @@
             [fullWidth]="true"
             [disabled]="loginForm.invalid"
             [loading]="isLoading()"
+            (buttonKeydown)="undefined"
           >
             {{ isLoading() ? 'Connexion...' : 'Connexion' }}
           </app-button>
