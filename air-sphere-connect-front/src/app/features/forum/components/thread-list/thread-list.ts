@@ -164,9 +164,7 @@ export class ThreadListComponent {
     this.isSubmitting.set(true);
 
     this.threadService.addThread(title, content, sectionId, userId).subscribe({
-      next: (newPost) => {
-        console.log('Nouveau thread créé avec le post initial:', newPost);
-
+      next: () => {
         this.closeModal();
         this.isSubmitting.set(false);
 
@@ -176,10 +174,17 @@ export class ThreadListComponent {
         });
       },
       error: (error) => {
-        console.error('Erreur lors de la création du thread:', error);
+        this.logError('Erreur lors de la création du thread', error);
         alert('Erreur lors de la création du thread. Veuillez réessayer.');
         this.isSubmitting.set(false);
       }
     });
+  }
+
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
   }
 }

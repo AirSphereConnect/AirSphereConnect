@@ -47,7 +47,8 @@
             variant="ghost"
             size="sm"
             shape="circle"
-            (click)="onLikePost(post().id)"
+            (buttonClick)="onLikePost(post().id)"
+            (buttonKeydown)="undefined"
           >
             <app-icon
               name="like"
@@ -66,7 +67,8 @@
             variant="ghost"
             size="sm"
             shape="circle"
-            (click)="onDislikePost(post().id)"
+            (buttonClick)="onDislikePost(post().id)"
+            (buttonKeydown)="undefined"
           >
             <app-icon
               name="dislike"
@@ -86,7 +88,8 @@
             size="sm"
             shape="circle"
             [disabled]="post().isFlagged || false"
-            (click)="openFlagModal()"
+            (buttonClick)="openFlagModal()"
+            (buttonKeydown)="undefined"
           >
             <app-icon
               name="flag"

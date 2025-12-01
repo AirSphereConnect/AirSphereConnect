@@ -13,8 +13,8 @@ import {toSignal} from '@angular/core/rxjs-interop';
   styleUrl: './section.scss'
 })
 export class SectionComponent {
-  private sectionService = inject(SectionService)
-  private threadService = inject(ThreadService)
+  private readonly sectionService = inject(SectionService)
+  private readonly threadService = inject(ThreadService)
 
   readonly sections = toSignal(
     this.sectionService.getSections(),

@@ -20,8 +20,8 @@ import {IconComponent} from '../../../../shared/components/ui/icon/icon';
 })
 export class PostComponent {
 
-  private postService = inject(PostService);
-  private userService = inject(UserService);
+  private readonly postService = inject(PostService);
+  private readonly userService = inject(UserService);
 
   readonly refreshPosts$ = new Subject<void>()
 
@@ -66,7 +66,6 @@ export class PostComponent {
   openFlagModal(): void {
     // Si le post est déjà signalé, ne pas ouvrir la modale
     if (this.post().isFlagged) {
-      console.log('Ce post est déjà signalé !');
       return;
     }
 

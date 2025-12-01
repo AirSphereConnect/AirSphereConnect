@@ -168,7 +168,7 @@
         <form class="space-y-4" (submit)="$event.preventDefault(); createThread()">
           <!-- Titre -->
           <div class="form-control">
-            <label class="label">
+            <label for="thread-title-input" class="label">
             <span class="label-text font-semibold">
               Titre de la discussion
               <span class="text-error">*</span>
@@ -176,6 +176,7 @@
               <span class="label-text-alt">{{ newThreadTitle().length }}/100</span>
             </label>
             <input
+              id="thread-title-input"
               type="text"
               class="input input-bordered w-full"
               placeholder="Ex: Qu'est ce que l'AQI ?"
@@ -184,17 +185,18 @@
               maxlength="100"
               [disabled]="isSubmitting()"
               required
+              autocomplete="off"
             >
-            <label class="label">
+            <div class="label">
             <span class="label-text-alt text-base-content/60">
               Soyez clair et descriptif pour attirer les bonnes réponses
             </span>
-            </label>
+            </div>
           </div>
 
           <!-- Contenu -->
           <div class="form-control">
-            <label class="label">
+            <label for="thread-content-input" class="label">
             <span class="label-text font-semibold">
               Votre message
               <span class="text-error">*</span>
@@ -202,6 +204,7 @@
               <span class="label-text-alt">{{ newThreadContent().length }}/2000</span>
             </label>
             <textarea
+              id="thread-content-input"
               class="textarea textarea-bordered h-40 resize-none"
               placeholder="Décrivez votre question ou sujet en détail..."
               [value]="newThreadContent()"
@@ -209,12 +212,13 @@
               maxlength="2000"
               [disabled]="isSubmitting()"
               required
+              autocomplete="off"
             ></textarea>
-            <label class="label">
+            <div class="label">
             <span class="label-text-alt text-base-content/60">
               Plus vous donnez de détails, plus vous recevrez d'aide précise
             </span>
-            </label>
+            </div>
           </div>
 
           <!-- Aperçu des infos -->

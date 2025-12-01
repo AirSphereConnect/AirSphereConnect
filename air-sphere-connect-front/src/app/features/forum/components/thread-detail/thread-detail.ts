@@ -19,12 +19,12 @@ import { Post } from '../../../../core/models/post.model';
   styleUrls: ['./thread-detail.scss']
 })
 export class ThreadDetailComponent {
-  private route = inject(ActivatedRoute);
-  private router = inject(Router);
-  private threadService = inject(ThreadService);
-  private postService = inject(PostService);
-  private userService = inject(UserService);
-  private fb = inject(FormBuilder);
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly threadService = inject(ThreadService);
+  private readonly postService = inject(PostService);
+  private readonly userService = inject(UserService);
+  private readonly fb = inject(FormBuilder);
 
   // Forms & State
   newPostForm = this.fb.group({
@@ -91,7 +91,7 @@ export class ThreadDetailComponent {
           this.isLoadingPosts.set(false);
         },
         error: err => {
-          console.error('Erreur chargement posts:', err);
+          this.logError('Erreur chargement posts', err);
           this.isLoadingPosts.set(false);
           this.errorMessage.set('Erreur lors du chargement des posts');
         }
@@ -139,7 +139,7 @@ export class ThreadDetailComponent {
         this.isPublishing.set(false);
       },
       error: err => {
-        console.error('Erreur publication:', err);
+        this.logError('Erreur publication', err);
         this.isPublishing.set(false);
       }
     });
@@ -152,7 +152,7 @@ export class ThreadDetailComponent {
     this.postService.toggleReaction(postId, userId, 'LIKE').subscribe({
       next: updated => this.updatePost(updated),
       error: err => {
-        console.error('Erreur like:', err);
+        this.logError('Erreur like', err);
         this.errorMessage.set('Erreur lors du like');
       }
     });
@@ -165,7 +165,7 @@ export class ThreadDetailComponent {
     this.postService.toggleReaction(postId, userId, 'DISLIKE').subscribe({
       next: updated => this.updatePost(updated),
       error: err => {
-        console.error('Erreur dislike:', err);
+        this.logError('Erreur dislike', err);
         this.errorMessage.set('Erreur lors du dislike');
       }
     });
@@ -179,7 +179,7 @@ export class ThreadDetailComponent {
     this.postService.toggleFlag(postId).subscribe({
       next: updated => this.updatePost(updated),
       error: err => {
-        console.error('Erreur flag:', err);
+        this.logError('Erreur flag', err);
         this.errorMessage.set('Erreur lors du signalement');
       }
     });
@@ -194,9 +194,16 @@ export class ThreadDetailComponent {
         this.postsSignal.update(posts => posts.filter(p => p.id !== postId));
       },
       error: err => {
-        console.error('Erreur suppression:', err);
+        this.logError('Erreur suppression', err);
         this.errorMessage.set('Erreur lors de la suppression');
       }
     });
+  }
+
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
   }
 }
