@@ -6,13 +6,13 @@ import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class AirQualityService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
-  private apiUrl = `${this.api.apiUrl}/air-quality`;
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
+  private readonly apiUrl = `${this.api.apiUrl}/air-quality`;
 
   getComplete(cityName: string): Observable<AirQualityComplete> {
     return this.http
-      .get<any>(`${this.apiUrl}/city/${cityName}/complete`, {
+      .get<AirQualityComplete>(`${this.apiUrl}/city/${cityName}/complete`, {
         withCredentials: true,
       })
       .pipe(map(this.mapToComplete));
@@ -39,7 +39,7 @@ export class AirQualityService {
     );
   }
 
-  private mapToComplete(data: any): AirQualityComplete {
+  private mapToComplete(data: AirQualityComplete): AirQualityComplete {
     return {
       latestMeasurement: data.latestMeasurement,
       latestIndex: data.latestIndex,

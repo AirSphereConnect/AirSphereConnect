@@ -27,18 +27,22 @@ export class ThemeService {
   }
 
   private applyTheme(theme: Theme): void {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.dataset["theme"] = theme;
     this.saveTheme(theme);
-
-    // 🔥 Vérification que l'attribut est bien appliqué
-    const appliedTheme = document.documentElement.getAttribute('data-theme');
   }
 
   private saveTheme(theme: Theme): void {
     try {
       localStorage.setItem(this.STORAGE_KEY, theme);
     } catch (error) {
-      console.error('❌ Erreur lors de la sauvegarde du thème:', error);
+      this.logError('Erreur lors de la sauvegarde du thème:', error);
+    }
+  }
+
+  private logError(message: string, error?: unknown): void {
+    // Only log errors in development mode
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
     }
   }
 

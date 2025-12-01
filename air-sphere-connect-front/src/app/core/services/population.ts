@@ -6,13 +6,13 @@ import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class PopulationService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
-  private apiUrl = `${this.api.apiUrl}/history`;
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
+  private readonly apiUrl = `${this.api.apiUrl}/history`;
 
   getHistory(cityName: string): Observable<PopulationData[]> {
     return this.http
-      .get<any[]>(`${this.apiUrl}/${cityName}`, {
+      .get<PopulationData[]>(`${this.apiUrl}/${cityName}`, {
         withCredentials: true,
       })
       .pipe(map(data => data.map(this.mapToPopulation)));
@@ -20,13 +20,13 @@ export class PopulationService {
 
   getTopCities(limit: number): Observable<PopulationData[]> {
     return this.http
-      .get<any[]>(`${this.apiUrl}/top/${limit}`, {
+      .get<PopulationData[]>(`${this.apiUrl}/top/${limit}`, {
         withCredentials: true,
       })
       .pipe(map(data => data.map(this.mapToPopulation)));
   }
 
-  private mapToPopulation(data: any): PopulationData {
+  private mapToPopulation(data: PopulationData): PopulationData {
     return {
       cityName: data.cityName,
       population: data.population,

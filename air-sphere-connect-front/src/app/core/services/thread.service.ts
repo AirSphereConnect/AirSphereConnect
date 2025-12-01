@@ -1,7 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {Thread} from '../models/thread.model';
-import {PostService} from './post.service';
 import {UserService} from '../../shared/services/user-service';
 import {map, Observable} from 'rxjs';
 import { ApiConfigService } from './api';
@@ -10,10 +9,10 @@ import { ApiConfigService } from './api';
   providedIn: 'root'
 })
 export class ThreadService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
-  private userService = inject(UserService);
-  private apiUrl = `${this.api.apiUrl}/forum-threads`;
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
+  private readonly userService = inject(UserService);
+  private readonly apiUrl = `${this.api.apiUrl}/forum-threads`;
 
   getAllThreads(): Observable<Thread[]> {
     return this.http.get<Thread[]>(`${this.apiUrl}`,

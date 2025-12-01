@@ -1,6 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {Post} from '../models/post.model';
-import {map, Observable, tap} from 'rxjs';
+import {map, Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import { ApiConfigService } from './api';
 
@@ -10,9 +10,9 @@ type ReactionType = 'LIKE' | 'DISLIKE';
   providedIn: 'root'
 })
 export class PostService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
-  private apiUrlPosts = `${this.api.apiUrl}/forum-posts`;
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
+  private readonly apiUrlPosts = `${this.api.apiUrl}/forum-posts`;
 
 
   getPosts(currentUserId?: number): Observable<Post[]> {
@@ -83,8 +83,6 @@ export class PostService {
       `${this.apiUrlPosts}/${postId}/reaction`,
       {},
       {params, withCredentials: true}
-    ).pipe(
-      tap(updatedPost => console.log('Post mis à jour après réaction :', updatedPost))
     );
   }
 

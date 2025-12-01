@@ -18,6 +18,6 @@ export class ApiConfigService {
   constructor() {
     // Lecture depuis le fichier env.js injecté au runtime
     // Fallback sur localhost pour le développement local (sans Docker)
-    this.apiUrl = window.__env?.apiUrl || 'http://localhost:8080/api';
+    this.apiUrl = (globalThis as any).__env?.apiUrl || 'http://localhost:8080/api';
   }
 }

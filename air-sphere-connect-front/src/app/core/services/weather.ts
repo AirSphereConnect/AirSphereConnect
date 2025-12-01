@@ -6,9 +6,9 @@ import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
 export class WeatherService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
-  private apiUrl = `${this.api.apiUrl}/weather`;
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
+  private readonly apiUrl = `${this.api.apiUrl}/weather`;
 
   getHistory(cityId: number): Observable<WeatherMeasurement[]> {
     return this.http
