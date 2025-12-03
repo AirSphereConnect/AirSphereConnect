@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {Thread} from '../models/thread.model';
 import {UserService} from '../../shared/services/user-service';
 import {map, Observable} from 'rxjs';
@@ -31,10 +31,9 @@ export class ThreadService {
     );
   }
 
-  addThread(title: string, content: string, sectionId: number, userId: number): Observable<Thread> {
+  addThread(title: string, sectionId: number, userId: number): Observable<Thread> {
     const newThread = {
       title: title,
-      content: content,
       author: this.userService.getUsername(),
       createdAt: new Date(),
       rubricId: sectionId,
@@ -42,6 +41,13 @@ export class ThreadService {
 
     return this.http.post<Thread>(`${this.apiUrl}/new/${userId}`, newThread,
       { withCredentials: true}
+    );
+  }
+
+  deleteThread(threadId: number, userId: number): Observable<void> {
+    const params = new HttpParams().set('userId', userId.toString());
+    return this.http.delete<void>(`${this.apiUrl}/${threadId}`,
+      { params, withCredentials: true }
     );
   }
 }

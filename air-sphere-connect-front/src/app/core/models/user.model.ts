@@ -38,3 +38,40 @@ export interface UserProfileResponse {
   role: string;
   user: User;
 }
+
+// Payloads pour les requêtes
+export interface RegisterPayload {
+  username: string;
+  email: string;
+  address: {
+    street: string;
+    city: {
+      id: number;
+    };
+  };
+}
+
+export interface UpdateUserPayload {
+  username?: string;
+  email?: string;
+  password?: string;
+}
+
+export interface UpdateAddressPayload {
+  street: string;
+  city: {
+    id: number;
+  };
+}
+
+export interface AddFavoritePayload {
+  selectWeather: boolean;
+  selectAirQuality: boolean;
+  selectPopulation: boolean;
+  cityId: number | null;
+}
+
+export interface AddAlertPayload {
+  enabled: boolean;
+  cityId: number | null;
+}

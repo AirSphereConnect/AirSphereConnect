@@ -54,7 +54,7 @@ mailjet:
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:UneCleSecreteSuperLongueEtComplexePourTestUnique1234567890}
-  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:900000}   # 15 minutes en ms
+  access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:7200000}   # 2 heures en ms
   refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000} # 7 jours en ms
 
 # Cookie Configuration

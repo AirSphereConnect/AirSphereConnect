@@ -2,7 +2,8 @@ import {inject, Injectable} from '@angular/core';
 import {Post} from '../models/post.model';
 import {map, Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
-import { ApiConfigService } from './api';
+import {ApiConfigService} from './api';
+import {PostReportReason} from '../models/post-report.model';
 
 type ReactionType = 'LIKE' | 'DISLIKE';
 
@@ -60,10 +61,6 @@ export class PostService {
     return this.http.post<Post>(`${this.apiUrlPosts}/new/${userId}`, newPost, {withCredentials: true});
   }
 
-  updatePost(post: Post): Observable<Post> {
-    return this.http.put<Post>(`${this.apiUrlPosts}/${post.id}`, post);
-  }
-
   deletePost(postId: number, userId: number): Observable<Post> {
     const params = new HttpParams().set('userId', userId.toString());
     return this.http.delete<Post>(`${this.apiUrlPosts}/${postId}`, {params, withCredentials: true});
@@ -82,22 +79,7 @@ export class PostService {
     return this.http.post<Post>(
       `${this.apiUrlPosts}/${postId}/reaction`,
       {},
-      {params, withCredentials: true}
-    );
-  }
-
-  toggleFlag(postId: number): Observable<Post> {
-
-    return this.getPosts().pipe(
-      map(posts => {
-        const post = posts.find(p => p.id === postId);
-        if (!post) throw new Error('Post not found');
-        return {
-          ...post,
-          isFlagged: !post.isFlagged,
-        };
-      })
+      {params, withCredentials: true }
     );
   }
 }
-

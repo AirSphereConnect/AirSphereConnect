@@ -78,6 +78,7 @@ public class ForumRubricController {
         return ResponseEntity.ok(responses);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @Operation(
             summary = "Créer une nouvelle rubrique",
             description = "Permet à un utilisateur de créer une nouvelle rubrique de forum"
@@ -88,7 +89,6 @@ public class ForumRubricController {
             @ApiResponse(responseCode = "400", description = "Données invalides", content = @Content),
             @ApiResponse(responseCode = "403", description = "Accès refusé", content = @Content)
     })
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
     @PostMapping("/new/{userId}")
     public ResponseEntity<ForumRubricResponseDto> createRubric(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(

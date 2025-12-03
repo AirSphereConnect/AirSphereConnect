@@ -284,7 +284,7 @@ public class AirQualityController {
     })
     @GetMapping("/{cityId}")
     public ResponseEntity<?> getAirQuality(@PathVariable Long cityId) {
-        ...
+       // ...
     }
 }
 ```
@@ -293,7 +293,7 @@ public class AirQualityController {
 
 Pour permettre l'accès public à la documentation Swagger (sans authentification JWT), les endpoints suivants sont configurés dans `SecurityConfig.java` :
 
-```java
+```bash
 .requestMatchers("/swagger-ui/**",                 // 1️⃣ Interface Swagger UI
                 "/swagger-ui.html",                // 2️⃣ Page d'accueil Swagger (ancienne version)
                 "/v3/api-docs/**").permitAll();    // 3️⃣ Documentation OpenAPI JSON/YAML

@@ -1,5 +1,8 @@
 package com.airSphereConnect.exceptions;
 
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+
+@RestControllerAdvice
 /**
  * Contient les exceptions personnalisées métier utilisées dans l'application.
  * Chaque exception représente un type d'erreur métier ou de sécurité spécifique

@@ -62,6 +62,12 @@ public class SecurityConfig {
                 .exceptionHandling(handler -> handler.authenticationEntryPoint(unauthorizedHandler()))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+
+                        .requestMatchers(HttpMethod.POST,
+                                "/api/logout",
+                                "/api/users/signup",
+                                "/api/admin/historical-data/**").permitAll() // Chargement historique ATMO (usage ponctuel)
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         // Documentation Swagger (accès public)
                         .requestMatchers("/swagger-ui/**",
                                 "/swagger-ui.html",
@@ -75,11 +81,6 @@ public class SecurityConfig {
                                 "/api/profile",
                                 "/api/users/check",
                                 "/api/cities/search-name").permitAll()
-                        .requestMatchers(HttpMethod.POST,
-                                "/api/logout",
-                                "/api/users/signup",
-                                "/api/admin/historical-data/**").permitAll() // Chargement historique ATMO (usage ponctuel)
-                        .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
                         .requestMatchers("/api/home",
                                 "/api/weather/**",
                                 "/api/favorites/**",
@@ -89,8 +90,10 @@ public class SecurityConfig {
                                 "/api/address/**",
                                 "/api/history/**",
                                 "/api/regions/**",
-                                "/api/alert/configurations/**")
+                                "/api/alert/configurations/**",
+                                "/api/users/public-profile/**")
                         .hasAnyRole("USER", "ADMIN", "GUEST")
+
                         .anyRequest().authenticated()
                 );
 

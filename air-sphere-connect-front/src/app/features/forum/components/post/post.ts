@@ -1,11 +1,11 @@
 import {Component, computed, inject, input, output, signal} from '@angular/core';
 import {DatePipe} from '@angular/common';
 import {Post} from '../../../../core/models/post.model';
-import {PostService} from '../../../../core/services/post.service';
-import {Subject} from 'rxjs';
 import {UserService} from '../../../../shared/services/user-service';
 import {Button} from '../../../../shared/components/ui/button/button';
 import {IconComponent} from '../../../../shared/components/ui/icon/icon';
+import {PostReportReason} from '../../../../core/models/post-report.model';
+import {PostReportService} from '../../../../core/services/postReportService';
 
 @Component({
   selector: 'app-post',
@@ -20,39 +20,64 @@ import {IconComponent} from '../../../../shared/components/ui/icon/icon';
 })
 export class PostComponent {
 
-  private readonly postService = inject(PostService);
-  private readonly userService = inject(UserService);
 
-  readonly refreshPosts$ = new Subject<void>()
+  private readonly userService = inject(UserService);
+  private readonly postReportService = inject(PostReportService)
 
   post = input.required<Post>()
 
   onLike = output<number>();
   onDislike = output<number>();
-  onFlag = output<number>();
+  onFlag = output<{ postId: number; reason: PostReportReason; description: string }>();
   onDelete = output<number>();
 
   showFlagModal = signal(false);
   showDeleteModal = signal(false);
   flagConfirmed = signal(false);
 
-  isLiked = computed(() => this.post().currentUserReaction ==='LIKE');
-  isDisliked = computed(() => this.post().currentUserReaction ==='DISLIKE');
-  hasReacted = computed(() => this.post().currentUserReaction !== null);
+  isLiked = computed(() => this.post().currentUserReaction === 'LIKE');
+  isDisliked = computed(() => this.post().currentUserReaction === 'DISLIKE');
+
+  // Etat du signalement
+  selectedReason = signal<PostReportReason>(PostReportReason.SPAM)
+  reportDescription = signal('');
+  isReporting = signal(false);
+  hasReported = signal(false);
+  isCheckingReport = signal(true);
+
+  // labels des raisons de signalement
+  readonly reportReasons = [
+    {value: PostReportReason.SPAM, label: 'Spam'},
+    {value: PostReportReason.INAPPROPRIATE_CONTENT, label: 'Contenu inapproprié'},
+    {value: PostReportReason.HARASSMENT, label: 'Harcèlement ou intimidation'},
+    {value: PostReportReason.FALSE_INFORMATION, label: 'Fausse information'},
+    {value: PostReportReason.OFF_TOPIC, label: 'Hors sujet'},
+    {value: PostReportReason.COPYRIGHT_VIOLATION, label: 'Violation de droits d\'auteur'},
+    {value: PostReportReason.OTHER, label: 'Autre raison'}
+  ];
 
   canDelete = computed(() => {
     const currentUser = this.userService.currentUserProfile;
     const post = this.post();
     if (!currentUser) return false;
 
-    if(currentUser.user.role === 'ADMIN') return true;
+    if (currentUser.user.role === 'ADMIN') return true;
 
     return currentUser.user.id === post.userId;
   });
 
   isAuthenticated = computed(() => {
-    const currentUser = this.userService.currentUserProfile;
-    return currentUser && currentUser.user.role === 'ADMIN';
+    return !!this.userService.currentUserProfile;
+  });
+
+// Vérifie si l'AUTEUR DU POST est le propriétaire du thread
+  isAuthorThreadOwner = computed(() => {
+    const post = this.post();
+    const user = this.userService.userProfile$;
+    console.log(user)
+    console.log('Post userId:', post.userId, 'Thread owner:', post.threadOwnerId);
+    console.log(post.userRole);
+    return post.threadOwnerId !== undefined && post.userId === post.threadOwnerId;
   });
 
   onLikePost(postId: number): void {
@@ -62,25 +87,61 @@ export class PostComponent {
   onDislikePost(postId: number): void {
     this.onDislike.emit(postId);
   }
+
 // Modale de signalement
   openFlagModal(): void {
     // Si le post est déjà signalé, ne pas ouvrir la modale
-    if (this.post().isFlagged) {
+    if (this.hasReported()) {
+      alert('Vous avez déjà signalé ce post.')
       return;
     }
-
     this.showFlagModal.set(true);
-    this.flagConfirmed.set(false);
   }
 
   closeFlagModal(): void {
     this.showFlagModal.set(false);
-    this.flagConfirmed.set(false);
+    this.selectedReason.set(PostReportReason.SPAM);
+    this.reportDescription.set('');
   }
 
   confirmFlag(): void {
-   this.onFlag.emit(this.post().id)
-    this.flagConfirmed.set(true);
+    const userId = this.userService.currentUserProfile?.user.id;
+    if (!userId) {
+      alert('vous devez être connecté pour signaler un post.')
+      return;
+    }
+
+    this.isReporting.set(true);
+    const request = {
+      postId: this.post().id,
+      reason: this.selectedReason(),
+      description: this.reportDescription().trim() || 'Aucune description'
+    };
+
+    this.postReportService.createReport(request, userId).subscribe({
+      next: () => {
+        console.log('Post signalé avec succès');
+        this.hasReported.set(true);
+        this.closeFlagModal();
+        this.isReporting.set(false);
+        alert('Merci, votre signalement a été envoyé.');
+      },
+      error: (error) => {
+        console.error('Erreur signalement', error);
+
+        if (error.status === 401) {
+          alert('Vous ne pouvez pas signaler votre propre post');
+        } else if (error.error?.includes('déjà signalé')) {
+          alert('Vous avez déjà signalé ce post');
+          this.hasReported.set(true);
+        } else {
+          alert('Erreur lors du signalement');
+        }
+
+        this.isReporting.set(false);
+      }
+    });
+
   }
 
   // Modale de suppression
@@ -91,6 +152,7 @@ export class PostComponent {
   closeDeleteModal(): void {
     this.showDeleteModal.set(false);
   }
+
   confirmDelete(): void {
     this.onDelete.emit(this.post().id);
     this.closeDeleteModal();

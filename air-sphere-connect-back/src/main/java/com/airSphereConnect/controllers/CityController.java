@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,11 +26,17 @@ public class CityController {
     private final CityService cityService;
     private final CityMapper cityMapper;
 
+
     public CityController(CityService cityService, CityMapper cityMapper) {
         this.cityService = cityService;
         this.cityMapper = cityMapper;
     }
 
+    /**
+     * Récupère toutes les villes.
+     *
+     * @return responseEntity contenant la liste des villes au format CityResponseDto
+     */
     @Operation(
             summary = "Récupérer toutes les villes",
             description = "Retourne la liste complète des villes françaises avec leurs informations géographiques et démographiques"
@@ -39,10 +46,19 @@ public class CityController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CityResponseDto.class)))
     })
     @GetMapping
-    public List<CityResponseDto> getAllCities() {
-        return cityService.getAllCities().stream().map(cityMapper::toDto).toList();
+    public ResponseEntity<List<CityResponseDto>> getAllCities() {
+        List<CityResponseDto> cities = cityService.getAllCities().stream()
+                .map(cityMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(cities);
     }
 
+    /**
+     * Récupère une ville par son code INSEE.
+     *
+     * @param inseeCode le code INSEE de la ville
+     * @return responseEntity contenant la ville au format CityResponseDto
+     */
     @Operation(
             summary = "Rechercher une ville par code INSEE",
             description = "Retourne les informations d'une ville en utilisant son code INSEE unique (5 chiffres)"
@@ -53,13 +69,20 @@ public class CityController {
             @ApiResponse(responseCode = "404", description = "Ville non trouvée", content = @Content)
     })
     @GetMapping("/insee-code/{inseeCode}")
-    public CityResponseDto getCityByInseeCode(
+    public ResponseEntity<CityResponseDto> getCityByInseeCode(
             @Parameter(description = "Code INSEE de la ville (5 chiffres)", example = "75056", required = true)
-            @PathVariable String inseeCode) {
+            @PathVariable String inseeCode
+    ) {
         City city = cityService.getCityByInseeCode(inseeCode);
-        return cityMapper.toDto(city);
+        return ResponseEntity.ok(cityMapper.toDto(city));
     }
 
+    /**
+     * Récupère une ville par son code postal.
+     *
+     * @param postalCode le code postal de la ville
+     * @return responseEntity contenant la ville au format CityResponseDto
+     */
     @Operation(
             summary = "Rechercher une ville par code postal",
             description = "Retourne les informations d'une ville en utilisant son code postal"
@@ -70,13 +93,20 @@ public class CityController {
             @ApiResponse(responseCode = "404", description = "Ville non trouvée", content = @Content)
     })
     @GetMapping("/postal-code/{postalCode}")
-    public CityResponseDto getCityByPostalCode(
+    public ResponseEntity<CityResponseDto> getCityByPostalCode(
             @Parameter(description = "Code postal de la ville", example = "75001", required = true)
-            @PathVariable String postalCode) {
+            @PathVariable String postalCode
+    ) {
         City city = cityService.getCitiesByPostalCode(postalCode);
-        return cityMapper.toDto(city);
+        return ResponseEntity.ok(cityMapper.toDto(city));
     }
 
+    /**
+     * Récupère une ville par son nom.
+     *
+     * @param name le nom de la ville
+     * @return responseEntity contenant la ville au format CityResponseDto
+     */
     @Operation(
             summary = "Rechercher une ville par nom",
             description = "Retourne les informations d'une ville en utilisant son nom exact"
@@ -87,13 +117,19 @@ public class CityController {
             @ApiResponse(responseCode = "404", description = "Ville non trouvée", content = @Content)
     })
     @GetMapping("/city")
-    public CityResponseDto getCityByName(
+    public ResponseEntity<CityResponseDto> getCityByName(
             @Parameter(description = "Nom de la ville", example = "Paris", required = true)
             @RequestParam String name) {
         City city = cityService.getCityByName(name);
-        return cityMapper.toDto(city);
+        return ResponseEntity.ok(cityMapper.toDto(city));
     }
 
+    /**
+     * Recherche des villes par nom partiel (insensible à la casse).
+     *
+     * @param query le fragment de nom de la ville à rechercher
+     * @return responseEntity contenant la liste des villes correspondantes au format CityResponseDto
+     */
     @Operation(
             summary = "Recherche partielle de villes (autocomplétion)",
             description = "Retourne les villes dont le nom contient la requête (insensible à la casse). Utile pour l'autocomplétion."
@@ -103,48 +139,104 @@ public class CityController {
                     content = @Content(mediaType = "application/json", schema = @Schema(implementation = CityResponseDto.class)))
     })
     @GetMapping("/search-name")
-    public List<CityResponseDto> searchCities(
+    @PreAuthorize("permitAll()")
+    public ResponseEntity<List<CityResponseDto>> searchCities(
             @Parameter(description = "Chaîne de recherche (minimum 3 caractères recommandé)", example = "par", required = true)
-            @RequestParam String query) {
-        return cityService.findByNameContainingIgnoreCase(query).stream()
+            @RequestParam String query
+    ) {
+        List<CityResponseDto> cities = cityService.findByNameContainingIgnoreCase(query).stream()
                 .map(cityMapper::toDto)
                 .toList();
+        return ResponseEntity.ok(cities);
     }
 
+    /**
+     * Récupère les villes d'une région donnée.
+     *
+     * @param region le nom de la région
+     * @return responseEntity contenant la liste des villes au format CityResponseDto
+     */
     @GetMapping("/region/{region}")
-    public List<CityResponseDto> getCitiesByRegion(@PathVariable String region) {
-        return cityService.getCitiesByRegionName(region).stream().map(cityMapper::toDto).toList();
+    public ResponseEntity<List<CityResponseDto>> getCitiesByRegion(@PathVariable String region) {
+        List<CityResponseDto> cities = cityService.getCitiesByRegionName(region).stream()
+                .map(cityMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(cities);
     }
 
+    /**
+     * Récupère les villes d'un département donné.
+     *
+     * @param departmentName le nom du département
+     * @return responseEntity contenant la liste des villes au format CityResponseDto
+     */
     @GetMapping("/departmentName/{departmentName}")
-    public List<CityResponseDto> getCitiesByDepartmentName(@PathVariable String departmentName) {
-        return cityService.getCitiesByDepartmentName(departmentName).stream().map(cityMapper::toDto).toList();
+    public ResponseEntity<List<CityResponseDto>> getCitiesByDepartmentName(@PathVariable String departmentName) {
+        List<CityResponseDto> cities = cityService.getCitiesByDepartmentName(departmentName).stream()
+                .map(cityMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(cities);
     }
 
+    /**
+     * Récupère les villes d'un département donné par son code.
+     *
+     * @param departmentCode le code du département
+     * @return responseEntity contenant la liste des villes au format CityResponseDto
+     */
     @GetMapping("/departmentCode/{departmentCode}")
-    public List<CityResponseDto> getCitiesByDepartmentCode(@PathVariable String departmentCode) {
-        return cityService.getCitiesByDepartmentCode(departmentCode).stream().map(cityMapper::toDto).toList();
+    public ResponseEntity<List<CityResponseDto>> getCitiesByDepartmentCode(@PathVariable String departmentCode) {
+        List<CityResponseDto> cities = cityService.getCitiesByDepartmentCode(departmentCode).stream()
+                .map(cityMapper::toDto)
+                .toList();
+        return ResponseEntity.ok(cities);
     }
 
+
+    /**
+     * Recherche des villes par population minimale et/ou maximale.
+     *
+     * @param populationMin la population minimale (optionnel)
+     * @param populationMax la population maximale (optionnel)
+     * @return responseEntity contenant la liste des villes correspondantes au format CityResponseDto
+     */
     @GetMapping("/search")
-    public List<CityResponseDto> searchCitiesByPopulation(
+    public ResponseEntity<List<CityResponseDto>> searchCitiesByPopulation(
             @RequestParam(required = false) Integer populationMin,
             @RequestParam(required = false) Integer populationMax) {
 
+        List<City> cities;
+
         if (populationMin != null && populationMax != null) {
-            return cityService.getCitiesByPopulationBetweenThan(populationMin, populationMax).stream().map(cityMapper::toDto).toList();
+            cities = cityService.getCitiesByPopulationBetweenThan(populationMin, populationMax);
         } else if (populationMin != null) {
-            return cityService.getCitiesByPopulationGreaterThanEqual(populationMin).stream().map(cityMapper::toDto).toList();
+            cities = cityService.getCitiesByPopulationGreaterThanEqual(populationMin);
         } else if (populationMax != null) {
-            return cityService.getCitiesByPopulationLessThanEqual(populationMax).stream().map(cityMapper::toDto).toList();
+            cities = cityService.getCitiesByPopulationLessThanEqual(populationMax);
+        } else {
+            cities = cityService.getAllCities();
         }
-        return cityService.getAllCities().stream().map(cityMapper::toDto).toList();
+
+        return ResponseEntity.ok(cities.stream()
+                .map(cityMapper::toDto)
+                .toList());
     }
 
+    /**
+     * Récupère les villes les plus peuplées d'une zone donnée (par code).
+     *
+     * @param areaCode le code de la zone (région ou département)
+     * @param limit    le nombre maximum de villes à retourner
+     * @return responseEntity contenant la liste des villes au format CityResponseDto
+     */
     @GetMapping("/area/{areaCode}/top/{limit}")
-    public List<CityResponseDto> getTopCitiesByArea(@PathVariable String areaCode, @PathVariable int limit) {
-        return cityService.getTopCitiesByAreaCode(areaCode, limit).stream()
+    public ResponseEntity<List<CityResponseDto>> getTopCitiesByArea(
+            @PathVariable String areaCode,
+            @PathVariable int limit) {
+
+        List<CityResponseDto> cities = cityService.getTopCitiesByAreaCode(areaCode, limit).stream()
                 .map(cityMapper::toDto)
                 .toList();
+        return ResponseEntity.ok(cities);
     }
 }

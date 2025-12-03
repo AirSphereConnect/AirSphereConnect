@@ -1,6 +1,7 @@
 package com.airSphereConnect.dtos.response;
 
 import com.airSphereConnect.entities.enums.ReactionType;
+import com.airSphereConnect.entities.enums.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
@@ -17,8 +18,10 @@ public class ForumPostResponseDto {
     @Schema(description = "Identifiant de l'auteur du post", example = "55")
     private Long userId;
 
+    private UserRole userRole;
+
     @Schema(description = "Pseudo de l'auteur du post", example = "Cyril")
-    private  String username;
+    private String username;
 
     @Schema(description = "Identifiant du thread parent du post", example = "2")
     private Long threadId;
@@ -40,21 +43,25 @@ public class ForumPostResponseDto {
 
     @Schema(description = "Type de réaction sur le post de l'utilisateur en cours", example = "Post Liké")
     private ReactionType currentUserReaction;
+    private Boolean isReported;
 
     public ForumPostResponseDto() {
     }
 
-    public ForumPostResponseDto(Long id, String content, Long userId, String username, Long threadId, String threadTitle, LocalDateTime createdAt, long likeCount, long dislikeCount, ReactionType currentUserReaction) {
+    public ForumPostResponseDto(Long id, String content, Long userId, String username, UserRole userRole, Long threadId,
+                                String threadTitle, LocalDateTime createdAt, long likeCount, long dislikeCount, ReactionType currentUserReaction, Boolean isReported) {
         this.id = id;
         this.content = content;
         this.userId = userId;
         this.username = username;
+        this.userRole = userRole;
         this.threadId = threadId;
         this.threadTitle = threadTitle;
         this.createdAt = createdAt;
         this.likeCount = likeCount;
         this.dislikeCount = dislikeCount;
         this.currentUserReaction = currentUserReaction;
+        this.isReported = isReported;
     }
 
     public Long getId() {
@@ -143,5 +150,17 @@ public class ForumPostResponseDto {
 
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    public void setUserRole(UserRole userRole) {
+        this.userRole = userRole;
+    }
+
+    public Boolean getReported() {
+        return isReported;
+    }
+
+    public void setReported(Boolean reported) {
+        isReported = reported;
     }
 }

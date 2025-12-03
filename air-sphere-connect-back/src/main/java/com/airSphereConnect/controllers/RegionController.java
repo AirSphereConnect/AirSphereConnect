@@ -1,11 +1,9 @@
 package com.airSphereConnect.controllers;
 
 
-import com.airSphereConnect.dtos.response.DepartmentResponseDto;
 import com.airSphereConnect.dtos.response.RegionResponseDto;
-import com.airSphereConnect.mapper.DepartmentMapper;
+import com.airSphereConnect.entities.Region;
 import com.airSphereConnect.mapper.RegionMapper;
-import com.airSphereConnect.services.DepartmentService;
 import com.airSphereConnect.services.RegionService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -14,6 +12,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -37,6 +36,11 @@ public class RegionController {
         this.regionMapper = regionMapper;
     }
 
+    /**
+     * Récupère toutes les régions.
+     *
+     * @return responseEntity contenant la liste des régions au format RegionResponseDto
+     */
     @Operation(
             summary = "Récupérer toutes les régions (Admin uniquement)",
             description = "Retourne la liste complète des régions françaises"
@@ -47,13 +51,21 @@ public class RegionController {
             @ApiResponse(responseCode = "403", description = "Accès refusé", content = @Content)
     })
     @GetMapping()
-    public List<RegionResponseDto> getAllDepartments() {
-        return regionService.getAllRegions()
+    public ResponseEntity<List<RegionResponseDto>> getAllDepartments() {
+        List<RegionResponseDto> region = regionService.getAllRegions()
                 .stream()
                 .map(regionMapper::toDto)
                 .toList();
+
+        return ResponseEntity.ok(region);
     }
 
+    /**
+     * Récupère une région par son nom.
+     *
+     * @param name le nom de la région
+     * @return responseEntity contenant la région au format RegionResponseDto
+     */
     @Operation(
             summary = "Rechercher une région par nom",
             description = "Retourne les informations d'une région en utilisant son nom"
@@ -65,12 +77,20 @@ public class RegionController {
             @ApiResponse(responseCode = "403", description = "Accès refusé", content = @Content)
     })
     @GetMapping("/regionName/{name}")
-    public RegionResponseDto getDepartmentByName(
+    public ResponseEntity<RegionResponseDto> getDepartmentByName(
             @Parameter(description = "Nom de la région", example = "Occitanie", required = true)
-            @PathVariable String name) {
-        return regionMapper.toDto(regionService.getRegionByName(name));
+            @PathVariable String name
+    ) {
+        Region region = regionService.getRegionByName(name);
+        return ResponseEntity.ok(regionMapper.toDto(region));
     }
 
+    /**
+     * Récupère une région par son code.
+     *
+     * @param code le code de la région
+     * @return responseEntity contenant la région au format RegionResponseDto
+     */
     @Operation(
             summary = "Rechercher une région par code",
             description = "Retourne les informations d'une région en utilisant son code"
@@ -82,9 +102,11 @@ public class RegionController {
             @ApiResponse(responseCode = "403", description = "Accès refusé", content = @Content)
     })
     @GetMapping("/regionCode/{code}")
-    public RegionResponseDto getDepartmentByCode(
+    public ResponseEntity<RegionResponseDto> getDepartmentByCode(
             @Parameter(description = "Code de la région", example = "76", required = true)
-            @PathVariable String code) {
-        return regionMapper.toDto(regionService.getRegionByCode(code));
+            @PathVariable String code
+    ) {
+        Region region = regionService.getRegionByCode(code);
+        return ResponseEntity.ok(regionMapper.toDto(region));
     }
 }
