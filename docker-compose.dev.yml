@@ -29,6 +29,53 @@ services:
       start_period: 60s
 
   # ==============================
+  # SONARQUBE + POSTGRESQL
+  # ==============================
+  sonarqube-db:
+    image: postgres:15-alpine
+    container_name: sonarqube_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonarqube
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: sonarqube
+    restart: unless-stopped
+    depends_on:
+      sonarqube-db:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonarqube
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "9000:9000"
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:9000/api/system/status | grep -q UP || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # ==============================
   # MAILHOG
   # ==============================
 
@@ -67,6 +114,9 @@ services:
     volumes:
       # ✅ Code source Java
       - ./air-sphere-connect-back/src:/app/src
+
+      # ✅ Classes compilées pour hot-reload
+      - ./air-sphere-connect-back/target:/app/target
 
       # ✅ Configuration Maven
       - ./air-sphere-connect-back/pom.xml:/app/pom.xml
@@ -129,6 +179,14 @@ volumes:
     name: ${DB_VOLUME_NAME}
     driver: local
   maven_cache:
+    driver: local
+  sonarqube_db_data:
+    driver: local
+  sonarqube_data:
+    driver: local
+  sonarqube_extensions:
+    driver: local
+  sonarqube_logs:
     driver: local
 
 # ==============================

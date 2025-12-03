@@ -1,15 +1,29 @@
 package com.airSphereConnect.dtos.response;
 
-import java.time.LocalDateTime;
+import io.swagger.v3.oas.annotations.media.Schema;
 
+@Schema(description = "Données envoyées d'une rubrique du forum")
 public class ForumRubricResponseDto {
 
+    @Schema(description = "Identifiant de la rubrique du forum", example = "2")
     private Long id;
+
+    @Schema(description = "Titre de la rubrique du forum", example = "Données climatique")
     private String title;
+
+    @Schema(description = "Description de la rubrique du forum", example = "Données climatique en temps réel ")
     private String description;
+
+    @Schema(description = "Identifiant de l'auteur de la rubrique", example = "1")
     private Long userId;
+
+    @Schema(description = "Pseudo de l'auteur de la rubrique", example = "Cyril")
     private String username;
+
+    @Schema(description = "Identifiant du forum", example = "1")
     private Long forumId;
+
+    @Schema(description = "Titre du forum", example = "Forum sur l'environnement")
     private String forumTitle;
 
     public ForumRubricResponseDto() {

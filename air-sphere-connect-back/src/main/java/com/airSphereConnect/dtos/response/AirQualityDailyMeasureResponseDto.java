@@ -1,9 +1,11 @@
-package com.airSphereConnect.dtos.response.api;
+package com.airSphereConnect.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record AirQualityDailyMeasureResponseDto(
         @JsonProperty("insee_com")
         Integer inseeCode,
@@ -22,6 +24,9 @@ public record AirQualityDailyMeasureResponseDto(
 
         @JsonProperty("unite")
         String polluantUnit,
+
+        @JsonProperty("date_debut")
+        Long dateDebutTimestamp,
 
         LocalDateTime measuredAt
 ) {

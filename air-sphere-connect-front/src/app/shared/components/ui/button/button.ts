@@ -54,6 +54,7 @@ export class Button {
   @Input() size: ButtonVariants['size'] = 'md';
   @Input() variant: ButtonVariants['variant'] = 'solid';
   @Input() shape: ButtonVariants['shape'] = 'default';
+  @Input() padding?: ButtonVariants['padding'];
   @Input() fullWidth: boolean = false;
   @Input() wide?: boolean = false;
   @Input() loading: boolean = false;
@@ -77,6 +78,7 @@ export class Button {
       variant: this.variant,
       fullWidth: this.fullWidth,
       shape: this.shape,
+      padding: this.padding,
       wide: this.wide,
       class: this.class
     });

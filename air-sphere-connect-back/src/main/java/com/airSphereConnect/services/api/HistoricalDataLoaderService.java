@@ -1,6 +1,6 @@
 package com.airSphereConnect.services.api;
 
-import com.airSphereConnect.dtos.response.api.AirQualityHourlyMeasureResponseDto;
+import com.airSphereConnect.dtos.response.AirQualityHourlyMeasureResponseDto;
 import com.airSphereConnect.entities.AirQualityMeasurement;
 import com.airSphereConnect.entities.AirQualityStation;
 import com.airSphereConnect.repositories.AirQualityMeasurementRepository;

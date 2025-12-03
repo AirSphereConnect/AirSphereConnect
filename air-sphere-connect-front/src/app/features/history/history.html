@@ -1,0 +1,121 @@
+<div class="max-w-[1600px] mx-auto p-6">
+    <header class="mb-8 pb-5 border-b-2 border-base-300">
+      <h1 class="text-3xl font-bold text-base-content">Historique des mesures</h1>
+    </header>
+
+  <form [formGroup]="filterForm">
+    <div class="flex justify-between items-end mb-6 gap-4">
+      <div class="flex gap-4 flex-1">
+        <div class="w-full max-w-xs relative">
+          <app-input
+            label="Commune"
+            type="text"
+            formControlName="citySearchUtils"
+            placeholder="Tapez au moins 3 lettres..."
+            [fullWidth]="true"
+            size="md"
+            (blur)="onBlur()"
+          />
+          @if (showDropdown() && filteredCities().length > 0) {
+            <ul class="dropdown-content menu bg-base-100 rounded-box z-[1] w-full p-2 shadow max-h-60 overflow-y-auto flex-nowrap absolute top-full mt-1">
+              @for (city of filteredCities(); track city.id) {
+                <li>
+                  <a (mousedown)="onCitySelect(city.name)" class="whitespace-nowrap">
+                    {{ city.name }} ({{ city.postalCode }})
+                  </a>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <div class="w-full max-w-xs">
+          <app-input
+            label="Date de début"
+            type="date"
+            formControlName="startDate"
+            [fullWidth]="true"
+            size="md"
+          />
+        </div>
+
+        <div class="w-full max-w-xs">
+          <app-input
+            label="Date de fin"
+            type="date"
+            formControlName="endDate"
+            [fullWidth]="true"
+            size="md"
+          />
+        </div>
+      </div>
+
+      <div class="flex gap-2 my-3">
+        <app-button
+          variant="outline"
+          size="md"
+          [heroIcon]="'download'"
+          (click)="exportCSV()"
+        >
+          Export CSV
+        </app-button>
+        <app-button
+          variant="outline"
+          size="md"
+          [heroIcon]="'download'"
+          (click)="exportPDF()"
+        >
+          Export PDF
+        </app-button>
+      </div>
+    </div>
+  </form>
+
+  @if (error()) {
+    <div class="alert alert-error mb-4 shadow-lg">
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  @if (isLoading()) {
+    <div class="flex justify-center py-12">
+      <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+  }
+
+  @if (!isLoading() && historyData()) {
+    <div class="bg-base-100 rounded-lg shadow-lg overflow-hidden">
+      <app-tab [tabs]="tabs" variant="bordered" navClass="border-b border-base-300 bg-base-200" (tabChange)="onTabChange($event)" ></app-tab>
+    </div>
+  }
+
+  <ng-template #airQualityLabel>
+    <span class="flex items-center justify-center gap-2">
+      <app-icon [name]="'leaf'" [size]="'md'" />
+      Qualité de l'air
+    </span>
+  </ng-template>
+
+  <ng-template #weatherLabel>
+    <span class="flex items-center justify-center gap-2">
+      <app-icon [name]="'cloud'" [size]="'md'" />
+      Météo
+    </span>
+  </ng-template>
+
+  <ng-template #airQualityTab>
+    <app-air-quality-history
+      [historyData]="historyData()!"
+      [startDate]="startDate()"
+      [endDate]="endDate()">
+    </app-air-quality-history>
+  </ng-template>
+
+  <ng-template #weatherTab>
+    <app-weather-history
+      [historyData]="historyData()!"
+      [startDate]="startDate()"
+      [endDate]="endDate()">
+    </app-weather-history>
+  </ng-template>
+</div>

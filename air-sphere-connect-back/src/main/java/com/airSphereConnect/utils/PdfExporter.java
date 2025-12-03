@@ -21,7 +21,7 @@ import java.util.List;
 @Component
 public class PdfExporter {
 
-    public byte[] exportToPdf(List<ExportDto> data) throws IOException {
+    public byte[] exportToPdf(List<ExportDto> data, String type) throws IOException {
 
 
         ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -41,7 +41,8 @@ public class PdfExporter {
 //        document.add(img);
 
         // title
-        Paragraph title = new Paragraph("Rapport des données météorologiques et de qualité de l'air")
+        String titleText = getTitleForType(type);
+        Paragraph title = new Paragraph(titleText)
                 .setFontSize(18)
                 .setMarginBottom(20)
                 .setTextAlignment(TextAlignment.CENTER);
@@ -55,10 +56,7 @@ public class PdfExporter {
         document.add(subTitle);
 
         // Add table header
-        List<String> headers = Arrays.asList("Date", "Ville", "Latitude", "Longitude", "Population", "Température " +
-                        "(°C)", "Humidité (%)", "Pression (hPa)", "Vitesse du vent (m/s)", "Direction du vent (°)", "Message", "Station " +
-                        "ID", "PM2.5 (µg/m³)", "PM10 (µg/m³)", "NO2 (µg/m³)", "O3 (µg/m³)", "Unité", "Indice de qualité",
-                "Label de qualité");
+        List<String> headers = getHeadersForType(type);
 
         // Create table
         Table table = new Table(UnitValue.createPercentArray(headers.size())).useAllAvailableWidth();
@@ -79,23 +77,46 @@ public class PdfExporter {
         for (ExportDto dto : data) {
             table.addCell(dto.dateMesureMeteo() != null ? dto.dateMesureMeteo().format(dtf) : "");
             table.addCell(dto.nomVille());
-            table.addCell(format(dto.latitude()));
-            table.addCell(format(dto.longitude()));
-            table.addCell(format(dto.population()));
-            table.addCell(format(dto.temperature()));
-            table.addCell(format(dto.humidite()));
-            table.addCell(format(dto.pression()));
-            table.addCell(format(dto.vitesseVent()));
-            table.addCell(format(dto.directionVent()));
-            table.addCell(dto.message() != null ? dto.message() : "");
-            table.addCell(format(dto.stationId()));
-            table.addCell(format(dto.pm25()));
-            table.addCell(format(dto.pm10()));
-            table.addCell(format(dto.no2()));
-            table.addCell(format(dto.o3()));
-            table.addCell(dto.unite());
-            table.addCell(format(dto.qualiteIndex()));
-            table.addCell(dto.qualiteLabel());
+            table.addCell(dto.latitude());
+            table.addCell(dto.longitude());
+
+            if ("air-quality".equals(type)) {
+                // Air quality only
+                table.addCell(dto.stationId());
+                table.addCell(dto.pm25());
+                table.addCell(dto.pm10());
+                table.addCell(dto.no2());
+                table.addCell(dto.o3());
+                table.addCell(dto.unite());
+                table.addCell(dto.qualiteIndex());
+                table.addCell(dto.qualiteLabel());
+            } else if ("weather".equals(type)) {
+                // Weather only
+                table.addCell(dto.population());
+                table.addCell(dto.temperature());
+                table.addCell(dto.humidite());
+                table.addCell(dto.pression());
+                table.addCell(dto.vitesseVent());
+                table.addCell(dto.directionVent());
+                table.addCell(dto.message());
+            } else {
+                // Combined
+                table.addCell(dto.population());
+                table.addCell(dto.temperature());
+                table.addCell(dto.humidite());
+                table.addCell(dto.pression());
+                table.addCell(dto.vitesseVent());
+                table.addCell(dto.directionVent());
+                table.addCell(dto.message());
+                table.addCell(dto.stationId());
+                table.addCell(dto.pm25());
+                table.addCell(dto.pm10());
+                table.addCell(dto.no2());
+                table.addCell(dto.o3());
+                table.addCell(dto.unite());
+                table.addCell(dto.qualiteIndex());
+                table.addCell(dto.qualiteLabel());
+            }
         }
 
         document.add(table);
@@ -105,14 +126,37 @@ public class PdfExporter {
         return out.toByteArray();
     }
 
-    private String format(Object obj) {
-        if (obj == null) {
-            return "";
-        }
-        if (obj instanceof Double) {
-            return String.format("%.2f", obj);
-        }
-        return obj.toString();
+    private List<String> getHeadersForType(String type) {
+        return switch (type) {
+            case "air-quality" -> Arrays.asList(
+                    "Date de la mesure", "Nom Ville", "Latitude", "Longitude",
+                    "Station ID", "PM2.5 (µg/m³)", "PM10 (µg/m³)",
+                    "NO2 (µg/m³)", "O3 (µg/m³)", "Unité",
+                    "Qualité Index", "Qualité Label"
+            );
+            case "weather" -> Arrays.asList(
+                    "Date de la mesure", "Nom Ville", "Latitude", "Longitude",
+                    "Population de la ville", "Température (°C)", "Humidité (%)",
+                    "Pression (hPa)", "Vitesse Vent (m/s)",
+                    "Direction Vent (°)", "Message"
+            );
+            default -> Arrays.asList(
+                    "Date de la mesure", "Nom Ville", "Latitude", "Longitude",
+                    "Population de la ville", "Température (°C)", "Humidité (%)",
+                    "Pression (hPa)", "Vitesse Vent (m/s)",
+                    "Direction Vent (°)", "Message", "Station ID",
+                    "PM2.5 (µg/m³)", "PM10 (µg/m³)", "NO2 (µg/m³)",
+                    "O3 (µg/m³)", "Unité", "Qualité Index", "Qualité Label"
+            );
+        };
+    }
+
+    private String getTitleForType(String type) {
+        return switch (type) {
+            case "air-quality" -> "Rapport de qualité de l'air";
+            case "weather" -> "Rapport des données météorologiques";
+            default -> "Rapport des données météorologiques et de qualité de l'air";
+        };
     }
 
 }

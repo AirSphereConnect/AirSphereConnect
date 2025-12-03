@@ -10,6 +10,7 @@ export const routes: Routes = [
   { path: 'auth/settings', loadComponent: () => import('./features/auth/settings/settings').then(m => m.Settings) },
 
   { path: 'dashboard', loadComponent: () => import('./features/dashboard/components/dashboard/dashboard').then(m => m.Dashboard)},
+  { path: 'history', loadComponent: () => import('./features/history/history').then(m => m.History)},
 
   {
     path: 'forum',

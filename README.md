@@ -238,6 +238,140 @@ Le backend utilise le profil `dev` en environnement Docker :
 
 <br>
 
+## 📚 Documentation : Swagger & Compodoc
+
+### 📘 Swagger – Documentation de l'API Backend
+
+Le backend inclut une documentation automatique générée grâce à **SpringDoc OpenAPI 3**.
+Elle se génère et s'actualise automatiquement à partir de vos annotations dans les Controllers :
+- `@Operation`
+- `@ApiResponses`
+- `@Parameter`
+- `@Tag`
+
+#### ▶️ Accès à Swagger en environnement Docker
+
+Une fois Docker lancé :
+
+| Outil | URL | Description |
+|-------|-----|-------------|
+| **Swagger UI** | http://localhost:8080/swagger-ui/index.html | Interface visuelle et interactive |
+| **OpenAPI JSON** | http://localhost:8080/v3/api-docs | Spécification brute |
+| **OpenAPI YAML** | http://localhost:8080/v3/api-docs.yaml | Spécification YAML |
+
+#### ▶️ Accès en environnement local sans Docker
+
+Si vous lancez Spring Boot directement :
+```bash
+./mvnw spring-boot:run
+```
+
+Les URL sont identiques :
+- http://localhost:8080/swagger-ui/index.html
+
+#### ✔️ Exemple d'annotations dans le projet
+
+```java
+@Tag(name = "Qualité de l'air", description = "Endpoints relatifs aux mesures de pollution")
+@RestController
+@RequestMapping("/api/air")
+public class AirQualityController {
+
+    @Operation(summary = "Récupère les mesures de qualité de l'air pour une ville donnée")
+    @ApiResponses({
+        @ApiResponse(responseCode = "200", description = "Mesures trouvées"),
+        @ApiResponse(responseCode = "404", description = "Ville introuvable")
+    })
+    @GetMapping("/{cityId}")
+    public ResponseEntity<?> getAirQuality(@PathVariable Long cityId) {
+       // ...
+    }
+}
+```
+
+#### 🔐 Configuration de sécurité pour Swagger
+
+Pour permettre l'accès public à la documentation Swagger (sans authentification JWT), les endpoints suivants sont configurés dans `SecurityConfig.java` :
+
+```bash
+.requestMatchers("/swagger-ui/**",                 // 1️⃣ Interface Swagger UI
+                "/swagger-ui.html",                // 2️⃣ Page d'accueil Swagger (ancienne version)
+                "/v3/api-docs/**").permitAll();    // 3️⃣ Documentation OpenAPI JSON/YAML
+
+```
+
+**Détails de chaque pattern :**
+
+| Pattern | Description | Exemples |
+|---------|-------------|----------|
+| `/swagger-ui/**` | Interface Swagger UI moderne | `/swagger-ui/index.html`, `/swagger-ui/swagger-ui.css` |
+| `/swagger-ui.html` | Ancienne URL de Swagger (compatibilité) | Redirige vers `/swagger-ui/index.html` |
+| `/v3/api-docs/**` | Documentation OpenAPI brute | `/v3/api-docs`, `/v3/api-docs.yaml` |
+
+> 💡 **Bonne pratique** : Séparer les endpoints de documentation dans un `requestMatchers` dédié améliore la **lisibilité** et facilite la **maintenance** de la configuration de sécurité.
+
+<br>
+
+### 📗 Compodoc – Documentation du Frontend Angular
+
+Compodoc génère une documentation complète pour :
+- modules
+- components
+- services
+- routes
+- fiches techniques
+- graphiques de dépendances
+- modèles
+
+#### ▶️ Commandes disponibles (déjà configurées dans package.json)
+
+| Commande | Description |
+|----------|-------------|
+| `npm run compodoc` | Génère la doc + démarre un serveur |
+| `npm run docs:dev` | Génération + mode watch |
+| `npm run build:compodoc:css` | Compile le thème compodoc + Tailwind |
+
+#### ▶️ Accès à la documentation Angular
+
+Après exécution :
+```bash
+npm run compodoc
+```
+
+La documentation sera disponible sur :
+- **http://localhost:4300**
+
+#### ▶️ Environnement Docker
+
+Si vous voulez aussi consulter Compodoc depuis un conteneur Docker, ajoutez ce service (optionnel) :
+
+```yaml
+compodoc:
+  image: node:20
+  container_name: airsphere_compodoc
+  working_dir: /app
+  volumes:
+    - ./air-sphere-connect-front:/app
+  command: sh -c "npm install && npm run compodoc"
+  ports:
+    - "4300:4300"
+  networks:
+    - ${NETWORK_NAME}
+```
+
+<br>
+
+### 🔗 Résumé rapide des endpoints documentations
+
+| Documentation | URL | Service |
+|---------------|-----|---------|
+| **Swagger UI** | http://localhost:8080/swagger-ui/index.html | Backend |
+| **OpenAPI JSON** | http://localhost:8080/v3/api-docs | Backend |
+| **OpenAPI YAML** | http://localhost:8080/v3/api-docs.yaml | Backend |
+| **Compodoc (Angular)** | http://localhost:4300 | Frontend |
+
+
+
 
 ## 🛠️ Commandes utiles
 ### Gestion des conteneurs
@@ -450,6 +584,7 @@ Utilisez les Chrome DevTools :
 3. Vos fichiers TypeScript sont disponibles dans `webpack://`
 
 <br>
+
 
 ## 🩺 Troubleshooting
 ### Problème : MariaDB ne démarre pas

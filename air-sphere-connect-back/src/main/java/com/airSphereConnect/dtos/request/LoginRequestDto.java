@@ -1,20 +1,11 @@
 package com.airSphereConnect.dtos.request;
 
-public class LoginRequestDto {
-    private final String username;
-    private final String password;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-    public LoginRequestDto(String username, String password) {
-        this.username = username;
-        this.password = password;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
+@Schema(description = "Données reçue lors d'une connexion utilisateur")
+public record LoginRequestDto(
+        @Schema(description = "nom d'utilisateur de connexion", example = "Cyril")
+        String username,
+        @Schema(description = "Mot de passe de connexion de l'utilisateur", example = "Azerty123/")
+        String password) {
 }

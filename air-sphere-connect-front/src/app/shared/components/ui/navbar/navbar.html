@@ -36,7 +36,7 @@
     >
       Créer un compte
     </a>
-  } @else if (userRole === 'USER') {
+  } @else if (userRole === 'USER' || 'ADMIN') {
     <a
       routerLink="/dashboard"
       routerLinkActive="tab-active tab-active-primary"
@@ -44,6 +44,15 @@
       class="tab"
     >
       Données climatiques
+    </a>
+
+    <a
+      routerLink="/history"
+      routerLinkActive="tab-active tab-active-primary"
+      role="tab"
+      class="tab"
+    >
+      Historique
     </a>
 
     <a

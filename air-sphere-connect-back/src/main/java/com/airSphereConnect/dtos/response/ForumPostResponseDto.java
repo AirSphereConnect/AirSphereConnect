@@ -2,26 +2,50 @@ package com.airSphereConnect.dtos.response;
 
 import com.airSphereConnect.entities.enums.ReactionType;
 import com.airSphereConnect.entities.enums.UserRole;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDateTime;
 
+@Schema(description = "Données envoyées d'un post")
 public class ForumPostResponseDto {
+
+    @Schema(description = "Identifiant d'un post", example = "1")
     private Long id;
+
+    @Schema(description = "Contenu d'un post", example = "Bonjour tout le monde")
     private String content;
+
+    @Schema(description = "Identifiant de l'auteur du post", example = "55")
     private Long userId;
-    private String username;
+
     private UserRole userRole;
+
+    @Schema(description = "Pseudo de l'auteur du post", example = "Cyril")
+    private String username;
+
+    @Schema(description = "Identifiant du thread parent du post", example = "2")
     private Long threadId;
+
+    @Schema(description = "Titre du thread parent du post", example = "Données Climatiques de Montpellier")
     private String threadTitle;
+
+    @Schema(description = "Date de création du post", example = "2007-12-03T10:15:30:55.000000")
     private LocalDateTime createdAt;
+
+    @Schema(description = "Date de modification du post", example = "2007-12-03T10:15:30:55.000000")
     private LocalDateTime updatedAt;
+
+    @Schema(description = "Nombre de likes du post", example = "3")
     private long likeCount;
+
+    @Schema(description = "Nombre de dislikes du post", example = "1")
     private long dislikeCount;
+
+    @Schema(description = "Type de réaction sur le post de l'utilisateur en cours", example = "Post Liké")
     private ReactionType currentUserReaction;
     private Boolean isReported;
 
     public ForumPostResponseDto() {
-
     }
 
     public ForumPostResponseDto(Long id, String content, Long userId, String username, UserRole userRole, Long threadId,

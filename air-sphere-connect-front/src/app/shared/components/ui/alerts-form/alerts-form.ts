@@ -15,7 +15,7 @@ import {CityService} from '../../../../core/services/city';
 import {UserService} from '../../../services/user-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Button} from '../button/button';
-import {inputCitySearch} from '../../../utils/city-utils/city-utils';
+import {citySearch} from '../../../utils/city-search.util';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
 import {Subject} from 'rxjs';
@@ -50,7 +50,7 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
 
   private readonly destroy$ = new Subject<void>();
 
-  citySearchEffect = inputCitySearch(this.cityService, this.cityQuery, this.citySuggestions);
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
 
   ngOnInit() {
     this.alertsForm = this.fb.group({

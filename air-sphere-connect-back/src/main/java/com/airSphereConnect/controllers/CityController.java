@@ -4,13 +4,20 @@ import com.airSphereConnect.dtos.response.CityResponseDto;
 import com.airSphereConnect.entities.City;
 import com.airSphereConnect.mapper.CityMapper;
 import com.airSphereConnect.services.CityService;
-import jakarta.annotation.security.PermitAll;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@Tag(name = "Villes", description = "API de gestion des villes françaises - Recherche, filtrage et informations géographiques")
 @RestController
 //@PreAuthorize("hasAnyRole('USER', 'ADMIN')")
 @RequestMapping("/api/cities")
@@ -30,6 +37,14 @@ public class CityController {
      *
      * @return responseEntity contenant la liste des villes au format CityResponseDto
      */
+    @Operation(
+            summary = "Récupérer toutes les villes",
+            description = "Retourne la liste complète des villes françaises avec leurs informations géographiques et démographiques"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des villes récupérée avec succès",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CityResponseDto.class)))
+    })
     @GetMapping
     public ResponseEntity<List<CityResponseDto>> getAllCities() {
         List<CityResponseDto> cities = cityService.getAllCities().stream()
@@ -44,8 +59,20 @@ public class CityController {
      * @param inseeCode le code INSEE de la ville
      * @return responseEntity contenant la ville au format CityResponseDto
      */
+    @Operation(
+            summary = "Rechercher une ville par code INSEE",
+            description = "Retourne les informations d'une ville en utilisant son code INSEE unique (5 chiffres)"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ville trouvée",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CityResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Ville non trouvée", content = @Content)
+    })
     @GetMapping("/insee-code/{inseeCode}")
-    public ResponseEntity<CityResponseDto> getCityByInseeCode(@PathVariable String inseeCode) {
+    public ResponseEntity<CityResponseDto> getCityByInseeCode(
+            @Parameter(description = "Code INSEE de la ville (5 chiffres)", example = "75056", required = true)
+            @PathVariable String inseeCode
+    ) {
         City city = cityService.getCityByInseeCode(inseeCode);
         return ResponseEntity.ok(cityMapper.toDto(city));
     }
@@ -56,8 +83,20 @@ public class CityController {
      * @param postalCode le code postal de la ville
      * @return responseEntity contenant la ville au format CityResponseDto
      */
+    @Operation(
+            summary = "Rechercher une ville par code postal",
+            description = "Retourne les informations d'une ville en utilisant son code postal"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ville trouvée",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CityResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Ville non trouvée", content = @Content)
+    })
     @GetMapping("/postal-code/{postalCode}")
-    public ResponseEntity<CityResponseDto> getCityByPostalCode(@PathVariable String postalCode) {
+    public ResponseEntity<CityResponseDto> getCityByPostalCode(
+            @Parameter(description = "Code postal de la ville", example = "75001", required = true)
+            @PathVariable String postalCode
+    ) {
         City city = cityService.getCitiesByPostalCode(postalCode);
         return ResponseEntity.ok(cityMapper.toDto(city));
     }
@@ -68,8 +107,19 @@ public class CityController {
      * @param name le nom de la ville
      * @return responseEntity contenant la ville au format CityResponseDto
      */
+    @Operation(
+            summary = "Rechercher une ville par nom",
+            description = "Retourne les informations d'une ville en utilisant son nom exact"
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Ville trouvée",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CityResponseDto.class))),
+            @ApiResponse(responseCode = "404", description = "Ville non trouvée", content = @Content)
+    })
     @GetMapping("/city")
-    public ResponseEntity<CityResponseDto> getCityByName(@RequestParam String name) {
+    public ResponseEntity<CityResponseDto> getCityByName(
+            @Parameter(description = "Nom de la ville", example = "Paris", required = true)
+            @RequestParam String name) {
         City city = cityService.getCityByName(name);
         return ResponseEntity.ok(cityMapper.toDto(city));
     }
@@ -80,9 +130,20 @@ public class CityController {
      * @param query le fragment de nom de la ville à rechercher
      * @return responseEntity contenant la liste des villes correspondantes au format CityResponseDto
      */
+    @Operation(
+            summary = "Recherche partielle de villes (autocomplétion)",
+            description = "Retourne les villes dont le nom contient la requête (insensible à la casse). Utile pour l'autocomplétion."
+    )
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Liste des villes correspondantes",
+                    content = @Content(mediaType = "application/json", schema = @Schema(implementation = CityResponseDto.class)))
+    })
     @GetMapping("/search-name")
     @PreAuthorize("permitAll()")
-    public ResponseEntity<List<CityResponseDto>> searchCities(@RequestParam String query) {
+    public ResponseEntity<List<CityResponseDto>> searchCities(
+            @Parameter(description = "Chaîne de recherche (minimum 3 caractères recommandé)", example = "par", required = true)
+            @RequestParam String query
+    ) {
         List<CityResponseDto> cities = cityService.findByNameContainingIgnoreCase(query).stream()
                 .map(cityMapper::toDto)
                 .toList();

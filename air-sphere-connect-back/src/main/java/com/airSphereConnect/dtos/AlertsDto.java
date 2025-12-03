@@ -9,11 +9,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.time.LocalDateTime;
 
+/**
+ * Data Transfer Object représentant une alerte personnalisée d’un utilisateur
+ * liée à une ville, un département ou une région, avec type et message JSON.
+ */
 public class AlertsDto {
     private Long id;
     private Long userId;
     private City city;
-
     private Department department;
     private Region region;
     private String message;
@@ -96,12 +99,17 @@ public class AlertsDto {
         this.department = department;
     }
 
+    /**
+     * Tente de parser le champ message JSON en objet WeatherAlertDto.
+     *
+     * @return objet WeatherAlertDto parsé, ou null si erreur
+     */
     public WeatherAlertDto getParsedMessage() {
         try {
             ObjectMapper mapper = new ObjectMapper();
             return mapper.readValue(this.message, WeatherAlertDto.class);
         } catch (Exception e) {
-            //TODO Ajout logger
+            // TODO: Ajouter un logger pour enregistrer les erreurs de parsing
             return null;
         }
     }

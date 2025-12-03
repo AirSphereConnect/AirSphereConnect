@@ -1,0 +1,154 @@
+<div class="overflow-x-auto">
+  <table class="table w-full">
+    <!-- En-tête du tableau -->
+    <thead>
+      <tr class="text-center">
+        <th>Date</th>
+        <th>Température</th>
+        <th>Humidité</th>
+        <th>Pression</th>
+        <th>Vitesse du vent</th>
+        <th>Direction du vent</th>
+        <th>Message</th>
+      </tr>
+    </thead>
+
+    <!-- Corps du tableau -->
+    <tbody>
+      @if (filteredData().length === 0) {
+        <tr>
+          <td colspan="7" class="text-center py-8 text-gray-500">
+            Aucune donnée météo disponible pour cette période
+          </td>
+        </tr>
+      }
+
+      @if (hasOnlyAirQualityData()) {
+        <tr>
+          <td colspan="7" class="text-center py-8 text-gray-500">
+            Aucune donnée météo (seules les données de qualité de l'air sont disponibles)
+          </td>
+        </tr>
+      }
+
+      @for (snapshot of filteredData(); track snapshot.date; let i = $index) {
+        @if (snapshot.weather) {
+        <tr [class.bg-base-200]="i % 2 === 0">
+          <td class="font-medium text-center">
+            {{ snapshot.date | date: 'dd/MM/yyyy' }}
+          </td>
+
+          <td class="text-center">
+            @if (snapshot.weather.temperature !== undefined) {
+              <span class="badge badge-info">
+                {{ formatTemperature(snapshot.weather.temperature) }}
+              </span>
+            } @else {
+              <span class="opacity-60">Non mesuré</span>
+            }
+          </td>
+
+          <td class="text-center">
+            @if (snapshot.weather.humidity !== undefined) {
+              <span class="text-sm">
+                {{ formatHumidity(snapshot.weather.humidity) }}
+              </span>
+            } @else {
+              <span class="opacity-60">Non mesuré</span>
+            }
+          </td>
+
+          <td class="text-center">
+            @if (snapshot.weather.pressure !== undefined) {
+              <span class="text-sm">
+                {{ formatPressure(snapshot.weather.pressure) }}
+              </span>
+            } @else {
+              <span class="opacity-60">Non mesuré</span>
+            }
+          </td>
+
+          <td class="text-center">
+            @if (snapshot.weather.windSpeed !== undefined) {
+              <span class="text-sm">
+                {{ formatWindSpeed(snapshot.weather.windSpeed) }}
+              </span>
+            } @else {
+              <span class="opacity-60">Non mesuré</span>
+            }
+          </td>
+
+          <td class="text-center">
+            @if (snapshot.weather.windDirection !== undefined) {
+              <div class="flex items-center justify-center gap-2">
+                <span class="badge badge-outline">
+                  {{ getWindDirection(snapshot.weather.windDirection) }}
+                </span>
+                <span class="text-xs opacity-60">
+                  ({{ snapshot.weather.windDirection }}°)
+                </span>
+              </div>
+            } @else {
+              <span class="opacity-60">Non mesuré</span>
+            }
+          </td>
+
+          <td class="text-center">
+            @if (snapshot.weather.message) {
+              <div class="flex items-center justify-center gap-2">
+                @if (getWeatherIcon(snapshot.weather.message); as icon) {
+                  <img
+                    [src]="getWeatherIconUrl(icon)"
+                    [alt]="translateWeatherMessage(snapshot.weather.message)"
+                    class="w-10 h-10"
+                  />
+                }
+                <span class="text-sm">
+                  {{ translateWeatherMessage(snapshot.weather.message) }}
+                </span>
+              </div>
+            } @else {
+              <span class="opacity-60">-</span>
+            }
+          </td>
+        </tr>
+        }
+      }
+    </tbody>
+  </table>
+
+  @if (totalPages() > 1) {
+    <div class="flex justify-center items-center gap-3 m-4">
+
+      @if (currentPage() > 1) {
+        <app-button
+          size="sm"
+          variant="outline"
+          (click)="prevPage()"
+        >
+          Précédent
+        </app-button>
+      } @else {
+        <div class="w-[88px]"></div>
+      }
+
+      <span class="text-sm">
+        Page {{ currentPage() }} / {{ totalPages() }}
+        ({{ allFilteredData().length }} résultats)
+      </span>
+
+      @if (currentPage() < totalPages()) {
+          <app-button
+            size="sm"
+            variant="outline"
+            padding="lg"
+            (click)="nextPage()"
+          >
+            Suivant
+          </app-button>
+      } @else {
+        <div class="w-[88px]"></div>
+      }
+    </div>
+  }
+</div>

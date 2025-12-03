@@ -4,7 +4,9 @@ export interface Favorite {
   cityName: string;
   createdAt: string;
   updatedAt: string;
-  favoriteCategory: string;
+  selectWeather: boolean;
+  selectAirQuality: boolean;
+  selectPopulation: boolean;
 }
 
 export interface Alerts {
@@ -21,6 +23,7 @@ export interface User {
   email: string;
   role: string;
   address: {
+    id: number;
     street: string;
     city: {
       name: string;

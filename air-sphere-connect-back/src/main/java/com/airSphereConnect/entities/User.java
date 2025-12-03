@@ -9,6 +9,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
+import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +19,10 @@ import java.util.Objects;
 
 @Entity
 @Table(name= "users")
-public class User extends Timestamp implements UserDetails {
+public class User extends Timestamp implements UserDetails, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,12 +30,12 @@ public class User extends Timestamp implements UserDetails {
 
     @NotBlank(message = "{user.username.notBlank}")
     @Size(min = 2, max = 50, message = "{user.username.size}")
-    @Column(name = "username", unique = true, nullable = false, length = 50)
+    @Column(name = "username", unique = false, nullable = false, length = 50)
     private String username;
 
     @NotBlank(message = "{user.email.notBlank}")
     @Email(message = "{user.email.invalid}")
-    @Column(name = "email", unique = true, nullable = false, length = 150)
+    @Column(name = "email", unique = false, nullable = false, length = 150)
     private String email;
 
     @NotBlank(message = "{user.password.notBlank}")
@@ -65,6 +71,10 @@ public class User extends Timestamp implements UserDetails {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<PostReaction> postReactions = new ArrayList<>();
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
 
 
     public User() {}
@@ -103,6 +113,18 @@ public class User extends Timestamp implements UserDetails {
 
     public String getPassword() {
         return password;
+    }
+
+    public LocalDateTime getDeletedAt() {
+        return deletedAt;
+    }
+
+    public void setDeletedAt(LocalDateTime deletedAt) {
+        this.deletedAt = deletedAt;
+    }
+
+    public void softDelete() {
+        this.deletedAt = LocalDateTime.now();
     }
 
     public void setPassword(String password) {

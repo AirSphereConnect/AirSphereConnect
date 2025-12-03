@@ -31,5 +31,12 @@ public interface AirQualityService {
 
     AirQualityDataResponseDto getCompleteDataForCity(String cityName);
 
+    /**
+     * Récupère les N plus grandes villes du département qui ont des données air quality
+     * @param departmentCode Code département (2 chiffres)
+     * @param limit Nombre de villes à retourner
+     * @return Liste des villes avec leurs données complètes
+     */
+    List<AirQualityDataResponseDto> getTopCitiesWithDataInDepartment(String departmentCode, int limit);
 
 }

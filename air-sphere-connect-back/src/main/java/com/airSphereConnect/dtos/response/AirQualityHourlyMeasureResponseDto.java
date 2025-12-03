@@ -1,7 +1,8 @@
 
-package com.airSphereConnect.dtos.response.api;
+package com.airSphereConnect.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -11,6 +12,7 @@ import java.time.ZoneId;
  * DTO pour l'API horaire 30 jours ATMO Occitanie
  * Service : Mesure_horaire_(30j)_Region_Occitanie_Polluants_Reglementaires_1
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record AirQualityHourlyMeasureResponseDto(
         @JsonProperty("insee_com")
         Integer inseeCode,

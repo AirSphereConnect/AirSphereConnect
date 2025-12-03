@@ -1,7 +1,7 @@
 package com.airSphereConnect.services.api;
 
-import com.airSphereConnect.dtos.response.api.AirQualityDailyMeasureResponseDto;
-import com.airSphereConnect.dtos.response.api.AirQualityIndexMeasureResponseDto;
+import com.airSphereConnect.dtos.response.AirQualityDailyMeasureResponseDto;
+import com.airSphereConnect.dtos.response.AirQualityIndexMeasureResponseDto;
 import com.airSphereConnect.entities.AirQualityIndex;
 import com.airSphereConnect.entities.AirQualityMeasurement;
 import com.airSphereConnect.entities.AirQualityStation;
@@ -120,13 +120,10 @@ public class ApiAirQualityService implements DataSyncService {
         Map<String, List<AirQualityDailyMeasureResponseDto>> groupedByStation =
                 groupMeasuresByStation(measureDtos);
 
-        // ✅ Toujours sauvegarder à minuit pour cohérence avec l'historique
-        LocalDateTime syncDateTime = LocalDate.now().atStartOfDay();
-
         int savedCount = 0;
         for (Map.Entry<String, List<AirQualityDailyMeasureResponseDto>> entry : groupedByStation.entrySet()) {
             try {
-                savedCount += saveMeasurementForStation(entry.getValue(), syncDateTime);
+                savedCount += saveMeasurementForStation(entry.getValue());
             } catch (Exception e) {
                 log.error("❌ [ATMO] Erreur sauvegarde mesure station {} : {}",
                         entry.getKey(), e.getMessage());
@@ -139,14 +136,26 @@ public class ApiAirQualityService implements DataSyncService {
     }
 
     private int saveMeasurementForStation(
-            List<AirQualityDailyMeasureResponseDto> stationMeasures,
-            LocalDateTime syncDateTime) {
+            List<AirQualityDailyMeasureResponseDto> stationMeasures) {
 
         AirQualityDailyMeasureResponseDto dailyDto = stationMeasures.get(0);
         AirQualityStation station = getOrCreateStation(dailyDto);
         if (station == null) {
             log.warn("⚠️ [ATMO] Mesures ignorées pour station {} : station introuvable",
                     dailyDto.codeStation());
+            return 0;
+        }
+
+        // ✅ CORRECTION : Extraire la vraie date de l'API au lieu d'utiliser LocalDate.now()
+        LocalDateTime syncDateTime = timestampToLocalDateTime(dailyDto.dateDebutTimestamp());
+        log.debug("📅 [ATMO] Station {} - Date extraite de l'API : {}",
+                dailyDto.codeStation(), syncDateTime);
+
+        // ✅ Vérifier si une mesure existe déjà pour cette station et cette date
+        boolean exists = measurementRepository.existsByStationAndMeasuredAt(station, syncDateTime);
+        if (exists) {
+            log.debug("⏭️ [ATMO] Mesure déjà existante pour station {} à la date {}",
+                    dailyDto.codeStation(), syncDateTime);
             return 0;
         }
 
@@ -176,78 +185,83 @@ public class ApiAirQualityService implements DataSyncService {
         List<AirQualityIndexMeasureResponseDto> indexDtos = parseAtmoJson(json, "attributes", AirQualityIndexMeasureResponseDto.class);
         log.info("📥 [ATMO] {} indices parsés", indexDtos.size());
 
-        LocalDateTime syncDateTime = LocalDateTime.now();
-
         int savedCount = 0;
+        int skippedCount = 0;
         int alertCount = 0;
 
         for (AirQualityIndexMeasureResponseDto indexDto : indexDtos) {
             try {
-                // Chercher l'index existant par areaCode
-                Optional<AirQualityIndex> existingIndex = indexRepository.findFirstByAreaCodeOrderByMeasuredAtDesc(indexDto.areaCode());
+                // ✅ CORRECTION : Extraire la vraie date de l'API au lieu d'utiliser LocalDate.now()
+                LocalDateTime syncDateTime = timestampToLocalDateTime(indexDto.dateEchTimestamp());
+                log.debug("📅 [ATMO] Zone {} - Date extraite de l'API : {}",
+                        indexDto.areaCode(), syncDateTime);
 
-                AirQualityIndex index;
-                if (existingIndex.isPresent()) {
-                    // Mettre à jour l'index existant
-                    index = existingIndex.get();
-                    index.setQualityIndex(Integer.valueOf(indexDto.qualityIndex()));
-                    index.setQualityLabel(indexDto.qualityLabel());
-                    index.setQualityColor(indexDto.qualityColor());
-                    index.setSource(indexDto.source());
-                    index.setAreaName(indexDto.areaName());
-                    index.setMeasuredAt(syncDateTime);
-                    log.debug("🔄 [ATMO] Mise à jour indice existant pour {}", indexDto.areaCode());
-                } else {
-                    // Créer un nouvel index
-                    index = mapper.toEntity(indexDto);
-                    index.setMeasuredAt(syncDateTime);
-                    log.debug("🆕 [ATMO] Création nouvel indice pour {}", indexDto.areaCode());
-                }
-
-                String alertMessage = AirQualityAlertUtils.determineAlertMessageWithArea(
-                        Integer.valueOf(indexDto.qualityIndex()),
-                        indexDto.areaName()
-                );
-
-                if (alertMessage != null) {
-                    index.setAlertMessage(alertMessage);
-                    alertCount++;
-                    index.setAlert(true);
-                    log.warn("⚠️ [ATMO] Alerte qualité air : {}", alertMessage);
-                } else {
-                    index.setAlertMessage(null);
-                    index.setAlert(false);
-                }
-
+                // ✅ Vérifier si un indice existe déjà pour cette zone ET cette date
                 Optional<AirQualityIndex> existingOpt =
-                        indexRepository.findByAreaCodeAndMeasuredAt(index.getAreaCode(), index.getMeasuredAt());
-
+                        indexRepository.findByAreaCodeAndMeasuredAt(indexDto.areaCode(), syncDateTime);
 
                 if (existingOpt.isPresent()) {
+                    // ✅ Un indice existe déjà pour aujourd'hui : mise à jour des valeurs
                     AirQualityIndex existing = existingOpt.get();
 
-                    // 🔄 Mise à jour des champs nécessaires
-                    existing.setQualityIndex(index.getQualityIndex());
-                    existing.setQualityLabel(index.getQualityLabel());
-                    existing.setQualityColor(index.getQualityColor());
-                    existing.setAlertMessage(index.getAlertMessage());
-                    existing.setSource(index.getSource());
+                    existing.setQualityIndex(Integer.valueOf(indexDto.qualityIndex()));
+                    existing.setQualityLabel(indexDto.qualityLabel());
+                    existing.setQualityColor(indexDto.qualityColor());
+                    existing.setSource(indexDto.source());
+                    existing.setAreaName(indexDto.areaName());
+
+                    String alertMessage = AirQualityAlertUtils.determineAlertMessageWithArea(
+                            Integer.valueOf(indexDto.qualityIndex()),
+                            indexDto.areaName()
+                    );
+
+                    if (alertMessage != null) {
+                        existing.setAlertMessage(alertMessage);
+                        existing.setAlert(true);
+                        alertCount++;
+                        log.warn("⚠️ [ATMO] Alerte qualité air : {}", alertMessage);
+                    } else {
+                        existing.setAlertMessage(null);
+                        existing.setAlert(false);
+                    }
 
                     indexRepository.save(existing);
-                    log.debug("♻️ [ATMO] Index mis à jour pour {}", existing.getAreaCode());
+                    log.debug("♻️ [ATMO] Index mis à jour pour {} ({})", existing.getAreaCode(), syncDateTime.toLocalDate());
+                    savedCount++;
                 } else {
-                    indexRepository.save(index);
-                    log.debug("🆕 [ATMO] Nouvel index ajouté pour {}", index.getAreaCode());
-                }
+                    // ✅ Aucun indice pour aujourd'hui : créer un nouveau
+                    AirQualityIndex newIndex = mapper.toEntity(indexDto);
+                    newIndex.setMeasuredAt(syncDateTime);
 
-                savedCount++;
+                    String alertMessage = AirQualityAlertUtils.determineAlertMessageWithArea(
+                            Integer.valueOf(indexDto.qualityIndex()),
+                            indexDto.areaName()
+                    );
+
+                    if (alertMessage != null) {
+                        newIndex.setAlertMessage(alertMessage);
+                        newIndex.setAlert(true);
+                        alertCount++;
+                        log.warn("⚠️ [ATMO] Alerte qualité air : {}", alertMessage);
+                    } else {
+                        newIndex.setAlertMessage(null);
+                        newIndex.setAlert(false);
+                    }
+
+                    indexRepository.save(newIndex);
+                    log.debug("🆕 [ATMO] Nouvel index créé pour {} ({})", newIndex.getAreaCode(), syncDateTime.toLocalDate());
+                    savedCount++;
+                }
 
             } catch (Exception e) {
                 log.error("❌ [ATMO] Erreur sauvegarde indice : {}", e.getMessage());
             }
         }
 
-        log.info("✅ [ATMO] {} indices sauvegardés", savedCount);
+        log.info("✅ [ATMO] {} indices sauvegardés, {} déjà à jour", savedCount, skippedCount);
+        if (alertCount > 0) {
+            log.warn("⚠️ [ATMO] {} alertes détectées", alertCount);
+        }
         return savedCount;
     }
 
@@ -307,7 +321,9 @@ public class ApiAirQualityService implements DataSyncService {
 
         // ✅ CORRECTION : Chercher la ville AVANT de sauvegarder
         if (dto.inseeCode() != null) {
-            String inseeCode = String.valueOf(dto.inseeCode());
+            // ✅ FIX: Padder le code INSEE pour avoir toujours 5 chiffres
+            // L'API ATMO retourne 9261 mais en base on a "09261"
+            String inseeCode = String.format("%05d", dto.inseeCode());
             newStation.setInseeCode(inseeCode);
 
             cityRepository.findByInseeCode(inseeCode)
@@ -376,6 +392,23 @@ public class ApiAirQualityService implements DataSyncService {
         }
     }
 
+    /**
+     * 📅 Convertir un timestamp ATMO (millisecondes) en LocalDateTime
+     * L'API ATMO retourne des timestamps UTC, on les convertit en LocalDateTime à minuit
+     */
+    private LocalDateTime timestampToLocalDateTime(Long timestampMs) {
+        if (timestampMs == null) {
+            log.warn("⚠️ [ATMO] Timestamp null, utilisation de la date du jour par défaut");
+            return LocalDate.now().atStartOfDay();
+        }
+
+        // Convertir le timestamp en Instant (UTC), puis en date locale (jour uniquement)
+        java.time.Instant instant = java.time.Instant.ofEpochMilli(timestampMs);
+        java.time.LocalDate date = instant.atZone(java.time.ZoneOffset.UTC).toLocalDate();
+
+        // Retourner le LocalDateTime à minuit du jour concerné
+        return date.atStartOfDay();
+    }
 
     @Override
     public boolean isEnabled() {

@@ -83,6 +83,13 @@
             ],
             "styles": [
               "src/styles.css"
+            ],
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "**/*.spec.ts",
+              "**/*.config.ts",
+              "**/test/**",
+              "**/environments/**"
             ]
           }
         }

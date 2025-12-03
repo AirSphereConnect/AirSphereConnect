@@ -1,23 +1,46 @@
 package com.airSphereConnect.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import io.swagger.v3.oas.annotations.media.Schema;
+
 
 import java.time.LocalDateTime;
 
+@Schema(description = "Réponse contenant les données météo pour une ville, ainsi que les alertes associées.")
 public class WeatherResponseDto {
 
+    @Schema(description = "Identifiant unique de la ville.", example = "12")
     private Long cityId;
+
+    @Schema(description = "Nom de la ville.", example = "Paris")
     private String cityName;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+
+    @Schema(description = "Date et heure de la mesure météorologique.", example = "2025-11-24T15:00:00")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime measuredAt;
 
+    @Schema(description = "Température actuelle en degrés Celsius.", example = "18.3")
     private Double temperature;
+
+    @Schema(description = "Humidité relative en pourcentage.", example = "60")
     private Double humidity;
+
+    @Schema(description = "Vitesse du vent en m/s.", example = "5.5")
     private Double windSpeed;
+
+    @Schema(description = "Direction du vent en degrés.", example = "180")
     private Double windDirection;
+
+    @Schema(description = "Pression atmosphérique en hPa.", example = "1012")
     private Double pressure;
+
+    @Schema(description = "Tableau des descriptions détaillées des conditions météo.")
     private WeatherDescriptionDto[] message;
+
+    @Schema(description = "Indique si une alerte météo est active pour cette ville.", example = "true")
     private Boolean alert;
+
+    @Schema(description = "Tableau des alertes météo actives pour cette ville.")
     private WeatherAlertDto[] alertMessage;
 
 

@@ -1,16 +1,26 @@
 package com.airSphereConnect.dtos.request;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
+@Schema(description = "Données reçues d'une rubrique du forum")
 public class ForumRubricRequestDto {
+
+    @Schema(description = "Titre d'une rubrique du forum", example = "Qualité de l'air")
     @NotBlank(message = "{rubric.title.required}")
     @Size(min = 2, max = 255, message = "{rubric.title.size}")
     private String title;
+
+    @Schema(description = "Description d'une rubrique du forum", example = "Qualité de l'air à Montpellier")
     @NotBlank(message = "{rubric.description.required}")
     @Size(min = 2, max = 255, message = "{rubric.description.size}")
     private String description;
+
+    @Schema(description = "Identifiant de l'utilisateur qui créé la rubrique", example = "1")
     private Long userId;
+
+    @Schema(description = "Identifiant du forum dans le quel se trouve la rubrique", example = "1")
     private Long forumId;
 
     public ForumRubricRequestDto() {

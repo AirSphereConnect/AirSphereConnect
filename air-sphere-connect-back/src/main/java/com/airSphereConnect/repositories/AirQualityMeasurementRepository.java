@@ -29,7 +29,22 @@ public interface AirQualityMeasurementRepository extends JpaRepository<AirQualit
     List<AirQualityMeasurement> findByStation_City_AreaCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
             String areaCode, LocalDateTime start, LocalDateTime end);
 
+    // Recherche par département (2 premiers chiffres du code INSEE)
+    // Retourne toutes les mesures récentes du département pour pouvoir trouver la ville la plus proche
+    @Query("SELECT DISTINCT m FROM AirQualityMeasurement m WHERE SUBSTRING(m.station.city.inseeCode, 1, 2) = :departmentCode AND m.measuredAt = (SELECT MAX(m2.measuredAt) FROM AirQualityMeasurement m2 WHERE m2.station = m.station)")
+    List<AirQualityMeasurement> findLatestByDepartmentCode(@Param("departmentCode") String departmentCode);
+
+    @Query("SELECT m FROM AirQualityMeasurement m WHERE SUBSTRING(m.station.city.inseeCode, 1, 2) = :departmentCode ORDER BY m.measuredAt DESC")
+    List<AirQualityMeasurement> findByDepartmentCodeOrderByMeasuredAtDesc(@Param("departmentCode") String departmentCode);
+
+    @Query("SELECT m FROM AirQualityMeasurement m WHERE SUBSTRING(m.station.city.inseeCode, 1, 2) = :departmentCode AND m.measuredAt BETWEEN :start AND :end ORDER BY m.measuredAt DESC")
+    List<AirQualityMeasurement> findByDepartmentCodeAndMeasuredAtBetweenOrderByMeasuredAtDesc(
+            @Param("departmentCode") String departmentCode,
+            @Param("start") LocalDateTime start,
+            @Param("end") LocalDateTime end);
+
     boolean existsByStationAndMeasuredAt(AirQualityStation station, LocalDateTime measuredAt);
 
     List<AirQualityMeasurement> findByMeasuredAtAfterOrderByStation_IdAscMeasuredAtDesc(LocalDateTime since);
+
 }

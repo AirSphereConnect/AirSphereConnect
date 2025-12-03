@@ -1,9 +1,18 @@
 package com.airSphereConnect.dtos.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
+@Schema(description = "Données concernant le forum")
 public class ForumResponseDto {
 
+    @Schema(description = "Identifiant du forum", example = "1")
     private Long id;
+
+    @Schema(description = "Titre du forum", example = "Forum sur l'écologie")
     private String title;
+
+    @Schema(description = "Description du forum", example = "Ici vous trouverez toutes les discussions disponibles " +
+            "sur l'environnement")
     private String description;
 
     public ForumResponseDto() {

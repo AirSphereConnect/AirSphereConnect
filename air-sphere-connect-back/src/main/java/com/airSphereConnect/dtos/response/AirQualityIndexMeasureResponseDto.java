@@ -1,7 +1,9 @@
-package com.airSphereConnect.dtos.response.api;
+package com.airSphereConnect.dtos.response;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record AirQualityIndexMeasureResponseDto(
         @JsonProperty("code_qual")
         String qualityIndex,
@@ -19,6 +21,9 @@ public record AirQualityIndexMeasureResponseDto(
         String areaCode,
 
         @JsonProperty("lib_zone")
-        String areaName
+        String areaName,
+
+        @JsonProperty("date_ech")
+        Long dateEchTimestamp
 ) {
 }

@@ -41,7 +41,27 @@ public class AirQualityMapper {
                 measurement.getSo2(),
                 measurement.getUnit(),
                 measurement.getMeasuredAt(),
-                measurement.getStation() != null ? measurement.getStation().getName() : null
+                measurement.getStation() != null ? measurement.getStation().getName() : null,
+                "exact", // Par défaut, données exactes
+                null // Pas de villes sources pour données exactes
+        );
+    }
+
+    public AirQualityMeasurementResponseDto toDto(AirQualityMeasurement measurement, String dataSource, String sourceCities) {
+        if (measurement == null) return null;
+
+        return new AirQualityMeasurementResponseDto(
+                measurement.getId(),
+                measurement.getPm10(),
+                measurement.getPm25(),
+                measurement.getNo2(),
+                measurement.getO3(),
+                measurement.getSo2(),
+                measurement.getUnit(),
+                measurement.getMeasuredAt(),
+                measurement.getStation() != null ? measurement.getStation().getName() : null,
+                dataSource,
+                sourceCities
         );
     }
 

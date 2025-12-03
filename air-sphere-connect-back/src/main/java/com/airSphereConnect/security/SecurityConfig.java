@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -69,6 +68,11 @@ public class SecurityConfig {
                                 "/api/users/signup",
                                 "/api/admin/historical-data/**").permitAll() // Chargement historique ATMO (usage ponctuel)
                         .requestMatchers("/api/admin/**").hasRole("ADMIN") // hasRole ajoute ROLE_ automatiquement
+                        // Documentation Swagger (accès public)
+                        .requestMatchers("/swagger-ui/**",
+                                "/swagger-ui.html",
+                                "/v3/api-docs/**").permitAll()
+                        // Endpoints publics
                         .requestMatchers("/actuator/health",
                                 "/actuator/info",
                                 "/api/refresh-token",
