@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
 import {FormBuilder, FormControl, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 import {Button} from '../button/button';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
+import {ErrorMessageService} from '../../../services/error-message-service';
 
 @Component({
   selector: 'app-user-form',
@@ -21,6 +22,7 @@ export class UserForm implements OnChanges, OnInit {
   @Output() updated = new EventEmitter<void>();
 
   userForm: FormGroup;
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -49,39 +51,39 @@ export class UserForm implements OnChanges, OnInit {
   }
 
   submit() {
-    if (this.userForm.invalid) {
-      console.log("[UserForm] Formulaire invalide");
+    const isNewEntry = !this.editingUserId;
+    const userValid = !this.userForm;
+
+    if (!this.userForm.valid || !this.userForm.dirty || (isNewEntry && !userValid)) {
+      this.errorMessageService.setMessage('Veuillez renseigner une adresse email.');
       return;
     }
 
+    if (this.userForm.invalid) return;
     this.isLoading.set(true);
+
     const payload = { ...this.userForm.value };
 
-    console.log("[UserForm] Soumission des données:", payload);
 
     this.userService.editUser(this.editingUserId, payload).subscribe({
       next: (res) => {
-        console.log("[UserForm] Réponse backend:", res);
 
         if (!res || Object.keys(res).length === 0) {
-          console.log("[UserForm] Session invalidée côté backend, déconnexion forcée");
-
+          this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
           this.userService.setUserProfile(null);
           this.userService.fetchUserProfile();
           this.router.navigate(['/home']);
         } else {
-          console.log("[UserForm] Mise à jour normale, rafraîchissement du profil");
-
+          this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
           this.userService.fetchUserProfile();
           this.updated.emit();
           this.close.emit();
         }
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error("[UserForm] Erreur lors de la mise à jour:", err);
+      error: () => {
         this.isLoading.set(false);
-        this.errorMessage.set('Erreur lors de la mise à jour.');
+        this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
       }
     });
   }

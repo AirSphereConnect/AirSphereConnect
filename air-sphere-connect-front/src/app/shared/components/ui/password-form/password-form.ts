@@ -1,10 +1,11 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 import {Button} from '../button/button';
 import {InputComponent} from '../input/input';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
+import {ErrorMessageService} from '../../../services/error-message-service';
 
 @Component({
   selector: 'app-password-form',
@@ -25,6 +26,7 @@ export class PasswordForm implements OnChanges, OnInit {
   @Output() updated = new EventEmitter<void>();
 
   passwordForm: FormGroup;
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -53,39 +55,39 @@ export class PasswordForm implements OnChanges, OnInit {
   }
 
   submit() {
-    if (this.passwordForm.invalid) {
-      console.log("[PasswordForm] Formulaire invalide");
+    const isNewEntry = !this.editingUserId;
+    const passwordFormValid = !this.passwordForm;
+
+    if (!this.passwordForm.valid || !this.passwordForm.dirty || (isNewEntry && !passwordFormValid)) {
+      this.errorMessageService.setMessage('Veuillez renseigner un nouveau mot de passe.');
       return;
     }
 
+    if (this.passwordForm.invalid) return;
     this.isLoading.set(true);
+
     const payload = { ...this.passwordForm.value };
 
-    console.log("[PasswordForm] Soumission des données:", payload);
 
     this.userService.editUser(this.editingUserId, payload).subscribe({
       next: (res) => {
-        console.log("[PasswordForm] Réponse backend:", res);
 
         if (!res || Object.keys(res).length === 0) {
-          console.log("[PasswordForm] Session invalidée côté backend, déconnexion forcée");
-
+          this.errorMessageService.setMessage("Session invalidée côté backend, déconnexion forcée");
           this.userService.setUserProfile(null);
           this.userService.fetchUserProfile();
           this.router.navigate(['/home']);
         } else {
-          console.log("[PasswordForm] Mise à jour normale, rafraîchissement du profil");
-
+          this.errorMessageService.setMessage("Mise à jour normale, rafraîchissement du profil");
           this.userService.fetchUserProfile();
           this.updated.emit();
           this.close.emit();
         }
         this.isLoading.set(false);
       },
-      error: (err) => {
-        console.error("[PasswordForm] Erreur lors de la mise à jour:", err);
+      error: () => {
         this.isLoading.set(false);
-        this.errorMessage.set('Erreur lors de la mise à jour.');
+        this.errorMessageService.setMessage('Erreur lors de la mise à jour.');
       }
     });
   }

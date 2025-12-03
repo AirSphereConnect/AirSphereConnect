@@ -9,11 +9,12 @@ import {Button} from '../../../../shared/components/ui/button/button';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {NavigationService} from '../../../../shared/services/navigation-service';
+import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
 
 @Component({
   selector: 'app-user-dashboard',
   standalone: true,
-  imports: [UserForm, AddressForm, EmailForm, PasswordForm, Button],
+  imports: [UserForm, AddressForm, EmailForm, PasswordForm, Button, WarningMessage],
   templateUrl: './user.html',
   styleUrls: ['./user.scss']
 })
@@ -23,19 +24,20 @@ export class UserDashboard {
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
 
-
   // Modales séparées
   isUserModalOpen = signal(false);
   isEmailModalOpen = signal(false);
   isPasswordModalOpen = signal(false);
   isAddressModalOpen = signal(false);
+  isWarningOpen = signal(false);
+  warningMessage = signal<string | null>(null);
 
-  // Données en cours d'édition
   editingUserId: number | null = null;
   initialUserData: any = null;
   initialEmailData: any = null;
   initialPasswordData: any = null;
   initialAddressData: any = null;
+  userToDeleteId: number | null = null;
 
   constructor(protected userService: UserService) {
     // Suivi automatique du profil
@@ -101,19 +103,31 @@ export class UserDashboard {
     this.isAddressModalOpen.set(false);
   }
 
-  deleteUser(userId: number) {
-    console.log('deleteUser called with id:', userId);
-    this.userService.deleteUser(userId)
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe({
-      next: () => {
-        console.log('User deleted');
-        this.router.navigate(['/home']);
-      },
-      error: err => {
-        console.error('Erreur suppression :', err);
-      }
-    });
+  deleteUser(id: number) {
+    this.userToDeleteId = id;
+    this.warningMessage.set('Êtes-vous sûr de vouloir supprimer votre compte ?');
+    this.isWarningOpen.set(true);
   }
 
+  confirmDelete() {
+    if (this.userToDeleteId !== null) {
+      this.userService.deleteUser(this.userToDeleteId)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: () => {
+            this.router.navigate(['/home']);
+            console.log(`User ${this.userToDeleteId} supprimée avec succès`);
+            this.userToDeleteId = null;
+            this.isWarningOpen.set(false);
+            this.warningMessage.set(null);
+          },
+          error: err => {
+            console.error('Erreur lors de la suppression de l\'user', this.user?.username, err);
+            this.isWarningOpen.set(false);
+            this.userToDeleteId = null;
+            this.warningMessage.set(null);
+          }
+        });
+    }
+  }
 }

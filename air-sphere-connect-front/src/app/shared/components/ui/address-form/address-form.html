@@ -2,35 +2,49 @@
   <div class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
     <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md relative">
       <app-button-close-modal
-        (close)="close.emit()">
+        (close)="closeModal()">
       </app-button-close-modal>
       <h2 class="text-xl font-bold mb-4">Modifier mon adresse</h2>
-      <form [formGroup]="addressForm" (ngSubmit)="submit()">
-        <input formControlName="street" placeholder="Adresse" class="text-black input mb-2 w-full" />
 
-        <input
+      <form [formGroup]="addressForm" (ngSubmit)="submit()">
+        <app-input
+          formControlName="street"
+          placeholder="Adresse"
+          label="adresse">
+        </app-input>
+
+        <app-input
           formControlName="cityName"
           placeholder="Ville"
-          class="text-black input mb-2 w-full"
-        />
+          label="ville"
+          (input)="onCityInput($event)">
+        </app-input>
 
-        @if(citySuggestions.length) {
-        <ul class="menu bg-base-100 w-full rounded-box mb-2">
-          @for(city of citySuggestions; track city.id) {
-          <li><a class="text-black" (click)="selectCity(city)">{{ city.name }} ({{ city.postalCode }})</a></li>
+        <div class="rounded mt-2 max-h-32 overflow-y-auto">
+          @if (citySuggestions().length) {
+            @for (city of citySuggestions(); track city.id) {
+              <app-button
+                color="neutral"
+                class="btn-outline block w-full text-left px-2 py-1"
+                (click)="selectCity(city)">
+                {{ city.name }}
+              </app-button>
+            }
           }
-        </ul>
-        }
+        </div>
 
-        <input formControlName="cityId" type="hidden" />
+        <app-input
+          formControlName="cityId"
+          type="hidden">
+        </app-input>
 
-        @if(errorMessage()) { <div class="alert alert-error">{{ errorMessage() }}</div> }
-
-        <div class="flex gap-2 mt-4">
-          <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+        <div class="flex justify-end gap-2 mt-4">
+          <app-button
+            type="submit"
+            [disabled]="isLoading()">
             @if(isLoading()) { <span class="loading loading-spinner"></span> }
             Sauvegarder
-          </button>
+          </app-button>
         </div>
       </form>
     </div>

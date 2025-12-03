@@ -1,9 +1,10 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {UserService} from '../../../services/user-service';
 import {Button} from '../button/button';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
+import {ErrorMessageService} from '../../../services/error-message-service';
 
 @Component({
   selector: 'app-email-form',
@@ -24,6 +25,7 @@ export class EmailForm implements OnChanges, OnInit {
   @Output() updated = new EventEmitter<void>();
 
   emailForm: FormGroup;
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -33,6 +35,7 @@ export class EmailForm implements OnChanges, OnInit {
       email: ['', [Validators.required, Validators.email]]
     });
   }
+
   ngOnInit() {
     // 🔁 Synchronisation automatique avec le profil utilisateur
     this.userService.userProfile$.subscribe(profile => {
@@ -51,8 +54,17 @@ export class EmailForm implements OnChanges, OnInit {
   }
 
   submit() {
+    const isNewEntry = !this.editingUserId;
+    const emailValid = !this.emailForm;
+
+    if (!this.emailForm.valid || !this.emailForm.dirty || (isNewEntry && !emailValid)) {
+      this.errorMessageService.setMessage('Veuillez renseigner une adresse email.');
+      return;
+    }
+
     if (this.emailForm.invalid) return;
     this.isLoading.set(true);
+
     const payload: any = { ...this.emailForm.value };
 
     this.userService.editUser(this.editingUserId, payload).subscribe({
@@ -64,7 +76,7 @@ export class EmailForm implements OnChanges, OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.errorMessage.set('Erreur lors de la mise à jour.');
+        this.errorMessageService.setMessage('Erreur lors de la mise à jour.');
       }
     });
   }
