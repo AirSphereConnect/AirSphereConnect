@@ -33,7 +33,7 @@ export class AddressForm implements OnInit, OnChanges {
   @Input() isOpen = signal(false);
   @Input({ transform: numberAttribute }) editingUserId!: number | undefined;
   @Input() addressData: any = null;
-  @Output() closeEvent = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
   private readonly fb = inject(FormBuilder);
@@ -116,7 +116,7 @@ export class AddressForm implements OnInit, OnChanges {
         next: () => {
           this.isLoading.set(false);
           this.updated.emit();
-          this.closeEvent.emit();
+          this.closeModal.emit();
         },
         error: () => {
           this.isLoading.set(false);
@@ -125,10 +125,10 @@ export class AddressForm implements OnInit, OnChanges {
       });
   }
 
-  closeModal() {
+  onCloseModal() {
     this.addressForm.reset();
     this.selectedCityId = null;
     this.isOpen.set(false);
-    this.closeEvent.emit();
+    this.closeModal.emit();
   }
 }

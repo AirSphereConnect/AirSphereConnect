@@ -30,7 +30,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   @Input() isOpen = signal(false);
   @Input() editingFavoriteId: number | null = null;
   @Input() initialFavoriteData: FavoriteFormData | null = null;
-  @Output() closeEvent = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
   @Output() submitSuccess = new EventEmitter<void>();
 
   private readonly destroy$ = new Subject<void>();
@@ -148,7 +148,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
       });
   }
 
-  closeModal() {
+  onCloseModal() {
     this.favoritesForm.reset({
       activeWeather: false,
       activeAirQuality: false,
@@ -158,7 +158,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
     this.cityIdSelected = null;
     this.isDeleteMode = false;
     this.isOpen.set(false);
-    this.closeEvent.emit();
+    this.closeModal.emit();
   }
 
   private handleSuccess() {
@@ -168,6 +168,6 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
     this.isDeleteMode = false;
     this.userService.fetchUserProfile();
     this.submitSuccess.emit();
-    this.closeModal();
+    this.onCloseModal();
   }
 }
