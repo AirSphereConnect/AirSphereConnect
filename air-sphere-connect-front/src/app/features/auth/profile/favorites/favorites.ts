@@ -4,13 +4,14 @@ import {Button} from '../../../../shared/components/ui/button/button';
 import {UserService} from '../../../../shared/services/user-service';
 import {FavoritesService} from '../../../../shared/services/favorites-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
 import {Favorite, User} from '../../../../core/models/user.model';
 
 @Component({
   selector: 'app-favorites',
   templateUrl: './favorites.html',
   standalone: true,
-  imports: [FavoritesForm, Button],
+  imports: [FavoritesForm, Button, WarningMessage],
 })
 export class Favorites implements OnInit {
   @Input() user: User | null = null;
@@ -19,9 +20,12 @@ export class Favorites implements OnInit {
 
   private readonly destroyRef = inject(DestroyRef);
 
-  isModalOpen = signal(false);
   editingFavoriteId: number | null = null;
   initialFavoriteData: any = null;
+  favoritesToDeleteId: number | null = null;
+  isModalOpen = signal(false);
+  isWarningOpen = signal(false);
+  warningMessage = signal<string | null>(null);
 
 
   ngOnInit() {
@@ -53,19 +57,29 @@ export class Favorites implements OnInit {
     }
   }
 
-  /** 🗑️ Suppression d'un favori */
   deleteFavorites(id: number) {
-    const favorite = this.user?.favorites.find((f: Favorite) => f.id === id);
-    if (favorite && confirm('Êtes-vous sûr de vouloir supprimer ce favori ?')) {
-      this.favoritesService.deleteFavorites(id)
+    this.favoritesToDeleteId = id;
+    this.warningMessage.set('Êtes-vous sûr de vouloir supprimer ce favoris ?');
+    this.isWarningOpen.set(true);
+  }
+
+  /** 🗑️ Suppression d’un favori */
+  confirmDelete() {
+    if (this.favoritesToDeleteId !== null) {
+      this.favoritesService.deleteFavorites(this.favoritesToDeleteId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
-            // 🔁 rafraîchit le profil complet
             this.userService.fetchUserProfile();
+            this.favoritesToDeleteId = null;
+            this.isWarningOpen.set(false);
+            this.warningMessage.set(null);
           },
           error: (err) => {
             this.logError('Erreur lors de la suppression du favori', err);
+            this.isWarningOpen.set(false);
+            this.favoritesToDeleteId = null;
+            this.warningMessage.set(null);
           }
         });
     }

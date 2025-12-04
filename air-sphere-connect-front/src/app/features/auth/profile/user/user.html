@@ -96,11 +96,11 @@
     <div>
 
       <app-button
-        color="warning"
+        color="error"
+        variant="outline"
         type="button"
         (buttonClick)="deleteUser(user.id)"
         (buttonKeydown)="undefined"
-        class="btn-outline btn-primary"
       >
         Supprimer mon compte
       </app-button>
@@ -137,8 +137,13 @@
   [isOpen]="isAddressModalOpen"
   [editingUserId]="editingUserId"
   [addressData]="initialAddressData"
-  (closeModal)="onAddressModalClose()"
+  (closeEvent)="onAddressModalClose()"
   (updated)="userService.fetchUserProfile()">
 </app-address-form>
 
-
+<app-warning-message
+  [isOpen]="isWarningOpen"
+  [message]="warningMessage()"
+  (close)="isWarningOpen.set(false)"
+  (confirm)="confirmDelete()"
+></app-warning-message>

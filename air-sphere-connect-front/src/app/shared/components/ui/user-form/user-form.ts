@@ -1,9 +1,10 @@
-import {Component, EventEmitter, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
+import {Component, EventEmitter, Input, inject, OnChanges, OnInit, Output, signal} from '@angular/core';
 import {FormBuilder, FormGroup, Validators, ReactiveFormsModule} from '@angular/forms';
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
+import {ErrorMessageService} from '../../../services/error-message-service';
 
 @Component({
   selector: 'app-user-form',
@@ -20,6 +21,7 @@ export class UserForm implements OnChanges, OnInit {
   @Output() updated = new EventEmitter<void>();
 
   userForm: FormGroup;
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
@@ -48,7 +50,13 @@ export class UserForm implements OnChanges, OnInit {
   }
 
   submit() {
-    if (this.userForm.invalid) {
+    const isNewEntry = !this.editingUserId;
+    const userValid = !this.userForm;
+
+    if (this.userForm.invalid) return;
+
+    if (!this.userForm.valid || !this.userForm.dirty || (isNewEntry && !userValid)) {
+      this.errorMessageService.setMessage('Veuillez renseigner une adresse email.');
       return;
     }
 
@@ -57,30 +65,26 @@ export class UserForm implements OnChanges, OnInit {
 
     this.userService.editUser(this.editingUserId, payload).subscribe({
       next: (res) => {
+
         if (!res || Object.keys(res).length === 0) {
+          this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
           this.userService.setUserProfile(null);
           this.userService.fetchUserProfile();
           this.router.navigate(['/home']);
         } else {
+          this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
           this.userService.fetchUserProfile();
           this.updated.emit();
           this.closeModal.emit();
         }
         this.isLoading.set(false);
       },
-      error: (err) => {
-        this.logError('Erreur lors de la mise à jour utilisateur', err);
+      error: () => {
         this.isLoading.set(false);
-        this.errorMessage.set('Erreur lors de la mise à jour.');
+        this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
       }
     });
   }
 
-  private logError(message: string, error?: unknown): void {
-    // Only log errors in development mode
-    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
-      console.error(message, error);
-    }
-  }
 
 }

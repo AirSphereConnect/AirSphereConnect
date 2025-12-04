@@ -22,18 +22,18 @@
           autocomplete="off"
         ></app-input>
 
-        <div class="bg-white rounded mt-2 max-h-32 overflow-y-auto">
+        <div class="rounded mt-2 max-h-32 overflow-y-auto">
           @if (citySuggestions().length) {
             @for (city of citySuggestions(); track city.id) {
-              <button type="button" class="block w-full text-left px-2 py-1 hover:bg-gray-200"
-                      (click)="selectCity(city)">
+              <app-button
+                color="neutral"
+                class="btn-outline block w-full text-left px-2 py-1"
+                (click)="selectCity(city)">
                 {{ city.name }}
-              </button>
+              </app-button>
             }
           }
         </div>
-
-        <p class="text-red-700 mt-2" [hidden]="!errorMessage">{{ errorMessage }}</p>
 
         <div class="flex justify-end gap-2 mt-4">
           <app-button

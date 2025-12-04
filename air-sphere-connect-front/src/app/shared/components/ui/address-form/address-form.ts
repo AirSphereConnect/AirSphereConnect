@@ -1,46 +1,58 @@
 import {
-  Component, DestroyRef,
+  Component,
+  DestroyRef,
   EventEmitter,
   inject,
   Input,
   numberAttribute,
   OnChanges,
+  OnInit,
   Output,
-  signal
+  signal,
+  SimpleChanges
 } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { UserService } from '../../../services/user-service';
 import { CityService } from '../../../../core/services/city';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
-import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
-import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Button } from '../button/button';
+import { ButtonCloseModal } from '../button-close-modal/button-close-modal';
+import { InputComponent } from '../input/input';
+import { citySearch } from '../../../utils/city-search.util';
+import { Subject } from 'rxjs';
+import { ErrorMessageService } from '../../../services/error-message-service';
 
 @Component({
   selector: 'app-address-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonCloseModal],
+  imports: [ReactiveFormsModule, Button, ButtonCloseModal, InputComponent],
   templateUrl: './address-form.html',
+  styleUrl: './address-form.scss'
 })
-export class AddressForm implements OnChanges {
+export class AddressForm implements OnInit, OnChanges {
   @Input() isOpen = signal(false);
-  @Input({transform: numberAttribute}) editingUserId!: number | undefined;
+  @Input({ transform: numberAttribute }) editingUserId!: number | undefined;
   @Input() addressData: any = null;
-  @Output() closeModal = new EventEmitter<void>();
+  @Output() closeEvent = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
-  addressForm: FormGroup;
-  citySuggestions: any[] = [];
-  selectedCityId: number | null = null;
-
-  private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
   private readonly userService = inject(UserService);
   private readonly cityService = inject(CityService);
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly errorMessageService = inject(ErrorMessageService);
 
+  addressForm!: FormGroup;
+  cityQuery = signal('');
+  citySuggestions = signal<any[]>([]);
+  selectedCityId: number | null = null;
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
 
-  constructor() {
+
+  // !! Obligatoire !!
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
+
+  ngOnInit() {
     this.addressForm = this.fb.group({
       street: ['', Validators.required],
       cityName: ['', Validators.required],
@@ -48,27 +60,23 @@ export class AddressForm implements OnChanges {
     });
   }
 
-  ngOnChanges() {
-    if (this.addressData) {
-      this.addressForm.patchValue({
-        street: this.addressData.street,
-        cityName: this.addressData.city?.name || '',
-        cityId: this.addressData.city?.id || null
-      });
-      this.selectedCityId = this.addressData.city?.id || null;
+  ngOnChanges(changes: SimpleChanges) {
+    if (this.addressForm && changes['addressData'] && this.addressData) {
+      this.patchFormData();
     }
+  }
 
-    // Suivi des changements pour suggestions
-    this.addressForm.get('cityName')?.valueChanges
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        switchMap(query => query && query.length > 1 ? this.cityService.searchCities(query) : [])
-      )
-      .subscribe({
-        next: (cities) => this.citySuggestions = cities || [],
-        error: () => this.citySuggestions = []
-      });
+  private patchFormData() {
+    this.addressForm.patchValue({
+      street: this.addressData.street,
+      cityName: this.addressData.city?.name || '',
+      cityId: this.addressData.city?.id || null
+    });
+    this.selectedCityId = this.addressData.city?.id || null;
+  }
+
+  onCityInput(event: any) {
+    this.cityQuery.set(event.target.value);
   }
 
   selectCity(city: any) {
@@ -77,10 +85,18 @@ export class AddressForm implements OnChanges {
       cityId: city.id
     });
     this.selectedCityId = city.id;
-    this.citySuggestions = [];
+    this.citySuggestions.set([]);
   }
 
   submit() {
+    const isNewEntry = !this.editingUserId;
+    const cityIdValid = this.selectedCityId !== null && this.selectedCityId !== undefined;
+
+    if (!this.addressForm.valid || !this.addressForm.dirty || (isNewEntry && !cityIdValid)) {
+      this.errorMessageService.setMessage('Veuillez modifier au moins un champ et sélectionner une ville.');
+      return;
+    }
+
     if (this.addressForm.invalid) return;
     this.isLoading.set(true);
 
@@ -97,15 +113,22 @@ export class AddressForm implements OnChanges {
     this.userService.editAddress(this.addressData.id, payload)
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-      next: () => {
-        this.isLoading.set(false);
-        this.updated.emit();
-        this.closeModal.emit();
-      },
-      error: () => {
-        this.isLoading.set(false);
-        this.errorMessage.set('Erreur lors de la mise à jour.');
-      }
-    });
+        next: () => {
+          this.isLoading.set(false);
+          this.updated.emit();
+          this.closeEvent.emit();
+        },
+        error: () => {
+          this.isLoading.set(false);
+          this.errorMessageService.setMessage('Erreur lors de la mise à jour.');
+        }
+      });
+  }
+
+  closeModal() {
+    this.addressForm.reset();
+    this.selectedCityId = null;
+    this.isOpen.set(false);
+    this.closeEvent.emit();
   }
 }

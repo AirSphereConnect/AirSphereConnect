@@ -29,8 +29,8 @@
               </app-button>
               <div class="divider divider-horizontal"> </div>
               <app-button
-                class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                color="warning"
+                class="w-20 h-7 divider-horizontal divider-start btn-outline"
+                color="error"
                 variant="solid"
                 (buttonClick)="deleteAlerts(alert.id)"
                 (buttonKeydown)="undefined"
@@ -57,3 +57,10 @@
   [initialAlertsData]="initialAlertData"
   (closeModal)="onModalClose()"
 ></app-alerts-form>
+
+<app-warning-message
+  [isOpen]="isWarningOpen"
+  [message]="warningMessage()"
+  (close)="isWarningOpen.set(false)"
+  (confirm)="confirmDelete()"
+></app-warning-message>

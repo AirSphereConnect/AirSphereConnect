@@ -26,6 +26,7 @@ interface AlertFormData {
   cityName: string;
   enabled: boolean;
 }
+import {ErrorMessageService} from '../../../services/error-message-service';
 
 @Component({
   selector: 'app-alerts-form',
@@ -47,16 +48,19 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   private readonly cityService = inject(CityService);
   private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly errorMessageService = inject(ErrorMessageService);
 
   alertsForm!: FormGroup;
   cityQuery = signal('');
   citySuggestions = signal<City[]>([]);
+  isLoading = signal(false);
   cityIdSelected: number | null = null;
   errorMessage: string | null = null;
   isDeleteMode = false;
 
   private readonly destroy$ = new Subject<void>();
 
+  // !! Obligatoire !!
   citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
 
   ngOnInit() {
@@ -98,25 +102,35 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   }
 
   submitForm() {
+    const isNewEntry = !this.editingAlertsId;
+    const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
+
+    if (!this.alertsForm.valid || !this.alertsForm.dirty || (isNewEntry && !cityIdValid)) {
+      this.errorMessageService.setMessage('Veuillez modifier au moins un champ et sélectionner une ville.');
+      return;
+    }
+
+    if (this.alertsForm.invalid) return;
+    this.isLoading.set(true);
+
     if (this.isDeleteMode) {
       if (!this.editingAlertsId) return;
 
       this.alertsService.deleteAlerts(this.editingAlertsId)
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
-          next: () => this.handleSuccess(),
-          error: () => this.errorMessage = "Erreur lors de la suppression de l'alerte."
+          next: () => {
+            this.handleSuccess();
+            this.isLoading.set(false);
+          },
+          error: () => {{
+            this.errorMessageService.setMessage("Erreur lors de la suppression de l'alerte.");
+            this.isLoading.set(false);
+          }}
         });
       return;
     }
 
-    const isNewEntry = !this.editingAlertsId;
-    const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
-
-    if (!this.alertsForm.valid || !this.alertsForm.dirty || (isNewEntry && !cityIdValid)) {
-      this.errorMessage = 'Veuillez modifier au moins un champ et sélectionner une ville.';
-      return;
-    }
 
     const payload = {
       enabled: !!this.alertsForm.value.activeAlert,
@@ -130,8 +144,14 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
     request$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
-        next: () => this.handleSuccess(),
-        error: () => this.errorMessage = "Erreur lors de l'enregistrement de l'alerte."
+        next: () => {
+          this.handleSuccess()
+          this.isLoading.set(false);
+        },
+        error: () => {
+          this.errorMessageService.setMessage("Erreur lors de l'enregistrement de l'alerte.")
+          this.isLoading.set(false);
+        }
       });
   }
 

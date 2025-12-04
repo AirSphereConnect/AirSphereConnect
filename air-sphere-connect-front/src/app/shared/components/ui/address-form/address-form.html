@@ -5,36 +5,48 @@
         (closeModal)="closeModal.emit()">
       </app-button-close-modal>
       <h2 class="text-xl font-bold mb-4">Modifier mon adresse</h2>
-      <form [formGroup]="addressForm" (ngSubmit)="submit()">
-        <label for="street-address-input" class="sr-only">Adresse</label>
-        <input id="street-address-input" formControlName="street" placeholder="Adresse" class="text-black input mb-2 w-full" autocomplete="street-address" />
 
-        <label for="city-name-input" class="sr-only">Ville</label>
-        <input
-          id="city-name-input"
+      <form [formGroup]="addressForm" (ngSubmit)="submit()">
+        <app-input
+          formControlName="street"
+          placeholder="Adresse"
+          label="adresse">
+        </app-input>
+
+        <app-input
           formControlName="cityName"
           placeholder="Ville"
-          class="text-black input mb-2 w-full"
-          autocomplete="address-level2"
-        />
+          label="ville"
+          (input)="onCityInput($event)">
+        </app-input>
 
-        @if(citySuggestions.length) {
-        <ul class="menu bg-base-100 w-full rounded-box mb-2">
-          @for(city of citySuggestions; track city.id) {
-          <li><a class="text-black" (click)="selectCity(city)">{{ city.name }} ({{ city.postalCode }})</a></li>
+        <div class="rounded mt-2 max-h-32 overflow-y-auto">
+          @if (citySuggestions().length) {
+            @for (city of citySuggestions(); track city.id) {
+              <app-button
+                color="neutral"
+                class="btn-outline block w-full text-left px-2 py-1"
+                (buttonClick)="selectCity(city)"
+                (buttonKeydown)="undefined"
+              >
+                {{ city.name }}
+              </app-button>
+            }
           }
-        </ul>
-        }
+        </div>
 
-        <input formControlName="cityId" type="hidden" autocomplete="off" />
+        <app-input
+          formControlName="cityId"
+          type="hidden">
+        </app-input>
 
-        @if(errorMessage()) { <div class="alert alert-error">{{ errorMessage() }}</div> }
-
-        <div class="flex gap-2 mt-4">
-          <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+        <div class="flex justify-end gap-2 mt-4">
+          <app-button
+            type="submit"
+            [disabled]="isLoading()">
             @if(isLoading()) { <span class="loading loading-spinner"></span> }
             Sauvegarder
-          </button>
+          </app-button>
         </div>
       </form>
     </div>
