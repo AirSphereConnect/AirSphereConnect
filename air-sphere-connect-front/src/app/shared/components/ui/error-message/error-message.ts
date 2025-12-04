@@ -4,7 +4,8 @@ import { ErrorMessageService } from '../../../services/error-message-service';
 @Component({
   selector: 'app-error-message',
   templateUrl: './error-message.html',
-  styleUrl: './error-message.scss'
+  styleUrl: './error-message.scss',
+
 })
 export class ErrorMessage {
 

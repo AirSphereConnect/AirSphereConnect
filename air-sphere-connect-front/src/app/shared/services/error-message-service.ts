@@ -6,10 +6,11 @@ import { Injectable, signal } from '@angular/core';
 export class ErrorMessageService {
   message = signal<string | null>(null);
 
-  setMessage(msg: string, duration = 1000) {
+  setMessage(msg: string, duration = 3000) {
     this.message.set(msg);
     setTimeout(() => {
       this.message.set(null);
     }, duration);
   }
+
 }

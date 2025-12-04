@@ -19,7 +19,6 @@ import { Button } from '../button/button';
 import { ButtonCloseModal } from '../button-close-modal/button-close-modal';
 import { InputComponent } from '../input/input';
 import { citySearch } from '../../../utils/city-search.util';
-import { Subject } from 'rxjs';
 import { ErrorMessageService } from '../../../services/error-message-service';
 
 @Component({
