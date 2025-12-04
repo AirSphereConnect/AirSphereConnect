@@ -16,13 +16,13 @@ import {
 
 @Injectable({ providedIn: 'root' })
 export class DataOrchestratorService {
-  private cityService = inject(CityService);
-  private weatherService = inject(WeatherService);
-  private airQualityService = inject(AirQualityService);
-  private populationService = inject(PopulationService);
+  private readonly cityService = inject(CityService);
+  private readonly weatherService = inject(WeatherService);
+  private readonly airQualityService = inject(AirQualityService);
+  private readonly populationService = inject(PopulationService);
 
   // Cache pour les données d'historique par ville
-  private historyCache = new Map<string, Observable<CityHistoryData>>();
+  private readonly historyCache = new Map<string, Observable<CityHistoryData>>();
 
   /**
    * 📊 DASHBOARD - Données complètes pour une ville
@@ -151,152 +151,174 @@ export class DataOrchestratorService {
     airMeasurements: any[],
     airIndexes: any[]
   ): CityDailySnapshot[] {
-    const dataByDate = new Map<string, CityDailySnapshot>();
-
     console.log('\n🔧 [MERGE] Starting merge process...');
 
-    // Grouper météo
-    weatherHistory.forEach(w => {
-      // Weather measuredAt est un objet Date déjà en local time
-      const weatherDate = new Date(w.measuredAt);
-      const dateKey = this.formatDate(weatherDate);
+    const dataByDate = new Map<string, CityDailySnapshot>();
 
+    this.addWeatherData(dataByDate, weatherHistory);
+    this.addAirMeasurements(dataByDate, airMeasurements);
+    this.addAirIndexes(dataByDate, airIndexes);
+
+    return this.sortAndLogResults(dataByDate);
+  }
+
+  /**
+   * Ajouter les données météo à la map
+   */
+  private addWeatherData(dataByDate: Map<string, CityDailySnapshot>, weatherHistory: any[]): void {
+    for (const w of weatherHistory) {
+      const dateKey = this.formatDate(new Date(w.measuredAt));
       if (!dataByDate.has(dateKey)) {
-        // ⚠️ IMPORTANT: Créer une date à minuit LOCAL pour éviter les problèmes de timezone
-        const [year, month, day] = dateKey.split('-').map(Number);
-        dataByDate.set(dateKey, {
-          date: new Date(year, month - 1, day, 0, 0, 0, 0),
-          weather: w,
-          airMeasurement: null,
-          airIndex: null
-        });
+        dataByDate.set(dateKey, this.createSnapshot(dateKey, { weather: w }));
       }
-    });
+    }
+  }
 
-    // Grouper mesures air - Agréger par jour
-    const measurementsByDate = new Map<string, any[]>();
-    airMeasurements.forEach(m => {
-      // ⚠️ PROBLEM: Angular HttpClient convertit automatiquement "2025-11-15T00:00:00" en Date object
-      // qui est interprété comme UTC, donc 2025-11-15T00:00:00 UTC = 2025-11-15T01:00:00 Europe/Paris
-      // Quand on fait formatDate(), ça extrait la date locale (15/11) mais le jour affiché est décalé
-      // SOLUTION: Si c'est un Date object, extraire la date UTC au lieu de locale
-      let dateKey: string;
-      if (typeof m.measuredAt === 'string') {
-        dateKey = m.measuredAt.split('T')[0];
-      } else if (m.measuredAt instanceof Date) {
-        // Extraire la date UTC (la "vraie" date stockée en DB)
-        const year = m.measuredAt.getUTCFullYear();
-        const month = String(m.measuredAt.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(m.measuredAt.getUTCDate()).padStart(2, '0');
-        dateKey = `${year}-${month}-${day}`;
+  /**
+   * Ajouter les mesures de qualité de l'air à la map
+   */
+  private addAirMeasurements(dataByDate: Map<string, CityDailySnapshot>, airMeasurements: any[]): void {
+    const measurementsByDate = this.groupMeasurementsByDate(airMeasurements);
+
+    for (const [dateKey, measurements] of measurementsByDate) {
+      const averaged = this.averageMeasurements(measurements);
+      this.logDebugMeasurements(dateKey, measurements, averaged);
+
+      const existing = dataByDate.get(dateKey);
+      if (existing) {
+        existing.airMeasurement = averaged;
       } else {
-        dateKey = this.formatDate(new Date(m.measuredAt));
+        dataByDate.set(dateKey, this.createSnapshot(dateKey, { airMeasurement: averaged }));
       }
+    }
+  }
 
-      if (dateKey === '2025-11-14' || dateKey === '2025-11-13' || dateKey === '2025-11-15') {
-        console.log(`📊 [${dateKey}] Found measurement with measuredAt=${m.measuredAt} (type: ${typeof m.measuredAt}):`, m);
+  /**
+   * Ajouter les index de qualité de l'air à la map
+   */
+  private addAirIndexes(dataByDate: Map<string, CityDailySnapshot>, airIndexes: any[]): void {
+    for (const index of airIndexes) {
+      const dateKey = this.extractDateKey(index.measuredAt);
+      this.logDebugIfTestDate(dateKey, `Adding index (type: ${typeof index.measuredAt})`, index);
+
+      const existing = dataByDate.get(dateKey);
+      if (existing) {
+        existing.airIndex = index;
+      } else {
+        dataByDate.set(dateKey, this.createSnapshot(dateKey, { airIndex: index }));
       }
+    }
+  }
+
+  /**
+   * Grouper les mesures par date
+   */
+  private groupMeasurementsByDate(airMeasurements: any[]): Map<string, any[]> {
+    const measurementsByDate = new Map<string, any[]>();
+
+    for (const m of airMeasurements) {
+      const dateKey = this.extractDateKey(m.measuredAt);
+      this.logDebugIfTestDate(dateKey, `Found measurement with measuredAt=${m.measuredAt}`, m);
 
       if (!measurementsByDate.has(dateKey)) {
         measurementsByDate.set(dateKey, []);
       }
       measurementsByDate.get(dateKey)!.push(m);
-    });
+    }
 
-    // Pour chaque jour, calculer la moyenne des mesures
-    measurementsByDate.forEach((measurements, dateKey) => {
-      const averaged = this.averageMeasurements(measurements);
+    return measurementsByDate;
+  }
 
-      if (dateKey === '2025-11-14' || dateKey === '2025-11-13' || dateKey === '2025-11-15') {
-        console.log(`📊 [${dateKey}] Processing ${measurements.length} measurements:`, measurements);
-        console.log(`📊 [${dateKey}] Averaged result:`, averaged);
-      }
+  /**
+   * Extraire une clé de date depuis différents formats (Date object ou string)
+   */
+  private extractDateKey(measuredAt: any): string {
+    if (typeof measuredAt === 'string') {
+      return measuredAt.split('T')[0];
+    }
 
-      const existing = dataByDate.get(dateKey);
-      if (existing) {
-        console.log(`📊 [${dateKey}] Adding measurement to EXISTING entry (has weather: ${!!existing.weather})`);
-        existing.airMeasurement = averaged;
-      } else {
-        console.log(`📊 [${dateKey}] Creating NEW entry with measurement only`);
-        // ⚠️ IMPORTANT: Créer une date à minuit LOCAL pour éviter les problèmes de timezone
-        const [year, month, day] = dateKey.split('-').map(Number);
-        dataByDate.set(dateKey, {
-          date: new Date(year, month - 1, day, 0, 0, 0, 0),
-          weather: null,
-          airMeasurement: averaged,
-          airIndex: null
-        });
-      }
-    });
+    if (measuredAt instanceof Date) {
+      const year = measuredAt.getUTCFullYear();
+      const month = String(measuredAt.getUTCMonth() + 1).padStart(2, '0');
+      const day = String(measuredAt.getUTCDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
 
-    // Grouper index air
-    airIndexes.forEach(i => {
-      // ⚠️ SAME PROBLEM: Angular HttpClient converts dates to Date objects interpreted as UTC
-      let dateKey: string;
-      if (typeof i.measuredAt === 'string') {
-        dateKey = i.measuredAt.split('T')[0];
-      } else if (i.measuredAt instanceof Date) {
-        // Extraire la date UTC (la "vraie" date stockée en DB)
-        const year = i.measuredAt.getUTCFullYear();
-        const month = String(i.measuredAt.getUTCMonth() + 1).padStart(2, '0');
-        const day = String(i.measuredAt.getUTCDate()).padStart(2, '0');
-        dateKey = `${year}-${month}-${day}`;
-      } else {
-        dateKey = this.formatDate(new Date(i.measuredAt));
-      }
+    return this.formatDate(new Date(measuredAt));
+  }
 
-      if (dateKey === '2025-11-14' || dateKey === '2025-11-13' || dateKey === '2025-11-15') {
-        console.log(`📊 [${dateKey}] Adding index (type: ${typeof i.measuredAt}):`, i);
-      }
+  /**
+   * Créer un snapshot vide avec date et données partielles
+   */
+  private createSnapshot(dateKey: string, data: Partial<CityDailySnapshot>): CityDailySnapshot {
+    const [year, month, day] = dateKey.split('-').map(Number);
+    return {
+      date: new Date(year, month - 1, day, 0, 0, 0, 0),
+      weather: data.weather || null,
+      airMeasurement: data.airMeasurement || null,
+      airIndex: data.airIndex || null
+    };
+  }
 
-      const existing = dataByDate.get(dateKey);
-      if (existing) {
-        existing.airIndex = i;
-      } else {
-        // ⚠️ IMPORTANT: Créer une date à minuit LOCAL pour éviter les problèmes de timezone
-        const [year, month, day] = dateKey.split('-').map(Number);
-        dataByDate.set(dateKey, {
-          date: new Date(year, month - 1, day, 0, 0, 0, 0),
-          weather: null,
-          airMeasurement: null,
-          airIndex: i
-        });
-      }
-    });
-
-    // Convertir en tableau et trier par date décroissante
+  /**
+   * Trier les résultats et logger les détails de debug
+   */
+  private sortAndLogResults(dataByDate: Map<string, CityDailySnapshot>): CityDailySnapshot[] {
     const result = Array.from(dataByDate.values())
       .sort((a, b) => b.date.getTime() - a.date.getTime());
 
-    // Log 13/11 and 14/11 final state
-    const nov14 = result.find(r => this.formatDate(r.date) === '2025-11-14');
-    const nov13 = result.find(r => this.formatDate(r.date) === '2025-11-13');
-
-    if (nov14) {
-      console.log('\n✅ [14/11] Final snapshot:', {
-        date: nov14.date,
-        hasWeather: !!nov14.weather,
-        airMeasurement: nov14.airMeasurement,
-        airIndex: nov14.airIndex
-      });
-    }
-
-    if (nov13) {
-      console.log('\n✅ [13/11] Final snapshot:', {
-        date: nov13.date,
-        hasWeather: !!nov13.weather,
-        airMeasurement: nov13.airMeasurement,
-        airIndex: nov13.airIndex
-      });
-    } else {
-      console.log('\n⚠️ [13/11] NO SNAPSHOT FOUND in final result!');
-    }
-
+    this.logFinalSnapshots(result);
     return result;
   }
 
+  /**
+   * Logger les snapshots finaux pour les dates de test
+   */
+  private logFinalSnapshots(result: CityDailySnapshot[]): void {
+    const testDates = ['2025-11-14', '2025-11-13'];
+
+    for (const testDate of testDates) {
+      const snapshot = result.find(r => this.formatDate(r.date) === testDate);
+      if (snapshot) {
+        console.log(`\n✅ [${testDate.slice(5)}] Final snapshot:`, {
+          date: snapshot.date,
+          hasWeather: !!snapshot.weather,
+          airMeasurement: snapshot.airMeasurement,
+          airIndex: snapshot.airIndex
+        });
+      } else {
+        console.log(`\n⚠️ [${testDate.slice(5)}] NO SNAPSHOT FOUND in final result!`);
+      }
+    }
+  }
+
+  /**
+   * Logger les détails de debug pour les mesures (seulement pour dates de test)
+   */
+  private logDebugMeasurements(dateKey: string, measurements: any[], averaged: any): void {
+    if (this.isTestDate(dateKey)) {
+      console.log(`📊 [${dateKey}] Processing ${measurements.length} measurements:`, measurements);
+      console.log(`📊 [${dateKey}] Averaged result:`, averaged);
+    }
+  }
+
+  /**
+   * Logger si la date est une date de test
+   */
+  private logDebugIfTestDate(dateKey: string, message: string, data?: any): void {
+    if (this.isTestDate(dateKey)) {
+      console.log(`📊 [${dateKey}] ${message}`, data || '');
+    }
+  }
+
+  /**
+   * Vérifier si c'est une date de test (pour réduire les logs)
+   */
+  private isTestDate(dateKey: string): boolean {
+    return ['2025-11-14', '2025-11-13', '2025-11-15'].includes(dateKey);
+  }
+
   private formatDate(date: Date): string {
-    // ⚠️ IMPORTANT: Utiliser l'heure locale au lieu d'UTC pour éviter les problèmes de timezone
     const year = date.getFullYear();
     const month = String(date.getMonth() + 1).padStart(2, '0');
     const day = String(date.getDate()).padStart(2, '0');
@@ -304,7 +326,7 @@ export class DataOrchestratorService {
   }
 
   /**
-   * 📅 Normaliser une date string (YYYY-MM-DD) vers minuit
+   * Normaliser une date string (YYYY-MM-DD) vers minuit
    */
   private normalizeToMidnight(dateString: string): Date {
     // Créer une date à minuit dans le fuseau horaire local
@@ -313,7 +335,7 @@ export class DataOrchestratorService {
   }
 
   /**
-   * 🧮 Calculer la moyenne des mesures air de plusieurs stations/heures
+   * Calculer la moyenne des mesures air de plusieurs stations/heures
    */
   private averageMeasurements(measurements: any[]): any {
     if (measurements.length === 0) return null;
@@ -326,13 +348,13 @@ export class DataOrchestratorService {
     const o3Values: number[] = [];
     const so2Values: number[] = [];
 
-    measurements.forEach(m => {
+    for (const m of measurements) {
       if (m.pm25 != null) pm25Values.push(m.pm25);
       if (m.pm10 != null) pm10Values.push(m.pm10);
       if (m.no2 != null) no2Values.push(m.no2);
       if (m.o3 != null) o3Values.push(m.o3);
       if (m.so2 != null) so2Values.push(m.so2);
-    });
+    }
 
     // Calculer les moyennes avec arrondi à 1 décimale
     const average = (values: number[]) =>
@@ -352,7 +374,7 @@ export class DataOrchestratorService {
   }
 
   /**
-   * 👑 ADMIN - Même chose que dashboard mais en read-only
+   * ADMIN - Même chose que dashboard mais en read-only
    * (même méthode, différente présentation dans le composant)
    */
   loadAdminDashboardData(cityName: string): Observable<DashboardData> {
