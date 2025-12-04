@@ -11,6 +11,9 @@ import {NgClass} from '@angular/common';
 import {GroupedBar} from '@unovis/ts';
 import {User} from '../../../../core/models/user.model';
 
+type Period = '7days' | '15days' | '30days';
+type PollutantKey = 'pm25' | 'pm10' | 'no2' | 'o3' | 'so2';
+
 @Component({
   selector: 'app-pollutants-chart',
   standalone: true,
@@ -22,73 +25,14 @@ import {User} from '../../../../core/models/user.model';
     VisBulletLegendModule,
     NgClass,
   ],
-  template: `
-    <div class="bg-base-100 rounded-lg p-5 shadow-md transition-colors">
-      <div class="flex justify-between items-center mb-5">
-        <h3 class="text-xl font-semibold text-base-content m-0">
-          @if (user) {
-            Taux de polluants – {{ user.address.city.name }}
-          }
-
-        </h3>
-
-        <div class="flex gap-1">
-          @for (period of periods; track period.value) {
-            <button
-              class="btn btn-sm rounded-md transition-all"
-              [ngClass]="selectedPeriod() === period.value
-                ? 'btn-primary text-primary-content'
-                : 'btn-outline btn-primary'"
-              (click)="selectPeriod(period.value)">
-              {{ period.label }}
-            </button>
-          }
-        </div>
-      </div>
-
-      @if (chartData().length > 0) {
-        @if (hasAlerts()) {
-          <div class="bg-warning/20 border border-warning text-warning px-3 py-3 rounded mb-5 font-medium flex items-center gap-2">
-            ⚠️ Alerte : {{ alertMessage() }}
-          </div>
-        }
-
-        <vis-bullet-legend [items]="pollutantLegend()"></vis-bullet-legend>
-
-        <vis-xy-container [data]="chartData()" [height]="400" [margin]="{ top: 20, right: 20, bottom: 20, left: 20 }">
-          <vis-grouped-bar
-            [x]="x"
-            [y]="y"
-            [color]="colors"
-            [barPadding]="0.2"
-            [groupPadding]="0.1">
-          </vis-grouped-bar>
-
-          <vis-axis
-            type="x"
-            label="Date"
-            [tickFormat]="dateFormat"
-            [tickTextAngle]="-45"
-            [tickValues]="xTickValues()"></vis-axis>
-          <vis-axis
-            type="y"
-            label="Concentration (µg/m³)"
-            [tickFormat]="yTickFormat"></vis-axis>
-          <vis-tooltip [triggers]="tooltipTriggers"></vis-tooltip>
-        </vis-xy-container>
-      } @else {
-        <p class="text-base-content opacity-60 italic text-center py-8">
-          Aucune donnée de pollution disponible
-        </p>
-      }
-    </div>
-  `
+  templateUrl: './pollutants-chart.html'
 })
+
 export class PollutantsChart {
   data = input.required<AirQualityMeasurement[]>()
   cityName = input.required<string>()
 
-  selectedPeriod = signal<'7days' | '15days' | '30days'>('7days')
+  selectedPeriod = signal<Period>('7days')
   hasAlerts = signal(false)
   alertMessage = signal('')
 
@@ -124,7 +68,13 @@ export class PollutantsChart {
 
   chartData = computed(() => {
     const period = this.selectedPeriod();
-    const days = period === '7days' ? 7 : period === '15days' ? 15 : 30;
+    const periodToDays: Record<Period, number> = {
+      '7days': 7,
+      '15days': 15,
+      '30days': 30
+    };
+
+    const days = periodToDays[period] ?? 7;
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - days);
 
@@ -151,10 +101,10 @@ export class PollutantsChart {
       const firstDate = new Date(measurements[0].measuredAt);
 
       // Fonction helper pour calculer la moyenne d'un polluant
-      const average = (key: 'pm25' | 'pm10' | 'no2' | 'o3' | 'so2'): number => {
+      const average = (key: PollutantKey): number => {
         const values = measurements
           .map(m => m[key])
-          .filter((v): v is number => v != null && !isNaN(v));
+          .filter((v): v is number => v != null && !Number.isNaN(v));
 
         return values.length > 0
           ? values.reduce((sum, v) => sum + v, 0) / values.length
@@ -218,13 +168,14 @@ export class PollutantsChart {
   Math = Math;
   @Input() user!: User | null;
 
-  selectPeriod(period: '7days' | '15days' | '30days') {
+  selectPeriod(period: Period) {
     this.selectedPeriod.set(period)
   }
 
   checkAlerts(data: AirQualityMeasurement[]) {
     if (data.length === 0) return
-    const last = data[data.length - 1]
+    const last = data.at(-1)
+    if (!last) return
     const alerts: string[] = []
 
     if (last.pm25 > 35) alerts.push('PM2.5')

@@ -1,1 +1,43 @@
-<p>city-population-chart works!</p>
+<div class="bg-base-100 rounded-lg p-5 shadow-md h-full flex flex-col">
+  <div class="flex justify-between items-center mb-4">
+    <h3 class="text-xl font-semibold text-base-content">
+      Top 10 des villes de la zone
+    </h3>
+    <span class="text-sm text-base-content/60">Données geo.gouv.fr</span>
+  </div>
+
+  @if (chartData().length > 0) {
+    <div class="flex-1 min-h-0">
+      <vis-xy-container
+        [data]="chartData()"
+        [margin]="{ top: 20, right: 20, bottom: 20, left: 20 }">
+
+        <vis-grouped-bar
+          [x]="x"
+          [y]="y"
+          [color]="color">
+        </vis-grouped-bar>
+
+        <vis-axis
+          type="x"
+          label="Ville"
+          [tickTextAngle]="-45"
+          [tickValues]="xTickValues()"
+          [tickFormat]="xTickFormat">
+        </vis-axis>
+
+        <vis-axis
+          type="y"
+          label="Population"
+          [tickFormat]="yTickFormat">
+        </vis-axis>
+
+        <vis-tooltip [triggers]="tooltipTriggers"></vis-tooltip>
+      </vis-xy-container>
+    </div>
+  } @else {
+    <p class="text-base-content opacity-60 italic text-center py-8">
+      Chargement des données...
+    </p>
+  }
+</div>
