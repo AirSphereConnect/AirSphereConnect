@@ -5,11 +5,12 @@ import {Router} from '@angular/router';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
 import {ErrorMessageService} from '../../../services/error-message-service';
+import {Button} from '../button/button';
 
 @Component({
   selector: 'app-user-form',
   standalone: true,
-  imports: [ReactiveFormsModule, ButtonCloseModal, InputComponent],
+  imports: [ReactiveFormsModule, ButtonCloseModal, InputComponent, Button],
   templateUrl: './user-form.html',
 })
 export class UserForm implements OnChanges, OnInit {
@@ -19,21 +20,22 @@ export class UserForm implements OnChanges, OnInit {
   @Input() initialUserData: any = null;
   @Output() closeModal = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
+  @Output() submitSuccess = new EventEmitter<void>();
 
-  userForm: FormGroup;
+  userForm!: FormGroup;
   private readonly errorMessageService = inject(ErrorMessageService);
+  private readonly fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
+  private readonly router = inject(Router);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
-  constructor(private readonly fb: FormBuilder, private readonly userService: UserService, private readonly router: Router) {
+  ngOnInit() {
     this.userForm = this.fb.group({
       username: ['', Validators.required]
     });
-  }
 
-  ngOnInit() {
-    // 🔁 Synchronisation automatique avec le profil utilisateur
     this.userService.userProfile$.subscribe(profile => {
       if (profile?.user) {
         this.user = profile.user;
@@ -61,7 +63,7 @@ export class UserForm implements OnChanges, OnInit {
     }
 
     this.isLoading.set(true);
-    const payload = { ...this.userForm.value };
+    const payload = {...this.userForm.value};
 
     this.userService.editUser(this.editingUserId, payload).subscribe({
       next: (res) => {
@@ -77,6 +79,7 @@ export class UserForm implements OnChanges, OnInit {
           this.updated.emit();
           this.closeModal.emit();
         }
+        this.handleSuccess()
         this.isLoading.set(false);
       },
       error: () => {
@@ -86,5 +89,21 @@ export class UserForm implements OnChanges, OnInit {
     });
   }
 
+  private handleSuccess() {
+    this.userForm.reset();
+    this.userService.fetchUserProfile();
+    this.submitSuccess.emit();
+    this.onClose();
+  }
 
+  onClose() {
+    this.userForm.reset({
+      activeWeather: false,
+      activeAirQuality: false,
+      activePopulation: false,
+      cityName: ''
+    });
+    this.isOpen.set(false);
+    this.onClose();
+  }
 }

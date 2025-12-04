@@ -1,16 +1,21 @@
-import {Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
+import {Component, DestroyRef, EventEmitter, inject, Input, OnChanges, OnInit, Output, signal} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
 import {UserService} from '../../../services/user-service';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
 import {ErrorMessageService} from '../../../services/error-message-service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {Button} from '../button/button';
+import {AlertsService} from '../../../services/alerts-service';
+import {CityService} from '../../../../core/services/city';
 
 @Component({
   selector: 'app-email-form',
   imports: [
     ReactiveFormsModule,
     ButtonCloseModal,
-    InputComponent
+    InputComponent,
+    Button
   ],
   templateUrl: './email-form.html',
   styleUrl: './email-form.scss'
@@ -23,20 +28,19 @@ export class EmailForm implements OnChanges, OnInit {
   @Output() closeModal = new EventEmitter<void>();
   @Output() updated = new EventEmitter<void>();
 
-  emailForm: FormGroup;
+  emailForm!: FormGroup;
+  private readonly fb = inject(FormBuilder);
+  private readonly userService = inject(UserService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly errorMessageService = inject(ErrorMessageService);
 
   isLoading = signal(false);
   errorMessage = signal<string | null>(null);
 
-  constructor(private readonly fb: FormBuilder, private readonly userService: UserService) {
+  ngOnInit() {
     this.emailForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
     });
-  }
-
-  ngOnInit() {
-    // 🔁 Synchronisation automatique avec le profil utilisateur
     this.userService.userProfile$.subscribe(profile => {
       if (profile?.user) {
         this.user = profile.user;
@@ -66,7 +70,9 @@ export class EmailForm implements OnChanges, OnInit {
 
     const payload: any = { ...this.emailForm.value };
 
-    this.userService.editUser(this.editingUserId, payload).subscribe({
+    this.userService.editUser(this.editingUserId, payload)
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe({
       next: () => {
         this.userService.fetchUserProfile();
         this.isLoading.set(false);

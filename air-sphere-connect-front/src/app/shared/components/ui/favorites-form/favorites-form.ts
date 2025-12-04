@@ -1,4 +1,16 @@
-import {Component, Input, Output, EventEmitter, OnInit, OnChanges, SimpleChanges, signal, inject, OnDestroy} from '@angular/core';
+import {
+  Component,
+  Input,
+  Output,
+  EventEmitter,
+  OnInit,
+  OnChanges,
+  SimpleChanges,
+  signal,
+  inject,
+  OnDestroy,
+  DestroyRef
+} from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {FavoritesService} from '../../../services/favorites-service';
 import {CityService} from '../../../../core/services/city';
@@ -11,11 +23,14 @@ import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {MatSelectModule} from '@angular/material/select';
 import {City} from '../../../../core/models/city.model';
 import {ErrorMessageService} from '../../../services/error-message-service';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 interface FavoriteFormData {
   cityId: number;
   cityName: string;
-  enabled: boolean;
+  selectWeather: boolean;
+  selectAirQuality: boolean;
+  selectPopulation: boolean;
 }
 
 
@@ -26,18 +41,19 @@ interface FavoriteFormData {
   standalone: true,
   imports: [ReactiveFormsModule, Button, ButtonCloseModal, InputComponent, MatSelectModule]
 })
-export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
+export class FavoritesForm implements OnInit, OnChanges {
+
   @Input() isOpen = signal(false);
   @Input() editingFavoriteId: number | null = null;
   @Input() initialFavoriteData: FavoriteFormData | null = null;
   @Output() closeModal = new EventEmitter<void>();
   @Output() submitSuccess = new EventEmitter<void>();
 
-  private readonly destroy$ = new Subject<void>();
   private readonly fb = inject(FormBuilder);
   private readonly favoritesService = inject(FavoritesService);
   private readonly cityService = inject(CityService);
   private readonly userService = inject(UserService);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly errorMessageService = inject(ErrorMessageService);
 
   favoritesForm!: FormGroup;
@@ -45,8 +61,9 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   citySuggestions = signal<City[]>([]);
   isLoading = signal(false);
   cityIdSelected: number | null = null;
-  errorMessage: string | null = null;
   isDeleteMode = false;
+
+  private readonly destroy$ = new Subject<void>();
 
   citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
 
@@ -59,26 +76,22 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
     });
   }
 
-  /** ✅ Ajout : réagit quand initialData change (ex: ouverture modal en mode édition) */
   ngOnChanges(changes: SimpleChanges) {
-    if (changes['initialFavoriteData'] && this.initialFavoriteData) {
+    if (this.favoritesForm && changes['initialFavoriteData'] && this.initialFavoriteData) {
       this.patchFormData();
     }
   }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
   private patchFormData() {
-    this.favoritesForm.patchValue({
-      activeWeather: this.initialFavoriteData?.enabled,
-      activeAirQuality: this.initialFavoriteData?.enabled,
-      activePopulation: this.initialFavoriteData?.enabled,
-      cityName: this.initialFavoriteData?.cityName ?? ''
-    });
-    this.cityIdSelected = this.initialFavoriteData?.cityId ?? null;
+    if (this.initialFavoriteData) {
+      this.favoritesForm.patchValue({
+        activeWeather: this.initialFavoriteData.selectWeather,
+        activeAirQuality: this.initialFavoriteData.selectAirQuality,
+        activePopulation: this.initialFavoriteData.selectPopulation,
+        cityName: this.initialFavoriteData.cityName || ''
+      });
+    }
+    this.cityIdSelected = this.initialFavoriteData!.cityId || null;
     this.isDeleteMode = false;
   }
 
@@ -108,8 +121,9 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
 
     if (this.isDeleteMode) {
       if (!this.editingFavoriteId) return;
+
       this.favoritesService.deleteFavorites(this.editingFavoriteId)
-        .pipe(takeUntil(this.destroy$))
+        .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
             this.handleSuccess();
@@ -135,7 +149,7 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
       : this.favoritesService.addFavorites(payload);
 
     request$
-      .pipe(takeUntil(this.destroy$))
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
           this.handleSuccess();
@@ -162,7 +176,6 @@ export class FavoritesForm implements OnInit, OnChanges, OnDestroy {
   }
 
   private handleSuccess() {
-    this.errorMessage = null;
     this.favoritesForm.reset();
     this.cityIdSelected = null;
     this.isDeleteMode = false;

@@ -55,7 +55,6 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   citySuggestions = signal<City[]>([]);
   isLoading = signal(false);
   cityIdSelected: number | null = null;
-  errorMessage: string | null = null;
   isDeleteMode = false;
 
   private readonly destroy$ = new Subject<void>();
@@ -156,7 +155,6 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   }
 
   private handleSuccess() {
-    this.errorMessage = null;
     this.alertsForm.reset();
     this.cityIdSelected = null;
     this.isDeleteMode = false;
