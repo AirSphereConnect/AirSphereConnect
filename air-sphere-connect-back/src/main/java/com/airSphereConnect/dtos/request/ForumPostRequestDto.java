@@ -15,6 +15,9 @@ public class ForumPostRequestDto {
     @Schema(description = "Identifiant du thread parent du post", example = "2")
     private Long threadId;
 
+    public ForumPostRequestDto() {
+    }
+
 
     public ForumPostRequestDto(String content, Long userId, Long threadId) {
         this.content = content;
