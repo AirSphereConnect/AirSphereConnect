@@ -1,5 +1,5 @@
 import {Injectable} from '@angular/core';
-import {type HeroIconName, HEROICONS} from '../icons/heroicons.registry';
+import {type HeroIcon, HEROICONS} from '../icons/heroicons.registry';
 
 @Injectable({
   providedIn: 'root'
@@ -7,12 +7,12 @@ import {type HeroIconName, HEROICONS} from '../icons/heroicons.registry';
 export class IconService {
 
 
-  getHeroIcon(name: HeroIconName): string {
+  getHeroIcon(name: HeroIcon): string {
     return HEROICONS[name] || '';
   }
 
 
-  getIconWithClasses(name: HeroIconName, classes: string = ''): string {
+  getIconWithClasses(name: HeroIcon, classes: string = ''): string {
     const icon = this.getHeroIcon(name);
     if (!icon) return '';
 
@@ -21,7 +21,7 @@ export class IconService {
       .replace('<svg', `<svg class="${classes}"`);
   }
 
-  getIconWithCustomColor(name: HeroIconName, color: string): string {
+  getIconWithCustomColor(name: HeroIcon, color: string): string {
     const icon = this.getHeroIcon(name);
     if (!icon) return '';
 
@@ -30,8 +30,8 @@ export class IconService {
       `stroke="var(--color-${color})" style="color: var(--color-${color})"`
     );  }
 
-  getAllHeroIconNames(): HeroIconName[] {
-    return Object.keys(HEROICONS) as HeroIconName[];
+  getAllHeroIcons(): HeroIcon[] {
+    return Object.keys(HEROICONS) as HeroIcon[];
   }
 
 }

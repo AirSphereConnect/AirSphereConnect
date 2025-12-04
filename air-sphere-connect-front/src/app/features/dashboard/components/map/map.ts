@@ -246,8 +246,8 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       const shouldShow = this.shouldShowCity(city, zoom);
 
       if (shouldShow) {
-        if (!this.map!.hasLayer(marker)) {
-          marker.addTo(this.map!);
+        if (!this.map.hasLayer(marker)) {
+          marker.addTo(this.map);
 
           // Ajouter le click handler une seule fois
           if (!item.popupBound) {
@@ -276,8 +276,8 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
 
           shownCount++;
         }
-      } else if (this.map!.hasLayer(marker)) {
-        this.map!.removeLayer(marker);
+      } else if (this.map.hasLayer(marker)) {
+        this.map.removeLayer(marker);
       }
     }
   }

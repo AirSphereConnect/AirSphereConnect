@@ -56,7 +56,7 @@ export class App implements AfterViewInit, OnDestroy {
   }
 
   ngAfterViewInit() {
-    this.scrollSub = fromEvent(window, 'scroll')
+    this.scrollSub = fromEvent(globalThis, 'scroll')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.scrolled.set(window.scrollY > 0);

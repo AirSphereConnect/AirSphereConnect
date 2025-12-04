@@ -20,7 +20,7 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormErrorService } from '../../../../features/auth/services/form-error.service';
 import { inputVariants, type InputVariants } from '../../../variants/input.variants';
 import { NgClass } from '@angular/common';
-import { type HeroIconName } from '../../../icons/heroicons.registry';
+import { type HeroIcon } from '../../../icons/heroicons.registry';
 import { IconComponent } from '../icon/icon';
 
 @Component({
@@ -59,8 +59,8 @@ export class InputComponent implements ControlValueAccessor, OnInit {
   @Input() helperText?: string;
   @Input() successMessage?: string;
   @Input() required: boolean = false;
-  @Input() iconLeft?: HeroIconName;
-  @Input() iconRight?: HeroIconName;
+  @Input() iconLeft?: HeroIcon;
+  @Input() iconRight?: HeroIcon;
   @Input() autocomplete?: string;
   @Input() readonly: boolean = false;
   @Input() fieldName?: string;
@@ -163,7 +163,7 @@ export class InputComponent implements ControlValueAccessor, OnInit {
     return 'default';
   });
 
-  stateIconName = computed<HeroIconName | null>(() => {
+  stateIconName = computed<HeroIcon | null>(() => {
     if (this.isInvalid()) return 'exclamationTriangle';
     if (this.isSuccess()) return 'check';
     return null;

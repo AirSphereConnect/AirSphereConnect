@@ -1,6 +1,5 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
-import {Section} from '../../../../core/models/section.model';
 import {SectionService} from '../../../../core/services/section.service';
 
 @Component({

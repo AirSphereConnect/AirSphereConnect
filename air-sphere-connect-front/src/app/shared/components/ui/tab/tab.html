@@ -1,19 +1,23 @@
-<nav role="tablist" [class]="navClasses() + ' ' + navClass">
+<div role="tablist" [class]="navClasses() + ' ' + navClass">
   <ng-container>
     @for (tab of tabs; track tab.label; let i = $index) {
-      <a
+      <button
+        type="button"
         role="tab"
         [class]="getTabClasses(i)"
-        (click)="setActive(i)">
+        [attr.tabindex]="0"
+        (click)="setActive(i)"
+        (keydown.enter)="setActive(i)"
+        (keydown.space)="setActive(i)">
         @if (tab.labelTemplate) {
           <ng-container [ngTemplateOutlet]="tab.labelTemplate"></ng-container>
         } @else {
           {{ tab.label }}
         }
-      </a>
+      </button>
     }
   </ng-container>
-</nav>
+</div>
 
 <section role="tabpanel" [class]="panelClasses()">
   <ng-container>

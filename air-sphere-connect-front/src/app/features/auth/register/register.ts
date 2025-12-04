@@ -4,8 +4,7 @@ import {
   DestroyRef,
   inject,
   OnInit,
-  signal,
-  WritableSignal
+  signal
 } from '@angular/core';
 import {
   AbstractControl,
@@ -21,7 +20,7 @@ import { Router, RouterLink } from '@angular/router';
 import { InputComponent } from '../../../shared/components/ui/input/input';
 import { Button } from '../../../shared/components/ui/button/button';
 import { IconComponent } from '../../../shared/components/ui/icon/icon';
-import { HeroIconName } from '../../../shared/icons/heroicons.registry';
+import { HeroIcon } from '../../../shared/icons/heroicons.registry';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {citySearch} from '../../../shared/utils/city-search.util';
 import {CityService} from '../../../core/services/city';
@@ -128,7 +127,7 @@ export class Register implements OnInit {
     this.passwordVisible.set(!this.passwordVisible());
   }
 
-  passwordIcon = computed<HeroIconName>(() => this.passwordVisible() ? 'eyeSlash' : 'eye');
+  passwordIcon = computed<HeroIcon>(() => this.passwordVisible() ? 'eyeSlash' : 'eye');
   passwordType = computed(() => this.passwordVisible() ? 'text' : 'password');
 
   onFirstSubmit() {
@@ -210,7 +209,7 @@ export class Register implements OnInit {
 
   private strictEmailValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const emailRegex = /^[\w.%+-]+@[\w.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(control.value)) return { invalidEmail: true };
     const parts = control.value.split('@');
     if (parts.length !== 2) return { invalidEmail: true };
@@ -223,7 +222,7 @@ export class Register implements OnInit {
 
   private validUsernameValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
-    const usernameRegex = /^[a-zA-Z0-9_-]+$/;
+    const usernameRegex = /^[\w-]+$/;
     return usernameRegex.test(control.value) ? null : { invalidUsername: true };
   }
 
@@ -231,7 +230,7 @@ export class Register implements OnInit {
     if (!control.value) return null;
     const hasUpperCase = /[A-Z]/.test(control.value);
     const hasLowerCase = /[a-z]/.test(control.value);
-    const hasNumber = /[0-9]/.test(control.value);
+    const hasNumber = /\d/.test(control.value);
     const hasSpecialChar = /[@$!%*?&#]/.test(control.value);
     const errors: ValidationErrors = {};
     if (!hasUpperCase) errors['noUpperCase'] = true;

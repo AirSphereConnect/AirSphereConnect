@@ -102,7 +102,7 @@ describe('ThreadService', () => {
 
     mockUserService.getUsername.and.returnValue('TestUser');
 
-    service.addThread('New Thread', 'New Content', 1, 123).subscribe(thread => {
+    service.addThread('New Thread', 1, 123).subscribe(thread => {
       expect(thread).toEqual(mockThread);
     });
 

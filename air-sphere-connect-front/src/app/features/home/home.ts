@@ -1,4 +1,4 @@
-import {Component, Input, OnDestroy, OnInit} from '@angular/core';
+import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
 import { Router } from '@angular/router';
 import { UserService } from '../../shared/services/user-service';
 import { Subscription } from 'rxjs';
@@ -14,8 +14,9 @@ export class Home implements OnInit, OnDestroy {
   profile: UserProfileResponse | null = null;
   @Input() userRole: string | null = null;
   private subscription?: Subscription;
+  private readonly router = inject(Router);
+  private readonly userService = inject(UserService);
 
-  constructor(private router: Router, private userService: UserService) {}
 
   ngOnInit() {
     this.subscription = this.userService.userProfile$.subscribe(profile => {

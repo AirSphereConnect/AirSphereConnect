@@ -1,7 +1,7 @@
 import {Component, computed, input} from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import {IconService} from '../../../services/icon';
-import { type HeroIconName } from '../../../icons/heroicons.registry';
+import { type HeroIcon } from '../../../icons/heroicons.registry';
 import { iconVariants, type IconVariants } from '../../../variants/icon.variants';
 
 @Component({
@@ -14,7 +14,7 @@ import { iconVariants, type IconVariants } from '../../../variants/icon.variants
     </span>`,
 })
 export class IconComponent {
-  name = input.required<HeroIconName>();
+  name = input.required<HeroIcon>();
   size = input<IconVariants['size']>('md');
   color = input<IconVariants['color']>('current');
   filled = input<boolean | undefined>(undefined);

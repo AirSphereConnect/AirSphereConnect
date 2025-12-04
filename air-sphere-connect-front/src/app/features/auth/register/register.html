@@ -15,7 +15,7 @@
               [required]="true"
               iconLeft="user"
               placeholder="Entrez votre nom d'utilisateur"
-              autocomplete="username"
+              [attr.autocomplete]="'username'"
               fieldName="username"
             ></app-input>
 
@@ -26,7 +26,7 @@
               [required]="true"
               iconLeft="envelope"
               placeholder="exemple@exemple.com"
-              autocomplete="email"
+              [attr.autocomplete]="'email'"
               fieldName="email"
             ></app-input>
 
@@ -39,9 +39,10 @@
               [iconRight]="passwordIcon()"
               (iconRightClick)="togglePasswordVisibility()"
               placeholder="••••••••"
-              autocomplete="new-password"
+              [attr.autocomplete]="'new-password'"
               fieldName="password"
             ></app-input>
+
 
             @if (errorMessage()) {
               <div class="alert alert-error">
@@ -83,7 +84,7 @@
               [control]="addressControl"
               [required]="true"
               placeholder="Entrez votre adresse"
-              autocomplete="street-address"
+              [attr.autocomplete]="'street-address'"
               fieldName="address"
             ></app-input>
 
@@ -93,7 +94,7 @@
               [control]="cityNameControl"
               [required]="true"
               placeholder="Entrez le nom de votre ville"
-              autocomplete="address-level2"
+              [attr.autocomplete]="'address-level2'"
               (input)="onCityInput($event)"
               fieldName="cityName"
             ></app-input>
@@ -116,7 +117,7 @@
               type="text"
               [control]="cityCodeControl"
               placeholder="Code postal"
-              autocomplete="postal-code"
+              [attr.autocomplete]="'postal-code'"
               [readonly]="true"
             ></app-input>
 

@@ -6,10 +6,12 @@ import {Section} from '../../../../core/models/section.model';
 import {RouterLink} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
 import {UserService} from '../../../../shared/services/user-service';
+import {Button} from '../../../../shared/components/ui/button/button';
+import {IconComponent} from '../../../../shared/components/ui/icon/icon';
 
 @Component({
   selector: 'app-section',
-  imports: [RouterLink],
+  imports: [RouterLink, Button, IconComponent],
   templateUrl: './section.html',
   styleUrl: './section.scss'
 })
@@ -89,7 +91,7 @@ export class SectionComponent {
       next: () => {
         this.closeCreateSectionModal();
         this.isCreating.set(false);
-        window.location.reload();
+        globalThis.location.reload();
       },
       error: (error) => {
         this.isCreating.set(false);

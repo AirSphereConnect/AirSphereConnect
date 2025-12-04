@@ -1,5 +1,4 @@
 import { Routes } from '@angular/router';
-import {AuthGuard} from './core/guards/AuthGuard';
 
 export const routes: Routes = [
   { path: 'home', loadComponent: () => import('./features/home/home').then(m => m.Home) },

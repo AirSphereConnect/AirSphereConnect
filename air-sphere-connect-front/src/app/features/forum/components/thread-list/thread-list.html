@@ -12,21 +12,17 @@
 
     <div class="flex gap-2">
       <!-- Modale pour nouveau thread -->
-      <button class="btn btn-primary btn-sm" (click)="openModal()">
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24"
-             stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-        </svg>
+      <app-button
+        heroIcon="plus"
+        size="sm"
+        (buttonClick)="openModal()"
+        (buttonKeydown)="$event.key === 'Enter' && openModal()"
+      >
         Nouveau Thread
-      </button>
+      </app-button>
       <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-outline btn-sm">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.207A1 1 0 013 6.5V4z"/>
-          </svg>
-        </div>
-        <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
+        <app-button variant="outline" size="sm" heroIcon="filter"></app-button>
+        <ul class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">
           <li><a (click)="sortThreads('date')">
             <span>Trier par date</span>
             <span class="ml-auto">{{ getSortIndicator('date') }}</span>
@@ -54,11 +50,7 @@
       <div class="flex items-center gap-4">
         <div class="avatar placeholder">
           <div class="bg-primary text-primary-content rounded-xl w-16 flex items-center justify-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
-                 stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
-            </svg>
+            <app-icon [name]="'archive'" size="lg"></app-icon>
           </div>
         </div>
         <div>
@@ -96,60 +88,39 @@
 
                 <!-- Bouton Supprimer (si autorisé) -->
                 @if (canDeleteThread(thread)) {
-                  <button
-                    class="btn btn-error btn-xs flex items-center"
+                  <app-button
+                    color="error"
+                    size="xs"
+                    heroIcon="trash"
+                    [loading]="isDeleting()"
                     [disabled]="isDeleting()"
-                    (click)="deleteThread(thread)"
+                    (buttonClick)="deleteThread(thread)"
+                    (buttonKeydown)="$event.key === 'Enter' && deleteThread(thread)"
                   >
-                    @if (isDeleting()) {
-                      <span class="loading loading-spinner loading-xs"></span>
-                    } @else {
-                      <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24"
-                           stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M6 18L18 6M6 6l12 12"/>
-                      </svg>
-                      Supprimer
-                    }
-                  </button>
+                    Supprimer
+                  </app-button>
                 }
               </div>
 
               <!-- Badge de statut -->
               <div class="badge badge-outline badge-sm">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 mr-1" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-                </svg>
-                {{ thread.postCount }} réponses
+                <app-icon [name]="'chatBubble'" size="xs"></app-icon>
+                <span class="ml-1">{{ thread.postCount }} réponses</span>
               </div>
             </div>
 
             <!-- Métadonnées -->
             <div class="flex items-center gap-4 text-sm text-base-content/60 mb-3">
               <div class="flex items-center gap-1  text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
+                <app-icon [name]="'user'" size="sm"></app-icon>
                 {{ thread.username }}
               </div>
               <div class="flex items-center gap-1 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
+                <app-icon [name]="'clock'" size="sm"></app-icon>
                 <span class="text-xs">{{ thread.createdAt }}</span>
               </div>
               <div class="flex items-center gap-1 text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="currentColor" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M14 10h4.764a2 2 0 011.789 2.894l-3.5 7A2 2 0 0115.263 21h-4.017c-.163 0-.326-.02-.485-.06L7 20m7-10V5a2 2 0 00-2-2h-.095c-.5 0-.905.405-.905.905 0 .714-.211 1.412-.608 2.006L7 11v9m7-10h-2M7 20H5a2 2 0 01-2-2v-6a2 2 0 012-2h2.5"/>
-                </svg>
+                <app-icon [name]="'thumbUp'" size="sm"></app-icon>
                 {{ thread.likeCount }} likes
               </div>
             </div>
@@ -164,20 +135,13 @@
     <dialog class="modal modal-open">
       <div class="modal-box max-w-2xl">
         <h3 class="font-bold text-2xl mb-6 flex items-center gap-2">
-          <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-primary" fill="none" viewBox="0 0 24 24"
-               stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-          </svg>
+          <app-icon [name]="'plus'" size="md" color="primary"></app-icon>
           Créer une nouvelle discussion
         </h3>
 
         <!-- Info utilisateur -->
         <div class="alert alert-info mb-4">
-          <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
-               viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
+          <app-icon [name]="'informationCircle'" size="md"></app-icon>
           <div>
             <h3 class="font-bold">Votre première contribution</h3>
             <div class="text-xs">Le premier message de la discussion sera créé automatiquement avec votre contenu.
@@ -247,19 +211,11 @@
               <h4 class="font-semibold text-sm mb-2">Aperçu de votre publication</h4>
               <div class="flex items-center gap-3 text-sm">
                 <div class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                       stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                  </svg>
+                  <app-icon [name]="'user'" size="sm"></app-icon>
                   <span class="font-medium">{{ userService.getUsername() || 'Utilisateur' }}</span>
                 </div>
                 <div class="flex items-center gap-1">
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                       stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                  </svg>
+                  <app-icon [name]="'clock'" size="sm"></app-icon>
                   <span>Maintenant</span>
                 </div>
               </div>
@@ -268,30 +224,27 @@
 
           <!-- Actions -->
           <div class="modal-action">
-            <button
+            <app-button
               type="button"
-              class="btn btn-ghost"
-              (click)="closeModal()"
+              variant="ghost"
+              (buttonClick)="closeModal()"
+              (buttonKeydown)="$event.key === 'Enter' && closeModal()"
               [disabled]="isSubmitting()"
             >
               Annuler
-            </button>
-            <button
+            </app-button>
+            <app-button
               type="submit"
-              class="btn btn-primary"
+              heroIcon="check"
+              [loading]="isSubmitting()"
               [disabled]="isSubmitting() || !newThreadTitle().trim()"
             >
-              @if (isSubmitting()) {
-                <span class="loading loading-spinner"></span>
-                Création...
-              } @else {
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24"
-                     stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                </svg>
+              @if (!isSubmitting()) {
                 Créer la discussion
+              } @else {
+                Création...
               }
-            </button>
+            </app-button>
           </div>
         </form>
       </div>

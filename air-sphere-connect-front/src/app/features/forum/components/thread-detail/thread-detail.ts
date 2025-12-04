@@ -9,12 +9,13 @@ import {switchMap, tap} from 'rxjs';
 import {FormBuilder, ReactiveFormsModule, Validators} from '@angular/forms';
 import {UserService} from '../../../../shared/services/user-service';
 import {Post} from '../../../../core/models/post.model';
-import {PostReportReason} from '../../../../core/models/post-report.model';
+import {IconComponent} from '../../../../shared/components/ui/icon/icon';
+import {Button} from '../../../../shared/components/ui/button/button';
 
 @Component({
   selector: 'app-thread-detail',
   standalone: true,
-  imports: [DatePipe, RouterLink, PostComponent, ReactiveFormsModule],
+  imports: [DatePipe, RouterLink, PostComponent, ReactiveFormsModule, IconComponent, Button],
   templateUrl: './thread-detail.html',
   styleUrls: ['./thread-detail.scss']
 })
@@ -38,17 +39,17 @@ export class ThreadDetailComponent {
   postsSignal = signal<Post[]>([]);
   posts = computed(() => this.postsSignal());
 
-  private routeParams = toSignal(this.route.paramMap);
+  private readonly routeParams = toSignal(this.route.paramMap);
 
   // Route params
   sectionId = computed(() => {
     const id = Number(this.routeParams()?.get('sectionId'));
-    return isNaN(id) ? null : id;
+    return Number.isNaN(id) ? null : id;
   });
 
   threadId = computed(() => {
     const id = Number(this.routeParams()?.get('threadId'));
-    return isNaN(id) ? null : id;
+    return Number.isNaN(id) ? null : id;
   });
 
   // Thread data
@@ -56,7 +57,7 @@ export class ThreadDetailComponent {
     this.route.paramMap.pipe(
       switchMap(params => {
         const id = Number(params.get('threadId'));
-        if (isNaN(id)) {
+        if (Number.isNaN(id)) {
           this.router.navigate(['/forum']);
           throw new Error('Invalid thread ID');
         }
@@ -78,7 +79,7 @@ export class ThreadDetailComponent {
         tap(() => this.isLoadingPosts.set(true)),
         switchMap(params => {
           const id = Number(params.get('threadId'));
-          if (isNaN(id)) {
+          if (Number.isNaN(id)) {
             this.router.navigate(['/forum']);
             throw new Error('Invalid thread ID');
           }
@@ -182,6 +183,20 @@ export class ThreadDetailComponent {
       }
     });
   }
+
+/*  onPostFlagged(postId: number): void {
+
+    const userId = this.getUserId();
+    if (!userId) return;
+
+    this.postService.toggleFlag(postId).subscribe({
+      next: updated => this.updatePost(updated),
+      error: err => {
+        this.logError('Erreur flag', err);
+        this.errorMessage.set('Erreur lors du signalement');
+      }
+    });
+  }*/
 
   onPostDeleted(postId: number): void {
     const userId = this.getUserId();

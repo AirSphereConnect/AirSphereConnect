@@ -26,10 +26,10 @@ export class PostComponent {
 
   post = input.required<Post>()
 
-  onLike = output<number>();
-  onDislike = output<number>();
-  onFlag = output<{ postId: number; reason: PostReportReason; description: string }>();
-  onDelete = output<number>();
+  like = output<number>();
+  dislike = output<number>();
+  flag = output<{ postId: number; reason: PostReportReason; description: string }>();
+  delete = output<number>();
 
   showFlagModal = signal(false);
   showDeleteModal = signal(false);
@@ -81,11 +81,11 @@ export class PostComponent {
   });
 
   onLikePost(postId: number): void {
-    this.onLike.emit(postId);
+    this.like.emit(postId);
   }
 
   onDislikePost(postId: number): void {
-    this.onDislike.emit(postId);
+    this.dislike.emit(postId);
   }
 
 // Modale de signalement
@@ -154,7 +154,7 @@ export class PostComponent {
   }
 
   confirmDelete(): void {
-    this.onDelete.emit(this.post().id);
+    this.delete.emit(this.post().id);
     this.closeDeleteModal();
   }
 }

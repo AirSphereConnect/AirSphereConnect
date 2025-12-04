@@ -1,17 +1,18 @@
 import {Component, computed, inject, signal} from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {toSignal} from '@angular/core/rxjs-interop';
-// Services et modèles
 import {PostService} from '../../../../core/services/post.service';
 import {ThreadService} from '../../../../core/services/thread.service';
 import {SectionService} from '../../../../core/services/section.service';
 import {FormsModule} from '@angular/forms';
 import {UserService} from '../../../../shared/services/user-service';
+import {Button} from '../../../../shared/components/ui/button/button';
+import {IconComponent} from '../../../../shared/components/ui/icon/icon';
 
 @Component({
   selector: 'app-thread-list',
   standalone: true,
-  imports: [RouterLink, FormsModule],
+  imports: [RouterLink, FormsModule, Button, IconComponent],
   templateUrl: './thread-list.html',
   styleUrls: ['./thread-list.scss']
 })
@@ -32,6 +33,7 @@ export class ThreadListComponent {
   readonly section = toSignal(this.sectionService.getSectionById(this.sectionId()), {initialValue: undefined});
   readonly threads = signal<any[]>([]);
   errorMessage = signal<string | null>(null);
+  isSubmitting = signal<boolean>(false);
 
   constructor() {
     this.loadThreads();
@@ -41,16 +43,7 @@ export class ThreadListComponent {
     this.threadService.getThreadsBySectionId(this.sectionId()).subscribe(threads => this.threads.set(threads));
   }
 
-  private getUserId(): number | null {
-    const userId = this.userService.currentUserProfile?.user.id;
-    if (!userId) {
-      this.errorMessage.set('Vous devez être connecté');
-    }
-    return userId ?? null;
-  }
-
   readonly posts = toSignal(this.postService.getPosts(), {initialValue: []});
-  readonly postsLikes = toSignal(this.postService.getLikesByThreadId(this.threadId()), {initialValue: 0});
   readonly isDeleting = signal<boolean>(false);
   readonly isDeletingPerThread = signal<Record<number, boolean>>({});
 

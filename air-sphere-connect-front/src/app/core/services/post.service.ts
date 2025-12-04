@@ -3,7 +3,6 @@ import {Post} from '../models/post.model';
 import {map, Observable} from 'rxjs';
 import {HttpClient, HttpParams} from '@angular/common/http';
 import {ApiConfigService} from './api';
-import {PostReportReason} from '../models/post-report.model';
 
 type ReactionType = 'LIKE' | 'DISLIKE';
 

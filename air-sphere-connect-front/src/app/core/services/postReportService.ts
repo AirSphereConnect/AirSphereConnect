@@ -8,9 +8,9 @@ import {Observable} from 'rxjs';
   providedIn: 'root'
 })
 export class PostReportService {
-  private http = inject(HttpClient);
-  private api = inject(ApiConfigService);
-  private apiUrlPosts = `${this.api.apiUrl}/post-reports`;
+  private readonly http = inject(HttpClient);
+  private readonly api = inject(ApiConfigService);
+  private readonly apiUrlPosts = `${this.api.apiUrl}/post-reports`;
 
   createReport(request: PostReportRequest, userId: number): Observable<PostReport> {
     return this.http.post<PostReport>(`${this.apiUrlPosts}/new/${userId}`, request,

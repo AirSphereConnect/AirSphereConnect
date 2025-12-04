@@ -93,7 +93,7 @@ const WEATHER_TRANSLATIONS: Record<string, string> = {
  * translateWeatherMessage([{"main":"Rain","description":"light rain","icon":"10d"}])
  * // returns "Pluie légère"
  */
-export function translateWeatherMessage(message: string | WeatherMessageItem[] | undefined | any): string {
+export function translateWeatherMessage(message: string | WeatherMessageItem[] | undefined): string {
   if (!message) return '-';
 
   try {
@@ -118,8 +118,8 @@ export function translateWeatherMessage(message: string | WeatherMessageItem[] |
 
     // Mettre la première lettre en majuscule
     return translatedDescription.charAt(0).toUpperCase() + translatedDescription.slice(1);
-  } catch (e) {
-    // Si le parsing échoue, retourner "-"
+  } catch {
+    // Invalid JSON format, return fallback
     return '-';
   }
 }

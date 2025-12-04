@@ -9,7 +9,7 @@
         <app-input
           formControlName="email"
           label="Email"
-          autocomplete="email"
+          [autocomplete]="'email'"
         ></app-input>
         @if(errorMessage()) { <div class="alert alert-error">{{ errorMessage() }}</div> }
         <div class="flex gap-2 mt-4">

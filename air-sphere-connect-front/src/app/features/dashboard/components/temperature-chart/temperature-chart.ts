@@ -105,7 +105,10 @@ export class TemperatureChart {
 
     // Toujours inclure le dernier (si différent du premier)
     if (data.length > 1) {
-      timestamps.push(data[data.length - 1].x.getTime());
+      const lastPoint = data.at(-1);
+      if (lastPoint) {
+        timestamps.push(lastPoint.x.getTime());
+      }
     }
 
     return timestamps;

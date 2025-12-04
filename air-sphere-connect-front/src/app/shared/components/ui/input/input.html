@@ -48,6 +48,10 @@
       <div
         [class]="iconRightWrapperClass()"
         (click)="iconRightClick.emit()"
+        (keydown.enter)="iconRightClick.emit()"
+        (keydown.space)="iconRightClick.emit()"
+        [attr.tabindex]="iconRightClick.observed ? 0 : null"
+        [attr.role]="iconRightClick.observed ? 'button' : null"
         [class.cursor-pointer]="iconRightClick.observed"
       >
         <app-icon

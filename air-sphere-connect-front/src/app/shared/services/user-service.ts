@@ -139,8 +139,4 @@ export class UserService {
       console.error(message, error);
     }
   }
-
-  getUserRoleById(userId: number): Observable<User> {
-    return this.http.get<User>(`${this.apiUrl}/users/public-profile/${userId}`, { withCredentials: true });
-  }
 }

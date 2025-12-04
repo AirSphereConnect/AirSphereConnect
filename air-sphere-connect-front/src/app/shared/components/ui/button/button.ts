@@ -1,7 +1,7 @@
 import {Component, Input, computed, inject, Output, EventEmitter} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {buttonVariants, type ButtonVariants} from '../../../variants/button.variants';
-import {type HeroIconName} from '../../../icons/heroicons.registry';
+import {type HeroIcon} from '../../../icons/heroicons.registry';
 import {IconVariants, iconVariants} from '../../../variants/icon.variants';
 import {IconService} from '../../../services/icon';
 import {DomSanitizer} from '@angular/platform-browser';
@@ -63,7 +63,7 @@ export class Button {
   @Input() type: 'button' | 'submit' | 'reset' | 'checkbox' | 'radio' = 'button';
   @Input() class: string = '';
 
-  @Input() heroIcon?: HeroIconName;
+  @Input() heroIcon?: HeroIcon;
   @Input() icon?: string;
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() iconColor?: IconVariants['color'];

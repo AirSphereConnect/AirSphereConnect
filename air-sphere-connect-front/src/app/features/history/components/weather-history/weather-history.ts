@@ -123,7 +123,8 @@ export class WeatherHistory {
 
       const weather = weatherArray[0];
       return weather.icon || null;
-    } catch (e) {
+    } catch {
+      // Invalid JSON format, return null
       return null;
     }
   }

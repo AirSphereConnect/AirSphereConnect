@@ -1,4 +1,3 @@
-import {Thread} from './thread.model';
 
 export interface Section {
   id: number;
