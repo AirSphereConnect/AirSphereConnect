@@ -8,7 +8,6 @@ import {PasswordForm} from '../../../../shared/components/ui/password-form/passw
 import {Button} from '../../../../shared/components/ui/button/button';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
-import {NavigationService} from '../../../../shared/services/navigation-service';
 import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
 
 @Component({

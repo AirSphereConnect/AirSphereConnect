@@ -62,7 +62,7 @@ export class App implements AfterViewInit, OnDestroy {
         this.scrolled.set(window.scrollY > 0);
       });
 
-    this.scrollSubTop = fromEvent(window, 'scroll')
+    this.scrollSubTop = fromEvent(globalThis, 'scroll')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
         this.scrolled.set(window.scrollY > 50);

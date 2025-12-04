@@ -1,5 +1,5 @@
 import {Component, EventEmitter, Input, inject, OnChanges, OnInit, Output, signal} from '@angular/core';
-import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/forms";
+import {FormBuilder, FormGroup, ReactiveFormsModule} from "@angular/forms";
 import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 import {InputComponent} from '../input/input';

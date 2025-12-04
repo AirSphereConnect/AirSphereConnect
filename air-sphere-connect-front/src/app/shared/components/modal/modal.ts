@@ -13,9 +13,9 @@ import {Component, EventEmitter, Output} from '@angular/core';
 `,
 })
 export class Modal {
-  @Output() close = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
 
   onBackdropClick() {
-    this.close.emit();
+    this.closeModal.emit();
   }
 }

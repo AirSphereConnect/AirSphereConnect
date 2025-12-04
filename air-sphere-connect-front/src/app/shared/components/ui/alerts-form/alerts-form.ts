@@ -123,10 +123,10 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
             this.handleSuccess();
             this.isLoading.set(false);
           },
-          error: () => {{
+          error: () => {
             this.errorMessageService.setMessage("Erreur lors de la suppression de l'alerte.");
             this.isLoading.set(false);
-          }}
+          }
         });
       return;
     }

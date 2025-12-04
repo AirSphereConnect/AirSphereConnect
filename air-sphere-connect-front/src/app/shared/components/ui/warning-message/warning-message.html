@@ -1,11 +1,12 @@
 @if (isOpen()) {
-  <app-modals (close)="close.emit()">
+  <app-modals (close)="closeModal.emit()">
     <p>{{ message }}</p>
     <app-button
-      (click)="confirm.emit()"
+      (buttonClick)="confirm.emit()"
+      (buttonKeydown)="undefined"
     >Confirmer</app-button>
     <app-button-close-modal
-      (close)="close.emit()">
+      (close)="closeModal.emit()">
     </app-button-close-modal>
   </app-modals>
 }

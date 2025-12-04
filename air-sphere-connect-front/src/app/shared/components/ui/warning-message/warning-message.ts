@@ -18,7 +18,7 @@ import {Button} from '../button/button';
 })
 export class WarningMessage {
   @Input() isOpen = signal(false);
-  @Output() close = new EventEmitter<void>();
+  @Output() closeModal = new EventEmitter<void>();
   @Input() message!: any;
   @Output() confirm = new EventEmitter<void>();
 }
