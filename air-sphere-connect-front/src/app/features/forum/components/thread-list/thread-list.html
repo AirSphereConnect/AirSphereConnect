@@ -12,14 +12,16 @@
 
     <div class="flex gap-2">
       <!-- Modale pour nouveau thread -->
-      <app-button
-        heroIcon="plus"
-        size="sm"
-        (buttonClick)="openModal()"
-        (buttonKeydown)="$event.key === 'Enter' && openModal()"
-      >
-        Nouveau Thread
-      </app-button>
+      @if (isAdmin() || isUser()) {
+        <app-button
+          heroIcon="plus"
+          size="sm"
+          (buttonClick)="openModal()"
+          (buttonKeydown)="$event.key === 'Enter' && openModal()">
+          Nouveau Thread
+        </app-button>
+      }
+
       <div class="dropdown dropdown-end">
         <app-button variant="outline" size="sm" heroIcon="filter"></app-button>
         <ul class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-52">

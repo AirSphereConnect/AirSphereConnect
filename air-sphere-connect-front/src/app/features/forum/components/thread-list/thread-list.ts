@@ -52,6 +52,12 @@ export class ThreadListComponent {
     const user = this.userService.currentUserProfile;
     return user?.user.role === 'ADMIN';
   });
+  // 🔹 Vérifie si l'utilisateur est user
+  readonly isUser = computed(() => {
+    const user = this.userService.currentUserProfile;
+    return user?.user.role === 'USER';
+  });
+
 
   // 🔹 Vérifie si l'utilisateur peut supprimer un thread
   canDeleteThread(thread: any): boolean {

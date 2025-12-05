@@ -17,11 +17,14 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {ThreadListComponent} from '../../../forum/components/thread-list/thread-list';
 import {Favorites} from '../favorites/favorites';
 import {Alerts} from '../alerts/alerts';
+import {ThreadService} from '../../../../core/services/thread.service';
+import {ThreadDetailComponent} from '../../../forum/components/thread-detail/thread-detail';
+import {CompteForum} from '../../../forum/components/compte-forum/compte-forum';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [RouterOutlet, UserDashboard, Tab, ThreadListComponent, Favorites, Alerts],
+  imports: [RouterOutlet, UserDashboard, Tab, ThreadListComponent, Favorites, Alerts, ThreadDetailComponent, CompteForum],
   templateUrl: './profile.html',
   styleUrls: ['./profile.scss']
 })
@@ -30,6 +33,7 @@ export class Profile implements OnInit, AfterViewInit {
   private readonly userService = inject(UserService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly threadService = inject(ThreadService);
 
   user: User | null = null;
 
@@ -54,7 +58,7 @@ export class Profile implements OnInit, AfterViewInit {
   ngAfterViewInit() {
     this.tabs = [
       { label: "Mon profil", template: this.profilUser },
-      { label: "Mes rubriques", template: this.thread },
+      { label: "Mes fils de discussions", template: this.thread },
       { label: 'Mes favoris', template: this.favorites },
       { label: 'Mes alertes', template: this.alerts },
     ];

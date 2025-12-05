@@ -1,0 +1,31 @@
+@if (threads().length === 0) {
+  <div>
+    <p>vous n'avez pas créé de threads !</p>
+  </div>
+} @else {
+  <div class="">
+    @for (thread of threads(); track thread.id) {
+      <div class="card bg-base-100 from-primary/5 to-secondary/5 border border-primary/20 mt-5">
+        <div class="card-body">
+          <div class="flex items-start gap-4">
+            <!-- Informations du thread -->
+            <div class="flex-1">
+              <h1 class="text-3xl font-bold text-base-content mb-4">{{ thread.title }}</h1>
+            </div>
+          </div>
+          <div class="card-actions justify-between items-center mt-3">
+            <a
+              [routerLink]="['/forum/section', thread.id]"
+              class="btn btn-primary btn-sm group-hover:btn-primary-focus transition-all"
+            >
+              <app-icon [name]="'arrowRight'" size="sm"></app-icon>
+              Explorer
+            </a>
+          </div>
+          </div>
+
+      </div>
+    }
+  </div>
+
+}

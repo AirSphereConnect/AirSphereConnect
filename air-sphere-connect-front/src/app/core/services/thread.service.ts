@@ -24,6 +24,11 @@ export class ThreadService {
       { withCredentials: true});
   }
 
+  getThreadsByUserId(userId: number | undefined): Observable<Thread[]> {
+   return this.http.get<Thread[]>(`${this.apiUrl}/user/${userId}`,
+     { withCredentials: true});
+  }
+
   getThreadsBySectionId(id: number): Observable<Thread[]> {
     return this.getAllThreads().pipe(
       map(threads => threads.filter((thread) => thread.rubricId === id)
