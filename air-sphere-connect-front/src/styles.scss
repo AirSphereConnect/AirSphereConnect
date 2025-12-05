@@ -213,3 +213,11 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
   border-width: 0;
 }
+/*MASQUER LA BARRE DE DEFILEMENT*/
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

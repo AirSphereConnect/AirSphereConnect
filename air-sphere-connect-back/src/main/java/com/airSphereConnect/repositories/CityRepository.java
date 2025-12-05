@@ -43,5 +43,8 @@ public interface CityRepository extends JpaRepository<City, Long> {
 
     List<City> findByAreaCodeOrderByPopulationDesc(String areaCode, Pageable pageable);
 
+    List<City> findTop10ByNameStartingWithIgnoreCase(String query);
+
+    List<City> findTop10ByNameContainingIgnoreCase(String query);
 }
 

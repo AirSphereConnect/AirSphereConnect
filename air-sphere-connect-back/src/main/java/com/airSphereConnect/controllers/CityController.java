@@ -141,12 +141,12 @@ public class CityController {
     @GetMapping("/search-name")
     @PreAuthorize("permitAll()")
     public ResponseEntity<List<CityResponseDto>> searchCities(
-            @Parameter(description = "Chaîne de recherche (minimum 3 caractères recommandé)", example = "par", required = true)
             @RequestParam String query
     ) {
-        List<CityResponseDto> cities = cityService.findByNameContainingIgnoreCase(query).stream()
+        var cities = cityService.findTop10ByNameStartingWithIgnoreCase(query).stream()
                 .map(cityMapper::toDto)
                 .toList();
+
         return ResponseEntity.ok(cities);
     }
 

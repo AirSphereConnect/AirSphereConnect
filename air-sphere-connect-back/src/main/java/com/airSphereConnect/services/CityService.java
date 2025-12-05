@@ -30,4 +30,7 @@ public interface CityService {
     List<City> findByNameContainingIgnoreCase(String query);
 
     List<City> getTopCitiesByAreaCode(String areaCode, int limit);
+
+    List<City> findTop10ByNameStartingWithIgnoreCase(String query);
+
 }

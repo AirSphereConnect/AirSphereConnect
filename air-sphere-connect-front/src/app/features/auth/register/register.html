@@ -100,17 +100,20 @@
             ></app-input>
 
             <!-- Suggestions de villes -->
-            @if (citySuggestions().length) {
-              <ul class="menu bg-base-100 w-full rounded-box">
+            <div class="rounded mt-2 max-h-32 overflow-y-auto">
+              @if (citySuggestions().length) {
                 @for (city of citySuggestions(); track city.id) {
-                  <li>
-                    <a (click)="selectCity(city)">
-                      {{ city.name }} ({{ city.postalCode }})
-                    </a>
-                  </li>
+                  <app-button
+                    color="neutral"
+                    class="btn-outline block w-full text-left px-2 py-1"
+                    (buttonClick)="selectCity(city)"
+                    (buttonKeydown)="undefined"
+                  >
+                    {{ city.name }}
+                  </app-button>
                 }
-              </ul>
-            }
+              }
+            </div>
 
             <app-input
               label="Code postal"

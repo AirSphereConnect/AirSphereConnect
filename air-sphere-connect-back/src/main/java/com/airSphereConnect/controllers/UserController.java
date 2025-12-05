@@ -201,7 +201,7 @@ public class UserController {
             @ApiResponse(responseCode = "404", description = "Utilisateur non trouvé", content = @Content),
             @ApiResponse(responseCode = "403", description = "Accès refusé", content = @Content)
     })
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('USER','ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(
             @Parameter(description = "Identifiant de l'utilisateur à modifier", example = "1", required = true)

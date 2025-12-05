@@ -6,19 +6,23 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<div class="grid grid-template-rows: 80px 1fr 30px;">
+<div class="h-screen grid grid-rows-[80px_1fr_40px] overflow-y-auto no-scrollbar">
 
   <app-header [userRole]="userRole()" [scrolled]="scrolled()" class="sticky top-0 z-50"></app-header>
-  <main #mainContent class="container mx-auto px-4 py-8">
+  <main #mainContent class="container overflow-auto mx-auto px-4 py-8 no-scrollbar">
     <div class="content">
       <router-outlet></router-outlet>
     </div>
-    <app-notification class="fixed bottom-5 left-0 right-0 flex justify-center items-end z-[99999] pb-4"></app-notification>
+    <app-notification
+      class="fixed bottom-5 left-0 right-0 flex justify-center items-end z-[99999] pb-4"></app-notification>
   </main>
   @if (scrolled()) {
     <app-back-to-top (click)="top()" class="fixed bottom-0 right-0 z-50"></app-back-to-top>
   }
-  <app-footer [userRole]="userRole()"></app-footer>
+  @if (!router.url.startsWith('/auth/login') && !router.url.startsWith('/auth/register')) {
+    <app-footer [userRole]="userRole()" class="h-8 shrink-0"></app-footer>
+  }
+
 </div>
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <!-- * * * * * * * * * * * The content above * * * * * * * * * * * * -->

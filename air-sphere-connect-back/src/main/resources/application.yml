@@ -40,3 +40,16 @@ logging:
     org.springframework.web: DEBUG
     org.hibernate.SQL: DEBUG
 
+app:
+  security:
+    jwt:
+      public-paths:
+        - /api/login
+        - /api/profile
+        - /api/refresh-token
+        - /api/guest-token
+        - /api/users/check
+        - /actuator
+        - /swagger-ui
+        - /v3/api-docs
+      skip-options: true

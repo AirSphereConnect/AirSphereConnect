@@ -1,6 +1,8 @@
-<div>
+<div class="max-w-[1600px] mx-auto p-6">
   @if (user) {
-    <h1>Bienvenue {{ user.username }}</h1>
+    <header class="mb-8 pb-5 border-b-2 border-base-300">
+      <h1 class="text-3xl font-bold text-base-content">Bienvenue {{ user.username }}</h1>
+    </header>
   }
   <app-tab [tabs]="tabs" navClass="tabs-lift"></app-tab>
 

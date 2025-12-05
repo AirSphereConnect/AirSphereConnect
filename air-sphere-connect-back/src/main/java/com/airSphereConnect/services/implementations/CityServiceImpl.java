@@ -103,4 +103,20 @@ public class CityServiceImpl implements CityService {
         return cityRepository.findByAreaCodeOrderByPopulationDesc(areaCode, PageRequest.of(0, limit));
     }
 
+    @Override
+    public List<City> findTop10ByNameStartingWithIgnoreCase(String query) {
+        List<City> startsWith = cityRepository.findTop10ByNameStartingWithIgnoreCase(query);
+
+        if (startsWith.size() < 10) {
+            List<City> contains = cityRepository.findTop10ByNameContainingIgnoreCase(query);
+            contains.stream()
+                    .filter(c -> !startsWith.contains(c))
+                    .limit(10 - startsWith.size())
+                    .forEach(startsWith::add);
+        }
+
+
+        return startsWith;
+    }
+
 }
