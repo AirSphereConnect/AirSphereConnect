@@ -14,12 +14,12 @@ import {Header} from './shared/components/layout/header/header';
 import {Footer} from './shared/components/layout/footer/footer/footer';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {fromEvent, Subscription} from 'rxjs';
-import {ErrorMessage} from './shared/components/ui/error-message/error-message';
 import {BackToTop} from './shared/components/ui/back-to-top/back-to-top';
+import {Notification} from './shared/components/ui/notification/notification';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer, ErrorMessage, BackToTop, ErrorMessage],
+  imports: [RouterOutlet, Header, Footer, BackToTop, Notification],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
 })

@@ -1,18 +1,18 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ErrorMessage } from './error-message';
+import { Notification } from './notification';
 
-describe('ErrorMessage', () => {
-  let component: ErrorMessage;
-  let fixture: ComponentFixture<ErrorMessage>;
+describe('Notification', () => {
+  let component: Notification;
+  let fixture: ComponentFixture<Notification>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ErrorMessage]
+      imports: [Notification]
     })
     .compileComponents();
 
-    fixture = TestBed.createComponent(ErrorMessage);
+    fixture = TestBed.createComponent(Notification);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

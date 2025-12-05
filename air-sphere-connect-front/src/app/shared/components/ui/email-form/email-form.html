@@ -2,7 +2,7 @@
   <div class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
     <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md relative">
       <app-button-close-modal
-        (onClose)="closeModal.emit()">
+        (closeModal)="closeModal.emit()">
       </app-button-close-modal>
       <h2 class="text-xl font-bold mb-4">Modifier</h2>
       <form [formGroup]="emailForm" (ngSubmit)="submit()">
@@ -11,7 +11,6 @@
           label="Email"
           [autocomplete]="'email'"
         ></app-input>
-        @if(errorMessage()) { <div class="alert alert-error">{{ errorMessage() }}</div> }
         <div class="flex gap-2 mt-4">
           <app-button
             type="submit"

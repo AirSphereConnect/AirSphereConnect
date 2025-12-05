@@ -3,11 +3,9 @@ import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from "@angular/
 import {UserService} from '../../../services/user-service';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
-import {ErrorMessageService} from '../../../services/error-message-service';
+import {NotificationService} from '../../../services/notification-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Button} from '../button/button';
-import {AlertsService} from '../../../services/alerts-service';
-import {CityService} from '../../../../core/services/city';
 
 @Component({
   selector: 'app-email-form',
@@ -32,10 +30,9 @@ export class EmailForm implements OnChanges, OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly errorMessageService = inject(ErrorMessageService);
+  private readonly notificationService = inject(NotificationService);
 
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
 
   ngOnInit() {
     this.emailForm = this.fb.group({
@@ -61,7 +58,7 @@ export class EmailForm implements OnChanges, OnInit {
     const emailValid = !this.emailForm;
 
     if (!this.emailForm.valid || !this.emailForm.dirty || (isNewEntry && !emailValid)) {
-      this.errorMessageService.setMessage('Veuillez renseigner une adresse email.');
+      this.notificationService.showError('Veuillez renseigner une adresse email.');
       return;
     }
 
@@ -74,6 +71,7 @@ export class EmailForm implements OnChanges, OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
       next: () => {
+        this.notificationService.showSuccess('Email modifié avec succès')
         this.userService.fetchUserProfile();
         this.isLoading.set(false);
         this.updated.emit();
@@ -81,7 +79,7 @@ export class EmailForm implements OnChanges, OnInit {
       },
       error: () => {
         this.isLoading.set(false);
-        this.errorMessageService.setMessage('Erreur lors de la mise à jour.');
+        this.notificationService.showError('Erreur lors de la mise à jour.');
       }
     });
   }

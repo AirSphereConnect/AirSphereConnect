@@ -9,6 +9,7 @@ import {Button} from '../../../../shared/components/ui/button/button';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
+import {NotificationService} from '../../../../shared/services/notification-service';
 
 @Component({
   selector: 'app-user-dashboard',
@@ -22,6 +23,7 @@ export class UserDashboard {
 
   private readonly destroyRef = inject(DestroyRef);
   private readonly router = inject(Router);
+  private readonly notificationService = inject(NotificationService);
 
   // Modales séparées
   isUserModalOpen = signal(false);
@@ -79,7 +81,6 @@ export class UserDashboard {
     this.isAddressModalOpen.set(true);
   }
 
-
   /** 🔒 Ferme la modale user */
   onUserModalClose() {
     this.isUserModalOpen.set(false);
@@ -112,12 +113,15 @@ export class UserDashboard {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
+            this.notificationService.showSuccess('Suppression avec succès')
             this.router.navigate(['/home']);
             this.userToDeleteId = null;
             this.isWarningOpen.set(false);
             this.warningMessage.set(null);
           },
-          error: err => {
+          error: (err) => {
+            this.logError('Erreur lors de la suppression de l\'user', err);
+            this.notificationService.showError('Erreur lors de la suppression de l\'user');
             this.isWarningOpen.set(false);
             this.userToDeleteId = null;
             this.warningMessage.set(null);
@@ -126,4 +130,9 @@ export class UserDashboard {
     }
   }
 
+  private logError(message: string, error?: unknown): void {
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
+  }
 }

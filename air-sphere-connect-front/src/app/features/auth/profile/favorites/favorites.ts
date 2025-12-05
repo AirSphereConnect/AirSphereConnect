@@ -6,6 +6,8 @@ import {FavoritesService} from '../../../../shared/services/favorites-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
 import {Favorite, User} from '../../../../core/models/user.model';
+import {FormGroup} from '@angular/forms';
+import {NotificationService} from '../../../../shared/services/notification-service';
 
 @Component({
   selector: 'app-favorites',
@@ -17,6 +19,7 @@ export class Favorites implements OnInit {
   @Input() user: User | null = null;
   private readonly favoritesService = inject(FavoritesService);
   private readonly userService = inject(UserService);
+  private readonly notificationService = inject(NotificationService);
 
   private readonly destroyRef = inject(DestroyRef);
 
@@ -26,7 +29,6 @@ export class Favorites implements OnInit {
   isModalOpen = signal(false);
   isWarningOpen = signal(false);
   warningMessage = signal<string | null>(null);
-
 
   ngOnInit() {
     // Synchronisation automatique avec le profil utilisateur
@@ -38,7 +40,6 @@ export class Favorites implements OnInit {
         }
       });
   }
-
 
   /** ➕ Ajout d’un favori */
   addFavorites() {
@@ -70,6 +71,7 @@ export class Favorites implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
+            this.notificationService.showSuccess('Suppression avec succès');
             this.userService.fetchUserProfile();
             this.favoritesToDeleteId = null;
             this.isWarningOpen.set(false);
@@ -77,6 +79,7 @@ export class Favorites implements OnInit {
           },
           error: (err) => {
             this.logError('Erreur lors de la suppression du favori', err);
+            this.notificationService.showError('Erreur lors de la suppression du favori');
             this.isWarningOpen.set(false);
             this.favoritesToDeleteId = null;
             this.warningMessage.set(null);
@@ -86,7 +89,6 @@ export class Favorites implements OnInit {
   }
 
   private logError(message: string, error?: unknown): void {
-    // Only log errors in development mode
     if (typeof ngDevMode !== 'undefined' && ngDevMode) {
       console.error(message, error);
     }

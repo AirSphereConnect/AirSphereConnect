@@ -87,10 +87,10 @@
 
 <!-- 🟣 Modal -->
 <app-favorites-form
-  [isOpen]="isModalOpen"
+  [isOpen]="isModalOpen()"
   [editingFavoriteId]="editingFavoriteId"
   [initialFavoriteData]="initialFavoriteData"
-  (closeEvent)="onModalClose()"
+  (closeModal)="onModalClose()"
 ></app-favorites-form>
 
 <app-warning-message

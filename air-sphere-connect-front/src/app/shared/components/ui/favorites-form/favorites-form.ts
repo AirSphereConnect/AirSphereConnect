@@ -22,7 +22,7 @@ import {citySearch} from '../../../utils/city-search.util';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {MatSelectModule} from '@angular/material/select';
 import {City} from '../../../../core/models/city.model';
-import {ErrorMessageService} from '../../../services/error-message-service';
+import {NotificationService} from '../../../services/notification-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 
 interface FavoriteFormData {
@@ -43,7 +43,7 @@ interface FavoriteFormData {
 })
 export class FavoritesForm implements OnInit, OnChanges {
 
-  @Input() isOpen = signal(false);
+  @Input({ required: true }) isOpen!: boolean;
   @Input() editingFavoriteId: number | null = null;
   @Input() initialFavoriteData: FavoriteFormData | null = null;
   @Output() closeModal = new EventEmitter<void>();
@@ -54,7 +54,7 @@ export class FavoritesForm implements OnInit, OnChanges {
   private readonly cityService = inject(CityService);
   private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly errorMessageService = inject(ErrorMessageService);
+  private readonly notificationService = inject(NotificationService);
 
   favoritesForm!: FormGroup;
   cityQuery = signal<string>('');
@@ -112,7 +112,7 @@ export class FavoritesForm implements OnInit, OnChanges {
     const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
 
     if (!this.favoritesForm.valid || !this.favoritesForm.dirty || (isNewEntry && !cityIdValid)) {
-      this.errorMessageService.setMessage('Veuillez modifier au moins un champ et sélectionner une ville.');
+      this.notificationService.showError('Veuillez modifier au moins un champ et sélectionner une ville.');
       return;
     }
 
@@ -126,11 +126,12 @@ export class FavoritesForm implements OnInit, OnChanges {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
+            this.notificationService.showSuccess("Favoris supprimé avec succès")
             this.handleSuccess();
             this.isLoading.set(false);
           },
           error: () => {
-            this.errorMessageService.setMessage("Erreur lors de la suppression du favori.");
+            this.notificationService.showError("Erreur lors de la suppression du favori.");
             this.isLoading.set(false);
           }
         });
@@ -152,11 +153,12 @@ export class FavoritesForm implements OnInit, OnChanges {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.notificationService.showSuccess(isNewEntry ? 'Favoris ajouté avec succès' : 'Favoris modifié avec succès');
           this.handleSuccess();
           this.isLoading.set(false);
         },
         error: () => {
-          this.errorMessageService.setMessage("Erreur lors de l'enregistrement du favori.");
+          this.notificationService.showError("Erreur lors de l'enregistrement du favori.");
           this.isLoading.set(false);
         }
       });
@@ -169,9 +171,9 @@ export class FavoritesForm implements OnInit, OnChanges {
       activePopulation: false,
       cityName: ''
     });
+
     this.cityIdSelected = null;
     this.isDeleteMode = false;
-    this.isOpen.set(false);
     this.closeModal.emit();
   }
 

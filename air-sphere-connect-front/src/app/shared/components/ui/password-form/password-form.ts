@@ -4,7 +4,7 @@ import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 import {InputComponent} from '../input/input';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
-import {ErrorMessageService} from '../../../services/error-message-service';
+import {NotificationService} from '../../../services/notification-service';
 import {Button} from '../button/button';
 
 @Component({
@@ -27,11 +27,10 @@ export class PasswordForm implements OnChanges, OnInit {
   @Output() updated = new EventEmitter<void>();
 
   passwordForm: FormGroup;
-  private readonly errorMessageService = inject(ErrorMessageService);
+  private readonly notificationService = inject(NotificationService);
   private readonly userService = inject(UserService);
 
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
 
   constructor(private readonly fb: FormBuilder, private readonly router: Router) {
     this.passwordForm = this.fb.group({
@@ -61,7 +60,7 @@ export class PasswordForm implements OnChanges, OnInit {
     const passwordFormValid = !this.passwordForm;
 
     if (!this.passwordForm.valid || !this.passwordForm.dirty || (isNewEntry && !passwordFormValid)) {
-      this.errorMessageService.setMessage('Veuillez renseigner un nouveau mot de passe.');
+      this.notificationService.showError('Veuillez renseigner un nouveau mot de passe.');
       return;
     }
 
@@ -75,21 +74,22 @@ export class PasswordForm implements OnChanges, OnInit {
       next: (res) => {
 
         if (!res || Object.keys(res).length === 0) {
-          this.errorMessageService.setMessage("Session invalidée côté backend, déconnexion forcée");
+          this.notificationService.showError('Session invalidée côté backend, déconnexion forcée');
           this.userService.setUserProfile(null);
           this.userService.fetchUserProfile();
           this.router.navigate(['/home']);
         } else {
-          this.errorMessageService.setMessage("Mise à jour normale, rafraîchissement du profil");
+          this.notificationService.showError('Erreur lors de la mise à jour.');
           this.userService.fetchUserProfile();
           this.updated.emit();
           this.closeModal.emit();
         }
+        this.notificationService.showSuccess('Mot de passe modifier avec succès, Veuillez vous reconnecter')
         this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
-        this.errorMessageService.setMessage('Erreur lors de la mise à jour.');
+        this.notificationService.showError('Erreur lors de la mise à jour.');
       }
     });
   }

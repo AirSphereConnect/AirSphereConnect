@@ -26,7 +26,7 @@ interface AlertFormData {
   cityName: string;
   enabled: boolean;
 }
-import {ErrorMessageService} from '../../../services/error-message-service';
+import {NotificationService} from '../../../services/notification-service';
 
 @Component({
   selector: 'app-alerts-form',
@@ -48,7 +48,7 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   private readonly cityService = inject(CityService);
   private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly errorMessageService = inject(ErrorMessageService);
+  private readonly notificationService = inject(NotificationService);
 
   alertsForm!: FormGroup;
   cityQuery = signal('');
@@ -105,7 +105,7 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
     const cityIdValid = this.cityIdSelected !== null && this.cityIdSelected !== undefined;
 
     if (!this.alertsForm.valid || !this.alertsForm.dirty || (isNewEntry && !cityIdValid)) {
-      this.errorMessageService.setMessage('Veuillez modifier au moins un champ et sélectionner une ville.');
+      this.notificationService.showError('Veuillez modifier au moins un champ et sélectionner une ville.');
       return;
     }
 
@@ -119,13 +119,14 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
+            this.notificationService.showSuccess('Alerte supprimée avec succès');
             this.handleSuccess();
             this.isLoading.set(false);
           },
-          error: () => {
-            this.errorMessageService.setMessage("Erreur lors de la suppression de l'alerte.");
+          error: () => {{
+            this.notificationService.showError("Erreur lors de la suppression de l'alerte.");
             this.isLoading.set(false);
-          }
+          }}
         });
       return;
     }
@@ -144,11 +145,12 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.notificationService.showSuccess(isNewEntry ? 'Alerte ajoutée avec succès' : 'Alerte modifiée avec succès');
           this.handleSuccess()
           this.isLoading.set(false);
         },
         error: () => {
-          this.errorMessageService.setMessage("Erreur lors de l'enregistrement de l'alerte.")
+          this.notificationService.showError("Erreur lors de l'enregistrement de l'alerte.")
           this.isLoading.set(false);
         }
       });

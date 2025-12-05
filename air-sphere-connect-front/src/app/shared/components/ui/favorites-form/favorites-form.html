@@ -1,5 +1,5 @@
 <!-- Modal backdrop -->
-@if (isOpen()) {
+@if (isOpen) {
   <div class="fixed inset-0 flex items-center bg-white/5 backdrop-blur-sm justify-center z-50">
     <div class="bg-base-100 shadow-2xl p-6 rounded-2xl w-full max-w-md relative">
       <app-button-close-modal (closeModal)="onCloseModal()"></app-button-close-modal>
@@ -40,7 +40,7 @@
               <app-button
                 color="neutral"
                 class="btn-outline block w-full text-left px-2 py-1"
-                (click)="selectCity(city)">
+                (buttonClick)="selectCity(city)">
                 {{ city.name }}
               </app-button>
             }

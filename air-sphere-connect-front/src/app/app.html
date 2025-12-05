@@ -13,7 +13,7 @@
     <div class="content">
       <router-outlet></router-outlet>
     </div>
-    <app-error-message class="fixed bottom-5 left-0 right-0 flex justify-center items-end z-[99999] pb-4"></app-error-message>
+    <app-notification class="fixed bottom-5 left-0 right-0 flex justify-center items-end z-[99999] pb-4"></app-notification>
   </main>
   @if (scrolled()) {
     <app-back-to-top (click)="top()" class="fixed bottom-0 right-0 z-50"></app-back-to-top>

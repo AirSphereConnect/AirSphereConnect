@@ -19,7 +19,7 @@ import { Button } from '../button/button';
 import { ButtonCloseModal } from '../button-close-modal/button-close-modal';
 import { InputComponent } from '../input/input';
 import { citySearch } from '../../../utils/city-search.util';
-import { ErrorMessageService } from '../../../services/error-message-service';
+import { NotificationService } from '../../../services/notification-service';
 
 @Component({
   selector: 'app-address-form',
@@ -39,7 +39,7 @@ export class AddressForm implements OnInit, OnChanges {
   private readonly userService = inject(UserService);
   private readonly cityService = inject(CityService);
   private readonly destroyRef = inject(DestroyRef);
-  private readonly errorMessageService = inject(ErrorMessageService);
+  private readonly notificationService = inject(NotificationService);
 
   addressForm!: FormGroup;
   cityQuery = signal('');
@@ -92,7 +92,7 @@ export class AddressForm implements OnInit, OnChanges {
     const cityIdValid = this.selectedCityId !== null && this.selectedCityId !== undefined;
 
     if (!this.addressForm.valid || !this.addressForm.dirty || (isNewEntry && !cityIdValid)) {
-      this.errorMessageService.setMessage('Veuillez modifier au moins un champ et sélectionner une ville.');
+      this.notificationService.showError('Veuillez modifier au moins un champ et sélectionner une ville.');
       return;
     }
 
@@ -113,13 +113,14 @@ export class AddressForm implements OnInit, OnChanges {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: () => {
+          this.notificationService.showSuccess('Adresse modifier avec succès');
           this.isLoading.set(false);
           this.updated.emit();
-          this.closeModal.emit();
+          this.onCloseModal();
         },
         error: () => {
           this.isLoading.set(false);
-          this.errorMessageService.setMessage('Erreur lors de la mise à jour.');
+          this.notificationService.showError('Erreur lors de la mise à jour.');
         }
       });
   }

@@ -4,7 +4,7 @@ import {UserService} from '../../../services/user-service';
 import {Router} from '@angular/router';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
-import {ErrorMessageService} from '../../../services/error-message-service';
+import {NotificationService} from '../../../services/notification-service';
 import {Button} from '../button/button';
 
 @Component({
@@ -23,13 +23,12 @@ export class UserForm implements OnChanges, OnInit {
   @Output() submitSuccess = new EventEmitter<void>();
 
   userForm!: FormGroup;
-  private readonly errorMessageService = inject(ErrorMessageService);
+  private readonly notificationService = inject(NotificationService);
   private readonly fb = inject(FormBuilder);
   private readonly userService = inject(UserService);
   private readonly router = inject(Router);
 
   isLoading = signal(false);
-  errorMessage = signal<string | null>(null);
 
   ngOnInit() {
     this.userForm = this.fb.group({
@@ -58,7 +57,7 @@ export class UserForm implements OnChanges, OnInit {
     if (this.userForm.invalid) return;
 
     if (!this.userForm.valid || !this.userForm.dirty || (isNewEntry && !userValid)) {
-      this.errorMessageService.setMessage('Veuillez renseigner une adresse email.');
+      this.notificationService.showError('Veuillez renseigner une adresse email.');
       return;
     }
 
@@ -69,22 +68,22 @@ export class UserForm implements OnChanges, OnInit {
       next: (res) => {
 
         if (!res || Object.keys(res).length === 0) {
-          this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
+          this.notificationService.showError('Erreur lors de la mise à jour.');
           this.userService.setUserProfile(null);
           this.userService.fetchUserProfile();
           this.router.navigate(['/home']);
         } else {
-          this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
+          this.notificationService.showError('Erreur lors de la mise à jour.');
           this.userService.fetchUserProfile();
           this.updated.emit();
           this.closeModal.emit();
         }
-        this.handleSuccess()
+        this.notificationService.showSuccess('Données utilisateur modifiées avec succès, Veuillez vous reconnecter')
         this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);
-        this.errorMessageService.setMessage("Erreur lors de la mise à jour.");
+        this.notificationService.showError("Erreur lors de la mise à jour.");
       }
     });
   }

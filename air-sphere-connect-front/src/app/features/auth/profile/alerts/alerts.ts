@@ -6,6 +6,7 @@ import {UserService} from '../../../../shared/services/user-service';
 import {AlertsService} from '../../../../shared/services/alerts-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
+import {NotificationService} from '../../../../shared/services/notification-service';
 
 @Component({
   selector: 'app-alerts',
@@ -23,6 +24,7 @@ export class Alerts {
   private readonly alertsService = inject(AlertsService);
   private readonly userService = inject(UserService);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly notificationService = inject(NotificationService);
 
   editingAlertsId: number | null = null;
   initialAlertData: any = null;
@@ -59,12 +61,15 @@ export class Alerts {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
+            this.notificationService.showSuccess('Suppression avec succès');
             this.userService.fetchUserProfile();
             this.alertToDeleteId = null;
             this.isWarningOpen.set(false);
             this.warningMessage.set(null);
           },
-          error: () => {
+          error: (err) => {
+            this.logError('Erreur lors de la suppression de l\'alerte', err);
+            this.notificationService.showError('Erreur lors de la suppression de l\'artes');
             this.isWarningOpen.set(false);
             this.alertToDeleteId = null;
             this.warningMessage.set(null);
@@ -73,8 +78,13 @@ export class Alerts {
     }
   }
 
-
   onModalClose() {
     this.isModalOpen.set(false);
+  }
+
+  private logError(message: string, error?: unknown): void {
+    if (typeof ngDevMode !== 'undefined' && ngDevMode) {
+      console.error(message, error);
+    }
   }
 }
