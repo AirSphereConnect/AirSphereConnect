@@ -40,7 +40,8 @@
               <app-button
                 color="neutral"
                 class="btn-outline block w-full text-left px-2 py-1"
-                (buttonClick)="selectCity(city)">
+                (buttonClick)="selectCity(city)"
+                (buttonKeydown)="undefined">
                 {{ city.name }}
               </app-button>
             }
