@@ -4,7 +4,7 @@
       <h1 class="text-3xl font-bold text-base-content">Bienvenue {{ user.username }}</h1>
     </header>
   }
-  <app-tab [tabs]="tabs" navClass="tabs-lift"></app-tab>
+  <app-tab [tabs]="tabs" [activeTabIndex]="activeTabIndex" navClass="tabs-lift"></app-tab>
 
   <ng-template #profilUser>
     <app-user-dashboard [user]="user"></app-user-dashboard>

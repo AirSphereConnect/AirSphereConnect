@@ -1,4 +1,4 @@
-import {Component, Input, signal, TemplateRef, computed, Output, EventEmitter} from '@angular/core';
+import {Component, Input, signal, TemplateRef, computed, Output, EventEmitter, effect} from '@angular/core';
 import {NgTemplateOutlet} from '@angular/common';
 import { tabVariants, type TabVariantProps } from '../../../variants/tab.variants';
 
@@ -22,6 +22,11 @@ export class Tab {
   @Input() tabs: TabItem[] = [];
   @Input() navClass = '';
   @Input() variant: TabVariantProps['variant'] = 'default';
+  @Input() set activeTabIndex(value: number | undefined) {
+    if (value !== undefined && value >= 0) {
+      this.activeIndex.set(value);
+    }
+  }
   @Output() tabChange = new EventEmitter<number>();
 
   activeIndex = signal(0);

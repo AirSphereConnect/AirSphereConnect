@@ -58,9 +58,11 @@ export class Dashboard implements OnInit {
           const cityName = profile.user.address.city.name;
           const postalCode = profile.user.address.city.postalCode;
 
-          this.selectedCity.set(cityName);
-          this.selectedPostalCode.set(postalCode);
-          this.loadDashboard();
+          if (cityName) {
+            this.selectedCity.set(cityName);
+            this.selectedPostalCode.set(postalCode);
+            this.loadDashboard();
+          }
         }
       });
   }

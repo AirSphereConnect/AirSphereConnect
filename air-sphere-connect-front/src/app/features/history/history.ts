@@ -6,7 +6,8 @@ import {
   AfterViewInit,
   signal,
   ViewChild,
-  TemplateRef
+  TemplateRef,
+  ChangeDetectorRef
 } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -45,6 +46,7 @@ export class History implements OnInit, AfterViewInit {
   private readonly apiConfig = inject(ApiConfigService);
   private readonly destroyRef = inject(DestroyRef);
   private readonly fb = inject(FormBuilder);
+  private readonly cdr = inject(ChangeDetectorRef);
 
   // FormGroup pour les filtres
   filterForm!: FormGroup;
@@ -164,40 +166,35 @@ export class History implements OnInit, AfterViewInit {
         color: 'secondary'
       }
     ];
+    this.cdr.detectChanges();
   }
 
   private initializeWithUserCity(cities: City[], cityName: string) {
-    // Trouver la ville complète dans la liste pour obtenir l'inseeCode
     const userCity = cities.find(c => c.name === cityName);
+    if (!userCity) return;
 
-    if (userCity) {
-      this.selectedCityName.set(userCity.name);
-      this.citySearchInput.set(userCity.name);
-      this.selectedInseeCode.set(userCity.inseeCode);
+    const today = new Date();
+    const thirtyDaysAgo = new Date(today);
+    thirtyDaysAgo.setDate(today.getDate() - 30);
+    const startDateStr = thirtyDaysAgo.toISOString().split('T')[0];
+    const endDateStr = today.toISOString().split('T')[0];
 
-      // Période par défaut : 30 derniers jours
-      const today = new Date();
-      const thirtyDaysAgo = new Date(today);
-      thirtyDaysAgo.setDate(today.getDate() - 30);
+    // Mettre à jour les signaux et form controls
+    this.selectedCityName.set(userCity.name);
+    this.citySearchInput.set(userCity.name);
+    this.selectedInseeCode.set(userCity.inseeCode);
+    this.startDate.set(startDateStr);
+    this.endDate.set(endDateStr);
 
-      const startDateStr = thirtyDaysAgo.toISOString().split('T')[0];
-      const endDateStr = today.toISOString().split('T')[0];
+    this.citySearchControl.setValue(userCity.name);
+    this.startDateControl.setValue(startDateStr);
+    this.endDateControl.setValue(endDateStr);
 
-      this.startDate.set(startDateStr);
-      this.endDate.set(endDateStr);
-
-      // Mettre à jour les FormControls immédiatement
-      this.citySearchControl.setValue(userCity.name);
-      this.startDateControl.setValue(startDateStr);
-      this.endDateControl.setValue(endDateStr);
-
-      // Activer les événements après l'initialisation
-      setTimeout(() => {
-        this.isInitializing = false;
-        // Charger les données automatiquement au démarrage
-        this.loadHistory();
-      }, 100);
-    }
+    // Définir isInitializing et charger l’historique après la détection initiale
+    Promise.resolve().then(() => {
+      this.isInitializing = false;
+      this.loadHistory();
+    });
   }
 
   onCityInputChange(value: string) {

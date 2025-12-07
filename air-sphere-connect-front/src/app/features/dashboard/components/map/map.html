@@ -25,6 +25,13 @@
          [style.left.px]="tooltipPosition()?.x"
          [style.top.px]="tooltipPosition()?.y"
          style="max-width: 350px; min-width: 300px;">
+      <!-- Icône étoile en haut à gauche pour les favoris -->
+      @if (isCityFavorite(selectedCity()!.name)) {
+        <div class="absolute -top-3 -left-3 bg-yellow-400 rounded-full p-2 shadow-lg border-2 border-yellow-600">
+          <app-icon name="star" size="md" color="current" [filled]="true"></app-icon>
+        </div>
+      }
+
       <div class="flex justify-between items-start mb-3">
         <h3 class="text-lg font-bold text-base-content m-0">
           {{ selectedCity()!.name }}
@@ -181,10 +188,23 @@
         }
       </div>
 
-      <button (click)="viewCityGraphs(selectedCity()!.name)"
-              class="mt-4 w-full py-2.5 px-4 bg-secondary text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">
-        📊 Voir les graphiques
-      </button>
+      <div class="mt-4 flex flex-col gap-2">
+        <button (click)="viewCityGraphs(selectedCity()!.name)"
+                class=" py-2.5 px-4 bg-secondary text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">
+          Voir les graphiques
+        </button>
+        @if (isCityFavorite(selectedCity()!.name)) {
+          <button (click)="removeFromFavorites()"
+                  class=" py-2.5 px-4 bg-error text-white font-semibold rounded-lg hover:opacity-90 transition-opacity border-2 border-yellow-600">
+            Retirer des favoris
+          </button>
+        } @else {
+          <button (click)="addToFavorites()"
+                  class=" py-2.5 px-4 bg-primary text-white font-semibold rounded-lg hover:opacity-90 transition-opacity">
+            Ajouter en favori
+          </button>
+        }
+      </div>
     </div>
   }
 

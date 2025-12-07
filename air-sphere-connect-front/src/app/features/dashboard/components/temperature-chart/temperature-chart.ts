@@ -85,33 +85,18 @@ export class TemperatureChart {
     if (data.length === 0) return [];
 
     const maxTicks = 10; // Nombre max de ticks à afficher
-    const timestamps: number[] = [];
 
-    // Toujours inclure le premier
-    timestamps.push(data[0].x.getTime());
-
-    // Si on a plus de données que maxTicks, prendre des points réguliers
-    if (data.length > maxTicks) {
-      const step = Math.floor((data.length - 1) / (maxTicks - 1));
-      for (let i = step; i < data.length - 1; i += step) {
-        timestamps.push(data[i].x.getTime());
-      }
-    } else {
-      // Sinon, prendre tous les points intermédiaires
-      for (let i = 1; i < data.length - 1; i++) {
-        timestamps.push(data[i].x.getTime());
-      }
+    // Si on a moins de points que maxTicks, retourner tous les points
+    if (data.length <= maxTicks) {
+      return data.map(d => d.x.getTime());
     }
 
-    // Toujours inclure le dernier (si différent du premier)
-    if (data.length > 1) {
-      const lastPoint = data.at(-1);
-      if (lastPoint) {
-        timestamps.push(lastPoint.x.getTime());
-      }
-    }
+    // Sinon, prendre exactement maxTicks points répartis uniformément
+    const indices = Array.from({ length: maxTicks }, (_, i) =>
+      Math.round(i * (data.length - 1) / (maxTicks - 1))
+    );
 
-    return timestamps;
+    return indices.map(i => data[i].x.getTime());
   });
 
   // ✅ Calculer le domaine Y avec marge pour éviter que la courbe touche les bords

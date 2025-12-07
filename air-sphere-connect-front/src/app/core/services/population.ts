@@ -28,6 +28,7 @@ export class PopulationService {
 
   private mapToPopulation(data: PopulationData): PopulationData {
     return {
+      id: data.id,
       cityName: data.cityName,
       population: data.population,
       year: data.year,

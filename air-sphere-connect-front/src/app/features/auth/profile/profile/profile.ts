@@ -8,7 +8,7 @@ import {
   TemplateRef,
   ViewChild
 } from '@angular/core';
-import {RouterOutlet} from '@angular/router';
+import {RouterOutlet, ActivatedRoute} from '@angular/router';
 import {UserService} from '../../../../shared/services/user-service';
 import {User} from '../../../../core/models/user.model';
 import {Tab, TabItem} from '../../../../shared/components/ui/tab/tab';
@@ -30,8 +30,10 @@ export class Profile implements OnInit, AfterViewInit {
   private readonly userService = inject(UserService);
   private readonly cdr = inject(ChangeDetectorRef);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
 
   user: User | null = null;
+  activeTabIndex: number | undefined;
 
   @ViewChild('profilUser', { static: true }) profilUser!: TemplateRef<unknown>;
   @ViewChild('thread', { static: true }) thread!: TemplateRef<unknown>;
@@ -45,10 +47,34 @@ export class Profile implements OnInit, AfterViewInit {
     this.userService.userProfile$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(profile => {
-        if (profile) {
+        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+        if (profile && profile.user) {
           this.user = profile.user;
         }
       });
+
+    // Lire le query param "tab" pour ouvrir l'onglet correspondant
+    this.route.queryParams
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(params => {
+        const tabParam = params['tab'];
+        if (tabParam) {
+          const tabIndex = this.getTabIndex(tabParam);
+          if (tabIndex !== -1) {
+            this.activeTabIndex = tabIndex;
+          }
+        }
+      });
+  }
+
+  private getTabIndex(tabName: string): number {
+    const tabMap: Record<string, number> = {
+      'profile': 0,
+      'threads': 1,
+      'favorites': 2,
+      'alerts': 3
+    };
+    return tabMap[tabName] ?? -1;
   }
 
   ngAfterViewInit() {

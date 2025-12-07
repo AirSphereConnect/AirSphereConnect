@@ -107,12 +107,18 @@ export function translateWeatherMessage(message: string | WeatherMessageItem[] |
       weatherArray = JSON.parse(message);
     }
 
-    if (!Array.isArray(weatherArray) || weatherArray.length === 0) {
+    if (!Array.isArray(weatherArray)) {
       return typeof message === 'string' ? message : '-';
     }
 
+    if (weatherArray.length === 0) {
+      return '-';
+    }
+
     const weather = weatherArray[0];
-    const description = weather.description || '';
+    const description = String(weather.description || '').trim();
+
+    if (!description) return '';
 
     const translatedDescription = WEATHER_TRANSLATIONS[description.toLowerCase()] || description;
 

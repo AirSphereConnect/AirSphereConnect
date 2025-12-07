@@ -39,6 +39,11 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(UserService);
 
+  // Update document title when title signal changes
+  private readonly titleEffect = effect(() => {
+    document.title = this.title();
+  });
+
   ngOnInit() {
     // User recovery at startup
     this.userService.fetchUserProfile();
@@ -49,10 +54,6 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
       .subscribe(profile => {
         this.userRole.set(profile?.role ?? 'GUEST');
       });
-
-    effect(() => {
-      document.title = this.title();
-    });
   }
 
   ngAfterViewInit() {

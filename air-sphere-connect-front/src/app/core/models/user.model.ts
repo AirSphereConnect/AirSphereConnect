@@ -36,13 +36,14 @@ export interface User {
 
 export interface UserProfileResponse {
   role: string;
-  user: User;
+  user: User ;
 }
 
 // Payloads pour les requêtes
 export interface RegisterPayload {
   username: string;
   email: string;
+  password: string;
   address: {
     street: string;
     city: {
