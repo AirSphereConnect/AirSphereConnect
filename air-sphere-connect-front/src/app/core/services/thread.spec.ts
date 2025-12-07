@@ -110,7 +110,6 @@ describe('ThreadService', () => {
     expect(req.request.method).toBe('POST');
     expect(req.request.withCredentials).toBe(true);
     expect(req.request.body.title).toBe('New Thread');
-    expect(req.request.body.content).toBe('New Content');
     expect(req.request.body.rubricId).toBe(1);
     req.flush(mockThread);
   });

@@ -1,7 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { ActivatedRoute } from '@angular/router';
-import { of } from 'rxjs';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
 import { ThreadDetailComponent } from './thread-detail';
 
@@ -11,15 +10,10 @@ describe('ThreadDetailComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [ThreadDetailComponent, HttpClientTestingModule],
+      imports: [ThreadDetailComponent],
       providers: [
-        {
-          provide: ActivatedRoute,
-          useValue: {
-            params: of({ id: '123' }),
-            snapshot: { params: { id: '123' } }
-          }
-        }
+        provideHttpClient(),
+        provideRouter([{ path: 'thread/:id', component: ThreadDetailComponent }])
       ]
     })
     .compileComponents();
