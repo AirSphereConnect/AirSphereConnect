@@ -29,19 +29,19 @@ export class PostService {
   }
 
   // retrieve all the posts of a thread
-  getPostByThreadId(threadId: number): Observable<Post[]> {
-    return this.getPosts().pipe(
+  getPostByThreadId(threadId: number, currentUserId?: number): Observable<Post[]> {
+    return this.getPosts(currentUserId).pipe(
       map(posts => posts.filter(post => post.threadId === threadId)));
   }
 
-  getPostCountByThreadId(threadId: number): Observable<number> {
-    return this.getPostByThreadId(threadId).pipe(
+  getPostCountByThreadId(threadId: number, currentUserId?: number): Observable<number> {
+    return this.getPostByThreadId(threadId, currentUserId).pipe(
       map(posts => posts.length)
     );
   }
 
-  getLikesByThreadId(threadId: number): Observable<number> {
-    return this.getPostByThreadId(threadId).pipe(
+  getLikesByThreadId(threadId: number, currentUserId?: number): Observable<number> {
+    return this.getPostByThreadId(threadId, currentUserId).pipe(
       map(posts => posts.reduce((sum, post) => sum + post.likeCount, 0))
     );
   }

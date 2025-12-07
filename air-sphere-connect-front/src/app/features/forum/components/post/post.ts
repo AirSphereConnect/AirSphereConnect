@@ -73,10 +73,6 @@ export class PostComponent {
 // Vérifie si l'AUTEUR DU POST est le propriétaire du thread
   isAuthorThreadOwner = computed(() => {
     const post = this.post();
-    const user = this.userService.userProfile$;
-    console.log(user)
-    console.log('Post userId:', post.userId, 'Thread owner:', post.threadOwnerId);
-    console.log(post.userRole);
     return post.threadOwnerId !== undefined && post.userId === post.threadOwnerId;
   });
 

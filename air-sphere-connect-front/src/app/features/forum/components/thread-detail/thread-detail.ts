@@ -83,7 +83,8 @@ export class ThreadDetailComponent {
             this.router.navigate(['/forum']);
             throw new Error('Invalid thread ID');
           }
-          return this.postService.getPostByThreadId(id);
+          const currentUserId = this.userService.currentUserProfile?.user.id;
+          return this.postService.getPostByThreadId(id, currentUserId);
         })
       )
       .subscribe({
