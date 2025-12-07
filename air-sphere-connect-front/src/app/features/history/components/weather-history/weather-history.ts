@@ -1,4 +1,4 @@
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, computed, effect, input, signal } from '@angular/core';
 import { DatePipe } from '@angular/common';
 import { CityHistoryData } from '../../../../core/models/city.model';
 import { translateWeatherMessage } from '../../../../shared/utils/weather-translator.util';
@@ -20,26 +20,40 @@ export class WeatherHistory {
   currentPage = signal(1);
   itemsPerPage = 10;
 
-  // Données filtrées par période
+  constructor() {
+    // Réinitialiser la page à 1 quand les filtres de date changent
+    effect(() => {
+      this.startDate();
+      this.endDate();
+      this.currentPage.set(1);
+    });
+  }
+
+  // Données filtrées par période ET avec données météo
   allFilteredData = computed(() => {
     const snapshots = this.historyData().dailySnapshots;
     const start = this.startDate();
     const end = this.endDate();
 
-    if (!start && !end) {
-      return snapshots;
+    let filtered = snapshots;
+
+    // Filtre par date si nécessaire
+    if (start || end) {
+      filtered = snapshots.filter(snapshot => {
+        const date = new Date(snapshot.date);
+        const startDateObj = start ? new Date(start) : null;
+        const endDateObj = end ? new Date(end + 'T23:59:59') : null;
+
+        if (startDateObj && date < startDateObj) return false;
+        return !(endDateObj && date > endDateObj);
+      });
     }
 
-    const filtered = snapshots.filter(snapshot => {
-      const date = new Date(snapshot.date);
-      const startDateObj = start ? new Date(start) : null;
-      const endDateObj = end ? new Date(end + 'T23:59:59') : null;
+    // Ne garder QUE les snapshots avec données météo pour la pagination
+    filtered = filtered.filter(snapshot => snapshot.weather);
 
-      if (startDateObj && date < startDateObj) return false;
-      return !(endDateObj && date > endDateObj);
-    });
-
-    return filtered;
+    // Trier par date décroissante
+    return filtered.sort((a, b) => b.date.getTime() - a.date.getTime());
   });
 
   // Données paginées pour l'affichage
@@ -107,17 +121,20 @@ export class WeatherHistory {
     if (!message) return null;
 
     try {
-      let weatherArray: any[];
+      let weatherData: any;
 
       // Si c'est déjà un objet/array, l'utiliser directement
       if (typeof message === 'object') {
-        weatherArray = Array.isArray(message) ? message : [message];
+        weatherData = message;
       } else {
         // Sinon, c'est une string JSON à parser
-        weatherArray = JSON.parse(message);
+        weatherData = JSON.parse(message);
       }
 
-      if (!Array.isArray(weatherArray) || weatherArray.length === 0) {
+      // Convertir en array si nécessaire
+      const weatherArray = Array.isArray(weatherData) ? weatherData : [weatherData];
+
+      if (weatherArray.length === 0) {
         return null;
       }
 

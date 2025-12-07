@@ -1,4 +1,4 @@
-import {Component, computed, input, signal} from '@angular/core';
+import {Component, computed, effect, input, signal} from '@angular/core';
 import {DatePipe, NgClass} from '@angular/common';
 import {CityHistoryData} from '../../../../core/models/city.model';
 import {Button} from '../../../../shared/components/ui/button/button';
@@ -19,13 +19,22 @@ export class AirQualityHistory {
   currentPage = signal(1);
   itemsPerPage = 10;
 
-  // Données filtrées par période
+  constructor() {
+    // Réinitialiser la page à 1 quand les filtres de date changent
+    effect(() => {
+      this.startDate();
+      this.endDate();
+      this.currentPage.set(1);
+    });
+  }
+
+  // Données filtrées par période ET avec données air quality
   allFilteredData = computed(() => {
     const snapshots = this.historyData().dailySnapshots;
     const start = this.startDate();
     const end = this.endDate();
 
-    const filtered = snapshots.filter(snapshot => {
+    let filtered = snapshots.filter(snapshot => {
       const date = new Date(snapshot.date);
       const startDateObj = start ? new Date(start) : null;
       const endDateObj = end ? new Date(end + 'T23:59:59') : null;
@@ -33,6 +42,9 @@ export class AirQualityHistory {
       if (startDateObj && date < startDateObj) return false;
       return !(endDateObj && date > endDateObj);
     });
+
+    // Ne garder QUE les snapshots avec données air quality pour la pagination
+    filtered = filtered.filter(snapshot => snapshot.airMeasurement || snapshot.airIndex);
 
     // Trier par date décroissante
     return filtered.sort((a, b) => b.date.getTime() - a.date.getTime());
