@@ -44,7 +44,13 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
     document.title = this.title();
   });
 
+  splashDone = false;
+
   ngOnInit() {
+    setTimeout(() => {
+      this.splashDone = true;
+    }, 1500);
+
     // User recovery at startup
     this.userService.fetchUserProfile();
 

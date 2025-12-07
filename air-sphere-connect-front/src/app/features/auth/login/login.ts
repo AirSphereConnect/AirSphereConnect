@@ -5,8 +5,8 @@ import { UserService } from '../../../shared/services/user-service';
 import { CommonModule } from '@angular/common';
 import {InputComponent} from '../../../shared/components/ui/input/input';
 import {Button} from '../../../shared/components/ui/button/button';
-import {IconComponent} from '../../../shared/components/ui/icon/icon';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {NotificationService} from '../../../shared/services/notification-service';
 
 @Component({
   standalone: true,
@@ -16,8 +16,7 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
     ReactiveFormsModule,
     InputComponent,
     Button,
-    RouterLink,
-    IconComponent
+    RouterLink
   ],
   selector: 'app-login',
   templateUrl: './login.html',
@@ -28,11 +27,11 @@ export class Login implements OnInit {
   private readonly router = inject(Router);
 
   private readonly destroyRef = inject(DestroyRef);
+  private readonly notificationService = inject(NotificationService);
 
   loginForm!: FormGroup;
 
   // 🎯 Signals
-  errorMessage = signal<string | null>(null);
   isLoading = signal<boolean>(false);
   passwordType = signal<'password' | 'text'>('password');
 
@@ -62,7 +61,6 @@ export class Login implements OnInit {
   onSubmit() {
     if (this.loginForm.valid && !this.isLoading()) {
       this.isLoading.set(true);
-      this.errorMessage.set(null);
 
       const credentials = this.loginForm.value;
 
@@ -70,33 +68,28 @@ export class Login implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: () => {
+            this.notificationService.showSuccess('Connexion réussie')
             this.isLoading.set(false);
-            this.errorMessage.set(null);
             this.router.navigate(['/home']).then();
           },
         error: err => {
           this.isLoading.set(false);
           if (err.status === 0) {
-            this.errorMessage.set("Impossible de contacter le serveur.");
+            this.notificationService.showError('Impossible de contacter le serveur.');
           } else if (err.status === 401) {
-            this.errorMessage.set("Nom d'utilisateur ou mot de passe incorrect.");
+            this.notificationService.showError('Nom d\'utilisateur ou mot de passe incorrect.');
           } else if (err.status === 403) {
-            this.errorMessage.set("Accès refusé.");
+            this.notificationService.showError('Accès refusé.');
           } else if (err.status === 404) {
-            this.errorMessage.set("Service non disponible.");
+            this.notificationService.showError('Service non disponible.');
           } else if (err.status === 500) {
-            this.errorMessage.set("Erreur serveur. Veuillez réessayer plus tard.");
+            this.notificationService.showError('Erreur serveur. Veuillez réessayer plus tard.');
           } else {
-            this.errorMessage.set("Une erreur est survenue lors de la connexion.");
+            this.notificationService.showError('Une erreur est survenue lors de la connexion.');
           }
-
         }
       });
     }
-  }
-
-  clearError() {
-    this.errorMessage.set(null);
   }
 
   togglePasswordVisibility() {

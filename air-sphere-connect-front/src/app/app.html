@@ -7,20 +7,33 @@
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
 <div class="h-screen grid grid-rows-[80px_1fr_40px] overflow-y-auto no-scrollbar">
-
-  <app-header [userRole]="userRole()" [scrolled]="scrolled()" class="sticky top-0 z-50"></app-header>
-  <main #mainContent class="container overflow-auto mx-auto px-4 py-8 no-scrollbar">
-    <div class="content">
-      <router-outlet></router-outlet>
+  @if (!splashDone){
+    <div
+      class="splash-screen"
+      [class.splash-hidden]="splashDone">
+      <img
+        ngSrc="/images/logo-cloud-signal-wifi.png"
+        width="50"
+        height="50"
+        alt="Air Sphere Connect"
+        class="splash-logo"/>
     </div>
-    <app-notification
-      class="fixed bottom-5 left-0 right-0 flex justify-center items-end z-[99999] pb-4"></app-notification>
-  </main>
-  @if (scrolled()) {
-    <app-back-to-top (click)="top()" class="fixed bottom-0 right-0 z-50"></app-back-to-top>
   }
-  @if (!router.url.startsWith('/auth/login') && !router.url.startsWith('/auth/register')) {
-    <app-footer [userRole]="userRole()" class="h-8 shrink-0"></app-footer>
+  @if (splashDone) {
+    <app-header [userRole]="userRole()" [scrolled]="scrolled()" class="sticky top-0 z-50"></app-header>
+    <main #mainContent class="container overflow-auto mx-auto px-4 py-8 no-scrollbar">
+      <div class="content">
+        <router-outlet></router-outlet>
+      </div>
+      <app-notification
+        class="fixed bottom-5 left-0 right-0 flex justify-center items-end z-[99999] pb-4"></app-notification>
+    </main>
+    @if (scrolled()) {
+      <app-back-to-top (click)="top()" class="fixed bottom-0 right-0 z-50"></app-back-to-top>
+    }
+    @if (!router.url.startsWith('/auth/login') && !router.url.startsWith('/auth/register')) {
+      <app-footer [userRole]="userRole()" class="h-8 shrink-0"></app-footer>
+    }
   }
 
 </div>

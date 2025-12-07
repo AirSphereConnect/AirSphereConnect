@@ -1,1 +1,44 @@
 // app.scss
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Splash screen */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  background-color: #F5F5F4FF;
+}
+
+.splash-logo {
+  width: 120px;
+  height: auto;
+  animation: splashFadeOut 2s ease-out forwards; // animation sur le logo
+}
+
+/* Quand le splash est terminé (optionnel pour cacher le div) */
+.splash-hidden {
+  display: none;
+}
+
+/* Animation du logo uniquement */
+@keyframes splashFadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.98);
+    visibility: hidden;
+  }
+}
+

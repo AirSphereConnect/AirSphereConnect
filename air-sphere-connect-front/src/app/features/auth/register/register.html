@@ -47,14 +47,6 @@
             ></app-input>
 
 
-            @if (errorMessage()) {
-              <div class="alert alert-error">
-                <app-icon name="exclamationTriangle" size="md" color="current" />
-                <span>{{ errorMessage() }}</span>
-                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (buttonClick)="clearError()" (buttonKeydown)="undefined" heroIcon="xMark"></app-button>
-              </div>
-            }
-
             <app-button
               type="submit"
               [fullWidth]="true"
@@ -127,13 +119,6 @@
               [readonly]="true"
             ></app-input>
 
-            @if (errorMessage()) {
-              <div class="alert alert-error">
-                <app-icon name="exclamationTriangle" size="md" color="current" />
-                <span>{{ errorMessage() }}</span>
-                <app-button type="button" size="sm" shape="circle" color="error" variant="ghost" (buttonClick)="clearError()" (buttonKeydown)="undefined" heroIcon="xMark"></app-button>
-              </div>
-            }
 
 
             <div class="actions w-100 flex gap-4">
