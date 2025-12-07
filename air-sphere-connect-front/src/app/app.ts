@@ -16,10 +16,12 @@ import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {filter, fromEvent, Subscription} from 'rxjs';
 import {BackToTop} from './shared/components/ui/back-to-top/back-to-top';
 import {Notification} from './shared/components/ui/notification/notification';
+import {Logo} from './shared/components/ui/logo/logo';
+import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Header, Footer, BackToTop, Notification],
+  imports: [RouterOutlet, Header, Footer, BackToTop, Notification, Logo, NgOptimizedImage],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
 })
@@ -39,7 +41,13 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(UserService);
 
+  splashDone = false;
+
   ngOnInit() {
+    setTimeout(() => {
+      this.splashDone = true;
+    }, 1500);
+
     // User recovery at startup
     this.userService.fetchUserProfile();
 
@@ -53,6 +61,7 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
     effect(() => {
       document.title = this.title();
     });
+
   }
 
   ngAfterViewInit() {

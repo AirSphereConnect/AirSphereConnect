@@ -1,7 +1,95 @@
-<div>
-  @if (userRole === "GUEST"){
-    <span>Bienvenue invité</span>
-  } @else if (profile) {
-    <span>Bienvenue, {{ profile.user.username }}</span>
-  }
+<div class="home">
+    <section>
+      <div class="relative mb-5">
+        <h1 class="hero_h1 text-center font-bold">Air Sphere Connect – Occitanie</h1>
+        <img
+          class="absolute top-0 right-0"
+          ngSrc="/images/Logo_Occitanie_2017.svg"
+          alt="Logo de l'Occitanie"
+          width="80"
+          height="80"
+          priority
+        />
+      </div>
+      <p class="hero_p">
+        Plateforme citoyenne pour suivre la qualité de l’air en Occitanie
+        et mieux comprendre les enjeux écologiques du territoire.
+      </p>
+
+    </section>
+
+  <section class="intro">
+    <h2 class="underline">Informer, connecter, agir</h2>
+    <p>
+      Air Sphere Connect met à disposition des indicateurs sur la qualité de l’air,
+      croisés avec des données de population et des données météorologiques issues
+      des services publics Open Data de la région Occitanie.
+    </p>
+    <p class="hero_p">
+      L’objectif est de faciliter le partage d’informations sur les risques
+      écologiques et d’accompagner citoyens, associations et collectivités
+      dans leurs décisions.
+    </p>
+  </section>
+
+  <section class="features">
+    <h2 class="underline">Explorez les données de votre territoire</h2>
+    <p class="hero_p">
+      Air Sphere Connect vous donne une vue d’ensemble de la qualité de l’air en Occitanie,
+      des tendances dans le temps et des populations les plus exposées.
+    </p>
+
+    <div class="features-grid">
+      <article class="feature-card">
+        <img
+          ngSrc="/images/carte_air_sphere.png"
+          alt="Carte interactive de l'Occitanie"
+          width="1145"
+          height="550"
+          priority
+        />
+        <h3>Carte interactive</h3>
+        <p>
+          Naviguez sur la carte de l’Occitanie, commune par commune, pour suivre la qualité de l’air
+          et les indicateurs locaux.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <img
+          ngSrc="/images/history_air_sphere.png"
+          alt="Historique des données"
+          width="1147"
+          height="627"
+          priority
+        />
+        <h3>Historique des épisodes</h3>
+        <p>
+          Visualisez l’historique des pics de pollution et des épisodes météorologiques marquants
+          sur votre territoire.
+        </p>
+      </article>
+
+      <article class="feature-card">
+        <img
+          ngSrc="/images/graphe_air_sphere.png"
+          alt="Graphiques d'évolution"
+          width="1145"
+          height="550"
+          priority/>
+        <h3>Graphiques d’évolution</h3>
+        <p>
+          Analysez l’évolution des principaux polluants et comparez les périodes pour mieux comprendre les tendances.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="cta">
+    <h2 class="underline">Commencer à explorer l’Occitanie</h2>
+    <p>
+      Sélectionnez votre territoire, comparez les indicateurs, et partagez vos
+      observations avec la communauté Air Sphere Connect.
+    </p>
+  </section>
 </div>

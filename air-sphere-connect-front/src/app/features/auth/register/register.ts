@@ -26,6 +26,7 @@ import {citySearch} from '../../../shared/utils/city-search.util';
 import {CityService} from '../../../core/services/city';
 import {City} from '../../../core/models/city.model';
 import {UserProfileResponse} from '../../../core/models/user.model';
+import {NotificationService} from '../../../shared/services/notification-service';
 
 @Component({
   selector: 'app-register',
@@ -47,6 +48,8 @@ export class Register implements OnInit {
   private readonly cityService = inject(CityService);
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly notificationService = inject(NotificationService);
+
 
   step = signal<number>(1);
   registerForm!: FormGroup;
@@ -56,7 +59,6 @@ export class Register implements OnInit {
   citySuggestions = signal<any[]>([]);
   cityIdSelected: number | null = null;
 
-  errorMessage = signal<string | null>(null);
   isLoadingStep1 = signal<boolean>(false);
   isLoadingStep2 = signal<boolean>(false);
   passwordVisible = signal(false);
@@ -134,7 +136,6 @@ export class Register implements OnInit {
     if (this.registerFirstForm.invalid || this.isLoadingStep1()) return;
 
     this.isLoadingStep1.set(true);
-    this.errorMessage.set(null);
 
     const { username, email } = this.registerFirstForm.value;
 
@@ -144,24 +145,24 @@ export class Register implements OnInit {
         next: (res) => {
           this.isLoadingStep1.set(false);
           if (res.usernameTaken) {
-            this.errorMessage.set("Nom d'utilisateur déjà pris.");
+            this.notificationService.showError('Nom d\'utilisateur déjà pris.');
           } else if (res.emailTaken) {
-            this.errorMessage.set("Adresse email déjà utilisée.");
+            this.notificationService.showError('Adresse email déjà utilisée.');
           } else {
-            this.errorMessage.set(null);
             this.step.set(2);
           }
+          this.notificationService.showSuccess('Données validées.')
         },
         error: (err) => {
           this.isLoadingStep1.set(false);
           if (err.status === 0) {
-            this.errorMessage.set("Impossible de contacter le serveur.");
+            this.notificationService.showError('Impossible de contacter le serveur.');
           } else if (err.status === 404) {
-            this.errorMessage.set("Service non disponible.");
+            this.notificationService.showError('Service non disponible.');
           } else if (err.status === 500) {
-            this.errorMessage.set("Erreur serveur (500).");
+            this.notificationService.showError('Erreur serveur (500).');
           } else {
-            this.errorMessage.set(`Erreur serveur (${err.status}).`);
+            this.notificationService.showError(`Erreur serveur (${err.status}).`);
           }
         }
       });
@@ -171,7 +172,6 @@ export class Register implements OnInit {
     if (this.registerForm.invalid || this.registerFirstForm.invalid || this.isLoadingStep2()) return;
 
     this.isLoadingStep2.set(true);
-    this.errorMessage.set(null);
 
     const payload = {
       ...this.registerFirstForm.value,
@@ -193,19 +193,15 @@ export class Register implements OnInit {
         },
         error: () => {
           this.isLoadingStep2.set(false);
-          this.errorMessage.set("Erreur lors de l'inscription.");
+          this.notificationService.showError('Erreur lors de l\'inscription.');
         }
       });
   }
 
   goBackToStep1() {
     this.step.set(1);
-    this.errorMessage.set(null);
   }
 
-  clearError() {
-    this.errorMessage.set(null);
-  }
 
   private strictEmailValidator(control: AbstractControl): ValidationErrors | null {
     if (!control.value) return null;
