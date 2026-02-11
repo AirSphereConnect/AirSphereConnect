@@ -27,6 +27,11 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.Function;
 
+/**
+ * Implémentation du service de gestion de la qualité de l'air.
+ * Fournit les opérations pour récupérer les données de qualité de l'air (mesures, indices, historiques)
+ * pour les villes avec stratégie de fallback (ville -> intercommunalité -> département).
+ */
 @Service
 @Transactional(readOnly = true)
 public class AirQualityServiceImpl implements AirQualityService {
@@ -39,6 +44,15 @@ public class AirQualityServiceImpl implements AirQualityService {
     private final CityRepository cityRepository;
     private final AirQualityMapper mapper;
 
+    /**
+     * Constructeur de l'implémentation du service de qualité de l'air.
+     *
+     * @param stationRepository       Repository des stations de mesure
+     * @param measurementRepository   Repository des mesures de qualité de l'air
+     * @param indexRepository         Repository des indices de qualité de l'air
+     * @param cityRepository          Repository des villes
+     * @param mapper                  Mapper pour les DTOs de qualité de l'air
+     */
     public AirQualityServiceImpl (
             AirQualityStationRepository stationRepository,
             AirQualityMeasurementRepository measurementRepository,
@@ -52,6 +66,11 @@ public class AirQualityServiceImpl implements AirQualityService {
         this.mapper = mapper;
     }
 
+    /**
+     * Récupère toutes les stations de mesure de la qualité de l'air.
+     *
+     * @return La liste de toutes les stations
+     */
     @Override
     public List<AirQualityStationResponseDto> getAllStations() {
         return stationRepository.findAll()
@@ -60,6 +79,14 @@ public class AirQualityServiceImpl implements AirQualityService {
                 .toList();
     }
 
+    /**
+     * Récupère la dernière mesure de qualité de l'air pour une ville donnée.
+     * Utilise une stratégie de fallback : code INSEE -> areaCode -> département.
+     *
+     * @param cityName Le nom de la ville
+     * @return La dernière mesure de qualité de l'air
+     * @throws GlobalException.ResourceNotFoundException Si aucune mesure n'est trouvée
+     */
     @Override
     public AirQualityMeasurementResponseDto getLatestMeasurementForCity(String cityName) {
         City city = findCityByName(cityName);
@@ -106,10 +133,18 @@ public class AirQualityServiceImpl implements AirQualityService {
             }
         }
 
+
         throw new GlobalException.ResourceNotFoundException(
                 "Aucune mesure trouvée pour: " + cityName);
     }
 
+    /**
+     * Récupère le dernier indice de qualité de l'air pour une ville donnée.
+     *
+     * @param cityName Le nom de la ville
+     * @return Le dernier indice de qualité de l'air avec message d'alerte
+     * @throws GlobalException.ResourceNotFoundException Si aucun indice n'est trouvé ou si la ville n'a pas d'areaCode
+     */
     @Override
     public AirQualityIndexResponseDto getLatestIndexQualityForCity(String cityName) {
         City city = findCityByName(cityName);
@@ -130,6 +165,16 @@ public class AirQualityServiceImpl implements AirQualityService {
         return mapper.toDto(index, alertMessage);
     }
 
+    /**
+     * Récupère l'historique des mesures de qualité de l'air pour une ville sur une période donnée.
+     * Utilise une stratégie de fallback : code INSEE -> areaCode -> département.
+     * Par défaut, récupère les 30 derniers jours si aucune date n'est spécifiée.
+     *
+     * @param cityName  Le nom de la ville
+     * @param startDate La date de début (null pour 30 jours avant aujourd'hui)
+     * @param endDate   La date de fin (null pour aujourd'hui)
+     * @return La liste des mesures sur la période
+     */
     @Override
     public List<AirQualityMeasurementResponseDto> getMeasurementsHistoryForCity(
             String cityName,
@@ -178,6 +223,16 @@ public class AirQualityServiceImpl implements AirQualityService {
         return List.of();
     }
 
+    /**
+     * Récupère l'historique des indices de qualité de l'air pour une ville sur une période donnée.
+     * Par défaut, récupère les 30 derniers jours si aucune date n'est spécifiée.
+     *
+     * @param cityName  Le nom de la ville
+     * @param startDate La date de début (null pour 30 jours avant aujourd'hui)
+     * @param endDate   La date de fin (null pour aujourd'hui)
+     * @return La liste des indices sur la période avec messages d'alerte
+     * @throws GlobalException.ResourceNotFoundException Si la ville n'a pas d'areaCode
+     */
     @Override
     public List<AirQualityIndexResponseDto> getIndicesHistoryForCity(
             String cityName,
@@ -205,7 +260,13 @@ public class AirQualityServiceImpl implements AirQualityService {
                 .toList();
     }
 
-
+    /**
+     * Récupère toutes les données de qualité de l'air pour une ville (mesures, indices, historiques).
+     * Utilise une stratégie de fallback pour les mesures : code INSEE -> areaCode -> département.
+     *
+     * @param cityName Le nom de la ville
+     * @return Les données complètes de qualité de l'air
+     */
     @Override
     public AirQualityDataResponseDto getCompleteDataForCity(String cityName) {
         City city = findCityByName(cityName);
@@ -284,12 +345,26 @@ public class AirQualityServiceImpl implements AirQualityService {
         return dto;
     }
 
+    /**
+     * Recherche une ville par son nom (insensible à la casse).
+     *
+     * @param cityName Le nom de la ville
+     * @return La ville trouvée
+     * @throws GlobalException.ResourceNotFoundException Si la ville n'existe pas
+     */
     private City findCityByName(String cityName) {
         return cityRepository.findByNameIgnoreCase(cityName)
                 .orElseThrow(() -> new GlobalException.ResourceNotFoundException(
                         "Ville non trouvée: " + cityName));
     }
 
+    /**
+     * Valide qu'une ville possède un areaCode.
+     *
+     * @param city     La ville à valider
+     * @param cityName Le nom de la ville (pour le message d'erreur)
+     * @throws GlobalException.ResourceNotFoundException Si la ville n'a pas d'areaCode
+     */
     private void validateAreaCode(City city, String cityName) {
         if (city.getAreaCode() == null) {
             throw new GlobalException.ResourceNotFoundException(
@@ -297,6 +372,14 @@ public class AirQualityServiceImpl implements AirQualityService {
         }
     }
 
+    /**
+     * Construit la plage de dates pour les requêtes d'historique.
+     * Par défaut : 30 jours avant aujourd'hui jusqu'à aujourd'hui.
+     *
+     * @param startDate La date de début (null pour 30 jours avant aujourd'hui)
+     * @param endDate   La date de fin (null pour aujourd'hui)
+     * @return Un tableau avec [start, end] en LocalDateTime
+     */
     private LocalDateTime[] getDateRange(LocalDate startDate, LocalDate endDate) {
         LocalDateTime start = (startDate != null)
                 ? startDate.atStartOfDay()
@@ -309,6 +392,13 @@ public class AirQualityServiceImpl implements AirQualityService {
         return new LocalDateTime[]{start, end};
     }
 
+    /**
+     * Recherche la première valeur non nulle d'un polluant dans une liste de mesures.
+     *
+     * @param measurements La liste des mesures
+     * @param getter       La fonction pour extraire la valeur du polluant
+     * @return La première valeur non nulle trouvée, ou null
+     */
     private Double findFirstNonNull(
             List<AirQualityMeasurement> measurements,
             Function<AirQualityMeasurement, Double> getter
@@ -320,6 +410,14 @@ public class AirQualityServiceImpl implements AirQualityService {
                 .orElse(null);
     }
 
+    /**
+     * Récupère les N plus grandes villes d'un département qui ont des données de qualité de l'air.
+     * Les villes sont triées par population décroissante.
+     *
+     * @param departmentCode Le code du département (2 chiffres)
+     * @param limit          Le nombre de villes à retourner
+     * @return La liste des données complètes pour les villes sélectionnées
+     */
     @Override
     public List<AirQualityDataResponseDto> getTopCitiesWithDataInDepartment(String departmentCode, int limit) {
         List<City> citiesWithData = cityRepository.findAll().stream()

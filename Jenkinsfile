@@ -2,13 +2,11 @@ pipeline {
     agent {
         label 'docker-agent'
     }
-
     options {
         buildDiscarder(logRotator(numToKeepStr: '10'))
         disableConcurrentBuilds()
         timeout(time: 30, unit: 'MINUTES')
     }
-
     stages {
         stage('Checkout') {
             steps {
@@ -23,7 +21,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Backend') {
             steps {
                 dir('air-sphere-connect-back') {
@@ -32,7 +29,6 @@ pipeline {
                 }
             }
         }
-
         stage('Test Backend') {
             steps {
                 dir('air-sphere-connect-back') {
@@ -46,7 +42,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Frontend') {
             steps {
                 dir('air-sphere-connect-front') {
@@ -58,7 +53,6 @@ pipeline {
                 }
             }
         }
-
         stage('Build Docker Images') {
             steps {
                 echo '=== Construction des images Docker ==='
@@ -67,7 +61,6 @@ pipeline {
                 """
             }
         }
-
         stage('Deploy') {
             steps {
                 script {
@@ -114,7 +107,6 @@ pipeline {
                 }
             }
         }
-
         stage('Health Check') {
             steps {
                 script {

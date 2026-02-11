@@ -1,93 +1,111 @@
-<div class="home">
-    <section>
-      <div class="relative mb-5">
-        <h1 class="hero_h1 text-center font-bold">Air Sphere Connect – Occitanie</h1>
-        <img
-          class="absolute top-0 right-0"
-          ngSrc="/images/Logo_Occitanie_2017.svg"
-          alt="Logo de l'Occitanie"
-          width="80"
-          height="80"
-          priority
-        />
-      </div>
-      <p class="hero_p">
-        Plateforme citoyenne pour suivre la qualité de l’air en Occitanie
-        et mieux comprendre les enjeux écologiques du territoire.
-      </p>
+<div class="min-h-screen bg-base-200 py-8 px-4">
+  <!-- Hero Section -->
+  <section class="mb-12">
+    <div class="relative mb-8 flex items-center justify-center gap-4">
+      <h1 class="text-4xl font-bold text-base-content text-center">
+        Air Sphere Connect – Occitanie
+      </h1>
+      <img
+        src="/images/Logo_Occitanie_2017.svg"
+        alt="Logo de l'Occitanie"
+        class="w-20 h-20"
+      />
+    </div>
+    <p class="text-lg text-base-content/80 text-center max-w-3xl mx-auto mb-6">
+      Plateforme citoyenne pour suivre la qualité de l'air en Occitanie
+      et mieux comprendre les enjeux écologiques du territoire.
+    </p>
+  </section>
 
-    </section>
-
-  <section class="intro">
-    <h2 class="underline">Informer, connecter, agir</h2>
-    <p>
-      Air Sphere Connect met à disposition des indicateurs sur la qualité de l’air,
+  <!-- Intro Section -->
+  <section class="max-w-4xl mx-auto mb-16 text-center">
+    <h2 class="text-2xl font-semibold text-base-content mb-6 underline">
+      Informer, connecter, agir
+    </h2>
+    <p class="text-base-content/80 mb-4">
+      Air Sphere Connect met à disposition des indicateurs sur la qualité de l'air,
       croisés avec des données de population et des données météorologiques issues
       des services publics Open Data de la région Occitanie.
     </p>
-    <p class="hero_p">
-      L’objectif est de faciliter le partage d’informations sur les risques
-      écologiques et d’accompagner citoyens, associations et collectivités
+    <p class="text-base-content/80 max-w-3xl mx-auto">
+      L'objectif est de faciliter le partage d'informations sur les risques
+      écologiques et d'accompagner citoyens, associations et collectivités
       dans leurs décisions.
     </p>
   </section>
 
-  <section class="features">
-    <h2 class="underline">Explorez les données de votre territoire</h2>
-    <p class="hero_p">
-      Air Sphere Connect vous donne une vue d’ensemble de la qualité de l’air en Occitanie,
+  <!-- Features Section -->
+  <section class="max-w-6xl mx-auto mb-16">
+    <h2 class="text-2xl font-semibold text-base-content text-center mb-6 underline">
+      Explorez les données de votre territoire
+    </h2>
+    <p class="text-base-content/80 text-center max-w-3xl mx-auto mb-12">
+      Air Sphere Connect vous donne une vue d'ensemble de la qualité de l'air en Occitanie,
       des tendances dans le temps et des populations les plus exposées.
     </p>
 
-    <div class="features-grid">
-      <article class="feature-card">
-        <img
-          ngSrc="/images/carte_air_sphere.png"
-          alt="Carte interactive de l'Occitanie"
-          width="1145"
-          height="550"
-          priority
-        />
-        <h3>Carte interactive</h3>
-        <p>
-          Naviguez sur la carte de l’Occitanie, commune par commune, pour suivre la qualité de l’air
-          et les indicateurs locaux.
-        </p>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Carte Interactive -->
+      <article class="card bg-base-100 shadow-xl">
+        <figure class="px-4 pt-4">
+          <img
+            src="/images/carte_air_sphere.png"
+            alt="Carte interactive de l'Occitanie"
+            class="rounded-xl w-full"
+          />
+        </figure>
+        <div class="card-body">
+          <h3 class="card-title text-primary">Carte interactive</h3>
+          <p class="text-base-content/70">
+            Naviguez sur la carte de l'Occitanie, commune par commune, pour suivre la qualité de l'air
+            et les indicateurs locaux.
+          </p>
+        </div>
       </article>
 
-      <article class="feature-card">
-        <img
-          ngSrc="/images/history_air_sphere.png"
-          alt="Historique des données"
-          width="1147"
-          height="627"
-          priority
-        />
-        <h3>Historique des épisodes</h3>
-        <p>
-          Visualisez l’historique des pics de pollution et des épisodes météorologiques marquants
-          sur votre territoire.
-        </p>
+      <!-- Historique -->
+      <article class="card bg-base-100 shadow-xl">
+        <figure class="px-4 pt-4">
+          <img
+            src="/images/history_air_sphere.png"
+            alt="Historique des données"
+            class="rounded-xl w-full"
+          />
+        </figure>
+        <div class="card-body">
+          <h3 class="card-title text-secondary">Historique des épisodes</h3>
+          <p class="text-base-content/70">
+            Visualisez l'historique des pics de pollution et des épisodes météorologiques marquants
+            sur votre territoire.
+          </p>
+        </div>
       </article>
 
-      <article class="feature-card">
-        <img
-          ngSrc="/images/graphe_air_sphere.png"
-          alt="Graphiques d'évolution"
-          width="1145"
-          height="550"
-          priority/>
-        <h3>Graphiques d’évolution</h3>
-        <p>
-          Analysez l’évolution des principaux polluants et comparez les périodes pour mieux comprendre les tendances.
-        </p>
+      <!-- Graphiques -->
+      <article class="card bg-base-100 shadow-xl">
+        <figure class="px-4 pt-4">
+          <img
+            src="/images/graphe_air_sphere.png"
+            alt="Graphiques d'évolution"
+            class="rounded-xl w-full"
+          />
+        </figure>
+        <div class="card-body">
+          <h3 class="card-title text-accent">Graphiques d'évolution</h3>
+          <p class="text-base-content/70">
+            Analysez l'évolution des principaux polluants et comparez les périodes pour mieux comprendre les tendances.
+          </p>
+        </div>
       </article>
     </div>
   </section>
 
-  <section class="cta">
-    <h2 class="underline">Commencer à explorer l’Occitanie</h2>
-    <p>
+  <!-- CTA Section -->
+  <section class="max-w-4xl mx-auto text-center">
+    <h2 class="text-2xl font-semibold text-base-content mb-6 underline">
+      Commencer à explorer l'Occitanie
+    </h2>
+    <p class="text-base-content/80">
       Sélectionnez votre territoire, comparez les indicateurs, et partagez vos
       observations avec la communauté Air Sphere Connect.
     </p>

@@ -9,8 +9,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 /**
- * DTO pour l'API horaire 30 jours ATMO Occitanie
- * Service : Mesure_horaire_(30j)_Region_Occitanie_Polluants_Reglementaires_1
+ * DTO de réponse pour les mesures horaires de polluants de l'API ATMO Occitanie.
+ * Représente une mesure horaire d'un polluant spécifique provenant du service
+ * "Mesure_horaire_(30j)_Region_Occitanie_Polluants_Reglementaires_1" de l'API ATMO.
+ * Utilisé lors de la synchronisation des données depuis l'API externe vers la base locale.
+ * Fournit une méthode utilitaire pour convertir le timestamp Unix en LocalDateTime.
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AirQualityHourlyMeasureResponseDto(
@@ -36,7 +39,10 @@ public record AirQualityHourlyMeasureResponseDto(
         Long dateDebutTimestamp
 ) {
     /**
-     * Convertit le timestamp Unix (millisecondes) en LocalDateTime
+     * Convertit le timestamp Unix (millisecondes) en LocalDateTime.
+     * Utilise le fuseau horaire système pour la conversion.
+     *
+     * @return La date et heure de la mesure convertie, ou null si le timestamp est null
      */
     public LocalDateTime getMeasuredAt() {
         if (dateDebutTimestamp == null) {

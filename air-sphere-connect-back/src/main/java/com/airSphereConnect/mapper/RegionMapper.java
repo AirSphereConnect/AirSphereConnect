@@ -15,7 +15,7 @@ public class RegionMapper {
 
         return new RegionResponseDto(
                 region.getId(),
-                region.getCode(),
-                region.getName());
+                region.getName(),
+                region.getCode());
     }
 }

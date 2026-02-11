@@ -39,3 +39,11 @@ air-sphere-connect-front/.nyc_output/
 # SonarQube
 .sonarqube/
 .sonar/
+
+docs/
+
+# Backup/temp files
+*.backup
+*.bak
+*.tmp
+nul

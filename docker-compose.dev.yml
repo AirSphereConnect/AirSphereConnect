@@ -1,7 +1,4 @@
 services:
-  # ==============================
-  # BASE DE DONNÉES MARIADB
-  # ==============================
   mariadb:
     image: mariadb:${MARIADB_VERSION}
     container_name: ${DB_CONTAINER_NAME}
@@ -28,9 +25,6 @@ services:
       retries: 5
       start_period: 60s
 
-  # ==============================
-  # SONARQUBE + POSTGRESQL
-  # ==============================
   sonarqube-db:
     image: postgres:15-alpine
     container_name: sonarqube_db
@@ -75,31 +69,21 @@ services:
       retries: 5
       start_period: 60s
 
-  # ==============================
-  # MAILHOG
-  # ==============================
-
   mailhog:
     image: mailhog/mailhog:latest
     container_name: mailhog
     restart: unless-stopped
-
     ports:
       - "1025:1025"  # SMTP
       - "8025:8025"  # Web UI
-
     networks:
       - ${NETWORK_NAME}
-
     healthcheck:
       test: [ "CMD", "wget", "--spider", "-q", "http://localhost:8025" ]
       interval: 10s
       timeout: 5s
       retries: 3
 
-  # ==============================
-  # BACKEND SPRING BOOT
-  # ==============================
   backend:
     build:
       context: ${BACKEND_CONTEXT}
@@ -112,20 +96,12 @@ services:
       SPRING_DOCKER_COMPOSE_ENABLED: "false"
       SPRING_SCHEDULING_ENABLED: "true"
     volumes:
-      # ✅ Code source Java
       - ./air-sphere-connect-back/src:/app/src
-
-      # ✅ Classes compilées pour hot-reload
       - ./air-sphere-connect-back/target:/app/target
-
-      # ✅ Configuration Maven
       - ./air-sphere-connect-back/pom.xml:/app/pom.xml
-
-      # ✅ Cache Maven
       - maven_cache:/root/.m2
     ports:
       - "${BACKEND_PORT}:8080"
-#      - "${DEBUG_PORT}:5005"
     depends_on:
       mariadb:
         condition: service_healthy
@@ -138,9 +114,6 @@ services:
       retries: 10
       start_period: 90s
 
-  # ==============================
-  # FRONTEND ANGULAR
-  # ==============================
   frontend:
     build:
       context: ${FRONTEND_CONTEXT}
@@ -153,11 +126,9 @@ services:
     ports:
       - "${FRONTEND_PORT}:4200"
     volumes:
-      # ✅ Angular : uniquement src/ et config
       - ./air-sphere-connect-front/src:/app/src
       - ./air-sphere-connect-front/angular.json:/app/angular.json
       - ./air-sphere-connect-front/package.json:/app/package.json
-#      - node_modules:/app/node_modules
     depends_on:
       backend:
         condition: service_healthy
@@ -170,10 +141,6 @@ services:
       retries: 3
       start_period: 45s
 
-
-# ==============================
-# VOLUMES
-# ==============================
 volumes:
   air_sphere_connect_db_data:
     name: ${DB_VOLUME_NAME}
@@ -189,9 +156,6 @@ volumes:
   sonarqube_logs:
     driver: local
 
-# ==============================
-# NETWORKS
-# ==============================
 networks:
   air_sphere_connect_network:
     name: ${NETWORK_NAME}

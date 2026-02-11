@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map } from 'rxjs';
-import { AirQualityComplete, AirQualityIndex, AirQualityMeasurement, AirQualityData } from '../models/data.model';
+import { AirQualityData, AirQualityIndex, AirQualityMeasurement } from '../models/data.model';
 import { ApiConfigService } from './api';
 
 @Injectable({ providedIn: 'root' })
@@ -10,20 +10,19 @@ export class AirQualityService {
   private readonly api = inject(ApiConfigService);
   private readonly apiUrl = `${this.api.apiUrl}/air-quality`;
 
-  getComplete(cityName: string): Observable<AirQualityComplete> {
+  getComplete(cityName: string): Observable<AirQualityData> {
     return this.http
-      .get<AirQualityComplete>(`${this.apiUrl}/city/${cityName}/complete`, {
+      .get<AirQualityData>(`${this.apiUrl}/city/${cityName}/complete`, {
         withCredentials: true,
-      })
-      .pipe(map(this.mapToComplete));
+      });
   }
 
   getLatestIndex(cityName: string): Observable<AirQualityIndex | null> {
-    return this.getComplete(cityName).pipe(map(data => data.latestIndex));
+    return this.getComplete(cityName).pipe(map(data => data.latestIndex || null));
   }
 
   getLatestMeasurement(cityName: string): Observable<AirQualityMeasurement | null> {
-    return this.getComplete(cityName).pipe(map(data => data.latestMeasurement));
+    return this.getComplete(cityName).pipe(map(data => data.latestMeasurement || null));
   }
 
   /**
@@ -37,14 +36,5 @@ export class AirQualityService {
       `${this.apiUrl}/department/${departmentCode}/top-cities`,
       { params, withCredentials: true }
     );
-  }
-
-  private mapToComplete(data: AirQualityComplete): AirQualityComplete {
-    return {
-      latestMeasurement: data.latestMeasurement,
-      latestIndex: data.latestIndex,
-      measurementHistory: data.measurementHistory || [],
-      indexHistory: data.indexHistory || [],
-    };
   }
 }

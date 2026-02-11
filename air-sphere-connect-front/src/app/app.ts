@@ -1,19 +1,21 @@
-import {NavigationEnd, Router, RouterOutlet} from '@angular/router';
+import {Router, RouterOutlet} from '@angular/router';
 import {UserService} from './shared/services/user-service';
 import {
+  AfterViewInit,
   Component,
-  signal,
-  inject,
   DestroyRef,
   effect,
-  ViewChild,
   ElementRef,
-  AfterViewInit, OnDestroy, computed, OnInit
+  inject,
+  OnDestroy,
+  OnInit,
+  signal,
+  ViewChild
 } from '@angular/core';
 import {Header} from './shared/components/layout/header/header';
 import {Footer} from './shared/components/layout/footer/footer/footer';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-import {filter, fromEvent, Subscription} from 'rxjs';
+import {fromEvent, Subscription} from 'rxjs';
 import {BackToTop} from './shared/components/ui/back-to-top/back-to-top';
 import {Notification} from './shared/components/ui/notification/notification';
 

@@ -16,14 +16,10 @@ export interface AirQualityMeasurement {
   no2: number;
   o3: number;
   so2: number;
-  co: number;
   unit: string;
-  station?: {
-    id: number;
-    name: string;
-    latitude: number;
-    longitude: number;
-  };
+  station?: string;  // Nom de la station (string depuis le backend)
+  dataSource?: string;  // "exact", "areaCode", "department", "neighboring_departments"
+  sourceCities?: string;  // Villes sources (ex: "Toulouse (Haute-Garonne), Montpellier (Hérault)")
 }
 
 export interface AirQualityIndex {

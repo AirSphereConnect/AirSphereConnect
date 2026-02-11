@@ -5,6 +5,12 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * DTO de réponse contenant les données complètes de qualité de l'air pour une ville.
+ * Agrège à la fois les mesures de polluants atmosphériques (PM10, PM2.5, NO2, O3, SO2)
+ * et les indices ATMO de qualité de l'air, ainsi que leurs historiques respectifs.
+ * Utilisé pour fournir une vue complète de la qualité de l'air d'une ville donnée.
+ */
 @Schema(description = "Données complètes de qualité de l'air pour une ville")
 public class AirQualityDataResponseDto {
 

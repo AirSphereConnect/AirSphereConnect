@@ -11,7 +11,7 @@
       <app-button variant="ghost" shape="circle" (buttonClick)="toggleTheme()" (buttonKeydown)="undefined">
         <app-icon
           [name]="isDarkTheme() ? 'sun' : 'darkMoon'"
-          color="current"
+          [color]="isDarkTheme() ? 'warning' : 'current'"
           size="md"
         />
       </app-button>

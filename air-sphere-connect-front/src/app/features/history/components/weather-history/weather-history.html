@@ -17,7 +17,7 @@
     <tbody>
       @if (filteredData().length === 0) {
         <tr>
-          <td colspan="7" class="text-center py-8 text-gray-500">
+          <td colspan="7" class="text-center py-8 text-base-content opacity-60">
             Aucune donnée météo disponible pour cette période
           </td>
         </tr>
@@ -25,7 +25,7 @@
 
       @if (hasOnlyAirQualityData()) {
         <tr>
-          <td colspan="7" class="text-center py-8 text-gray-500">
+          <td colspan="7" class="text-center py-8 text-base-content opacity-60">
             Aucune donnée météo (seules les données de qualité de l'air sont disponibles)
           </td>
         </tr>

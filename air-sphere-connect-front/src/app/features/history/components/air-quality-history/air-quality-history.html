@@ -15,7 +15,7 @@
     <tbody>
       @if (filteredData().length === 0) {
         <tr>
-          <td colspan="8" class="text-center py-8 text-gray-500">
+          <td colspan="8" class="text-center py-8 text-base-content opacity-60">
             Aucune donnée de qualité de l'air disponible pour cette période
           </td>
         </tr>
@@ -23,7 +23,7 @@
 
       @if (hasOnlyWeatherData()) {
         <tr>
-          <td colspan="8" class="text-center py-8 text-gray-500">
+          <td colspan="8" class="text-center py-8 text-base-content opacity-60">
             Aucune donnée de qualité de l'air (seules les données météo sont disponibles)
           </td>
         </tr>
@@ -41,7 +41,7 @@
                 {{ snapshot.airIndex.qualityIndex }}
               </span>
             } @else {
-              <span class="text-gray-400">Non mesuré</span>
+              <span class="text-base-content opacity-40">Non mesuré</span>
             }
           </td>
 

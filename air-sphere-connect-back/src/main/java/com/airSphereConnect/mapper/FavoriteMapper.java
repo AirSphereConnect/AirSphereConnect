@@ -10,8 +10,8 @@ public class FavoriteMapper {
     public FavoriteDto toDto(Favorite favorite) {
         return new FavoriteDto(
                 favorite.getId(),
-                favorite.getSelectAirQuality(),
                 favorite.getSelectPopulation(),
+                favorite.getSelectAirQuality(),
                 favorite.getSelectWeather(),
                 favorite.getCreatedAt(),
                 favorite.getUpdatedAt(),

@@ -5,6 +5,12 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.time.LocalDateTime;
 
+/**
+ * DTO de réponse pour les mesures journalières de polluants de l'API ATMO Occitanie.
+ * Représente une mesure journalière d'un polluant spécifique provenant du service
+ * "Mesure_journaliere_(30j)_Region_Occitanie_Polluants_Reglementaires" de l'API ATMO.
+ * Utilisé lors de la synchronisation des données depuis l'API externe vers la base locale.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public record AirQualityDailyMeasureResponseDto(
         @JsonProperty("insee_com")

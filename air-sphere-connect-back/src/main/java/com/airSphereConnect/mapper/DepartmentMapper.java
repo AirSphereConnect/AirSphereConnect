@@ -13,7 +13,7 @@ public class DepartmentMapper {
 
         return new DepartmentResponseDto(
                 department.getId(),
-                department.getCode(),
-                department.getName());
+                department.getName(),
+                department.getCode());
     }
 }

@@ -24,6 +24,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * Service de synchronisation des données de qualité de l'air depuis l'API ATMO Occitanie.
+ * Gère la récupération, le parsing et la sauvegarde des mesures de polluants et des indices de qualité de l'air.
+ */
 @Service
 public class ApiAirQualityService implements DataSyncService {
 
@@ -46,18 +50,31 @@ public class ApiAirQualityService implements DataSyncService {
     private LocalDateTime lastSync;
     private int consecutiveErrors = 0;
 
-    // URLs des services GeoJSON ATMO Occitanie
+    /** URL du service d'indices de qualité de l'air ATMO Occitanie */
     private static final String QUALITY_INDEX =
-            "/Indice_quotidien_de_qualité_de_l’air_pour_les_collectivités_territoriales_en_Occitanie/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=json";
+            "/Indice_quotidien_de_qualité_de_l'air_pour_les_collectivités_territoriales_en_Occitanie/FeatureServer/0/query?where=1=1&outFields=*&outSR=4326&f=json";
+
+    /** URL du service de mesures journalières des polluants ATMO Occitanie */
     private static final String MEASURES_DAILY =
             "/mesures_occitanie_journaliere_poll_princ/FeatureServer/0/query?where=1=1&outFields=*&f=geojson";
 
-    // Seuil d'alerte indice qualité
+    /** Seuil d'alerte pour l'indice de qualité de l'air */
     private static final int ALERT_THRESHOLD = 3;
-    // Timeout requête HTTP
+
+    /** Timeout des requêtes HTTP en secondes */
     private static final int HTTP_TIMEOUT_SECONDS = 30;
 
-
+    /**
+     * Constructeur du service de synchronisation ATMO.
+     *
+     * @param atmoApiWebClient          Client WebFlux pour les appels API ATMO
+     * @param stationRepository         Repository des stations de mesure
+     * @param measurementRepository     Repository des mesures de qualité de l'air
+     * @param indexRepository           Repository des indices de qualité de l'air
+     * @param cityRepository            Repository des villes
+     * @param mapper                    Mapper pour les DTOs ATMO
+     * @param objectMapper              Mapper JSON
+     */
     public ApiAirQualityService(WebClient atmoApiWebClient,
                                 AirQualityStationRepository stationRepository,
                                 AirQualityMeasurementRepository measurementRepository,
@@ -74,11 +91,20 @@ public class ApiAirQualityService implements DataSyncService {
         this.objectMapper = objectMapper;
     }
 
+    /**
+     * Retourne le nom du service de synchronisation.
+     *
+     * @return Le nom du service
+     */
     @Override
     public String getServiceName() {
         return "AIR_QUALITY";
     }
 
+    /**
+     * Synchronise les données de qualité de l'air depuis l'API ATMO Occitanie.
+     * Récupère les mesures des stations et les indices de qualité de l'air.
+     */
     @Override
     public void syncData() {
         log.info("🔄 Début synchronisation ATMO Occitanie...");
@@ -104,6 +130,12 @@ public class ApiAirQualityService implements DataSyncService {
 
     }
 
+    /**
+     * Synchronise les mesures des stations de qualité de l'air.
+     * Récupère les données depuis l'API, les parse et les sauvegarde en base de données.
+     *
+     * @return Le nombre de mesures synchronisées
+     */
     private int syncStationMeasures() {
         log.info("📊 [ATMO] Récupération mesures stations");
 
@@ -135,6 +167,13 @@ public class ApiAirQualityService implements DataSyncService {
         return savedCount;
     }
 
+    /**
+     * Sauvegarde les mesures de qualité de l'air pour une station donnée.
+     * Évite les doublons en vérifiant si une mesure existe déjà pour la date du jour.
+     *
+     * @param stationMeasures La liste des mesures pour la station
+     * @return Le nombre de mesures sauvegardées (0 ou 1)
+     */
     private int saveMeasurementForStation(
             List<AirQualityDailyMeasureResponseDto> stationMeasures) {
 
@@ -146,9 +185,10 @@ public class ApiAirQualityService implements DataSyncService {
             return 0;
         }
 
-        // ✅ CORRECTION : Extraire la vraie date de l'API au lieu d'utiliser LocalDate.now()
-        LocalDateTime syncDateTime = timestampToLocalDateTime(dailyDto.dateDebutTimestamp());
-        log.debug("📅 [ATMO] Station {} - Date extraite de l'API : {}",
+        // ✅ Utiliser la date du jour de la synchronisation (comme pour Weather)
+        // Cela évite les duplicata quand ATMO retourne toujours le même timestamp
+        LocalDateTime syncDateTime = LocalDate.now().atStartOfDay();
+        log.debug("📅 [ATMO] Station {} - Date de synchronisation : {}",
                 dailyDto.codeStation(), syncDateTime);
 
         // ✅ Vérifier si une mesure existe déjà pour cette station et cette date
@@ -173,6 +213,12 @@ public class ApiAirQualityService implements DataSyncService {
         return 1;
     }
 
+    /**
+     * Synchronise les indices de qualité de l'air pour les zones géographiques.
+     * Crée ou met à jour les indices et détecte les alertes de qualité de l'air.
+     *
+     * @return Le nombre d'indices synchronisés
+     */
     private int syncQualityIndex() {
         log.info("📊 [ATMO] Récupération indices qualité");
 
@@ -191,9 +237,10 @@ public class ApiAirQualityService implements DataSyncService {
 
         for (AirQualityIndexMeasureResponseDto indexDto : indexDtos) {
             try {
-                // ✅ CORRECTION : Extraire la vraie date de l'API au lieu d'utiliser LocalDate.now()
-                LocalDateTime syncDateTime = timestampToLocalDateTime(indexDto.dateEchTimestamp());
-                log.debug("📅 [ATMO] Zone {} - Date extraite de l'API : {}",
+                // ✅ Utiliser la date du jour de la synchronisation (comme pour Weather)
+                // Cela évite les duplicata quand ATMO retourne toujours le même timestamp
+                LocalDateTime syncDateTime = LocalDate.now().atStartOfDay();
+                log.debug("📅 [ATMO] Zone {} - Date de synchronisation : {}",
                         indexDto.areaCode(), syncDateTime);
 
                 // ✅ Vérifier si un indice existe déjà pour cette zone ET cette date
@@ -265,6 +312,15 @@ public class ApiAirQualityService implements DataSyncService {
         return savedCount;
     }
 
+    /**
+     * Parse le JSON retourné par l'API ATMO et extrait les données dans des DTOs.
+     *
+     * @param json      Le JSON à parser
+     * @param dataField Le champ contenant les données (properties ou attributes)
+     * @param dtoClass  La classe du DTO cible
+     * @param <T>       Le type du DTO
+     * @return La liste des DTOs parsés
+     */
     private <T> List<T> parseAtmoJson(String json, String dataField, Class<T> dtoClass) {
         List<T> results = new ArrayList<>();
 
@@ -295,6 +351,12 @@ public class ApiAirQualityService implements DataSyncService {
         return results;
     }
 
+    /**
+     * Groupe les mesures par station de mesure.
+     *
+     * @param measures La liste des mesures à grouper
+     * @return Une map avec le code station comme clé et la liste des mesures comme valeur
+     */
     private Map<String, List<AirQualityDailyMeasureResponseDto>> groupMeasuresByStation(
             List<AirQualityDailyMeasureResponseDto> measures) {
 
@@ -309,6 +371,13 @@ public class ApiAirQualityService implements DataSyncService {
         return grouped;
     }
 
+    /**
+     * Récupère une station existante ou en crée une nouvelle.
+     * La station doit être associée à une ville existante en base de données.
+     *
+     * @param dto Le DTO contenant les informations de la station
+     * @return La station trouvée ou créée, null si aucune ville associée n'existe
+     */
     private AirQualityStation getOrCreateStation(AirQualityDailyMeasureResponseDto dto) {
         Optional<AirQualityStation> existingStation = stationRepository.findByCode(dto.codeStation());
 
@@ -358,7 +427,12 @@ public class ApiAirQualityService implements DataSyncService {
         return stationRepository.save(newStation);
     }
 
-
+    /**
+     * Récupère les données JSON depuis l'API ATMO.
+     *
+     * @param uri L'URI de l'endpoint à appeler
+     * @return Le JSON récupéré, ou null en cas d'erreur
+     */
     private String fetchJson(String uri) {
         try {
             log.debug("📥 [ATMO] Fetch {}", uri);
@@ -376,6 +450,13 @@ public class ApiAirQualityService implements DataSyncService {
         }
     }
 
+    /**
+     * Remplit les valeurs de polluants d'une mesure en fonction du nom du polluant.
+     *
+     * @param measurement   La mesure à remplir
+     * @param pollutantName Le nom du polluant (PM10, PM2.5, NO2, O3, SO2)
+     * @param value         La valeur de concentration du polluant
+     */
     public void fillPollutant(AirQualityMeasurement measurement,
                               String pollutantName,
                               Double value) {
@@ -393,8 +474,11 @@ public class ApiAirQualityService implements DataSyncService {
     }
 
     /**
-     * 📅 Convertir un timestamp ATMO (millisecondes) en LocalDateTime
-     * L'API ATMO retourne des timestamps UTC, on les convertit en LocalDateTime à minuit
+     * Convertit un timestamp ATMO (millisecondes) en LocalDateTime.
+     * L'API ATMO retourne des timestamps UTC, convertis en LocalDateTime à minuit.
+     *
+     * @param timestampMs Le timestamp en millisecondes
+     * @return Le LocalDateTime correspondant à minuit du jour de la mesure
      */
     private LocalDateTime timestampToLocalDateTime(Long timestampMs) {
         if (timestampMs == null) {
@@ -410,21 +494,41 @@ public class ApiAirQualityService implements DataSyncService {
         return date.atStartOfDay();
     }
 
+    /**
+     * Indique si le service de synchronisation est activé.
+     *
+     * @return true si le service est activé et qu'il y a moins de 3 erreurs consécutives
+     */
     @Override
     public boolean isEnabled() {
         return enabled && consecutiveErrors < 3;
     }
 
+    /**
+     * Retourne l'intervalle de synchronisation configuré.
+     *
+     * @return La durée entre deux synchronisations
+     */
     @Override
     public Duration getSyncInterval() {
         return Duration.ofHours(syncIntervalHours);
     }
 
+    /**
+     * Retourne la date et l'heure de la dernière synchronisation réussie.
+     *
+     * @return La date et l'heure de la dernière synchronisation
+     */
     @Override
     public LocalDateTime getLastSync() {
         return lastSync;
     }
 
+    /**
+     * Retourne le nombre d'erreurs consécutives lors des synchronisations.
+     *
+     * @return Le nombre d'erreurs consécutives
+     */
     @Override
     public int getConsecutiveErrors() {
         return consecutiveErrors;

@@ -3,13 +3,10 @@ import { Router } from '@angular/router';
 import { UserService } from '../../shared/services/user-service';
 import { Subscription } from 'rxjs';
 import {UserProfileResponse} from '../../core/models/user.model';
-import {NgOptimizedImage} from '@angular/common';
 
 @Component({
   selector: 'app-home',
-  imports: [
-    NgOptimizedImage
-  ],
+  imports: [],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })

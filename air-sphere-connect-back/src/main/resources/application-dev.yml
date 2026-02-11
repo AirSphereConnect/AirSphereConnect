@@ -1,21 +1,17 @@
-# Profil développement local
 spring:
   datasource:
     url: jdbc:mariadb://${DB_HOST:mariadb}:3306/${DB_NAME:air_sphere_connect}
     username: ${DB_USER:air_sphere_connect_user}
     password: ${DB_PASSWORD:PassASC@34Diginamic!}
     driver-class-name: org.mariadb.jdbc.Driver
-
   messages:
     basename: ValidationMessages
     encoding: UTF-8
-
   security:
     user:
       name: ${SPRING_SECURITY_USER_NAME:-admin}
       password: ${SPRING_SECURITY_USER_PASSWORD:-admin123}
       roles: ADMIN
-
   jpa:
     hibernate:
       ddl-auto: ${JPA_DDL_AUTO:update}
@@ -24,7 +20,6 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.MariaDBDialect
-
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -36,31 +31,23 @@ spring:
           auth: false
           starttls:
             enable: false
-
 cors:
   allowed-origins: ${CORS_ORIGINS:-http://localhost:4200}
   allowed-methods: "GET,POST,PUT,DELETE,OPTIONS"
   allowed-headers: "*"
-
 weather:
   api:
     key: ${WEATHER_API_KEY:e935d0947600dd8f7247eefe1819751a}
-
 mailjet:
   api:
     key: ${MAILJET_API_KEY:13f60c773c9d6b968a6415fa88e6affc}
     secret: ${MAILJET_API_SECRET:361d897cbe85bd88f3ddfea48599a081}
-
-# JWT Configuration
 jwt:
   secret: ${JWT_SECRET:UneCleSecreteSuperLongueEtComplexePourTestUnique1234567890}
   access-token-validity: ${JWT_ACCESS_TOKEN_VALIDITY:900000}   # 15 minutes en ms
   refresh-token-validity: ${JWT_REFRESH_TOKEN_VALIDITY:604800000} # 7 jours en ms
-
-# Cookie Configuration
 cookie:
   secure: ${COOKIE_SECURE:false}  # false en dev (HTTP), true en prod (HTTPS)
-
 docker:
   compose:
     enabled: false
