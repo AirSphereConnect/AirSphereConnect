@@ -5,12 +5,14 @@ import { of, throwError, Subject } from 'rxjs';
 
 import { Login } from './login';
 import { UserService } from '../../../shared/services/user-service';
+import { NotificationService } from '../../../shared/services/notification-service';
 import { UserProfileResponse } from '../../../core/models/user.model';
 
 describe('Login', () => {
   let component: Login;
   let fixture: ComponentFixture<Login>;
   let userService: jasmine.SpyObj<UserService>;
+  let notificationService: jasmine.SpyObj<NotificationService>;
   let router: Router;
 
   const mockUserProfile: UserProfileResponse = {
@@ -20,13 +22,15 @@ describe('Login', () => {
 
   beforeEach(async () => {
     const userServiceSpy = jasmine.createSpyObj('UserService', ['login']);
+    const notificationServiceSpy = jasmine.createSpyObj('NotificationService', ['showSuccess', 'showError']);
 
     await TestBed.configureTestingModule({
       imports: [Login],
       providers: [
         provideHttpClient(),
         provideRouter([]),
-        { provide: UserService, useValue: userServiceSpy }
+        { provide: UserService, useValue: userServiceSpy },
+        { provide: NotificationService, useValue: notificationServiceSpy }
       ]
     })
     .compileComponents();
@@ -34,6 +38,7 @@ describe('Login', () => {
     fixture = TestBed.createComponent(Login);
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
+    notificationService = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
     router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
     fixture.detectChanges();
@@ -71,10 +76,6 @@ describe('Login', () => {
   });
 
   describe('Signals', () => {
-    it('should initialize errorMessage to null', () => {
-      expect(component.errorMessage()).toBeNull();
-    });
-
     it('should initialize isLoading to false', () => {
       expect(component.isLoading()).toBeFalse();
     });
@@ -137,14 +138,6 @@ describe('Login', () => {
     });
   });
 
-  describe('clearError', () => {
-    it('should clear errorMessage', () => {
-      component.errorMessage.set('Some error');
-      component.clearError();
-      expect(component.errorMessage()).toBeNull();
-    });
-  });
-
   describe('onSubmit', () => {
     beforeEach(() => {
       component.loginForm.patchValue({
@@ -174,13 +167,6 @@ describe('Login', () => {
       loginSubject.complete();
     });
 
-    it('should clear errorMessage before login', () => {
-      component.errorMessage.set('Previous error');
-      userService.login.and.returnValue(of(mockUserProfile));
-      component.onSubmit();
-      expect(component.errorMessage()).toBeNull();
-    });
-
     it('should call userService.login with credentials', () => {
       userService.login.and.returnValue(of(mockUserProfile));
       component.onSubmit();
@@ -201,13 +187,12 @@ describe('Login', () => {
         });
       });
 
-      it('should clear errorMessage after success', (done) => {
+      it('should show success notification after success', (done) => {
         userService.login.and.returnValue(of(mockUserProfile));
-        component.errorMessage.set('Previous error');
         component.onSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBeNull();
+          expect(notificationService.showSuccess).toHaveBeenCalledWith('Connexion réussie');
           done();
         });
       });
@@ -239,7 +224,7 @@ describe('Login', () => {
         component.onSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Impossible de contacter le serveur.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Impossible de contacter le serveur.');
           done();
         });
       });
@@ -249,7 +234,7 @@ describe('Login', () => {
         component.onSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe("Nom d'utilisateur ou mot de passe incorrect.");
+          expect(notificationService.showError).toHaveBeenCalledWith("Nom d'utilisateur ou mot de passe incorrect.");
           done();
         });
       });
@@ -259,7 +244,7 @@ describe('Login', () => {
         component.onSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Accès refusé.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Accès refusé.');
           done();
         });
       });
@@ -269,7 +254,7 @@ describe('Login', () => {
         component.onSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Service non disponible.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Service non disponible.');
           done();
         });
       });
@@ -279,7 +264,7 @@ describe('Login', () => {
         component.onSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Erreur serveur. Veuillez réessayer plus tard.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Erreur serveur. Veuillez réessayer plus tard.');
           done();
         });
       });
@@ -289,7 +274,7 @@ describe('Login', () => {
         component.onSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Une erreur est survenue lors de la connexion.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Une erreur est survenue lors de la connexion.');
           done();
         });
       });

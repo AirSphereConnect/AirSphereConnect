@@ -8,7 +8,7 @@ import { PopulationService } from './population';
 import { City } from '../models/city.model';
 import {
   WeatherMeasurement,
-  AirQualityComplete,
+  AirQualityData,
   PopulationData,
   AirQualityMeasurement,
   AirQualityIndex
@@ -63,7 +63,6 @@ describe('DataOrchestratorService', () => {
     no2: 30.2,
     o3: 45.1,
     so2: 5.5,
-    co: 200,
     unit: 'µg/m³'
   };
 
@@ -76,7 +75,9 @@ describe('DataOrchestratorService', () => {
     areaName: 'Paris'
   };
 
-  const mockAirQualityComplete: AirQualityComplete = {
+  const mockAirQualityComplete: AirQualityData = {
+    cityId: 1,
+    cityName: 'Paris',
     latestMeasurement: mockAirQualityMeasurement,
     latestIndex: mockAirQualityIndex,
     measurementHistory: [mockAirQualityMeasurement],
@@ -166,6 +167,8 @@ describe('DataOrchestratorService', () => {
       mockCityService.getByName.and.returnValue(of(mockCity));
       mockWeatherService.getHistory.and.returnValue(of([]));
       mockAirQualityService.getComplete.and.returnValue(of({
+        cityId: 1,
+        cityName: 'Paris',
         latestMeasurement: mockAirQualityMeasurement,
         latestIndex: mockAirQualityIndex,
         measurementHistory: [],
@@ -175,7 +178,7 @@ describe('DataOrchestratorService', () => {
 
       service.loadDashboardData('Paris').subscribe(dashboardData => {
         expect(dashboardData.weatherHistory.length).toBe(0);
-        expect(dashboardData.airQuality.measurementHistory.length).toBe(0);
+        expect(dashboardData.airQuality.measurementHistory?.length).toBe(0);
         expect(dashboardData.populationHistory.length).toBe(0);
         done();
       });

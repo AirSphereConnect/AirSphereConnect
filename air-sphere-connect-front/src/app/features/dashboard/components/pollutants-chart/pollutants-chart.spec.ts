@@ -14,7 +14,6 @@ describe('PollutantsChart', () => {
       no2: 30.2,
       o3: 45.1,
       so2: 5.5,
-      co: 200,
       unit: 'µg/m³'
     },
     {
@@ -24,7 +23,6 @@ describe('PollutantsChart', () => {
       no2: 28.5,
       o3: 42.3,
       so2: 4.8,
-      co: 180,
       unit: 'µg/m³'
     }
   ];

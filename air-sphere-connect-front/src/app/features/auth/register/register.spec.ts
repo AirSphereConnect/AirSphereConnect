@@ -6,12 +6,14 @@ import { of, throwError, Subject } from 'rxjs';
 import { Register } from './register';
 import { UserService } from '../../../shared/services/user-service';
 import { CityService } from '../../../core/services/city';
+import { NotificationService } from '../../../shared/services/notification-service';
 
 describe('Register', () => {
   let component: Register;
   let fixture: ComponentFixture<Register>;
   let userService: jasmine.SpyObj<UserService>;
   let cityService: jasmine.SpyObj<CityService>;
+  let notificationService: jasmine.SpyObj<NotificationService>;
   let router: Router;
 
   const mockCity = {
@@ -28,6 +30,7 @@ describe('Register', () => {
   beforeEach(async () => {
     const userServiceSpy = jasmine.createSpyObj('UserService', ['checkAvailability', 'register', 'setUserProfile']);
     const cityServiceSpy = jasmine.createSpyObj('CityService', ['searchCities']);
+    const notificationServiceSpy = jasmine.createSpyObj('NotificationService', ['showSuccess', 'showError']);
 
     await TestBed.configureTestingModule({
       imports: [Register],
@@ -35,7 +38,8 @@ describe('Register', () => {
         provideHttpClient(),
         provideRouter([]),
         { provide: UserService, useValue: userServiceSpy },
-        { provide: CityService, useValue: cityServiceSpy }
+        { provide: CityService, useValue: cityServiceSpy },
+        { provide: NotificationService, useValue: notificationServiceSpy }
       ]
     })
     .compileComponents();
@@ -44,6 +48,7 @@ describe('Register', () => {
     component = fixture.componentInstance;
     userService = TestBed.inject(UserService) as jasmine.SpyObj<UserService>;
     cityService = TestBed.inject(CityService) as jasmine.SpyObj<CityService>;
+    notificationService = TestBed.inject(NotificationService) as jasmine.SpyObj<NotificationService>;
     router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.returnValue(Promise.resolve(true));
     fixture.detectChanges();
@@ -92,7 +97,6 @@ describe('Register', () => {
 
   describe('Signals', () => {
     it('should initialize signals with default values', () => {
-      expect(component.errorMessage()).toBeNull();
       expect(component.isLoadingStep1()).toBeFalse();
       expect(component.isLoadingStep2()).toBeFalse();
       expect(component.passwordVisible()).toBeFalse();
@@ -272,14 +276,6 @@ describe('Register', () => {
     });
   });
 
-  describe('clearError', () => {
-    it('should clear error message', () => {
-      component.errorMessage.set('Some error');
-      component.clearError();
-      expect(component.errorMessage()).toBeNull();
-    });
-  });
-
   describe('onFirstSubmit - Step 1', () => {
     beforeEach(() => {
       component.registerFirstForm.patchValue({
@@ -310,13 +306,6 @@ describe('Register', () => {
       checkSubject.complete();
     });
 
-    it('should clear errorMessage before checking', () => {
-      component.errorMessage.set('Previous error');
-      userService.checkAvailability.and.returnValue(of({ usernameTaken: false, emailTaken: false }));
-      component.onFirstSubmit();
-      expect(component.errorMessage()).toBeNull();
-    });
-
     it('should call checkAvailability with username and email', () => {
       userService.checkAvailability.and.returnValue(of({ usernameTaken: false, emailTaken: false }));
       component.onFirstSubmit();
@@ -330,7 +319,6 @@ describe('Register', () => {
 
         setTimeout(() => {
           expect(component.step()).toBe(2);
-          expect(component.errorMessage()).toBeNull();
           expect(component.isLoadingStep1()).toBeFalse();
           done();
         });
@@ -338,12 +326,12 @@ describe('Register', () => {
     });
 
     describe('when username is taken', () => {
-      it('should show error and stay on step 1', (done) => {
+      it('should show error notification and stay on step 1', (done) => {
         userService.checkAvailability.and.returnValue(of({ usernameTaken: true, emailTaken: false }));
         component.onFirstSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe("Nom d'utilisateur déjà pris.");
+          expect(notificationService.showError).toHaveBeenCalledWith("Nom d'utilisateur déjà pris.");
           expect(component.step()).toBe(1);
           expect(component.isLoadingStep1()).toBeFalse();
           done();
@@ -352,12 +340,12 @@ describe('Register', () => {
     });
 
     describe('when email is taken', () => {
-      it('should show error and stay on step 1', (done) => {
+      it('should show error notification and stay on step 1', (done) => {
         userService.checkAvailability.and.returnValue(of({ usernameTaken: false, emailTaken: true }));
         component.onFirstSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Adresse email déjà utilisée.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Adresse email déjà utilisée.');
           expect(component.step()).toBe(1);
           expect(component.isLoadingStep1()).toBeFalse();
           done();
@@ -371,7 +359,7 @@ describe('Register', () => {
         component.onFirstSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Impossible de contacter le serveur.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Impossible de contacter le serveur.');
           expect(component.isLoadingStep1()).toBeFalse();
           done();
         });
@@ -382,7 +370,7 @@ describe('Register', () => {
         component.onFirstSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Service non disponible.');
+          expect(notificationService.showError).toHaveBeenCalledWith('Service non disponible.');
           done();
         });
       });
@@ -392,7 +380,7 @@ describe('Register', () => {
         component.onFirstSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Erreur serveur (500).');
+          expect(notificationService.showError).toHaveBeenCalledWith('Erreur serveur (500).');
           done();
         });
       });
@@ -402,7 +390,7 @@ describe('Register', () => {
         component.onFirstSubmit();
 
         setTimeout(() => {
-          expect(component.errorMessage()).toBe('Erreur serveur (418).');
+          expect(notificationService.showError).toHaveBeenCalledWith('Erreur serveur (418).');
           done();
         });
       });
@@ -452,16 +440,6 @@ describe('Register', () => {
         role: 'USER'
       } as any);
       registerSubject.complete();
-    });
-
-    it('should clear errorMessage before registering', () => {
-      component.errorMessage.set('Previous error');
-      userService.register.and.returnValue(of({
-        user: { id: 1, username: 'testuser', email: 'test@example.com', role: 'USER', address: null as any, favorites: [], alerts: [] },
-        role: 'USER'
-      } as any));
-      component.onSubmit();
-      expect(component.errorMessage()).toBeNull();
     });
 
     it('should call register with correct payload', () => {
@@ -527,7 +505,7 @@ describe('Register', () => {
       component.onSubmit();
 
       setTimeout(() => {
-        expect(component.errorMessage()).toBe("Erreur lors de l'inscription.");
+        expect(notificationService.showError).toHaveBeenCalledWith("Erreur lors de l'inscription.");
         expect(component.isLoadingStep2()).toBeFalse();
         expect(router.navigate).not.toHaveBeenCalled();
         done();
@@ -540,12 +518,6 @@ describe('Register', () => {
       component.step.set(2);
       component.goBackToStep1();
       expect(component.step()).toBe(1);
-    });
-
-    it('should clear errorMessage', () => {
-      component.errorMessage.set('Some error');
-      component.goBackToStep1();
-      expect(component.errorMessage()).toBeNull();
     });
   });
 

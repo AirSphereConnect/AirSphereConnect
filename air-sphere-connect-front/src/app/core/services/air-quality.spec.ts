@@ -2,7 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { AirQualityService } from './air-quality';
 import { ApiConfigService } from './api';
-import { AirQualityComplete, AirQualityData } from '../models/data.model';
+import { AirQualityData } from '../models/data.model';
 
 describe('AirQualityService', () => {
   let service: AirQualityService;
@@ -36,14 +36,15 @@ describe('AirQualityService', () => {
 
   describe('getComplete', () => {
     it('should fetch complete air quality data for a city', () => {
-      const mockResponse: AirQualityComplete = {
+      const mockResponse: AirQualityData = {
+        cityId: 1,
+        cityName: 'Paris',
         latestMeasurement: {
           pm25: 15.5,
           pm10: 25.3,
           no2: 30.2,
           o3: 45.1,
           so2: 5.5,
-          co: 0.5,
           unit: 'µg/m³',
           measuredAt: '2024-01-01T12:00:00'
         },
@@ -76,14 +77,15 @@ describe('AirQualityService', () => {
 
   describe('getLatestIndex', () => {
     it('should fetch only the latest air quality index', () => {
-      const mockComplete: AirQualityComplete = {
+      const mockComplete: AirQualityData = {
+        cityId: 2,
+        cityName: 'Lyon',
         latestMeasurement: {
           pm25: 10.0,
           pm10: 20.0,
           no2: 25.0,
           o3: 40.0,
           so2: 4.0,
-          co: 0.4,
           unit: 'µg/m³',
           measuredAt: '2024-01-01T12:00:00'
         },
@@ -100,7 +102,7 @@ describe('AirQualityService', () => {
       };
 
       service.getLatestIndex('Lyon').subscribe(index => {
-        expect(index).toEqual(mockComplete.latestIndex);
+        expect(index).toEqual(mockComplete.latestIndex!);
         expect(index?.qualityLabel).toBe('Bon');
       });
 
@@ -112,14 +114,15 @@ describe('AirQualityService', () => {
 
   describe('getLatestMeasurement', () => {
     it('should fetch only the latest air quality measurement', () => {
-      const mockComplete: AirQualityComplete = {
+      const mockComplete: AirQualityData = {
+        cityId: 3,
+        cityName: 'Marseille',
         latestMeasurement: {
           pm25: 12.5,
           pm10: 20.3,
           no2: 25.2,
           o3: 40.1,
           so2: 4.5,
-          co: 0.6,
           unit: 'µg/m³',
           measuredAt: '2024-01-01T12:00:00'
         },
@@ -136,7 +139,7 @@ describe('AirQualityService', () => {
       };
 
       service.getLatestMeasurement('Marseille').subscribe(measurement => {
-        expect(measurement).toEqual(mockComplete.latestMeasurement);
+        expect(measurement).toEqual(mockComplete.latestMeasurement!);
         expect(measurement?.pm25).toBe(12.5);
       });
 

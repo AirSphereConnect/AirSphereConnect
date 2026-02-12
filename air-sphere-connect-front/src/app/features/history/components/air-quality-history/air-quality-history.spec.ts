@@ -28,7 +28,6 @@ describe('AirQualityHistory', () => {
       no2: 30.2,
       o3: 45.1,
       so2: 5.5,
-      co: 200,
       unit: 'µg/m³'
     } : null,
     airIndex: hasAirData ? {

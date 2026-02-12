@@ -77,6 +77,6 @@ import { City } from './city.model';
 export interface DashboardData {
   city: City;
   weatherHistory: WeatherMeasurement[];
-  airQuality: AirQualityComplete;
+  airQuality: AirQualityData;
   populationHistory: PopulationData[];
 }

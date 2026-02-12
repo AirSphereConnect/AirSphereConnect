@@ -113,7 +113,7 @@ export class DataOrchestratorService {
           const dailyData = this.mergeDailyData(
             data.weatherHistory,
             measurements,
-            data.airQuality.indexHistory
+            data.airQuality.indexHistory || []
           );
 
           return {

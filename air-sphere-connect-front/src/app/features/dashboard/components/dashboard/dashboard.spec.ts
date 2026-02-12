@@ -3,7 +3,7 @@ import { of, throwError, BehaviorSubject } from 'rxjs';
 import { Dashboard } from './dashboard';
 import { DataOrchestratorService } from '../../../../core/services/data-orchestrator';
 import { UserService } from '../../../../shared/services/user-service';
-import { DashboardData, WeatherMeasurement, AirQualityComplete, PopulationData } from '../../../../core/models/data.model';
+import { DashboardData, WeatherMeasurement, AirQualityData, PopulationData } from '../../../../core/models/data.model';
 import { City } from '../../../../core/models/city.model';
 import { User, UserProfileResponse } from '../../../../core/models/user.model';
 
@@ -39,7 +39,9 @@ describe('Dashboard', () => {
     }
   ];
 
-  const mockAirQuality: AirQualityComplete = {
+  const mockAirQuality: AirQualityData = {
+    cityId: 1,
+    cityName: 'Paris',
     latestMeasurement: {
       measuredAt: '2024-01-01T12:00:00',
       pm25: 15.5,
@@ -47,7 +49,6 @@ describe('Dashboard', () => {
       no2: 30.2,
       o3: 45.1,
       so2: 5.5,
-      co: 200,
       unit: 'µg/m³'
     },
     latestIndex: {

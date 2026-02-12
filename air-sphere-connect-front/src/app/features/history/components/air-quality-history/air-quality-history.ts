@@ -66,12 +66,12 @@ export class AirQualityHistory {
 
   // Nombre de snapshots avec données air quality
   hasAirQualityData = computed(() => {
-    return this.allFilteredData().some(s => s.airMeasurement || s.airIndex);
+    return this.historyData().dailySnapshots.some(s => s.airMeasurement || s.airIndex);
   });
 
   // Vérifie si on a des données mais aucune air quality
   hasOnlyWeatherData = computed(() => {
-    return this.allFilteredData().length > 0 && !this.hasAirQualityData();
+    return this.historyData().dailySnapshots.length > 0 && !this.hasAirQualityData();
   });
 
   // Fonction pour obtenir la couleur badge selon l'indice qualité

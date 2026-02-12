@@ -72,12 +72,12 @@ export class WeatherHistory {
 
   // Nombre de snapshots avec données météo
   hasWeatherData = computed(() => {
-    return this.allFilteredData().some(s => s.weather);
+    return this.historyData().dailySnapshots.some(s => s.weather);
   });
 
   // Vérifie si on a des données mais aucune météo
   hasOnlyAirQualityData = computed(() => {
-    return this.allFilteredData().length > 0 && !this.hasWeatherData();
+    return this.historyData().dailySnapshots.length > 0 && !this.hasWeatherData();
   });
 
   // Fonction pour obtenir la direction du vent en texte

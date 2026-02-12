@@ -19,6 +19,7 @@ describe('App', () => {
 
   it('should render header component', () => {
     const fixture = TestBed.createComponent(App);
+    fixture.componentInstance.splashDone = true;
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('app-header')).toBeTruthy();
