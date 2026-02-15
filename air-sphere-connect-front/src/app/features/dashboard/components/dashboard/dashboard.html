@@ -1,7 +1,7 @@
-<div class="max-w-[1600px] mx-auto p-6">
+<div class="max-w-[1600px] mx-auto p-3 lg:p-6">
     <header class="mb-8 pb-5 border-b-2 border-base-300">
-      <h1 class="text-3xl font-bold text-base-content">Tableau de bord des indicateurs de la ville de
-        <span class="">{{ cityName() }}</span>
+      <h1 class="text-2xl lg:text-3xl font-bold text-base-content">Données climatiques de
+        <span>{{ cityName() }}</span>
         <span class="ml-2">({{ cityPostalCode() }})</span></h1>
     </header>
 
@@ -24,8 +24,6 @@
   @if (!isLoading() && !error() && dashboardData()) {
 
     <div class="dashboard-content grid grid-cols-12 gap-6">
-
-      <!-- 🗺️ Carte (pleine largeur) -->
       <section class="col-span-12">
         <app-map
           [userCityName]="selectedCity()"
@@ -33,22 +31,21 @@
         </app-map>
       </section>
 
-      <!-- 📊 CityPopulation et Pollutants côte à côte -->
-      <section class="col-span-12 lg:col-span-6">
+      <section class="col-span-12 lg:col-span-6 h-full">
         <app-city-population-chart
           [selectedCity]="city()!">
         </app-city-population-chart>
       </section>
 
-      <section class="col-span-12 lg:col-span-6">
+      <section class="col-span-12 lg:col-span-6 h-full">
         <app-pollutants-chart
           [user]="user"
           [data]="airQuality()?.measurementHistory || []"
-          [cityName]="selectedCity()">
+          [cityName]="selectedCity()"
+        class="block h-full">
         </app-pollutants-chart>
       </section>
 
-      <!-- 🌡️ Température (pleine largeur) -->
       <section class="col-span-12">
         <app-temperature-chart
           [data]="weatherHistory()"

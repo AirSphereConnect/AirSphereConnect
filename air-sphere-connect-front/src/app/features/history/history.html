@@ -1,12 +1,12 @@
-<div class="max-w-[1600px] mx-auto p-6">
+<div class="max-w-[1600px] mx-auto p-3 lg:p-6">
     <header class="mb-8 pb-5 border-b-2 border-base-300">
-      <h1 class="text-3xl font-bold text-base-content">Historique des mesures</h1>
+      <h1 class="text-2xl sm:text-3xl font-bold text-base-content">Historique des mesures</h1>
     </header>
 
   <form [formGroup]="filterForm">
-    <div class="flex justify-between items-end mb-6 gap-4">
-      <div class="flex gap-4 flex-1">
-        <div class="w-full max-w-xs relative">
+    <div class="flex flex-col lg:flex-row lg:justify-between lg:items-end mb-6 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 flex-1">
+        <div class="relative">
           <app-input
             label="Commune"
             type="text"
@@ -29,7 +29,7 @@
           }
         </div>
 
-        <div class="w-full max-w-xs">
+        <div>
           <app-input
             label="Date de début"
             type="date"
@@ -39,7 +39,7 @@
           />
         </div>
 
-        <div class="w-full max-w-xs">
+        <div>
           <app-input
             label="Date de fin"
             type="date"
@@ -50,7 +50,7 @@
         </div>
       </div>
 
-      <div class="flex gap-2 my-3">
+      <div class="flex gap-2">
         <app-button
           variant="outline"
           size="md"

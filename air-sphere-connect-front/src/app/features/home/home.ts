@@ -1,12 +1,13 @@
 import {Component, inject, Input, OnDestroy, OnInit} from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { UserService } from '../../shared/services/user-service';
 import { Subscription } from 'rxjs';
 import {UserProfileResponse} from '../../core/models/user.model';
+import {Button} from '../../shared/components/ui/button/button';
 
 @Component({
   selector: 'app-home',
-  imports: [],
+  imports: [RouterLink, Button],
   templateUrl: './home.html',
   styleUrls: ['./home.scss']
 })

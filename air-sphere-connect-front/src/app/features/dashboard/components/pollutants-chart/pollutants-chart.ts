@@ -1,4 +1,4 @@
-import {Component, input, signal, computed, effect, Input} from '@angular/core'
+import {Component, input, signal, computed, effect, Input, HostListener} from '@angular/core'
 import { AirQualityMeasurement } from '../../../../core/models/data.model'
 import {
   VisXYContainerModule,
@@ -36,6 +36,15 @@ export class PollutantsChart {
   hasAlerts = signal(false)
   alertMessage = signal('')
 
+  private readonly screenWidth = signal(window.innerWidth);
+  chartMargin = computed(() => ({
+    top: 0, right: 10, bottom: 0,
+    left: this.screenWidth() < 1024 ? 5 : 20
+  }));
+
+  @HostListener('window:resize')
+  onResize() { this.screenWidth.set(window.innerWidth); }
+
   periods = [
     { value: '7days' as const, label: '7 jours' },
     { value: '15days' as const, label: '15 jours' },
@@ -53,7 +62,7 @@ export class PollutantsChart {
 
   pollutants = ['pm25', 'pm10', 'no2', 'o3', 'so2']
 
-  // ✅ Palette dynamique selon le thème DaisyUI - optimisée
+  // Palette dynamique selon le thème DaisyUI - optimisée
   private getThemeColor(varName: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
   }

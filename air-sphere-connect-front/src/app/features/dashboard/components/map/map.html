@@ -1,7 +1,7 @@
 <div class="relative bg-base-100 rounded-lg p-5 shadow-md">
   <div class="flex justify-between items-center mb-4">
     <h3 class="text-xl font-semibold text-base-content m-0">
-      🗺️ Carte des villes d'Occitanie
+      Carte des villes d'Occitanie
     </h3>
 
     @if (isLoading()) {
@@ -10,7 +10,7 @@
       </span>
     }
     @if (!isLoading()) {
-      <span class="bg-indigo-500 text-white px-3 py-1 rounded-full text-xs font-semibold">
+      <span class="bg-indigo-500 text-white text-center lg:text-start px-3 py-1 rounded-full text-xs font-semibold">
         {{ mapData().length }} villes
       </span>
     }

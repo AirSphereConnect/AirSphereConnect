@@ -1,9 +1,7 @@
-import {Component, inject, Input} from '@angular/core';
+import {Component, Input} from '@angular/core';
 import { Navbar } from '../../ui/navbar/navbar';
 import {Logo} from '../../ui/logo/logo';
-import {ThemeService} from '../../../../core/services/theme';
-import {Button} from '../../ui/button/button';
-import {IconComponent} from '../../ui/icon/icon';
+
 
 @Component({
   selector: 'app-header',
@@ -13,18 +11,12 @@ import {IconComponent} from '../../ui/icon/icon';
   imports: [
     Navbar,
     Logo,
-    Button,
-    IconComponent,
   ]
 })
 export class Header {
   @Input() userRole: string | null = null;
-  @Input() scrolled = false; // Input pour le scroll
+  @Input() scrolled = false;
+  menuOpen = false;
 
-  readonly themeService = inject(ThemeService);
-  readonly isDarkTheme = this.themeService.isDarkMode;
 
-  toggleTheme() {
-    this.themeService.toggleTheme();
-  }
 }

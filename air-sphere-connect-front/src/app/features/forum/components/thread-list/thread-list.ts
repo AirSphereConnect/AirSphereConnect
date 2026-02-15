@@ -126,42 +126,54 @@ export class ThreadListComponent {
 
   openModal() {
     this.showModal.set(true);
+    this.errorMessage.set(null);
   }
 
   closeModal() {
     this.showModal.set(false);
     this.newThreadTitle.set('');
     this.newThreadContent.set('');
+    this.errorMessage.set(null);
   }
 
   createThread() {
     const title = this.newThreadTitle().trim();
+    const content = this.newThreadContent().trim();
     const sectionId = this.sectionId();
     const userId = this.userService.currentUserProfile?.user?.id;
 
     if (!userId) {
-      alert('Vous devez être connecté pour créer un thread.');
+      this.errorMessage.set('Vous devez être connecté pour créer une discussion.');
       return;
     }
 
     if (!title) {
-      alert('Le titre est obligatoire.');
+      this.errorMessage.set('Le titre de la discussion ne peut pas être vide.');
+      return;
+    }
+
+    if (!content) {
+      this.errorMessage.set('Le contenu du message ne peut pas être vide.');
       return;
     }
 
     this.isSubmitting.set(true);
 
-
     this.threadService.addThread(title, sectionId, userId).subscribe({
       next: () => {
         this.isSubmitting.set(false);
         this.closeModal();
-        this.loadThreads(); // ✅ Rafraîchissement réactif
+        this.loadThreads();
       },
       error: (error) => {
-        console.error('Erreur lors de la création du thread:', error);
-        alert('Erreur lors de la création du thread.');
         this.isSubmitting.set(false);
+        const statusCode = error.status;
+        const messages: Record<number, string> = {
+          403: 'Vous n\'avez pas les droits pour créer une discussion',
+          401: 'Vous devez être connecté pour créer une discussion',
+          409: 'Une discussion avec ce titre existe déjà'
+        };
+        this.errorMessage.set(messages[statusCode] || 'Erreur lors de la création de la discussion');
       }
     });
   }

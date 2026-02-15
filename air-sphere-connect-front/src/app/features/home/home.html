@@ -1,42 +1,90 @@
-<div class="min-h-screen bg-base-200 py-8 px-4">
+<div class="min-h-screen">
   <!-- Hero Section -->
-  <section class="mb-12">
-    <div class="relative mb-8 flex items-center justify-center gap-4">
-      <h1 class="text-4xl font-bold text-base-content text-center">
-        Air Sphere Connect – Occitanie
-      </h1>
+  <section class=" py-16 sm:py-20 px-4">
+    <div class="max-w-4xl mx-auto text-center">
       <img
         src="/images/Logo_Occitanie_2017.svg"
         alt="Logo de l'Occitanie"
-        class="w-20 h-20"
+        class="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-6"
       />
+      <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-base-content mb-4">
+        Air Sphere Connect – Occitanie
+      </h1>
+      <p class="text-base sm:text-lg text-base-content/80 max-w-2xl mx-auto mb-8">
+        Plateforme citoyenne pour suivre la qualité de l'air en Occitanie
+        et mieux comprendre les enjeux écologiques du territoire.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-3 justify-center">
+        @if (userRole === 'GUEST') {
+          <a routerLink="/auth/register">
+            <app-button color="primary" size="lg">Rejoindre la communauté</app-button>
+          </a>
+          <a routerLink="/forum">
+            <app-button variant="outline" size="lg">Explorer le forum</app-button>
+          </a>
+        } @else {
+          <a routerLink="/dashboard">
+            <app-button color="primary" size="lg">Voir les données climatiques</app-button>
+          </a>
+          <a routerLink="/forum">
+            <app-button variant="outline" size="lg">Accéder au forum</app-button>
+          </a>
+        }
+      </div>
     </div>
-    <p class="text-lg text-base-content/80 text-center max-w-3xl mx-auto mb-6">
-      Plateforme citoyenne pour suivre la qualité de l'air en Occitanie
-      et mieux comprendre les enjeux écologiques du territoire.
-    </p>
   </section>
 
   <!-- Intro Section -->
-  <section class="max-w-4xl mx-auto mb-16 text-center">
-    <h2 class="text-2xl font-semibold text-base-content mb-6 underline">
+  <section class="max-w-6xl mx-auto mb-16 px-4 py-12">
+    <h2 class="text-xl sm:text-2xl font-semibold text-base-content text-center mb-10">
       Informer, connecter, agir
     </h2>
-    <p class="text-base-content/80 mb-4">
-      Air Sphere Connect met à disposition des indicateurs sur la qualité de l'air,
-      croisés avec des données de population et des données météorologiques issues
-      des services publics Open Data de la région Occitanie.
-    </p>
-    <p class="text-base-content/80 max-w-3xl mx-auto">
-      L'objectif est de faciliter le partage d'informations sur les risques
-      écologiques et d'accompagner citoyens, associations et collectivités
-      dans leurs décisions.
-    </p>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Informer -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left gap-3">
+        <div class="bg-primary/10 text-primary rounded-full p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M12 2a10 10 0 110 20 10 10 0 010-20z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-base-content">Informer</h3>
+        <p class="text-sm sm:text-base text-base-content/70">
+          Des indicateurs sur la qualité de l'air, croisés avec des données de population
+          et météorologiques issues des services publics Open Data de la région Occitanie.
+        </p>
+      </div>
+      <!-- Connecter -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left gap-3">
+        <div class="bg-secondary/10 text-secondary rounded-full p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m9.12-1.26a4 4 0 10-8.24 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-base-content">Connecter</h3>
+        <p class="text-sm sm:text-base text-base-content/70">
+          Faciliter le partage d'informations entre citoyens, associations
+          et collectivités autour des enjeux écologiques du territoire.
+        </p>
+      </div>
+      <!-- Agir -->
+      <div class="flex flex-col items-center md:items-start text-center md:text-left gap-3">
+        <div class="bg-accent/10 text-accent rounded-full p-3">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-base-content">Agir</h3>
+        <p class="text-sm sm:text-base text-base-content/70">
+          Accompagner les décisions locales grâce à une meilleure compréhension
+          des risques liés à la qualité de l'air en Occitanie.
+        </p>
+      </div>
+    </div>
   </section>
 
   <!-- Features Section -->
-  <section class="max-w-6xl mx-auto mb-16">
-    <h2 class="text-2xl font-semibold text-base-content text-center mb-6 underline">
+  <section class="max-w-6xl mx-auto mb-16 px-4">
+    <h2 class="text-xl sm:text-2xl font-semibold text-base-content text-center mb-4">
       Explorez les données de votre territoire
     </h2>
     <p class="text-base-content/80 text-center max-w-3xl mx-auto mb-12">
@@ -44,9 +92,9 @@
       des tendances dans le temps et des populations les plus exposées.
     </p>
 
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
       <!-- Carte Interactive -->
-      <article class="card bg-base-100 shadow-xl">
+      <article class="card bg-base-100 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
         <figure class="px-4 pt-4">
           <img
             src="/images/carte_air_sphere.png"
@@ -56,7 +104,7 @@
         </figure>
         <div class="card-body">
           <h3 class="card-title text-primary">Carte interactive</h3>
-          <p class="text-base-content/70">
+          <p class="text-sm sm:text-base text-base-content/70">
             Naviguez sur la carte de l'Occitanie, commune par commune, pour suivre la qualité de l'air
             et les indicateurs locaux.
           </p>
@@ -64,7 +112,7 @@
       </article>
 
       <!-- Historique -->
-      <article class="card bg-base-100 shadow-xl">
+      <article class="card bg-base-100 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
         <figure class="px-4 pt-4">
           <img
             src="/images/history_air_sphere.png"
@@ -74,7 +122,7 @@
         </figure>
         <div class="card-body">
           <h3 class="card-title text-secondary">Historique des épisodes</h3>
-          <p class="text-base-content/70">
+          <p class="text-sm sm:text-base text-base-content/70">
             Visualisez l'historique des pics de pollution et des épisodes météorologiques marquants
             sur votre territoire.
           </p>
@@ -82,7 +130,7 @@
       </article>
 
       <!-- Graphiques -->
-      <article class="card bg-base-100 shadow-xl">
+      <article class="card bg-base-100 shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all duration-300">
         <figure class="px-4 pt-4">
           <img
             src="/images/graphe_air_sphere.png"
@@ -92,7 +140,7 @@
         </figure>
         <div class="card-body">
           <h3 class="card-title text-accent">Graphiques d'évolution</h3>
-          <p class="text-base-content/70">
+          <p class="text-sm sm:text-base text-base-content/70">
             Analysez l'évolution des principaux polluants et comparez les périodes pour mieux comprendre les tendances.
           </p>
         </div>
@@ -101,13 +149,22 @@
   </section>
 
   <!-- CTA Section -->
-  <section class="max-w-4xl mx-auto text-center">
-    <h2 class="text-2xl font-semibold text-base-content mb-6 underline">
+  <section class="max-w-5xl mx-auto text-center px-4 pb-8">
+    <h2 class="text-xl sm:text-2xl font-semibold text-base-content mb-4">
       Commencer à explorer l'Occitanie
     </h2>
-    <p class="text-base-content/80">
+    <p class="text-base-content/80 mb-6">
       Sélectionnez votre territoire, comparez les indicateurs, et partagez vos
       observations avec la communauté Air Sphere Connect.
     </p>
+    @if (userRole === 'GUEST') {
+      <a routerLink="/auth/login">
+        <app-button color="primary" size="md">Se connecter</app-button>
+      </a>
+    } @else {
+      <a routerLink="/dashboard">
+        <app-button color="primary" size="md">Explorer les données</app-button>
+      </a>
+    }
   </section>
 </div>

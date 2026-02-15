@@ -1,4 +1,4 @@
-import { Component, input, computed } from '@angular/core';
+import { Component, input, computed, signal, HostListener } from '@angular/core';
 import {
   VisXYContainerModule,
   VisLineModule,
@@ -15,36 +15,43 @@ import { WeatherMeasurement } from '../../../../core/models/data.model';
   imports: [VisXYContainerModule, VisLineModule, VisAxisModule, VisTooltipModule, VisCrosshairModule],
   template: `
     <div class="bg-base-100 rounded-lg p-5 shadow-md">
-      <h3 class="text-xl font-semibold text-base-content mb-4">
-        Évolution de la température - {{ cityName() }}
+      <h3 class="text-xl text-center xl:text-start font-semibold text-base-content mb-4">
+
+
+        Évolution de la température de {{ cityName() }}
       </h3>
 
       @if (chartData().length > 0) {
-        <vis-xy-container
-          [data]="chartData()"
-          [height]="height()"
-          [yDomain]="yDomain()"
-          [margin]="{ top: 10, right: 20, bottom: 60, left: 60 }">
+        <span class="text-xs text-base-content/50 mb-1 block">Température (°C)</span>
+        <div class="overflow-x-auto">
+          <div class="min-w-[500px]">
+            <vis-xy-container
+              [data]="chartData()"
+              [height]="height()"
+              [yDomain]="yDomain()"
+              [margin]="chartMargin()">
 
-          <vis-line
-            [x]="x"
-            [y]="y"
-            [color]="color"
-            [lineWidth]="3"
-            [curveType]="curveType">
-          </vis-line>
+              <vis-line
+                [x]="x"
+                [y]="y"
+                [color]="color"
+                [lineWidth]="3"
+                [curveType]="curveType">
+              </vis-line>
 
-          <vis-axis
-            type="x"
-            label="Date"
-            [tickFormat]="dateFormat"
-            [tickTextAngle]="45"
-            [tickValues]="xTickValues()"
-          ></vis-axis>
-          <vis-axis type="y" label="Température (°C)" [tickFormat]="yTickFormat"></vis-axis>
-          <vis-tooltip></vis-tooltip>
-          <vis-crosshair [template]="crosshairTemplate" [color]="color"></vis-crosshair>
-        </vis-xy-container>
+              <vis-axis
+                type="x"
+                label="Date"
+                [tickFormat]="dateFormat"
+                [tickTextAngle]="45"
+                [tickValues]="xTickValues()"
+              ></vis-axis>
+              <vis-axis type="y" [tickFormat]="yTickFormat"></vis-axis>
+              <vis-tooltip></vis-tooltip>
+              <vis-crosshair [template]="crosshairTemplate" [color]="color"></vis-crosshair>
+            </vis-xy-container>
+          </div>
+        </div>
       } @else {
         <p class="text-base-content opacity-60 italic text-center py-8">Aucune donnée de température disponible</p>
       }
@@ -57,6 +64,15 @@ export class TemperatureChart {
   data = input.required<WeatherMeasurement[]>();
   cityName = input.required<string>();
   height = input<number>(300);
+
+  private readonly screenWidth = signal(window.innerWidth);
+  chartMargin = computed(() => ({
+    top: 20, right: 10, bottom: 20,
+    left: this.screenWidth() < 1024 ? 5 : 20
+  }));
+
+  @HostListener('window:resize')
+  onResize() { this.screenWidth.set(window.innerWidth); }
 
   // === Données formatées pour Unovis ===
   chartData = computed(() => {

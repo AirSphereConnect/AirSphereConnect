@@ -68,7 +68,6 @@ export class InputComponent implements ControlValueAccessor, OnInit {
   @Output() iconRightClick = new EventEmitter<void>();
 
   private readonly _typeSignal = signal<string>('text');
-
   private readonly formTouched = signal(false);
   private readonly formDirty = signal(false);
   private readonly formValid = signal(false);

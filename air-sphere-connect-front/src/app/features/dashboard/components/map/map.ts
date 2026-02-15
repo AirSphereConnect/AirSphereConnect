@@ -13,7 +13,6 @@ import { AirQualityMeasurement, WeatherMeasurement, AirQualityIndex, AirQualityD
 import { IconComponent } from '../../../../shared/components/ui/icon/icon';
 import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import {Button} from '../../../../shared/components/ui/button/button';
 
 interface CityMapPoint extends City {
   airQualityIndex?: number;
@@ -28,7 +27,7 @@ interface CityMapPoint extends City {
 @Component({
   selector: 'app-map',
   standalone: true,
-  imports: [IconComponent, Button],
+  imports: [IconComponent],
   templateUrl: './map.html',
   styleUrls: ["map.scss"]
 })

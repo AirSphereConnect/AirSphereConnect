@@ -1,112 +1,126 @@
-<fieldset class="fieldset bg-base-200 border-base-300 rounded-box border p-4 w-full">
-  @if (user) {
-    <div class="flex flex-wrap gap-4 mb-4">
-      <div class="flex flex-col flex-1">
-        <div class="flex flex-raw flex-1 items-center">
-          <label for="username-input" class="label font-bold">Nom utilisateur</label>
-          <input id="username-input" type="text" class="input w-full" [value]="user.username" disabled autocomplete="username"/>
+@if (user) {
+  <div class="flex flex-col gap-6">
+
+    <!-- Card : Informations personnelles -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title text-lg mb-4">Informations personnelles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="flex flex-col gap-2">
+            <label for="username-input" class="label font-bold text-sm">Nom utilisateur</label>
+            <input id="username-input" type="text" class="input input-bordered w-full" [value]="user.username" disabled autocomplete="username"/>
+            <app-button
+              type="button"
+              variant="outline"
+              color="primary"
+              size="sm"
+              heroIcon="edit"
+              (buttonClick)="editUser()"
+              (buttonKeydown)="undefined"
+            >
+              Modifier
+            </app-button>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="email-input" class="label font-bold text-sm">Email</label>
+            <input id="email-input" type="text" class="input input-bordered w-full" [value]="user.email" disabled autocomplete="email"/>
+            <app-button
+              type="button"
+              variant="outline"
+              color="primary"
+              size="sm"
+              heroIcon="edit"
+              (buttonClick)="editEmail()"
+              (buttonKeydown)="undefined"
+            >
+              Modifier
+            </app-button>
+          </div>
+
+          <div class="flex flex-col gap-2">
+            <label for="role-input" class="label font-bold text-sm">Rôle</label>
+            <input id="role-input" type="text" class="input input-bordered w-full" [value]="user.role" disabled autocomplete="off"/>
+          </div>
         </div>
-        <div>
-          <app-button
-            type="button"
-            (buttonClick)="editUser()"
-            (buttonKeydown)="undefined"
-            class="btn-outline btn-primary"
-          >
-            Modifier nom utilisateur
-          </app-button>
-
-        </div>
-      </div>
-
-      <div class="divider divider-horizontal"></div>
-
-      <div class="flex flex-col flex-1">
-        <div class="flex flex-raw flex-1 items-center">
-          <label for="email-input" class="label font-bold">Email</label>
-          <input id="email-input" type="text" class="input w-full" [value]="user.email" disabled autocomplete="email"/>
-        </div>
-        <div>
-
-          <app-button
-            type="button"
-            (buttonClick)="editEmail()"
-            (buttonKeydown)="undefined"
-            class="btn-outline btn-primary"
-          >
-            Modifier email
-          </app-button>
-        </div>
-      </div>
-
-      <div class="divider divider-horizontal"></div>
-
-      <div class="flex flex-col flex-1 justify-between items-center">
-        <label for="role-input" class="label font-bold">Rôle</label>
-        <input id="role-input" type="text" class="input w-full  text-center " [value]="user.role" disabled autocomplete="off"/>
-      </div>
-
-      <div class="divider divider-horizontal"></div>
-
-      <div class="flex flex-raw items-center">
-        <app-button
-          type="button"
-          (buttonClick)="editPassword()"
-          (buttonKeydown)="undefined"
-          class="btn-outline btn-primary"
-        >
-          Modifier mot de passe
-        </app-button>
       </div>
     </div>
-    <div class="divider divider-vertical"></div>
 
+    <!-- Card : Adresse -->
     @if (user.address) {
-      <div class="flex flex-wrap gap-4 mb-4">
-        <div class="flex flex-col flex-1">
-          <label for="street-input" class="label font-bold">Adresse</label>
-          <input id="street-input" type="text" class="input w-full" [value]="user.address.street" disabled [autocomplete]="'street-address'"/>
-        </div>
+      <div class="card bg-base-100 shadow-sm">
+        <div class="card-body">
+          <h2 class="card-title text-lg mb-4">Adresse</h2>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="flex flex-col gap-2">
+              <label for="street-input" class="label font-bold text-sm">Rue</label>
+              <input id="street-input" type="text" class="input input-bordered w-full" [value]="user.address.street" disabled [autocomplete]="'street-address'"/>
+            </div>
 
-        <div class="flex flex-col flex-1">
-          <label for="city-input" class="label font-bold">Ville</label>
-          <input id="city-input" type="text" class="input w-full" [value]="user.address.city.name" disabled autocomplete="address-level2"/>
-        </div>
+            <div class="flex flex-col gap-2">
+              <label for="city-input" class="label font-bold text-sm">Ville</label>
+              <input id="city-input" type="text" class="input input-bordered w-full" [value]="user.address.city.name" disabled autocomplete="address-level2"/>
+            </div>
 
-        <div class="flex flex-col flex-1">
-          <label for="postal-code-input" class="label font-bold">Code postal</label>
-          <input id="postal-code-input" type="text" class="input w-full" [value]="user.address.city.postalCode" disabled autocomplete="postal-code"/>
-        </div>
-        <div>
-          <app-button
-            type="button"
-            (buttonClick)="editAddress()"
-            (buttonKeydown)="undefined"
-            class="btn-outline btn-primary"
-          >
-            Modifier adresse
-          </app-button>
-
+            <div class="flex flex-col gap-2">
+              <label for="postal-code-input" class="label font-bold text-sm">Code postal</label>
+              <input id="postal-code-input" type="text" class="input input-bordered w-full" [value]="user.address.city.postalCode" disabled autocomplete="postal-code"/>
+            </div>
+          </div>
+          <div class="mt-4">
+            <app-button
+              type="button"
+              variant="outline"
+              color="primary"
+              size="sm"
+              heroIcon="edit"
+              (buttonClick)="editAddress()"
+              (buttonKeydown)="undefined"
+            >
+              Modifier l'adresse
+            </app-button>
+          </div>
         </div>
       </div>
     }
 
-    <div class="divider divider-vertical"></div>
+    <!-- Card : Sécurité -->
+    <div class="card bg-base-100 shadow-sm">
+      <div class="card-body">
+        <h2 class="card-title text-lg mb-4">Sécurité</h2>
+        <app-button
+          type="button"
+          variant="outline"
+          color="primary"
+          size="sm"
+          heroIcon="lockClosed"
+          (buttonClick)="editPassword()"
+          (buttonKeydown)="undefined"
+        >
+          Modifier le mot de passe
+        </app-button>
 
-    <div>
+        <div class="divider"></div>
 
-      <app-button
-        color="error"
-        variant="outline"
-        type="button"
-        (buttonClick)="deleteUser(user.id)"
-        (buttonKeydown)="undefined"
-      >
-        Supprimer mon compte
-      </app-button>
+        <div>
+          <p class="text-sm text-base-content/60 mb-3">Cette action est irréversible.</p>
+          <app-button
+            color="error"
+            variant="outline"
+            size="sm"
+            type="button"
+            heroIcon="trash"
+            (buttonClick)="deleteUser(user.id)"
+            (buttonKeydown)="undefined"
+          >
+            Supprimer mon compte
+          </app-button>
+        </div>
+      </div>
     </div>
-  }
-</fieldset>
+
+  </div>
+}
 
 
 <app-user-form

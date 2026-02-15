@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, effect, inject, input, signal, HostListener } from '@angular/core';
 import {
   VisXYContainerModule,
   VisGroupedBarModule,
@@ -25,6 +25,15 @@ export class CityPopulationChart {
 
   selectedCity = input.required<City>();
   chartData = signal<City[]>([]);
+
+  private readonly screenWidth = signal(window.innerWidth);
+  chartMargin = computed(() => ({
+    top: 0, right: 10, bottom: 0,
+    left: this.screenWidth() < 1024 ? 5 : 20
+  }));
+
+  @HostListener('window:resize')
+  onResize() { this.screenWidth.set(window.innerWidth); }
 
   xTickValues = computed(() => this.chartData().map((_, i) => i));
 

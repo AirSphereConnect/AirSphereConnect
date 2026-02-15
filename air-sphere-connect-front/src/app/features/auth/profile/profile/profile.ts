@@ -47,8 +47,7 @@ export class Profile implements OnInit, AfterViewInit {
     this.userService.userProfile$
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(profile => {
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-        if (profile && profile.user) {
+        if (profile?.user) {
           this.user = profile.user;
         }
       });

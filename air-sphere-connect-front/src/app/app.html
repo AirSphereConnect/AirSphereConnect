@@ -6,7 +6,7 @@
 <!-- * * * * * * * * * Delete the template below * * * * * * * * * -->
 <!-- * * * * * * * to get started with your project! * * * * * * * -->
 <!-- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * -->
-<div class="h-screen grid grid-rows-[80px_1fr_40px] overflow-y-auto no-scrollbar">
+<div class="h-screen overflow-y-auto no-scrollbar">
   @if (!splashDone){
     <div
       class="splash-screen"
@@ -21,7 +21,7 @@
   }
   @if (splashDone) {
     <app-header [userRole]="userRole()" [scrolled]="scrolled()" class="sticky top-0 z-50"></app-header>
-    <main #mainContent class="container overflow-auto mx-auto px-4 py-8 no-scrollbar">
+    <main #mainContent class="container overflow-auto md:mx-auto px-4 py-8 no-scrollbar">
       <div class="content">
         <router-outlet></router-outlet>
       </div>
@@ -32,7 +32,7 @@
       <app-back-to-top (click)="top()" class="fixed bottom-0 right-0 z-50"></app-back-to-top>
     }
     @if (!router.url.startsWith('/auth/login') && !router.url.startsWith('/auth/register')) {
-      <app-footer [userRole]="userRole()" class="h-8 shrink-0"></app-footer>
+      <app-footer [userRole]="userRole()"></app-footer>
     }
   }
 

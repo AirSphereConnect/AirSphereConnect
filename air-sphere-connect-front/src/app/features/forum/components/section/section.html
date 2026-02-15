@@ -23,8 +23,8 @@
 
   <!-- Titre principal -->
   <div class="text-center mb-8">
-    <h1 class="text-4xl font-bold text-base-content mb-4">Sections du Forum</h1>
-    <p class="text-lg text-base-content/70 max-w-2xl mx-auto">
+    <h1 class="text-2xl lg:text-4xl font-bold text-base-content mb-4">Sections du Forum</h1>
+    <p class="text-md lg:text-lg text-base-content/70 max-w-2xl mx-auto">
       Explorez nos différentes sections thématiques et rejoignez les discussions qui vous intéressent
     </p>
   </div>
@@ -32,12 +32,13 @@
   <!-- Grille des sections -->
   <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
     @for (section of sectionsWithCount(); track section.id) {
-      <div class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-300 duration-300 hover:-translate-y-2 group">
+      <div
+        class="card bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-300 duration-300 hover:-translate-y-2 group">
         <div class="card-body p-6">
           <!-- Icône de section -->
           <div class="flex items-center justify-between mb-4">
             <div class="avatar placeholder">
-              <div class="bg-primary text-primary-content rounded-xl w-12 flex items-center justify-center">
+              <div class="bg-primary text-primary-content rounded-xl w-8 lg:w-12 flex items-center justify-center">
                 <app-icon [name]="'archive'" size="md"></app-icon>
               </div>
             </div>
@@ -47,7 +48,7 @@
           </div>
 
           <!-- Titre -->
-          <h2 class="card-title text-xl font-bold text-base-content group-hover:text-primary transition-colors">
+          <h2 class="card-title text-lg font-bold text-base-content group-hover:text-primary transition-colors">
             <a [routerLink]="['/forum/section', section.id]" class="hover:no-underline">
               {{ section.title }}
             </a>
@@ -77,8 +78,8 @@
                   variant="outline"
                   size="xs"
                   [heroIcon]="'trash'"
-                  [loading]="isDeletingPerSection()[section.id] ?? false"
-                  [disabled]="isDeletingPerSection()[section.id] ?? false"
+                  [loading]="isDeletingPerSection()[section.id]"
+                  [disabled]="isDeletingPerSection()[section.id]"
                   (buttonClick)="deleteSection(section)"
                   (buttonKeydown)="$event.key === 'Enter' && deleteSection(section)"
                 >
@@ -89,7 +90,7 @@
             <!-- Stats -->
             <div class="flex items-center gap-2 text-xs text-base-content/50">
               <app-icon [name]="'clock'" size="xs"></app-icon>
-              <span>Actif</span>
+              <p>Actif</p>
             </div>
           </div>
         </div>
@@ -133,19 +134,19 @@
       @if (errorMessage()) {
         <div class="alert alert-error mb-4">
           <app-icon [name]="'xCircle'" size="md"></app-icon>
-          <span>{{ errorMessage() }}</span>
+          <p>{{ errorMessage() }}</p>
         </div>
       }
 
-      <form class="space-y-4" (submit)="$event.preventDefault(); createSection()">
+      <form class="space-y-8" (submit)="$event.preventDefault(); createSection()">
         <!-- Titre -->
-        <div class="form-control">
+        <div class="form-control flex flex-col gap-2">
           <label class="label" for="section-title">
-            <span class="label-text font-semibold">
+            <p class="label-text font-semibold">
               Titre de la section
               <span class="text-error">*</span>
-            </span>
-            <span class="label-text-alt">{{ newSectionTitle().length }}/100</span>
+            </p>
+            <p class="label-text-alt">{{ newSectionTitle().length }}/100</p>
           </label>
           <input
             id="section-title"
@@ -159,24 +160,24 @@
             required
           >
           <div class="label">
-            <span class="label-text-alt text-base-content/60">
+            <p class="label-text-alt text-base-content/60">
               Un titre clair et descriptif pour la section
-            </span>
+            </p>
           </div>
         </div>
 
         <!-- Description -->
-        <div class="form-control">
+        <div class="form-control flex flex-col gap-2">
           <label class="label" for="section-description">
-            <span class="label-text font-semibold">
+            <p class="label-text font-semibold">
               Description
               <span class="text-error">*</span>
-            </span>
-            <span class="label-text-alt">{{ newSectionDescription().length }}/500</span>
+            </p>
+            <p class="label-text-alt">{{ newSectionDescription().length }}/500</p>
           </label>
           <textarea
             id="section-description"
-            class="textarea textarea-bordered h-32 resize-none"
+            class="textarea textarea-bordered h-32 w-full resize-none"
             placeholder="Décrivez le thème et le contenu de cette section..."
             [value]="newSectionDescription()"
             (input)="newSectionDescription.set($any($event.target).value)"
@@ -185,9 +186,9 @@
             required
           ></textarea>
           <div class="label">
-            <span class="label-text-alt text-base-content/60">
+            <p class="label-text-alt text-base-content/60">
               Expliquez ce que les utilisateurs trouveront dans cette section
-            </span>
+            </p>
           </div>
         </div>
 
@@ -195,16 +196,9 @@
         <div class="card bg-base-200">
           <div class="card-body p-4">
             <h4 class="font-semibold text-sm mb-2">Aperçu</h4>
-            <div class="flex items-start gap-3">
-              <div class="avatar placeholder">
-                <div class="bg-primary text-primary-content rounded-xl w-10">
-                  <app-icon [name]="'archive'" size="sm"></app-icon>
-                </div>
-              </div>
-              <div class="flex-1">
-                <h3 class="font-bold">{{ newSectionTitle() || 'Titre de la section' }}</h3>
-                <p class="text-sm text-base-content/70">{{ newSectionDescription() || 'Description de la section' }}</p>
-              </div>
+            <div class="flex-1">
+              <h3 class="font-bold">{{ newSectionTitle() || 'Titre de la section' }}</h3>
+              <p class="text-sm text-base-content/70">{{ newSectionDescription() || 'Description de la section' }}</p>
             </div>
           </div>
         </div>
@@ -214,6 +208,7 @@
           <app-button
             type="button"
             variant="ghost"
+            color="neutral"
             (buttonClick)="closeCreateSectionModal()"
             (buttonKeydown)="$event.key === 'Enter' && closeCreateSectionModal()"
             [disabled]="isCreating()"

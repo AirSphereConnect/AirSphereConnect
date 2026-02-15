@@ -47,7 +47,7 @@ export class Dashboard implements OnInit {
   weatherHistory = computed(() => this.dashboardData()?.weatherHistory || []);
   airQuality = computed(() => this.dashboardData()?.airQuality);
   populationHistory = computed(() => this.dashboardData()?.populationHistory || []);
-  @Input() user: User | null = null;
+  user: User | null = null;
 
   ngOnInit() {
     // Récupération de la ville par défaut depuis le profil utilisateur
@@ -55,6 +55,7 @@ export class Dashboard implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(profile => {
         if (profile?.user) {
+          this.user = profile.user;
           const cityName = profile.user.address.city.name;
           const postalCode = profile.user.address.city.postalCode;
 

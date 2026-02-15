@@ -1,4 +1,25 @@
 .tab-active-primary {
   color: var(--color-primary-content);
   background-color: var(--color-primary);
+  border-radius: var(--radius-field);
+}
+
+.tab {
+  border-radius: var(--radius-field);
+  transition: background-color 0.2s ease;
+
+  &:hover:not(.tab-active) {
+    background-color: color-mix(in oklch, var(--color-base-content) 10%, transparent);
+  }
+}
+
+// En mode sidebar mobile, afficher les liens en colonne
+:host-context(aside) .tabs {
+  flex-direction: column;
+  align-items: stretch;
+
+  .tab {
+    justify-content: flex-start;
+    text-align: left;
+  }
 }

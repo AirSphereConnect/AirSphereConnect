@@ -1,10 +1,10 @@
 <div class="flex justify-center min-h-screen p-4 bg-base-200">
   <div class="w-full max-w-md">
     <div class="card bg-base-100 shadow-lg">
-      <div class="card-body">
-        <h2 class="card-title text-primary/90 text-2xl font-bold mb-16">Connexion</h2>
+      <div class="card-body flex flex-col items-center lg:items-start">
+        <h2 class="card-title text-primary/90 text-2xl lg:text-4xl font-bold mb-16">Connexion</h2>
 
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col gap-8">
+        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="flex flex-col w-full gap-6">
 
           <app-input
             label="Nom d'utilisateur"
@@ -12,7 +12,7 @@
             [control]="usernameControl"
             [required]="true"
             iconLeft="user"
-            placeholder="Entrez votre nom d'utilisateur"
+            placeholder="Entrez votre identifiant"
             [autocomplete]="'username'"
             fieldName="username"
           ></app-input>

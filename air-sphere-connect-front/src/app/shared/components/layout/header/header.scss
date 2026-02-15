@@ -1,8 +1,30 @@
+:host {
+  display: block;
+}
+
+.header-wrapper {
+  transition: background-color 0.3s ease, backdrop-filter 0.3s ease, box-shadow 0.3s ease;
+}
+
 .bg-scrolled {
-  background-color: var(--color-base-200);
-  box-shadow: 0 4px 8px 0 var(--shadow-color), 0 6px 20px 0 var(--shadow-color-light);
+  background-color: color-mix(in oklch, var(--color-base-200) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 1px 3px 0 var(--shadow-color);
   z-index: 50 !important;
 }
+
 .bg-transparent {
-  background-color: transparent;
+  background-color: color-mix(in oklch, var(--color-base-100) 70%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+@keyframes slide-in-right {
+  from { transform: translateX(100%); }
+  to { transform: translateX(0); }
+}
+
+.animate-slide-in {
+  animation: slide-in-right 0.25s ease-out;
 }

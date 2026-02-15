@@ -19,7 +19,6 @@ import { UserService } from '../../../shared/services/user-service';
 import { Router, RouterLink } from '@angular/router';
 import { InputComponent } from '../../../shared/components/ui/input/input';
 import { Button } from '../../../shared/components/ui/button/button';
-import { IconComponent } from '../../../shared/components/ui/icon/icon';
 import { HeroIcon } from '../../../shared/icons/heroicons.registry';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import {citySearch} from '../../../shared/utils/city-search.util';
@@ -35,7 +34,6 @@ import {NotificationService} from '../../../shared/services/notification-service
     InputComponent,
     Button,
     RouterLink,
-    IconComponent,
   ],
   templateUrl: './register.html',
   styleUrls: ['./register.scss'],

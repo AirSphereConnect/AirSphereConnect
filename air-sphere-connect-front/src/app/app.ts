@@ -37,7 +37,6 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
   protected readonly router = inject(Router)
 
   private scrollSub!: Subscription;
-  private scrollSubTop!: Subscription;
   private readonly destroyRef = inject(DestroyRef);
   private readonly userService = inject(UserService);
 
@@ -68,19 +67,12 @@ export class App implements AfterViewInit, OnDestroy, OnInit {
     this.scrollSub = fromEvent(globalThis, 'scroll')
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe(() => {
-        this.scrolled.set(window.scrollY > 0);
-      });
-
-    this.scrollSubTop = fromEvent(globalThis, 'scroll')
-      .pipe(takeUntilDestroyed(this.destroyRef))
-      .subscribe(() => {
         this.scrolled.set(window.scrollY > 50);
       });
   }
 
   ngOnDestroy() {
     this.scrollSub?.unsubscribe();
-    this.scrollSubTop?.unsubscribe();
   }
 
   top() {

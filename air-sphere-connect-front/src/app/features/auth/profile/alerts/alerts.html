@@ -1,8 +1,8 @@
-<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4" style="width: 100%;">
+<fieldset class="fieldset overflow-x-auto w-full bg-base-200 border-base-300 rounded-box border p-4">
   @if (user && user.alerts && user.alerts.length > 0) {
-    <table class="w-full border border-base-300 rounded-lg shadow-sm">
-      <thead>
-      <tr>
+    <table class="table table-zebra w-full bg-base-100 border border-base-300 rounded-lg shadow-sm">
+      <thead class="bg-base-300/50">
+      <tr class="text-center">
         <th class="p-2">Ville</th>
         <th class="p-2">Créé le</th>
         <th class="p-2">Modifié le</th>
@@ -14,9 +14,12 @@
         @for (alert of user.alerts; track alert.id) {
           <tr class="border-t">
             <td class="p-2 text-center">{{ alert.cityName }}</td>
-            <td class="p-2 text-center">{{ alert.createdAt }}</td>
-            <td class="p-2 text-center">{{ alert.updatedAt }}</td>
-            <td class="p-2 text-center">{{ alert.enabled ? "Oui" : "Non" }}</td>
+            <td class="p-2 text-center">{{ alert.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td class="p-2 text-center">{{ alert.updatedAt | date:'dd/MM/yyyy' }}</td>
+            <td class="p-2 text-center">
+              <span class="badge" [class.badge-success]="alert.enabled"
+                    [class.badge-error]="!alert.enabled">{{ alert.enabled ? "Activé" : "Désactivé" }}</span>
+            </td>
             <td class="p-2 flex justify-center">
               <app-button
                 class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
@@ -27,7 +30,7 @@
               >
                 Modifier
               </app-button>
-              <div class="divider divider-horizontal"> </div>
+              <div class="divider divider-horizontal"></div>
               <app-button
                 class="w-20 h-7 divider-horizontal divider-start btn-outline"
                 color="error"
@@ -43,13 +46,15 @@
       </tbody>
     </table>
   } @else {
-    <p>Aucun favori trouvé.</p>
+    <p>Aucune alerte trouvée.</p>
   }
 </fieldset>
-  <br>
-<app-button color="primary" size="md" variant="solid" (buttonClick)="addAlerts()" (buttonKeydown)="undefined" class="btn-outline btn-primary">
-  Ajouter
-</app-button>
+<div class="mt-4">
+  <app-button color="primary" size="md" variant="solid" heroIcon="plus" (buttonClick)="addAlerts()"
+              (buttonKeydown)="undefined" class="btn-outline btn-primary">
+    Ajouter
+  </app-button>
+</div>
 
 <app-alerts-form
   [isOpen]="isModalOpen"

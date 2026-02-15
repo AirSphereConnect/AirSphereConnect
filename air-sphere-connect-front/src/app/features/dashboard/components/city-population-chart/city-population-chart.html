@@ -1,5 +1,5 @@
-<div class="bg-base-100 rounded-lg p-5 shadow-md h-full flex flex-col">
-  <div class="flex justify-between items-center mb-4">
+<div class="bg-base-100 rounded-lg p-5 shadow-md h-full flex flex-col gap-10">
+  <div class="flex flex-col gap-6 xl:flex-row justify-between items-center mb-4">
     <h3 class="text-xl font-semibold text-base-content">
       Top 10 des villes de la zone
     </h3>
@@ -8,32 +8,37 @@
 
   @if (chartData().length > 0) {
     <div class="flex-1 min-h-0">
-      <vis-xy-container
-        [data]="chartData()"
-        [margin]="{ top: 20, right: 20, bottom: 20, left: 20 }">
+      <span class="text-xs text-base-content/50 mb-1 block">Population</span>
+      <div class="overflow-x-auto">
+        <div class="min-w-[500px]">
+          <vis-xy-container
+            [data]="chartData()"
+            [height]="400"
+            [margin]="chartMargin()">
 
-        <vis-grouped-bar
-          [x]="x"
-          [y]="y"
-          [color]="color">
-        </vis-grouped-bar>
+            <vis-grouped-bar
+              [x]="x"
+              [y]="y"
+              [color]="color">
+            </vis-grouped-bar>
 
-        <vis-axis
-          type="x"
-          label="Ville"
-          [tickTextAngle]="-45"
-          [tickValues]="xTickValues()"
-          [tickFormat]="xTickFormat">
-        </vis-axis>
+            <vis-axis
+              type="x"
+              label="Ville"
+              [tickTextAngle]="-45"
+              [tickValues]="xTickValues()"
+              [tickFormat]="xTickFormat">
+            </vis-axis>
 
-        <vis-axis
-          type="y"
-          label="Population"
-          [tickFormat]="yTickFormat">
-        </vis-axis>
+            <vis-axis
+              type="y"
+              [tickFormat]="yTickFormat">
+            </vis-axis>
 
-        <vis-tooltip [triggers]="tooltipTriggers"></vis-tooltip>
-      </vis-xy-container>
+            <vis-tooltip [triggers]="tooltipTriggers"></vis-tooltip>
+          </vis-xy-container>
+        </div>
+      </div>
     </div>
   } @else {
     <p class="text-base-content opacity-60 italic text-center py-8">

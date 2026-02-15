@@ -1,22 +1,22 @@
-<fieldset class="fieldset bg-base-200 border-base-300 rounded-box w-xs border p-4" style="width: 100%;">
+<fieldset class="fieldset overflow-x-auto w-full bg-base-200 border-base-300 rounded-box border p-4">
   @if (user && user.favorites && user.favorites.length > 0) {
-    <table class="w-full border border-base-300 rounded-lg shadow-sm">
+    <table class="table table-zebra w-full bg-base-100 border border-base-300 rounded-lg shadow-sm">
       <thead>
-      <tr>
-        <th class="p-2">Export Qualité de l'air</th>
-        <th class="p-2">Export Population</th>
-        <th class="p-2">Export Météo</th>
-        <th class="p-2">Ville</th>
-        <th class="p-2">Créé le</th>
-        <th class="p-2">Modifié le</th>
-        <th class="p-2 w-0">Actions</th>
+      <tr class="text-center">
+        <th>Export Qualité de l'air</th>
+        <th>Export Population</th>
+        <th>Export Météo</th>
+        <th>Ville</th>
+        <th>Créé le</th>
+        <th>Modifié le</th>
+        <th>Actions</th>
       </tr>
       </thead>
       <tbody>
         @for (favorite of user.favorites; track favorite.id) {
-          <tr class="border-t">
+          <tr class="align-middle">
             @if (favorite?.selectAirQuality) {
-              <td class="p-2">
+              <td class="p-2 text-center">
                 <div class="flex justify-center">
                   <a href="#" class="link link-primary">PDF</a>
                   <div class="divider divider-horizontal mx-"></div>
@@ -24,10 +24,10 @@
                 </div>
               </td>
             } @else {
-              <td class="p-2 text-center">Non sélectionner</td>
+              <td class="p-2 text-center">Non sélectionné</td>
             }
             @if (favorite?.selectPopulation) {
-              <td class="p-2">
+              <td class="p-2 text-center">
                 <div class="flex justify-center">
                   <a href="#" class="link link-primary">PDF</a>
                   <div class="divider divider-horizontal mx-"></div>
@@ -35,10 +35,10 @@
                 </div>
               </td>
             } @else {
-              <td class="p-2 text-center">Non sélectionner</td>
+              <td class="p-2 text-center">Non sélectionné</td>
             }
             @if (favorite?.selectWeather) {
-              <td class="p-2">
+              <td class="p-2 text-center">
                 <div class="flex justify-center">
                   <a href="#" class="link link-primary">PDF</a>
                   <div class="divider divider-horizontal mx-"></div>
@@ -46,44 +46,48 @@
                 </div>
               </td>
             } @else {
-              <td class="p-2 text-center">Non sélectionner</td>
+              <td class="p-2 text-center">Non sélectionné</td>
             }
             <td class="p-2 text-center">{{ favorite.cityName }}</td>
-            <td class="p-2 text-center">{{ favorite.createdAt }}</td>
-            <td class="p-2 text-center">{{ favorite.updatedAt }}</td>
-            <td class="p-2 flex justify-center">
-              <app-button
-                class="w-20 h-7 divider-horizontal divider-start btn-outline btn-primary"
-                color="primary"
-                variant="solid"
-                (buttonClick)="editFavorites(favorite.id)"
-                (buttonKeydown)="undefined"
-              >
-                Modifier
-              </app-button>
-              <div class="divider divider-horizontal"></div>
-              <app-button
-                class="w-20 h-7 divider-horizontal divider-start btn-outline"
-                color="error"
-                variant="solid"
-                (buttonClick)="deleteFavorites(favorite.id)"
-                (buttonKeydown)="undefined"
-              >
-                Supprimer
-              </app-button>
+            <td class="p-2 text-center">{{ favorite.createdAt | date:'dd/MM/yyyy' }}</td>
+            <td class="p-2 text-center">{{ favorite.updatedAt | date:'dd/MM/yyyy' }}</td>
+            <td class="p-2 text-center">
+              <div class="flex justify-center items-center">
+                <app-button
+                  class="w-20 h-7"
+                  color="primary"
+                  variant="outline"
+                  (buttonClick)="editFavorites(favorite.id)"
+                  (buttonKeydown)="undefined"
+                >
+                  Modifier
+                </app-button>
+                <div class="divider divider-horizontal"></div>
+                <app-button
+                  class="w-20 h-7"
+                  color="error"
+                  variant="outline"
+                  (buttonClick)="deleteFavorites(favorite.id)"
+                  (buttonKeydown)="undefined"
+                >
+                  Supprimer
+                </app-button>
+              </div>
             </td>
           </tr>
         }
       </tbody>
     </table>
   } @else {
-    <p>Aucun favori trouvé.</p>
+    <p class="text-base-content/60 p-4">Aucun favori trouvé.</p>
   }
 </fieldset>
-<br>
-<app-button color="primary" size="md" variant="solid" (buttonClick)="addFavorites()" (buttonKeydown)="undefined" class="btn-outline btn-primary">
-  Ajouter
-</app-button>
+<div class="mt-4">
+  <app-button color="primary" size="md" variant="solid" (buttonClick)="addFavorites()" (buttonKeydown)="undefined"
+              class="btn-outline btn-primary"  heroIcon="plus">
+    Ajouter
+  </app-button>
+</div>
 
 <!-- 🟣 Modal -->
 <app-favorites-form

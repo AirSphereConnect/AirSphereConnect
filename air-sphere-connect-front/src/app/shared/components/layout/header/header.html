@@ -1,21 +1,43 @@
 <div
-  class="flex justify-between items-center p-4"
+  class="header-wrapper flex justify-between items-center shadow-md p-4"
   [class.bg-scrolled]="scrolled"
   [class.bg-transparent]="!scrolled"
 >
   <app-logo></app-logo>
-  <div class="flex flex-row gap-2 items-center">
+
+  <!-- Navbar desktop -->
+  <div class="hidden lg:flex gap-2 items-center">
     <app-navbar [userRole]="userRole"></app-navbar>
-    <div class="tabs tabs-box">
-
-      <app-button variant="ghost" shape="circle" (buttonClick)="toggleTheme()" (buttonKeydown)="undefined">
-        <app-icon
-          [name]="isDarkTheme() ? 'sun' : 'darkMoon'"
-          [color]="isDarkTheme() ? 'warning' : 'current'"
-          size="md"
-        />
-      </app-button>
-
-    </div>
   </div>
+
+  <!-- Bouton hamburger -->
+  <button class="btn btn-ghost lg:hidden" (click)="menuOpen = true">
+    <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+         stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+    </svg>
+  </button>
 </div>
+
+<!-- Overlay + Sidebar mobile -->
+@if (menuOpen) {
+  <div class="fixed inset-0 z-50 lg:hidden">
+    <!-- Overlay sombre -->
+    <div
+      class="absolute inset-0 bg-black/50 transition-opacity"
+      (click)="menuOpen = false">
+    </div>
+
+    <!-- Sidebar -->
+    <aside class="absolute top-0 right-0 h-full w-64 bg-base-100 shadow-xl p-6 flex flex-col gap-2 animate-slide-in">
+      <!-- Bouton fermer -->
+      <button class="btn btn-ghost btn-sm self-end mb-4" (click)="menuOpen = false">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+
+      <app-navbar [userRole]="userRole" (linkClicked)="menuOpen = false"></app-navbar>
+    </aside>
+  </div>
+}

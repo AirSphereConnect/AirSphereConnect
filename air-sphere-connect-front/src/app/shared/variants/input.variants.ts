@@ -8,8 +8,7 @@ export const inputVariants = tv({
     labelRequired: 'text-error ml-1 font-bold',
     inputWrapper: 'relative',
     input: 'input input-bordered w-full transition-all duration-200',
-    iconLeft: 'absolute left-0 -translate-x-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10 h-9 w-12 flex items-center justify-center rounded-tl-lg rounded-bl-lg bg-base-300/90',
-    iconRight: 'absolute right-3 top-1/2 -translate-y-1/2 z-10',
+    iconLeft: 'absolute left-0 -translate-x-2.5 top-1/2 -translate-y-1/2 pointer-events-none z-10 h-9 w-6 md:w-12 flex items-center justify-center rounded-tl-xl rounded-bl-xl bg-base-300/90',      iconRight: 'absolute right-3 top-1/2 -translate-y-1/2 z-10',
     helperWrapper: 'label',
     helperText: 'label-text-alt text-base-content/70 text-xs',
     errorText: 'label-text-alt text-error text-xs font-medium flex items-center gap-1.5',
@@ -30,7 +29,7 @@ export const inputVariants = tv({
         helperText: 'text-xs',
       },
       sm: {
-        input: 'input-sm text-sm',
+        input: 'input-sm text-sm placeholder:text-xs',
         labelText: 'text-sm',
         iconLeft: 'left-2.5',
         iconRight: 'right-2.5',
@@ -38,15 +37,15 @@ export const inputVariants = tv({
         successText: 'text-xs',
       },
       md: {
-        input: 'input-md text-base',
+        input: 'input-md text-base placeholder:text-sm',
         labelText: 'text-base',
         iconLeft: 'left-3',
         iconRight: 'right-3',
       },
       lg: {
-        input: 'input-lg text-lg',
+        input: 'input-lg text-lg placeholder:text-base',
         labelText: 'text-lg',
-        iconLeft: 'left-4',
+        iconLeft: 'left-4 h-9 w-12',
         iconRight: 'right-4',
       }
     },

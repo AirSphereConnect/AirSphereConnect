@@ -8,12 +8,13 @@ import {WarningMessage} from '../../../../shared/components/ui/warning-message/w
 import {Favorite, User} from '../../../../core/models/user.model';
 import {FormGroup} from '@angular/forms';
 import {NotificationService} from '../../../../shared/services/notification-service';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-favorites',
   templateUrl: './favorites.html',
   standalone: true,
-  imports: [FavoritesForm, Button, WarningMessage],
+  imports: [FavoritesForm, Button, WarningMessage, DatePipe],
 })
 export class Favorites implements OnInit {
   @Input() user: User | null = null;

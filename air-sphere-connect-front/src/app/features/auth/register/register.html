@@ -3,19 +3,20 @@
 
     @if (step() === 1) {
       <div class="card bg-base-100 shadow-lg">
-        <div class="card-body">
-          <h2 class="card-title text-primary/90 text-2xl font-bold mb-16">Créer un compte</h2>
+        <div class="card-body flex flex-col items-center lg:items-start">
+          <h2 class="card-title text-primary/90 text-2xl lg:text-4xl  font-bold mb-16">Inscription</h2>
 
-          <form [formGroup]="registerFirstForm" (ngSubmit)="onFirstSubmit()" class="flex flex-col gap-6">
+          <form [formGroup]="registerFirstForm" (ngSubmit)="onFirstSubmit()" class="flex flex-col gap-6 w-full">
 
             <app-input
               label="Nom d'utilisateur"
+              class="placeholder:text-sm"
               type="text"
               formControlName="username"
               [control]="usernameControl"
               [required]="true"
               iconLeft="user"
-              placeholder="Entrez votre nom d'utilisateur"
+              placeholder="Entrez votre identifiant"
               [attr.autocomplete]="'username'"
               fieldName="username"
             ></app-input>

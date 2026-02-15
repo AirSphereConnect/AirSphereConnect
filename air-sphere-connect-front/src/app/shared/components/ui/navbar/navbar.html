@@ -1,10 +1,11 @@
-<div role="tablist" class="tabs tabs-box min-w-[150px] flex gap-x-1">
+<div role="tablist" class="tabs min-w-[150px] flex justify-center gap-1 flex-wrap">
   <a
     routerLink="/home"
     routerLinkActive="tab-active tab-active-primary"
     role="tab"
-    class="tab"
+    class="tab tabs-md"
     [routerLinkActiveOptions]="{ exact: true }"
+    (click)="onLinkClick()"
   >
     Page d'accueil
   </a>
@@ -13,7 +14,8 @@
     routerLink="/forum"
     routerLinkActive="tab-active tab-active-primary"
     role="tab"
-    class="tab"
+    class="tab tabs-md"
+    (click)="onLinkClick()"
   >
     Forum
   </a>
@@ -23,25 +25,28 @@
       routerLink="/auth/login"
       routerLinkActive="tab-active tab-active-primary"
       role="tab"
-      class="tab"
+      class="tab tabs-md"
+      (click)="onLinkClick()"
     >
-      Se connecter
+      Connexion
     </a>
 
     <a
       routerLink="/auth/register"
       routerLinkActive="tab-active tab-active-primary"
       role="tab"
-      class="tab"
+      class="tab tabs-md"
+      (click)="onLinkClick()"
     >
-      Créer un compte
+      Inscription
     </a>
   } @else if (userRole === 'USER' || 'ADMIN') {
     <a
       routerLink="/dashboard"
       routerLinkActive="tab-active tab-active-primary"
       role="tab"
-      class="tab"
+      class="tab tabs-md"
+      (click)="onLinkClick()"
     >
       Données climatiques
     </a>
@@ -50,7 +55,8 @@
       routerLink="/history"
       routerLinkActive="tab-active tab-active-primary"
       role="tab"
-      class="tab"
+      class="tab tabs-md"
+      (click)="onLinkClick()"
     >
       Historique
     </a>
@@ -59,17 +65,26 @@
       routerLink="/auth/profile"
       routerLinkActive="tab-active tab-active-primary"
       role="tab"
-      class="tab"
+      class="tab tabs-md"
+      (click)="onLinkClick()"
     >
       Mon compte
     </a>
 
     <a
-      (click)="logout()"
+      (click)="logout(); onLinkClick()"
       role="tab"
-      class="tab"
+      class="tab tabs-md"
     >
       Déconnexion
     </a>
   }
+
+  <app-button variant="ghost" shape="circle" (buttonClick)="toggleTheme()" (buttonKeydown)="undefined">
+    <app-icon
+      [name]="isDarkTheme() ? 'sun' : 'darkMoon'"
+      [color]="isDarkTheme() ? 'warning' : 'current'"
+      size="md"
+    />
+  </app-button>
 </div>

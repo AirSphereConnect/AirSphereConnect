@@ -1,12 +1,11 @@
 import {Component, inject, OnInit} from '@angular/core';
 import {RouterOutlet} from '@angular/router';
 import {SectionService} from '../../../../core/services/section.service';
-
 @Component({
   selector: 'app-forum',
   standalone: true,
   imports: [
-    RouterOutlet
+    RouterOutlet,
   ],
   templateUrl: './forum.html',
   styleUrls: ['./forum.scss']

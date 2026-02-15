@@ -144,20 +144,27 @@
           <app-icon [name]="'informationCircle'" size="md"></app-icon>
           <div>
             <h3 class="font-bold">Votre première contribution</h3>
-            <div class="text-xs">Le premier message de la discussion sera créé automatiquement avec votre contenu.
-            </div>
+            <div class="text-xs">Le premier message de la discussion sera créé automatiquement avec votre contenu.</div>
           </div>
         </div>
 
-        <form class="space-y-4" (submit)="$event.preventDefault(); createThread()">
+        <!-- Message d'erreur -->
+        @if (errorMessage()) {
+          <div class="alert alert-error mb-4">
+            <app-icon [name]="'xCircle'" size="md"></app-icon>
+            <p>{{ errorMessage() }}</p>
+          </div>
+        }
+
+        <form class="space-y-8" (submit)="$event.preventDefault(); createThread()">
           <!-- Titre -->
-          <div class="form-control">
-            <label for="thread-title-input" class="label">
-            <span class="label-text font-semibold">
-              Titre de la discussion
-              <span class="text-error">*</span>
-            </span>
-              <span class="label-text-alt">{{ newThreadTitle().length }}/100</span>
+          <div class="form-control flex flex-col gap-2">
+            <label class="label" for="thread-title-input">
+              <p class="label-text font-semibold">
+                Titre de la discussion
+                <span class="text-error">*</span>
+              </p>
+              <p class="label-text-alt">{{ newThreadTitle().length }}/100</p>
             </label>
             <input
               id="thread-title-input"
@@ -172,24 +179,24 @@
               autocomplete="off"
             >
             <div class="label">
-            <span class="label-text-alt text-base-content/60">
-              Soyez clair et descriptif pour attirer les bonnes réponses
-            </span>
+              <p class="label-text-alt text-base-content/60">
+                Soyez clair et descriptif pour attirer les bonnes réponses
+              </p>
             </div>
           </div>
 
           <!-- Contenu -->
-          <div class="form-control">
-            <label for="thread-content-input" class="label">
-            <span class="label-text font-semibold">
-              Votre message
-              <span class="text-error">*</span>
-            </span>
-              <span class="label-text-alt">{{ newThreadContent().length }}/2000</span>
+          <div class="form-control flex flex-col gap-2">
+            <label class="label" for="thread-content-input">
+              <p class="label-text font-semibold">
+                Votre message
+                <span class="text-error">*</span>
+              </p>
+              <p class="label-text-alt">{{ newThreadContent().length }}/2000</p>
             </label>
             <textarea
               id="thread-content-input"
-              class="textarea textarea-bordered h-40 resize-none"
+              class="textarea textarea-bordered h-40 w-full resize-none"
               placeholder="Décrivez votre question ou sujet en détail..."
               [value]="newThreadContent()"
               (input)="newThreadContent.set($any($event.target).value)"
@@ -199,25 +206,19 @@
               autocomplete="off"
             ></textarea>
             <div class="label">
-            <span class="label-text-alt text-base-content/60">
-              Plus vous donnez de détails, plus vous recevrez d'aide précise
-            </span>
+              <p class="label-text-alt text-base-content/60">
+                Plus vous donnez de détails, plus vous recevrez d'aide précise
+              </p>
             </div>
           </div>
 
-          <!-- Aperçu des infos -->
+          <!-- Aperçu -->
           <div class="card bg-base-200">
             <div class="card-body p-4">
-              <h4 class="font-semibold text-sm mb-2">Aperçu de votre publication</h4>
-              <div class="flex items-center gap-3 text-sm">
-                <div class="flex items-center gap-1">
-                  <app-icon [name]="'user'" size="sm"></app-icon>
-                  <span class="font-medium">{{ userService.getUsername() || 'Utilisateur' }}</span>
-                </div>
-                <div class="flex items-center gap-1">
-                  <app-icon [name]="'clock'" size="sm"></app-icon>
-                  <span>Maintenant</span>
-                </div>
+              <h4 class="font-semibold text-sm mb-2">Aperçu</h4>
+              <div class="flex-1">
+                <h3 class="font-bold">{{ newThreadTitle() || 'Titre de la discussion' }}</h3>
+                <p class="text-sm text-base-content/70">{{ newThreadContent() || 'Contenu de votre message' }}</p>
               </div>
             </div>
           </div>
@@ -227,6 +228,7 @@
             <app-button
               type="button"
               variant="ghost"
+              color="neutral"
               (buttonClick)="closeModal()"
               (buttonKeydown)="$event.key === 'Enter' && closeModal()"
               [disabled]="isSubmitting()"
@@ -235,9 +237,9 @@
             </app-button>
             <app-button
               type="submit"
-              heroIcon="check"
+              [heroIcon]="'check'"
               [loading]="isSubmitting()"
-              [disabled]="isSubmitting() || !newThreadTitle().trim()"
+              [disabled]="isSubmitting() || !newThreadTitle().trim() || !newThreadContent().trim()"
             >
               @if (!isSubmitting()) {
                 Créer la discussion
@@ -249,7 +251,7 @@
         </form>
       </div>
 
-      <!-- Backdrop pour fermer la modale -->
+      <!-- Backdrop -->
       <form method="dialog" class="modal-backdrop">
         <button
           type="button"
@@ -260,6 +262,5 @@
         </button>
       </form>
     </dialog>
-
   }
 </div>

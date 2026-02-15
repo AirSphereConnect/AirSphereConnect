@@ -1,8 +1,10 @@
-<div class="bg-base-100 rounded-lg p-5 shadow-md transition-colors">
-  <div class="flex justify-between items-center mb-5">
-    <h3 class="text-xl font-semibold text-base-content m-0">
+<div class="bg-base-100 rounded-lg p-5 shadow-md transition-colors h-full flex flex-col ">
+  <div class="flex flex-col gap-6 xl:flex-row justify-between items-center mb-12">
+    <h3 class="text-xl text-center xl:text-start font-semibold text-base-content m-0">
       @if (user) {
-        Taux de polluants – {{ user.address.city.name }}
+        Taux de polluants de {{ user.address.city.name }}
+      } @else {
+        Taux de polluants
       }
     </h3>
 
@@ -27,29 +29,37 @@
       </div>
     }
 
-    <vis-bullet-legend [items]="pollutantLegend()"></vis-bullet-legend>
+    <div class="flex-1 min-h-0">
+      <div class="flex flex-col lg:flex-row text-center lg:text-stretch justify-between items-center">
+        <span class="text-xs text-base-content/50 mb-1 block">Concentration (µg/m³)</span>
+        <vis-bullet-legend [items]="pollutantLegend()"></vis-bullet-legend>
+      </div>
 
-    <vis-xy-container [data]="chartData()" [height]="400" [margin]="{ top: 20, right: 20, bottom: 20, left: 20 }">
-      <vis-grouped-bar
-        [x]="x"
-        [y]="y"
-        [color]="colors"
-        [barPadding]="0.2"
-        [groupPadding]="0.1">
-      </vis-grouped-bar>
+      <div class="overflow-x-auto">
+        <div class="min-w-[500px]">
+          <vis-xy-container [data]="chartData()" [height]="400" [margin]="chartMargin()">
+            <vis-grouped-bar
+              [x]="x"
+              [y]="y"
+              [color]="colors"
+              [barPadding]="0.2"
+              [groupPadding]="0.1">
+            </vis-grouped-bar>
 
-      <vis-axis
-        type="x"
-        label="Date"
-        [tickFormat]="dateFormat"
-        [tickTextAngle]="-45"
-        [tickValues]="xTickValues()"></vis-axis>
-      <vis-axis
-        type="y"
-        label="Concentration (µg/m³)"
-        [tickFormat]="yTickFormat"></vis-axis>
-      <vis-tooltip [triggers]="tooltipTriggers"></vis-tooltip>
-    </vis-xy-container>
+            <vis-axis
+              type="x"
+              label="Date"
+              [tickFormat]="dateFormat"
+              [tickTextAngle]="-45"
+              [tickValues]="xTickValues()"></vis-axis>
+            <vis-axis
+              type="y"
+              [tickFormat]="yTickFormat"></vis-axis>
+            <vis-tooltip [triggers]="tooltipTriggers"></vis-tooltip>
+          </vis-xy-container>
+        </div>
+      </div>
+    </div>
   } @else {
     <p class="text-base-content opacity-60 italic text-center py-8">
       Aucune donnée de pollution disponible

@@ -7,13 +7,15 @@ import {AlertsService} from '../../../../shared/services/alerts-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
 import {NotificationService} from '../../../../shared/services/notification-service';
+import {DatePipe} from '@angular/common';
 
 @Component({
   selector: 'app-alerts',
   imports: [
     Button,
     AlertsForm,
-    WarningMessage
+    WarningMessage,
+    DatePipe
   ],
   templateUrl: './alerts.html',
   styleUrl: './alerts.scss'
