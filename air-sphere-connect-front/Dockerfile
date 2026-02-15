@@ -36,5 +36,4 @@ COPY src/assets/env.template.js /usr/share/nginx/html/env.template.js
 EXPOSE 4200
 
 # Commande d'injection dynamique avant lancement de Nginx
-CMD envsubst < /usr/share/nginx/html/env.template.js > /usr/share/nginx/html/env.js \
-  && nginx -g 'daemon off;'
+CMD ["/bin/sh", "-c", "envsubst < /usr/share/nginx/html/env.template.js > /usr/share/nginx/html/env.js && nginx -g 'daemon off;'"]
