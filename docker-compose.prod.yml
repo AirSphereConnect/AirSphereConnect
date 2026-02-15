@@ -1,0 +1,80 @@
+services:
+  mariadb:
+    image: mariadb:${MARIADB_VERSION}
+    container_name: ${DB_CONTAINER_NAME}
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_CHARSET: ${DB_CHARSET}
+      MYSQL_COLLATION: ${DB_COLLATION}
+    volumes:
+      - ${DB_VOLUME_NAME}:/var/lib/mysql
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: ["CMD", "mariadb", "-h", "localhost", "-u", "root", "-p${DB_ROOT_PASSWORD}", "-e", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 60s
+
+  backend:
+    build:
+      context: ${BACKEND_CONTEXT}
+      dockerfile: ${BACKEND_DOCKERFILE}
+    container_name: ${BACKEND_CONTAINER_NAME}
+    restart: unless-stopped
+    env_file:
+      - .env.prod
+    environment:
+      SPRING_DOCKER_COMPOSE_ENABLED: "false"
+      SPRING_SCHEDULING_ENABLED: "true"
+    ports:
+      - "${BACKEND_PORT}:8080"
+    depends_on:
+      mariadb:
+        condition: service_healthy
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "wget --spider -q http://localhost:8080/actuator/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 10
+      start_period: 90s
+
+  frontend:
+    build:
+      context: ${FRONTEND_CONTEXT}
+      dockerfile: ${FRONTEND_DOCKERFILE}
+    container_name: ${FRONTEND_CONTAINER_NAME}
+    restart: unless-stopped
+    environment:
+      API_URL: ${API_URL}
+      NODE_ENV: ${NODE_ENV:-production}
+    ports:
+      - "${FRONTEND_PORT}:4200"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - ${NETWORK_NAME}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:4200 || exit 1"]
+      interval: ${HEALTHCHECK_INTERVAL:-30s}
+      timeout: ${HEALTHCHECK_TIMEOUT:-10s}
+      retries: 3
+      start_period: 45s
+
+volumes:
+  air_sphere_connect_db_data:
+    name: ${DB_VOLUME_NAME}
+    driver: local
+
+networks:
+  air_sphere_connect_network:
+    name: ${NETWORK_NAME}
+    driver: bridge
