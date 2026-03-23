@@ -38,6 +38,8 @@ cors:
 weather:
   api:
     key: ${WEATHER_API_KEY:e935d0947600dd8f7247eefe1819751a}
+  sync:
+    min-population: ${WEATHER_SYNC_MIN_POPULATION:5000}
 mailjet:
   api:
     key: ${MAILJET_API_KEY:13f60c773c9d6b968a6415fa88e6affc}

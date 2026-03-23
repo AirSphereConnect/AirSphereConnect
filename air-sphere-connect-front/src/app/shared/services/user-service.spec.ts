@@ -1,5 +1,6 @@
 import { TestBed, fakeAsync, tick } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { UserService } from './user-service';
 import { ApiConfigService } from '../../core/services/api';
 import { UserProfileResponse, RegisterPayload, UpdateUserPayload, UpdateAddressPayload } from '../../core/models/user.model';
@@ -18,8 +19,9 @@ describe('UserService', () => {
     });
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         UserService,
         { provide: ApiConfigService, useValue: apiConfigSpy }
       ]
@@ -50,8 +52,9 @@ describe('UserService', () => {
       });
 
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
         providers: [
+          provideHttpClient(),
+          provideHttpClientTesting(),
           UserService,
           { provide: ApiConfigService, useValue: apiConfigSpy }
         ]
@@ -72,8 +75,9 @@ describe('UserService', () => {
       });
 
       TestBed.configureTestingModule({
-        imports: [HttpClientTestingModule],
         providers: [
+          provideHttpClient(),
+          provideHttpClientTesting(),
           UserService,
           { provide: ApiConfigService, useValue: apiConfigSpy }
         ]

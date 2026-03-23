@@ -3,7 +3,6 @@ import {
   EventEmitter, inject,
   Input,
   OnChanges,
-  OnDestroy,
   OnInit,
   Output,
   signal,
@@ -18,7 +17,6 @@ import {Button} from '../button/button';
 import {citySearch} from '../../../utils/city-search.util';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
 import {InputComponent} from '../input/input';
-import {Subject} from 'rxjs';
 import {City} from '../../../../core/models/city.model';
 
 interface AlertFormData {
@@ -35,7 +33,7 @@ import {NotificationService} from '../../../services/notification-service';
   templateUrl: './alerts-form.html',
   styleUrl: './alerts-form.scss'
 })
-export class AlertsForm implements OnInit, OnChanges, OnDestroy {
+export class AlertsForm implements OnInit, OnChanges {
 
   @Input() isOpen = signal(false);
   @Input() editingAlertsId: number | null = null;
@@ -57,10 +55,8 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
   cityIdSelected: number | null = null;
   isDeleteMode = false;
 
-  private readonly destroy$ = new Subject<void>();
-
   // !! Obligatoire !!
-  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions, this.destroyRef);
 
   ngOnInit() {
     this.alertsForm = this.fb.group({
@@ -73,11 +69,6 @@ export class AlertsForm implements OnInit, OnChanges, OnDestroy {
     if (this.alertsForm && changes['initialAlertsData'] && this.initialAlertsData) {
       this.patchFormData();
     }
-  }
-
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   private patchFormData() {

@@ -1,5 +1,5 @@
 import { TestBed, fakeAsync, flush } from '@angular/core/testing';
-import { signal } from '@angular/core';
+import { DestroyRef, inject, signal } from '@angular/core';
 import { of, throwError } from 'rxjs';
 import { citySearch } from './city-search.util';
 import { City } from '../../core/models/city.model';
@@ -30,7 +30,7 @@ describe('citySearch', () => {
     citySuggestionsSignal.set(initialCities);
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('a');
       flush();
     });
@@ -44,7 +44,7 @@ describe('citySearch', () => {
     citySuggestionsSignal.set(initialCities);
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('');
       flush();
     });
@@ -62,7 +62,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValue(of(mockCities));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('Pa');
       flush();
     });
@@ -75,7 +75,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValue(of(mockCities));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('Paris');
       flush();
     });
@@ -87,7 +87,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValue(of(mockCities));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('Paris city');
       flush();
     });
@@ -100,7 +100,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValue(of([]));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('NonExistentCity');
       flush();
     });
@@ -112,7 +112,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValue(of(null));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('Test');
       flush();
     });
@@ -126,7 +126,7 @@ describe('citySearch', () => {
     );
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('Paris');
       flush();
     });
@@ -140,7 +140,7 @@ describe('citySearch', () => {
     );
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('Test');
       flush();
     });
@@ -155,7 +155,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValues(of(cities1), of(cities2));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
 
       querySignal.set('Pa');
       flush();
@@ -174,7 +174,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValue(of(mockCities));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
 
       querySignal.set('Paris');
       flush();
@@ -190,7 +190,7 @@ describe('citySearch', () => {
     mockCityService.searchCities.and.returnValue(of(undefined));
 
     TestBed.runInInjectionContext(() => {
-      citySearch(mockCityService, querySignal, citySuggestionsSignal);
+      citySearch(mockCityService, querySignal, citySuggestionsSignal, inject(DestroyRef));
       querySignal.set('Test');
       flush();
     });

@@ -49,7 +49,7 @@ export class AddressForm implements OnInit, OnChanges {
 
 
   // !! Obligatoire !!
-  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions, this.destroyRef);
 
   ngOnInit() {
     this.addressForm = this.fb.group({

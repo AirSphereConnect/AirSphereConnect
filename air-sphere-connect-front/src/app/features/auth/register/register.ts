@@ -65,7 +65,7 @@ export class Register implements OnInit {
   canSubmitStep2 = signal<boolean>(false);
 
   // Effet Angular 20 pour recherche villes
-  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions, this.destroyRef);
 
   ngOnInit() {
     this.registerFirstForm = this.fb.group({

@@ -1,4 +1,4 @@
-import {Component, computed, DestroyRef, inject, Input, OnInit, signal} from '@angular/core';
+import {Component, computed, DestroyRef, inject, OnInit, signal} from '@angular/core';
 import { TemperatureChart } from '../temperature-chart/temperature-chart';
 import { CityPopulationChart } from '../city-population-chart/city-population-chart';
 import { PollutantsChart } from '../pollutants-chart/pollutants-chart';
@@ -10,6 +10,7 @@ import {UserService} from '../../../../shared/services/user-service';
 import {Button} from '../../../../shared/components/ui/button/button';
 import {User} from '../../../../core/models/user.model';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
+import {take} from 'rxjs';
 
 
 @Component({
@@ -52,7 +53,7 @@ export class Dashboard implements OnInit {
   ngOnInit() {
     // Récupération de la ville par défaut depuis le profil utilisateur
     this.userService.userProfile$
-      .pipe(takeUntilDestroyed(this.destroyRef))
+      .pipe(take(1))
       .subscribe(profile => {
         if (profile?.user) {
           this.user = profile.user;

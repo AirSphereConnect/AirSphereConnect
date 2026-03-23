@@ -90,7 +90,8 @@
               "**/*.config.ts",
               "**/test/**",
               "**/environments/**"
-            ]
+            ],
+            "karmaConfig": "karma.conf.js"
           }
         }
       }

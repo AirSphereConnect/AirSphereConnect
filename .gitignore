@@ -24,10 +24,6 @@ target/
 dist/
 build/
 
-
-# ==============================
-# SonarQube & Coverage Reports
-# ==============================
 # Backend
 air-sphere-connect-back/target/jacoco.exec
 air-sphere-connect-back/target/site/jacoco/
@@ -42,6 +38,7 @@ air-sphere-connect-front/.nyc_output/
 .sonarqube/
 .sonar/
 
+# Documentation
 docs/
 
 # Backup/temp files

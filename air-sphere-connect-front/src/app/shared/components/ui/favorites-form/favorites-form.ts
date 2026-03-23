@@ -8,7 +8,6 @@ import {
   SimpleChanges,
   signal,
   inject,
-  OnDestroy,
   DestroyRef
 } from '@angular/core';
 import {FormBuilder, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
@@ -16,7 +15,6 @@ import {FavoritesService} from '../../../services/favorites-service';
 import {CityService} from '../../../../core/services/city';
 import {InputComponent} from '../input/input';
 import {UserService} from '../../../services/user-service';
-import {Subject, takeUntil} from 'rxjs';
 import {Button} from '../button/button';
 import {citySearch} from '../../../utils/city-search.util';
 import {ButtonCloseModal} from '../button-close-modal/button-close-modal';
@@ -63,9 +61,7 @@ export class FavoritesForm implements OnInit, OnChanges {
   cityIdSelected: number | null = null;
   isDeleteMode = false;
 
-  private readonly destroy$ = new Subject<void>();
-
-  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions);
+  citySearchEffect = citySearch(this.cityService, this.cityQuery, this.citySuggestions, this.destroyRef);
 
   ngOnInit() {
     this.favoritesForm = this.fb.group({

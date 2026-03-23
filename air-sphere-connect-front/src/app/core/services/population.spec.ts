@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { PopulationService } from './population';
 import { ApiConfigService } from './api';
 import { PopulationData } from '../models/data.model';
@@ -15,8 +16,9 @@ describe('PopulationService', () => {
     mockApiConfig = jasmine.createSpyObj('ApiConfigService', [], { apiUrl: mockApiUrl });
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         PopulationService,
         { provide: ApiConfigService, useValue: mockApiConfig }
       ]

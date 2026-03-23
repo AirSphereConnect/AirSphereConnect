@@ -242,8 +242,21 @@ export class Map implements OnInit, AfterViewInit, OnDestroy {
       .subscribe({
         next: (data) => {
           const aq: AirQualityIndex | undefined = data.airQuality?.latestIndex;
-          const measurement = data.airQuality?.latestMeasurement;
           const weather = data.weather;
+
+          // Calcul de la moyenne du jour depuis l'historique (cohérent avec le chart)
+          const history = data.airQuality?.measurementHistory || [];
+          const todayKey = new Date().toISOString().split('T')[0];
+          const todayMeasurements = history.filter(m => m.measuredAt.startsWith(todayKey));
+
+          const avg = (key: 'pm25' | 'pm10' | 'no2' | 'o3' | 'so2'): number => {
+            const values = todayMeasurements.map(m => m[key]).filter((v): v is number => v != null);
+            return values.length > 0 ? Math.round((values.reduce((a, b) => a + b, 0) / values.length) * 10) / 10 : 0;
+          };
+
+          const measurement = todayMeasurements.length > 0
+            ? { ...todayMeasurements[0], pm25: avg('pm25'), pm10: avg('pm10'), no2: avg('no2'), o3: avg('o3'), so2: avg('so2') }
+            : data.airQuality?.latestMeasurement;
 
           const enrichedCity: CityMapPoint = {
             ...city,

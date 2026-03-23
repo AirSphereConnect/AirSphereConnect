@@ -31,20 +31,16 @@ type PollutantKey = 'pm25' | 'pm10' | 'no2' | 'o3' | 'so2';
 export class PollutantsChart {
   data = input.required<AirQualityMeasurement[]>()
   cityName = input.required<string>()
-
   selectedPeriod = signal<Period>('7days')
   hasAlerts = signal(false)
   alertMessage = signal('')
-
   private readonly screenWidth = signal(window.innerWidth);
   chartMargin = computed(() => ({
     top: 0, right: 10, bottom: 0,
     left: this.screenWidth() < 1024 ? 5 : 20
   }));
-
   @HostListener('window:resize')
   onResize() { this.screenWidth.set(window.innerWidth); }
-
   periods = [
     { value: '7days' as const, label: '7 jours' },
     { value: '15days' as const, label: '15 jours' },
@@ -59,14 +55,11 @@ export class PollutantsChart {
       this.checkAlerts(rawData);
     });
   }
-
   pollutants = ['pm25', 'pm10', 'no2', 'o3', 'so2']
 
-  // Palette dynamique selon le thème DaisyUI - optimisée
   private getThemeColor(varName: string): string {
     return getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
   }
-
   pollutantLegend = computed(() => [
     { name: 'PM2.5', color: this.getThemeColor('--color-error') },       // rouge
     { name: 'PM10',  color: this.getThemeColor('--color-secondary') },   // bleu clair
@@ -173,7 +166,6 @@ export class PollutantsChart {
     }
   };
 
-  // Math pour le template
   Math = Math;
   @Input() user!: User | null;
 

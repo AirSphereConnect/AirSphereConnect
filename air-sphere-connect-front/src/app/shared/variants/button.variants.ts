@@ -1,4 +1,3 @@
-// src/app/shared/variants/button.variants.ts
 import { tv, type VariantProps } from 'tailwind-variants';
 
 export const buttonVariants = tv({
@@ -15,7 +14,6 @@ export const buttonVariants = tv({
       info: 'btn-info',
       neutral: 'btn-neutral',
     },
-
     size: {
       xs: 'btn-xs',
       sm: 'btn-sm',
@@ -23,7 +21,6 @@ export const buttonVariants = tv({
       lg: 'btn-lg',
       xl: 'btn-xl'
     },
-
     variant: {
       solid: '',
       outline: 'btn-outline',
@@ -32,15 +29,12 @@ export const buttonVariants = tv({
       active: 'btn-active',
       ghost: 'btn-ghost'
     },
-
     fullWidth: {
       true: 'btn-block'
     },
-
     wide: {
       true: 'btn-wide'
     },
-
     shape: {
       default: '',
       circle: 'btn-circle',
@@ -58,9 +52,7 @@ export const buttonVariants = tv({
 
   },
 
-  compoundVariants: [
-
-  ],
+  compoundVariants: [],
 
   defaultVariants: {
     color: 'primary',

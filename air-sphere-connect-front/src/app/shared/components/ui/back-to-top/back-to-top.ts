@@ -1,4 +1,4 @@
-import {Component, model} from '@angular/core';
+import {Component} from '@angular/core';
 import {Button} from '../button/button';
 
 @Component({

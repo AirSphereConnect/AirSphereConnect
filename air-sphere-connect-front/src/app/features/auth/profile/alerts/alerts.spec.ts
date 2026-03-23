@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { of, throwError } from 'rxjs';
 
 import { Alerts } from './alerts';
@@ -26,8 +27,10 @@ describe('Alerts', () => {
     const userServiceSpy = jasmine.createSpyObj('UserService', ['fetchUserProfile']);
 
     await TestBed.configureTestingModule({
-      imports: [Alerts, HttpClientTestingModule],
+      imports: [Alerts],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         { provide: AlertsService, useValue: alertsServiceSpy },
         { provide: UserService, useValue: userServiceSpy }
       ]

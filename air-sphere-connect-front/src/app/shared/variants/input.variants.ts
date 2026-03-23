@@ -14,8 +14,6 @@ export const inputVariants = tv({
     errorText: 'label-text-alt text-error text-xs font-medium flex items-center gap-1.5',
     successText: 'label-text-alt text-success text-xs font-medium flex items-center gap-1.5',
     characterCount: 'label-text-alt text-xs',
-
-
   },
   variants: {
     size: {

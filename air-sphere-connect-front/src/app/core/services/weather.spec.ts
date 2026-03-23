@@ -1,5 +1,6 @@
 import { TestBed } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClientTesting, HttpTestingController } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { WeatherService } from './weather';
 import { ApiConfigService } from './api';
 import { WeatherMeasurement } from '../models/data.model';
@@ -15,8 +16,9 @@ describe('WeatherService', () => {
     mockApiConfig = jasmine.createSpyObj('ApiConfigService', [], { apiUrl: mockApiUrl });
 
     TestBed.configureTestingModule({
-      imports: [HttpClientTestingModule],
       providers: [
+        provideHttpClient(),
+        provideHttpClientTesting(),
         WeatherService,
         { provide: ApiConfigService, useValue: mockApiConfig }
       ]

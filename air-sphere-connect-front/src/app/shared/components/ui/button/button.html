@@ -1,3 +1,28 @@
+<button
+  [ngClass]="buttonClasses()"
+  [disabled]="disabled || loading"
+  [type]="type"
+  [attr.aria-label]="ariaLabel"
+  (click)="handleClick($event)"
+  (keydown)="handleKeyDown($event)"
+>
+  @if (loading) {
+    <span class="loading loading-spinner"></span>
+  }
 
+  @if ((heroIcon || icon) && iconPosition === 'left' && !loading) {
+    <span
+      [innerHTML]="iconHtml()"
+      [ngClass]="iconClasses()">
+    </span>
+  }
 
+  <ng-content></ng-content>
 
+  @if ((heroIcon || icon) && iconPosition === 'right' && !loading) {
+    <span
+      [innerHTML]="iconHtml()"
+      [ngClass]="iconClasses()">
+    </span>
+  }
+</button>

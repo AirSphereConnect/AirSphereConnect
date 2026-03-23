@@ -1,4 +1,4 @@
-import {Component, Input, signal, TemplateRef, computed, Output, EventEmitter, effect} from '@angular/core';
+import {Component, Input, signal, TemplateRef, computed, Output, EventEmitter} from '@angular/core';
 import {NgTemplateOutlet} from '@angular/common';
 import { tabVariants, type TabVariantProps } from '../../../variants/tab.variants';
 

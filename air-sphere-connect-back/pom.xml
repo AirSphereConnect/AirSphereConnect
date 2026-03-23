@@ -10,7 +10,7 @@
         <relativePath/>
     </parent>
 
-    <groupId>com.air-sphere-connect</groupId>
+    <groupId>com.airsphereconnect</groupId>
     <artifactId>air-sphere-connect-back</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>air-sphere-connect</name>
@@ -177,10 +177,9 @@
             <plugin>
                 <groupId>org.owasp</groupId>
                 <artifactId>dependency-check-maven</artifactId>
-                <version>8.3.1</version> <!-- Utilisez la dernière version -->
+                <version>8.3.1</version>
                 <configuration>
-                    <!-- Échoue si une vulnérabilité critique est détectée -->
-                    <failBuildOnCVSS>7</failBuildOnCVSS>
+                   <failBuildOnCVSS>7</failBuildOnCVSS>
                 </configuration>
             </plugin>
             <plugin>

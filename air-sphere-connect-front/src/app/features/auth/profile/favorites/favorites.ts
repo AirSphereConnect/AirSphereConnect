@@ -6,7 +6,6 @@ import {FavoritesService} from '../../../../shared/services/favorites-service';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {WarningMessage} from '../../../../shared/components/ui/warning-message/warning-message';
 import {Favorite, User} from '../../../../core/models/user.model';
-import {FormGroup} from '@angular/forms';
 import {NotificationService} from '../../../../shared/services/notification-service';
 import {DatePipe} from '@angular/common';
 

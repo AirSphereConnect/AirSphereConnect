@@ -11,36 +11,7 @@ import {DomSanitizer} from '@angular/platform-browser';
   selector: 'app-button',
   standalone: true,
   imports: [CommonModule],
-  template: `
-    <button
-      [ngClass]="buttonClasses()"
-      [disabled]="disabled || loading"
-      [type]="type"
-      [attr.aria-label]="ariaLabel"
-      (click)="handleClick($event)"
-      (keydown)="handleKeyDown($event)"
-    >
-      @if (loading) {
-        <span class="loading loading-spinner"></span>
-      }
-
-      @if ((heroIcon || icon) && iconPosition === 'left' && !loading) {
-        <span
-          [innerHTML]="iconHtml()"
-          [ngClass]="iconClasses()">
-        </span>
-      }
-
-      <ng-content></ng-content>
-
-      @if ((heroIcon || icon) && iconPosition === 'right' && !loading) {
-        <span
-          [innerHTML]="iconHtml()"
-          [ngClass]="iconClasses()">
-        </span>
-      }
-    </button>
-  `,
+  templateUrl: './button.html',
   styles: [`
     :host {
       display: inline-block;
@@ -50,7 +21,6 @@ import {DomSanitizer} from '@angular/platform-browser';
 export class Button {
   private readonly iconService = inject(IconService);
   private readonly sanitizer = inject(DomSanitizer);
-
   @Input() color: ButtonVariants['color'] = 'primary';
   @Input() size: ButtonVariants['size'] = 'md';
   @Input() variant: ButtonVariants['variant'] = 'solid';
@@ -62,16 +32,13 @@ export class Button {
   @Input() disabled: boolean = false;
   @Input() type: 'button' | 'submit' | 'reset' | 'checkbox' | 'radio' = 'button';
   @Input() class: string = '';
-
   @Input() heroIcon?: HeroIcon;
   @Input() icon?: string;
   @Input() iconPosition: 'left' | 'right' = 'left';
   @Input() iconColor?: IconVariants['color'];
-
   @Input() ariaLabel?: string;
   @Output() buttonClick = new EventEmitter<MouseEvent>();
   @Output() buttonKeydown = new EventEmitter<KeyboardEvent>();
-
 
   buttonClasses = computed(() => {
     return buttonVariants({
@@ -85,7 +52,6 @@ export class Button {
       class: this.class
     });
   });
-
   iconHtml = computed(() => {
     if (this.heroIcon) {
       const sizeClasses = iconVariants({
@@ -99,13 +65,10 @@ export class Button {
 
     return '';
   });
-
   iconClasses = computed(() => {
     const colorClass = this.iconColor ? `text-${this.iconColor}` : 'text-current';
     return `flex-shrink-0 ${colorClass}`;
   });
-
-
 
   handleClick(event: MouseEvent): void {
     event.stopPropagation();

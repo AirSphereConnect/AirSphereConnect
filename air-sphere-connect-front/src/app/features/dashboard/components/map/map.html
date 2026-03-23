@@ -24,7 +24,7 @@
     <div class="absolute bg-base-100 rounded-lg shadow-2xl border border-base-300 p-5 z-[2000]"
          [style.left.px]="tooltipPosition()?.x"
          [style.top.px]="tooltipPosition()?.y"
-         style="max-width: 350px; min-width: 300px;">
+         style="max-width: 420px; min-width: 380px;">
       <!-- Icône étoile en haut à gauche pour les favoris -->
       @if (isCityFavorite(selectedCity()!.name)) {
         <div class="absolute -top-3 -left-3 bg-yellow-400 rounded-full p-2 shadow-lg border-2 border-yellow-600">
@@ -136,6 +136,51 @@
             </div>
           </div>
         }
+
+        <!-- Météo actuelle -->
+        @if (selectedCity()!.latestWeather) {
+          <div class="mt-3 p-3 bg-base-200 rounded-lg">
+            <h4 class="text-base-content font-semibold text-sm mb-2">🌤️ Météo actuelle</h4>
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div class="flex flex-col">
+                <span class="text-base-content opacity-70">Température</span>
+                <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.temperature }} °C</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-base-content opacity-70">Humidité</span>
+                <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.humidity }} %</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-base-content opacity-70">Pression</span>
+                <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.pressure }} hPa</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-base-content opacity-70">Vent</span>
+                <span class="font-bold text-base-content">{{ selectedCity()!.latestWeather!.windSpeed }} km/h</span>
+              </div>
+            </div>
+          </div>
+        }
+
+        <!-- Boutons d'action -->
+        <div class="mt-4 flex flex-col gap-2">
+          <button (click)="viewCityGraphs(selectedCity()!.name)"
+                  class="btn btn-primary btn-sm w-full">
+            📊 Voir les graphiques
+          </button>
+          @if (isCityFavorite(selectedCity()!.name)) {
+            <button (click)="removeFromFavorites()"
+                    class="btn btn-outline btn-warning btn-sm w-full">
+              ★ Retirer des favoris
+            </button>
+          } @else {
+            <button (click)="addToFavorites()"
+                    class="btn btn-outline btn-sm w-full">
+              ☆ Ajouter aux favoris
+            </button>
+          }
+        </div>
+
       </div>
     </div>
   }

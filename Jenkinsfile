@@ -47,9 +47,34 @@ pipeline {
                 dir('air-sphere-connect-front') {
                     echo '=== Build du frontend Angular ==='
                     sh '''
-                        npm ci
-                        npm run build
+                        npm ci --legacy-peer-deps
+                        NODE_OPTIONS=--max-old-space-size=512 npm run build -- --configuration production
                     '''
+                }
+            }
+        }
+        stage('Test Frontend') {
+            steps {
+                dir('air-sphere-connect-front') {
+                    echo '=== Tests unitaires frontend ==='
+                    sh 'npm run test -- --watch=false --browsers=ChromeHeadless'
+                }
+            }
+        }
+        stage('Analyse SonarQube') {
+            steps {
+                dir('air-sphere-connect-back') {
+                    echo '=== Analyse qualité du code (SonarQube) ==='
+                    script {
+                        def currentBranch = env.GIT_BRANCH ?: env.BRANCH_NAME ?: sh(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                        def branchName = currentBranch.replaceAll(/^origin\//, '')
+                        sh """
+                            mvn sonar:sonar \
+                                -Dsonar.host.url=\${SONAR_HOST_URL} \
+                                -Dsonar.token=\${SONAR_TOKEN} \
+                                -Dsonar.branch.name=${branchName}
+                        """
+                    }
                 }
             }
         }
@@ -72,7 +97,7 @@ pipeline {
 
                     echo "Branche détectée: ${branchName}"
 
-                    if (branchName == 'main' || branchName == 'jenkins') {
+                    if (branchName == 'main') {
                         echo '=== Déploiement des containers ==='
                         def environment = branchName == 'main' ? 'PRODUCTION' : 'STAGING'
 
@@ -102,7 +127,7 @@ pipeline {
                             fi
                         """
                     } else {
-                        echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
+                        echo "⏭️ Déploiement ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main')"
                     }
                 }
             }
@@ -116,7 +141,7 @@ pipeline {
                     // Nettoyer le nom de branche (enlever origin/ si présent)
                     def branchName = currentBranch.replaceAll(/^origin\//, '')
 
-                    if (branchName == 'main' || branchName == 'jenkins') {
+                    if (branchName == 'main') {
                         echo '=== Vérification de la santé des services ==='
 
                         sh """
@@ -137,7 +162,7 @@ pipeline {
                             fi
                         """
                     } else {
-                        echo "⏭️ Health check ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main' et 'jenkins')"
+                        echo "⏭️ Health check ignoré pour la branche '${branchName}' (déploiement uniquement sur 'main')"
                     }
                 }
             }
